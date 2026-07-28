@@ -46,8 +46,12 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "SHLM" },
       { property: "og:description", content: "Join SHLM and learn to trade with discipline, structure, and a mentor-backed system built for long-term consistency." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/" },
+      { property: "og:url", content: "https://shlmtrdng.com/" },
+      { property: "og:image", content: "https://shlmtrdng.com/og-image.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://shlmtrdng.com/og-image.jpg" },
     ],
     links: [{ rel: "canonical", href: "https://shlm-trading-bloom.lovable.app/" }],
     scripts: [
@@ -1113,7 +1117,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 
 function DiscordSection() {
   return (
-    <section id="discord" className="bg-background px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+    <section id="discord" className="bg-background px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
       <div className="mx-auto flex max-w-3xl items-center justify-center">
         <a
           href={DISCORD_JOIN_URL}
@@ -1150,10 +1154,10 @@ function CtaSection() {
         </p>
         <div className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:gap-4">
           <a
-            href="/auth?mode=signup"
+            href="/apply"
             className="flex min-h-12 items-center justify-center rounded-full bg-primary-foreground px-8 text-sm font-semibold text-primary transition-transform hover:scale-[1.02]"
           >
-            Create your account
+            Enroll now
           </a>
           <a
             href="#program"
