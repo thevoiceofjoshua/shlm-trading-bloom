@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { HomeButton } from "@/components/HomeButton";
 import { getSiteStats, updateSiteStats, type SiteStats } from "@/lib/site-stats.functions";
-import { listApplications, sendPaymentLink, type ApplicationList } from "@/lib/admin.functions";
+import { listApplications, sendPaymentLink, denyApplication, type ApplicationList } from "@/lib/admin.functions";
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
 
 export const Route = createFileRoute("/admin")({
@@ -20,6 +20,7 @@ function AdminPage() {
   const updateFn = useServerFn(updateSiteStats);
   const listFn = useServerFn(listApplications);
   const sendFn = useServerFn(sendPaymentLink);
+  const denyFn = useServerFn(denyApplication);
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -31,7 +32,8 @@ function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
-  const [sendingId, setSendingId] = useState<string | null>(null);
+  const [actingId, setActingId] = useState<string | null>(null);
+  const [action, setAction] = useState<"approve" | "deny" | null>(null);
   const [sendMsg, setSendMsg] = useState<{ id: string; ok: boolean; text: string } | null>(null);
 
   const {
@@ -79,24 +81,39 @@ function AdminPage() {
     }
   };
 
-  const handleSend = async (id: string) => {
-    setSendingId(id);
+  const handleApprove = async (id: string) => {
+    if (!confirm("Approve this applicant and send the payment link email?")) return;
+    setActingId(id);
+    setAction("approve");
     setSendMsg(null);
     try {
       await sendFn({
-        data: {
-          passcode,
-          applicationId: id,
-          origin: window.location.origin,
-          promoCode: "1MILL",
-        },
+        data: { passcode, applicationId: id, origin: window.location.origin, promoCode: "1MILL" },
       });
-      setSendMsg({ id, ok: true, text: "Payment link sent." });
+      setSendMsg({ id, ok: true, text: "Approved — payment link sent." });
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
     } catch (e) {
       setSendMsg({ id, ok: false, text: e instanceof Error ? e.message : "Failed to send" });
     } finally {
-      setSendingId(null);
+      setActingId(null);
+      setAction(null);
+    }
+  };
+
+  const handleDeny = async (id: string) => {
+    if (!confirm("Deny this applicant? A denial email will be sent.")) return;
+    setActingId(id);
+    setAction("deny");
+    setSendMsg(null);
+    try {
+      await denyFn({ data: { passcode, applicationId: id } });
+      setSendMsg({ id, ok: true, text: "Denied — email sent." });
+      queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
+    } catch (e) {
+      setSendMsg({ id, ok: false, text: e instanceof Error ? e.message : "Failed to deny" });
+    } finally {
+      setActingId(null);
+      setAction(null);
     }
   };
 
@@ -263,22 +280,32 @@ function AdminPage() {
                           })}
                         </p>
                       </div>
-                      <div className="flex shrink-0 flex-col items-start gap-2">
-                        {app.payment_link_status === "sent" ? (
-                          <span className="text-xs font-medium uppercase tracking-wider text-foreground">
-                            Link sent{" "}
-                            {app.payment_link_sent_at
-                              ? new Date(app.payment_link_sent_at).toLocaleDateString("en-US")
-                              : ""}
+                      <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
+                        {app.status === "approved" ? (
+                          <span className="rounded-full border border-foreground px-3 py-1 text-xs font-medium uppercase tracking-wider text-foreground">
+                            Approved{app.payment_link_sent_at ? ` · link sent ${new Date(app.payment_link_sent_at).toLocaleDateString("en-US")}` : ""}
+                          </span>
+                        ) : app.status === "denied" ? (
+                          <span className="rounded-full border border-border px-3 py-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                            Denied
                           </span>
                         ) : (
-                          <button
-                            onClick={() => handleSend(app.id)}
-                            disabled={sendingId === app.id}
-                            className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-50"
-                          >
-                            {sendingId === app.id ? "Sending…" : "Send payment link"}
-                          </button>
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              onClick={() => handleApprove(app.id)}
+                              disabled={actingId === app.id}
+                              className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-50"
+                            >
+                              {actingId === app.id && action === "approve" ? "Approving…" : "Approve"}
+                            </button>
+                            <button
+                              onClick={() => handleDeny(app.id)}
+                              disabled={actingId === app.id}
+                              className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                            >
+                              {actingId === app.id && action === "deny" ? "Denying…" : "Deny"}
+                            </button>
+                          </div>
                         )}
                         {sendMsg?.id === app.id && (
                           <p className={`text-xs ${sendMsg.ok ? "text-foreground" : "text-destructive"}`}>
