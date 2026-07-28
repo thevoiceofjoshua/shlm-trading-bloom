@@ -756,13 +756,18 @@ function Footer() {
             <h4 className="font-display text-sm font-semibold uppercase tracking-widest text-foreground">Account</h4>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li>
-                <a href="#pricing" className="hover:text-foreground">
+                <a href="/auth?mode=signin" className="hover:text-foreground">
                   Log in
                 </a>
               </li>
               <li>
-                <a href="#pricing" className="hover:text-foreground">
-                  Apply now
+                <a href="/auth?mode=signup" className="hover:text-foreground">
+                  Create account
+                </a>
+              </li>
+              <li>
+                <a href="#discord" className="hover:text-foreground">
+                  Discord
                 </a>
               </li>
               <li>
@@ -774,13 +779,16 @@ function Footer() {
           </div>
         </div>
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 text-sm text-muted-foreground sm:flex-row">
-          <p>© {new Date().getFullYear()} SHLM. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SHLM LLC. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-foreground">
+            <a href="/privacy" className="hover:text-foreground">
               Privacy
             </a>
-            <a href="#" className="hover:text-foreground">
+            <a href="/terms" className="hover:text-foreground">
               Terms
+            </a>
+            <a href="/refund" className="hover:text-foreground">
+              Refunds
             </a>
           </div>
         </div>
