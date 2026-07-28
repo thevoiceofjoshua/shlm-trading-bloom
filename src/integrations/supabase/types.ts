@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      purchases: {
+        Row: {
+          amount_total: number | null
+          created_at: string
+          currency: string | null
+          email: string
+          id: string
+          status: string
+          stripe_payment_intent: string | null
+          stripe_session_id: string
+          tier: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_total?: number | null
+          created_at?: string
+          currency?: string | null
+          email: string
+          id?: string
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id: string
+          tier: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_total?: number | null
+          created_at?: string
+          currency?: string | null
+          email?: string
+          id?: string
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string
+          tier?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       site_stats: {
         Row: {
           cohort_label: string
