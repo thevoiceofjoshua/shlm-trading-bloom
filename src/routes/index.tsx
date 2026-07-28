@@ -281,7 +281,10 @@ function Header({
               <a
                 key={link.href}
                 href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={(e) => {
+                  setMobileMenuOpen(false);
+                  handleNavClick(e, link.href);
+                }}
                 className={cn(
                   "flex min-h-12 items-center border-b py-3 text-base font-medium transition-colors",
                   scrolled
