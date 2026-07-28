@@ -196,3 +196,12 @@
 @utility text-balance {
   text-wrap: balance;
 }
+
+@keyframes hero-spin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+@utility animate-hero-spin {
+  animation: hero-spin 8s linear infinite;
+}
