@@ -155,7 +155,9 @@ function Header({
           : "bg-transparent text-white",
       )}
     >
+      <PromoBanner />
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6 sm:py-4 lg:px-8">
+
         <a href="/" className="font-display text-lg font-semibold tracking-tight sm:text-xl">
           SHLM
         </a>
