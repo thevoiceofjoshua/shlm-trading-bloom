@@ -20,6 +20,10 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FeaturesRiskRouteImport } from './routes/features.risk'
+import { Route as FeaturesMentorshipRouteImport } from './routes/features.mentorship'
+import { Route as FeaturesCurriculumRouteImport } from './routes/features.curriculum'
+import { Route as FeaturesCommunityRouteImport } from './routes/features.community'
 import { Route as BlogBreakoutStrategyRouteImport } from './routes/blog.breakout-strategy'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -79,6 +83,26 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeaturesRiskRoute = FeaturesRiskRouteImport.update({
+  id: '/features/risk',
+  path: '/features/risk',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesMentorshipRoute = FeaturesMentorshipRouteImport.update({
+  id: '/features/mentorship',
+  path: '/features/mentorship',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesCurriculumRoute = FeaturesCurriculumRouteImport.update({
+  id: '/features/curriculum',
+  path: '/features/curriculum',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesCommunityRoute = FeaturesCommunityRouteImport.update({
+  id: '/features/community',
+  path: '/features/community',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogBreakoutStrategyRoute = BlogBreakoutStrategyRouteImport.update({
   id: '/blog/breakout-strategy',
   path: '/blog/breakout-strategy',
@@ -109,6 +133,10 @@ export interface FileRoutesByFullPath {
   '/success': typeof SuccessRoute
   '/terms': typeof TermsRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/features/community': typeof FeaturesCommunityRoute
+  '/features/curriculum': typeof FeaturesCurriculumRoute
+  '/features/mentorship': typeof FeaturesMentorshipRoute
+  '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -125,6 +153,10 @@ export interface FileRoutesByTo {
   '/success': typeof SuccessRoute
   '/terms': typeof TermsRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/features/community': typeof FeaturesCommunityRoute
+  '/features/curriculum': typeof FeaturesCurriculumRoute
+  '/features/mentorship': typeof FeaturesMentorshipRoute
+  '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -142,6 +174,10 @@ export interface FileRoutesById {
   '/success': typeof SuccessRoute
   '/terms': typeof TermsRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/features/community': typeof FeaturesCommunityRoute
+  '/features/curriculum': typeof FeaturesCurriculumRoute
+  '/features/mentorship': typeof FeaturesMentorshipRoute
+  '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -160,6 +196,10 @@ export interface FileRouteTypes {
     | '/success'
     | '/terms'
     | '/blog/breakout-strategy'
+    | '/features/community'
+    | '/features/curriculum'
+    | '/features/mentorship'
+    | '/features/risk'
     | '/api/public/stripe-webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -176,6 +216,10 @@ export interface FileRouteTypes {
     | '/success'
     | '/terms'
     | '/blog/breakout-strategy'
+    | '/features/community'
+    | '/features/curriculum'
+    | '/features/mentorship'
+    | '/features/risk'
     | '/api/public/stripe-webhook'
     | '/lovable/email/transactional/preview'
   id:
@@ -192,6 +236,10 @@ export interface FileRouteTypes {
     | '/success'
     | '/terms'
     | '/blog/breakout-strategy'
+    | '/features/community'
+    | '/features/curriculum'
+    | '/features/mentorship'
+    | '/features/risk'
     | '/api/public/stripe-webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
@@ -209,6 +257,10 @@ export interface RootRouteChildren {
   SuccessRoute: typeof SuccessRoute
   TermsRoute: typeof TermsRoute
   BlogBreakoutStrategyRoute: typeof BlogBreakoutStrategyRoute
+  FeaturesCommunityRoute: typeof FeaturesCommunityRoute
+  FeaturesCurriculumRoute: typeof FeaturesCurriculumRoute
+  FeaturesMentorshipRoute: typeof FeaturesMentorshipRoute
+  FeaturesRiskRoute: typeof FeaturesRiskRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
@@ -292,6 +344,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/features/risk': {
+      id: '/features/risk'
+      path: '/features/risk'
+      fullPath: '/features/risk'
+      preLoaderRoute: typeof FeaturesRiskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features/mentorship': {
+      id: '/features/mentorship'
+      path: '/features/mentorship'
+      fullPath: '/features/mentorship'
+      preLoaderRoute: typeof FeaturesMentorshipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features/curriculum': {
+      id: '/features/curriculum'
+      path: '/features/curriculum'
+      fullPath: '/features/curriculum'
+      preLoaderRoute: typeof FeaturesCurriculumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features/community': {
+      id: '/features/community'
+      path: '/features/community'
+      fullPath: '/features/community'
+      preLoaderRoute: typeof FeaturesCommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/breakout-strategy': {
       id: '/blog/breakout-strategy'
       path: '/blog/breakout-strategy'
@@ -329,6 +409,10 @@ const rootRouteChildren: RootRouteChildren = {
   SuccessRoute: SuccessRoute,
   TermsRoute: TermsRoute,
   BlogBreakoutStrategyRoute: BlogBreakoutStrategyRoute,
+  FeaturesCommunityRoute: FeaturesCommunityRoute,
+  FeaturesCurriculumRoute: FeaturesCurriculumRoute,
+  FeaturesMentorshipRoute: FeaturesMentorshipRoute,
+  FeaturesRiskRoute: FeaturesRiskRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -515,21 +515,25 @@ function FeaturesSection() {
       title: "Structured curriculum",
       description: "A 12-week progression from market structure to advanced execution. No shortcuts. Every module builds on the last.",
       span: "md:col-span-2 md:row-span-2",
+      to: "/features/curriculum" as const,
     },
     {
       title: "Live mentorship",
       description: "Weekly 1:1 calls with experienced traders who review your trades, correct mistakes, and sharpen your edge.",
       span: "",
+      to: "/features/mentorship" as const,
     },
     {
       title: "Risk architecture",
       description: "Position sizing, drawdown rules, and psychological guardrails built into your daily process.",
       span: "",
+      to: "/features/risk" as const,
     },
     {
       title: "Private community",
       description: "Access a focused network of traders sharing setups, journals, and feedback in real time.",
       span: "md:col-span-2",
+      to: "/features/community" as const,
     },
   ];
 
@@ -545,8 +549,9 @@ function FeaturesSection() {
 
         <div className="grid gap-5 md:grid-cols-3">
           {features.map((feature) => (
-            <div
+            <Link
               key={feature.title}
+              to={feature.to}
               className={`group flex flex-col justify-between rounded-3xl border border-border bg-card p-7 transition-shadow hover:shadow-lg ${feature.span}`}
             >
               <div>
@@ -557,13 +562,14 @@ function FeaturesSection() {
                 <span className="transition-transform group-hover:translate-x-1">Learn more</span>
                 <span className="transition-transform group-hover:translate-x-1">→</span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
     </section>
   );
 }
+
 
 function ProgramSection() {
   const modules = [
