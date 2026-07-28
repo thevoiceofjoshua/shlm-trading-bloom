@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getSiteStats, type SiteStats } from "@/lib/site-stats.functions";
 import { DISCORD_JOIN_URL } from "@/lib/external-links";
+import { useAuthUser } from "@/hooks/use-auth-user";
+import { AccountMenu } from "@/components/AccountMenu";
 
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
 
