@@ -265,7 +265,7 @@ function HeroSection({ stats }: { stats: SiteStats }) {
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <a
             href="#pricing"
-            className="rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-foreground transition-transform hover:scale-[1.02] hover:bg-white/90"
+            className="rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black transition-transform hover:scale-[1.02] hover:bg-white/90"
           >
             Start your application
           </a>
