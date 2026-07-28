@@ -46,8 +46,12 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "SHLM" },
       { property: "og:description", content: "Join SHLM and learn to trade with discipline, structure, and a mentor-backed system built for long-term consistency." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/" },
+      { property: "og:url", content: "https://shlmtrdng.com/" },
+      { property: "og:image", content: "https://shlmtrdng.com/og-image.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://shlmtrdng.com/og-image.jpg" },
     ],
     links: [{ rel: "canonical", href: "https://shlm-trading-bloom.lovable.app/" }],
     scripts: [
