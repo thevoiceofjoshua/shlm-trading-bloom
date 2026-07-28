@@ -4,6 +4,8 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getSiteStats, type SiteStats } from "@/lib/site-stats.functions";
+import { createCheckoutSession } from "@/lib/checkout.functions";
+
 import heroBg from "@/assets/hero-bg.jpg";
 
 const siteStatsQuery = (fn: () => Promise<SiteStats>) =>
