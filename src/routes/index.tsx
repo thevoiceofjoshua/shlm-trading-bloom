@@ -935,7 +935,7 @@ function DiscordIcon() {
 
 function CtaSection() {
   return (
-    <section id="cta" className="bg-primary px-4 py-24 text-primary-foreground sm:px-6 lg:px-8">
+    <section id="cta" className="bg-primary px-4 py-20 text-primary-foreground sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-4xl text-center">
         <h2 className="font-display text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl">
           Ready to stop guessing and start building your edge?
