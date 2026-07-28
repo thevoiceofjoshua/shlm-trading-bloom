@@ -86,16 +86,16 @@ function Header({
 
         <div className="hidden items-center gap-3 md:flex">
           <a
-            href="#pricing"
+            href="/auth?mode=signin"
             className="rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
             Log in
           </a>
           <a
-            href="#pricing"
+            href="/auth?mode=signup"
             className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Apply now
+            Create account
           </a>
         </div>
 
@@ -124,18 +124,18 @@ function Header({
             ))}
             <div className="mt-2 flex flex-col gap-3">
               <a
-                href="#pricing"
+                href="/auth?mode=signin"
                 onClick={() => setMobileMenuOpen(false)}
                 className="rounded-full border border-border bg-background px-4 py-2 text-center text-sm font-medium text-foreground transition-colors hover:bg-accent"
               >
                 Log in
               </a>
               <a
-                href="#pricing"
+                href="/auth?mode=signup"
                 onClick={() => setMobileMenuOpen(false)}
                 className="rounded-full bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
-                Apply now
+                Create account
               </a>
             </div>
           </nav>
