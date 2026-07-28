@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { HomeButton } from "@/components/HomeButton";
+
 
 export const Route = createFileRoute("/privacy")({
   component: PrivacyPage,
@@ -59,9 +61,10 @@ export function LegalShell({
       <header className="border-b border-border px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
           <Link to="/" className="font-display text-2xl font-semibold tracking-tight">SHLM</Link>
-          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">← Back home</Link>
+          <HomeButton />
         </div>
       </header>
+
       <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
         <h1 className="font-display text-4xl font-medium tracking-tight sm:text-5xl">{title}</h1>
         <p className="mt-3 text-sm text-muted-foreground">Last updated: {updated}</p>

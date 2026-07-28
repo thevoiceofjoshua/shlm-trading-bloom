@@ -2,7 +2,9 @@ import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
+import { HomeButton } from "@/components/HomeButton";
 import { verifyCheckoutSession } from "@/lib/checkout.functions";
+
 
 const searchSchema = z.object({
   tier: z.enum(["foundation", "mentorship", "elite"]).optional(),
@@ -114,13 +116,9 @@ function SuccessPage() {
             >
               Go to your dashboard
             </Link>
-            <Link
-              to="/"
-              className="inline-flex w-full items-center justify-center rounded-full border border-border bg-background px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-            >
-              Back to SHLM
-            </Link>
+            <HomeButton />
           </div>
+
         </div>
 
         <p className="mt-6 text-sm text-muted-foreground">
