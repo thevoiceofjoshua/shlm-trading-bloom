@@ -95,7 +95,7 @@ function Header({
   setMobileMenuOpen: (open: boolean) => void;
 }) {
   const navLinks = [
-    { label: "Program", href: "#program" },
+    { label: "Program", href: "/program" },
     { label: "Mentorship", href: "#mentorship" },
     { label: "Pricing", href: "#pricing" },
     { label: "FAQ", href: "#faq" },
