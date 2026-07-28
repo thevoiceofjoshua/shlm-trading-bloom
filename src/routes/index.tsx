@@ -516,10 +516,37 @@ function LiveEnrollmentTicker() {
 }
 
 function StatsSection({ stats }: { stats: SiteStats }) {
+  const [copied, setCopied] = useState(false);
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText("1MILL");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {}
+  };
+
   const items = [
     { value: "12", label: "Week structured program" },
     { value: "1:1", label: "Mentor relationship" },
-    { value: "20% OFF", label: "With code 1MILL" },
+    {
+      value: "20% OFF",
+      label: (
+        <span className="inline-flex items-center gap-1">
+          With code
+          <button
+            type="button"
+            onClick={copyCode}
+            className={cn(
+              "rounded-sm px-1 py-0.5 font-mono font-bold tracking-wider text-background transition-colors",
+              copied ? "bg-background/25" : "bg-background/10 hover:bg-background/20",
+            )}
+            aria-label="Copy promo code 1MILL"
+          >
+            1MILL
+          </button>
+        </span>
+      ),
+    },
   ];
 
   return (
@@ -531,7 +558,7 @@ function StatsSection({ stats }: { stats: SiteStats }) {
           </div>
           {items.map((stat) => (
             <div
-              key={stat.label}
+              key={typeof stat.label === "string" ? stat.label : "20-off"}
               className="flex flex-col items-center justify-center text-center lg:border-l lg:border-background/10 lg:pl-10"
             >
               <p className="font-display text-5xl font-medium leading-none tracking-tight text-background sm:text-6xl">
@@ -547,6 +574,7 @@ function StatsSection({ stats }: { stats: SiteStats }) {
     </section>
   );
 }
+
 
 function FeaturesSection() {
   const features = [
