@@ -151,19 +151,19 @@ function Header({
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
         scrolled
-          ? "border-b border-border bg-background/80 backdrop-blur-md text-foreground"
+          ? "border-b border-border bg-background/85 backdrop-blur-md text-foreground"
           : "bg-transparent text-white",
       )}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <a href="/" className="font-display text-xl font-semibold tracking-tight">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6 sm:py-4 lg:px-8">
+        <a href="/" className="font-display text-lg font-semibold tracking-tight sm:text-xl">
           SHLM
         </a>
 
         <div className="hidden items-center gap-8 md:flex">
           <LiveClock scrolled={scrolled} />
 
-          <nav className="flex items-center gap-8">
+          <nav className="flex items-center gap-7 lg:gap-8">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -204,38 +204,51 @@ function Header({
           </a>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="inline-flex items-center justify-center rounded-md p-2 md:hidden"
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <span className="hidden xs:inline-flex">
+            <LiveClock scrolled={scrolled} />
+          </span>
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className={cn(
+              "inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors",
+              scrolled
+                ? "border-border text-foreground hover:bg-accent"
+                : "border-white/20 text-white hover:bg-white/10",
+            )}
+            aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
+        </div>
       </div>
 
       {mobileMenuOpen && (
-        <div className={cn("border-t px-4 py-4 md:hidden", scrolled ? "border-border bg-background" : "border-white/10 bg-black/90")}>
-          <nav className="flex flex-col gap-4">
+        <div className={cn("border-t px-4 py-5 md:hidden", scrolled ? "border-border bg-background" : "border-white/10 bg-black/95 backdrop-blur-md")}>
+          <nav className="flex flex-col">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "text-base font-medium transition-colors",
-                  scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/70 hover:text-white",
+                  "flex min-h-12 items-center border-b py-3 text-base font-medium transition-colors",
+                  scrolled
+                    ? "border-border/60 text-foreground hover:text-primary"
+                    : "border-white/10 text-white/80 hover:text-white",
                 )}
               >
                 {link.label}
               </a>
             ))}
-            <div className="mt-2 flex flex-col gap-3">
+            <div className="mt-5 flex flex-col gap-3">
               <a
                 href="/auth?mode=signin"
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "rounded-full border px-4 py-2 text-center text-sm font-medium transition-colors",
+                  "flex min-h-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition-colors",
                   scrolled
                     ? "border-border bg-background text-foreground hover:bg-accent"
                     : "border-white/20 bg-white/10 text-white hover:bg-white/20",
@@ -247,7 +260,7 @@ function Header({
                 href="/auth?mode=signup"
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "rounded-full px-4 py-2 text-center text-sm font-medium transition-colors",
+                  "flex min-h-12 items-center justify-center rounded-full px-4 text-sm font-semibold transition-colors",
                   scrolled
                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
                     : "bg-white text-foreground hover:bg-white/90",
@@ -291,44 +304,44 @@ function HeroSection({ stats }: { stats: SiteStats }) {
         <div className="absolute left-3/4 top-[calc(50%+12px)] h-px w-3 bg-white/20" />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-24 pt-32 text-center sm:px-6 lg:px-8">
-        <p className="font-display text-sm font-medium uppercase tracking-[0.25em] text-white/60">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-36 pt-28 text-center sm:px-6 sm:pb-32 sm:pt-32 lg:px-8">
+        <p className="font-display text-[11px] font-medium uppercase tracking-[0.28em] text-white/60 sm:text-sm sm:tracking-[0.25em]">
           Premium trading mentorship
         </p>
-        <h1 className="mt-6 text-balance font-display text-[clamp(4rem,14vw,12rem)] font-medium leading-[0.85] tracking-tighter text-white">
+        <h1 className="mt-5 text-balance font-display text-[clamp(4.5rem,17vw,12rem)] font-medium leading-[0.85] tracking-tighter text-white sm:mt-6">
           &ldquo;SHLM&rdquo;
         </h1>
-        <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-white/70 sm:text-xl">
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/75 sm:mt-8 sm:text-lg md:text-xl">
           A mentorship program for traders who want a structured system, real feedback, and the discipline to perform consistently in any market.
         </p>
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
           <a
             href="#pricing"
-            className="rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black transition-transform hover:scale-[1.02] hover:bg-white/90"
+            className="flex min-h-12 items-center justify-center rounded-full bg-white px-7 text-sm font-semibold text-black transition-transform hover:scale-[1.02] hover:bg-white/90 sm:min-h-0 sm:py-3.5"
           >
             Start your application
           </a>
           <a
             href="/program"
-            className="group inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+            className="group flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-7 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20 sm:min-h-0 sm:py-3.5"
           >
             Explore the program
             <span className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>
         </div>
-        <div className="mt-12 flex items-center justify-center gap-3 text-sm text-white/60">
+        <div className="mt-10 flex items-center justify-center gap-3 text-xs text-white/60 sm:mt-12 sm:text-sm">
           <span className="inline-flex h-2 w-2 rounded-full bg-white" />
           <span>{stats.hero_note}</span>
         </div>
       </div>
 
-      {/* Social links — bottom left, like the reference */}
-      <div className="absolute bottom-8 left-4 z-10 flex items-center gap-3 sm:left-6 lg:left-8">
+      {/* Social links — bottom left */}
+      <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3 sm:bottom-8 sm:left-6 sm:translate-x-0 lg:left-8">
         <a
-          href="https://x.com/"
+          href="https://x.com/thevoiceofjoshua"
           target="_blank"
           rel="noreferrer"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/80 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
           aria-label="X (Twitter)"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -336,10 +349,10 @@ function HeroSection({ stats }: { stats: SiteStats }) {
           </svg>
         </a>
         <a
-          href="https://instagram.com/"
+          href="https://instagram.com/thevoiceofjoshua"
           target="_blank"
           rel="noreferrer"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/80 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
           aria-label="Instagram"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -352,7 +365,7 @@ function HeroSection({ stats }: { stats: SiteStats }) {
           href="https://discord.gg/nZRhH42j"
           target="_blank"
           rel="noreferrer"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/80 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
           aria-label="Discord"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -450,13 +463,13 @@ function StatsSection({ stats }: { stats: SiteStats }) {
   ];
 
   return (
-    <section className="border-y border-border bg-surface px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 sm:grid-cols-4">
+    <section className="border-y border-border bg-surface px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-14">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-y-8 gap-x-6 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-4">
         <LiveEnrollmentTile />
         {items.map((stat) => (
-          <div key={stat.label} className="text-center">
-            <p className="font-display text-3xl font-medium text-foreground sm:text-4xl">{stat.value}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
+          <div key={stat.label} className="flex flex-col items-center text-center">
+            <p className="font-display text-4xl font-medium leading-none text-foreground sm:text-4xl lg:text-5xl">{stat.value}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -489,7 +502,7 @@ function FeaturesSection() {
   ];
 
   return (
-    <section className="bg-background px-4 py-24 sm:px-6 lg:px-8">
+    <section className="bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="mb-16 max-w-2xl">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">What you receive</p>
@@ -531,7 +544,7 @@ function ProgramSection() {
   ];
 
   return (
-    <section id="program" className="bg-surface px-4 py-24 sm:px-6 lg:px-8">
+    <section id="program" className="bg-surface px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="mb-16 max-w-2xl">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">The curriculum</p>
@@ -559,7 +572,7 @@ function ProgramSection() {
 
 function MentorshipSection() {
   return (
-    <section id="mentorship" className="bg-background px-4 py-24 sm:px-6 lg:px-8">
+    <section id="mentorship" className="bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div className="order-2 lg:order-1">
@@ -688,7 +701,7 @@ function PricingSection() {
 
 
   return (
-    <section id="pricing" className="bg-surface px-4 py-24 sm:px-6 lg:px-8">
+    <section id="pricing" className="bg-surface px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="mb-16 text-center">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">Pricing</p>
@@ -700,47 +713,46 @@ function PricingSection() {
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-6 lg:grid-cols-3 lg:items-stretch lg:gap-8">
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative flex flex-col rounded-3xl border p-7 ${
+              className={`relative flex flex-col rounded-3xl border p-7 transition-all sm:p-8 ${
                 plan.featured
-                  ? "border-foreground bg-primary text-primary-foreground"
-                  : "border-border bg-card text-card-foreground"
+                  ? "border-foreground bg-primary text-primary-foreground shadow-xl shadow-black/10 lg:-my-2 lg:scale-[1.03] lg:p-9"
+                  : "border-border bg-card text-card-foreground hover:-translate-y-0.5 hover:shadow-lg"
               }`}
             >
               {plan.featured && (
-                <span className="absolute -top-3 left-6 rounded-full bg-primary-foreground px-3 py-1 text-xs font-semibold text-primary">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary-foreground px-4 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary shadow-sm sm:left-8 sm:translate-x-0">
                   Most popular
                 </span>
               )}
               <div>
-                <h3 className="font-display text-xl font-medium">{plan.name}</h3>
-                <p className={`mt-2 text-sm ${plan.featured ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                <h3 className="font-display text-xl font-medium sm:text-2xl">{plan.name}</h3>
+                <p className={`mt-2 text-sm leading-relaxed ${plan.featured ? "text-primary-foreground/75" : "text-muted-foreground"}`}>
                   {plan.description}
                 </p>
               </div>
-              <div className="my-6">
-                <span className="font-display text-4xl font-medium">{plan.price}</span>
+              <div className="my-6 flex items-baseline gap-2">
+                <span className="font-display text-4xl font-medium sm:text-5xl">{plan.price}</span>
                 <span className={`text-sm ${plan.featured ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                  {" "}
                   / {plan.period}
                 </span>
               </div>
               <ul className="mb-8 flex-1 space-y-3">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3 text-sm">
-                    <span className="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-foreground/10">
+                  <li key={feature} className="flex items-start gap-3 text-sm leading-relaxed">
+                    <span className={`mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${plan.featured ? "bg-primary-foreground/15" : "bg-foreground/10"}`}>
                       <span className={`h-1.5 w-1.5 rounded-full ${plan.featured ? "bg-primary-foreground" : "bg-foreground"}`} />
                     </span>
-                    {feature}
+                    <span>{feature}</span>
                   </li>
                 ))}
               </ul>
               <a
                 href={`/apply?tier=${plan.key}`}
-                className={`rounded-full px-6 py-3 text-center text-sm font-semibold transition-colors ${
+                className={`flex min-h-12 items-center justify-center rounded-full px-6 text-center text-sm font-semibold transition-transform hover:scale-[1.02] ${
                   plan.featured
                     ? "bg-primary-foreground text-primary hover:bg-primary-foreground/90"
                     : "bg-primary text-primary-foreground hover:bg-primary/90"
@@ -748,10 +760,10 @@ function PricingSection() {
               >
                 {plan.cta}
               </a>
-
             </div>
           ))}
         </div>
+
 
         <p className="mt-8 text-center text-sm text-muted-foreground">
           Payment plans available for Mentorship and Elite. Apply to discuss options.
@@ -781,7 +793,7 @@ function TestimonialsSection() {
   ];
 
   return (
-    <section className="bg-background px-4 py-24 sm:px-6 lg:px-8">
+    <section className="bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="mb-16 max-w-2xl">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">Testimonials</p>
@@ -827,7 +839,7 @@ function FaqSection() {
   ];
 
   return (
-    <section id="faq" className="bg-surface px-4 py-24 sm:px-6 lg:px-8">
+    <section id="faq" className="bg-surface px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-3xl">
         <div className="mb-16 text-center">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">FAQ</p>
@@ -850,23 +862,31 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-border bg-card">
+    <div className={cn("overflow-hidden rounded-2xl border border-border bg-card transition-shadow", open && "shadow-md")}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between p-6 text-left"
+        className="flex w-full items-center justify-between gap-4 p-5 text-left sm:p-6"
         aria-expanded={open}
       >
-        <span className="font-display text-lg font-medium text-card-foreground">{question}</span>
-        <span className="ml-4 text-2xl text-muted-foreground transition-transform duration-200" style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}>
+        <span className="font-display text-base font-medium text-card-foreground sm:text-lg">{question}</span>
+        <span
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border text-xl text-muted-foreground transition-transform duration-200"
+          style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}
+        >
           +
         </span>
       </button>
-      {open && (
-        <div className="px-6 pb-6">
-          <p className="leading-relaxed text-muted-foreground">{answer}</p>
+      <div
+        className={cn(
+          "grid transition-all duration-300 ease-out",
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+        )}
+      >
+        <div className="overflow-hidden">
+          <p className="px-5 pb-6 leading-relaxed text-muted-foreground sm:px-6">{answer}</p>
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -874,9 +894,9 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 function DiscordSection() {
   const inviteUrl = "https://discord.gg/nZRhH42j";
   return (
-    <section id="discord" className="border-t border-border bg-background px-4 py-24 sm:px-6 lg:px-8">
+    <section id="discord" className="border-t border-border bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-5xl">
-        <div className="rounded-3xl border border-border bg-card p-10 sm:p-14">
+        <div className="rounded-3xl border border-border bg-card p-6 sm:p-10 lg:p-14">
           <div className="grid gap-10 md:grid-cols-[1.2fr,1fr] md:items-center">
             <div>
               <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">Community</p>
@@ -922,24 +942,24 @@ function DiscordIcon() {
 
 function CtaSection() {
   return (
-    <section id="cta" className="bg-primary px-4 py-24 text-primary-foreground sm:px-6 lg:px-8">
+    <section id="cta" className="bg-primary px-4 py-20 text-primary-foreground sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-4xl text-center">
-        <h2 className="font-display text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl">
+        <h2 className="font-display text-[clamp(2rem,6vw,3.5rem)] font-medium leading-[1.05] tracking-tight">
           Ready to stop guessing and start building your edge?
         </h2>
-        <p className="mx-auto mt-6 max-w-2xl text-lg opacity-80">
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed opacity-80 sm:text-lg">
           Applications are reviewed weekly. If SHLM is the right fit, we’ll invite you to enroll and begin the onboarding process.
         </p>
-        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <div className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:gap-4">
           <a
             href="/auth?mode=signup"
-            className="rounded-full bg-primary-foreground px-8 py-4 text-sm font-semibold text-primary transition-transform hover:scale-[1.02]"
+            className="flex min-h-12 items-center justify-center rounded-full bg-primary-foreground px-8 text-sm font-semibold text-primary transition-transform hover:scale-[1.02]"
           >
             Create your account
           </a>
           <a
             href="#program"
-            className="rounded-full border border-primary-foreground/30 px-8 py-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/10"
+            className="flex min-h-12 items-center justify-center rounded-full border border-primary-foreground/30 px-8 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/10"
           >
             Review the curriculum
           </a>
