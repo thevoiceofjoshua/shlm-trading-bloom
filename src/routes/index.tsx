@@ -228,10 +228,10 @@ function HeroSection() {
 
 function StatsSection() {
   const stats = [
-    { value: "200+", label: "Active members" },
+    { value: "New", label: "Cohort now enrolling" },
     { value: "12", label: "Week structured program" },
     { value: "1:1", label: "Mentor relationship" },
-    { value: "94%", label: "Member satisfaction" },
+    { value: "Live", label: "Results tracked from day one" },
   ];
 
   return (
