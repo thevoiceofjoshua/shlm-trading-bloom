@@ -862,23 +862,31 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-border bg-card">
+    <div className={cn("overflow-hidden rounded-2xl border border-border bg-card transition-shadow", open && "shadow-md")}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between p-6 text-left"
+        className="flex w-full items-center justify-between gap-4 p-5 text-left sm:p-6"
         aria-expanded={open}
       >
-        <span className="font-display text-lg font-medium text-card-foreground">{question}</span>
-        <span className="ml-4 text-2xl text-muted-foreground transition-transform duration-200" style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}>
+        <span className="font-display text-base font-medium text-card-foreground sm:text-lg">{question}</span>
+        <span
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border text-xl text-muted-foreground transition-transform duration-200"
+          style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}
+        >
           +
         </span>
       </button>
-      {open && (
-        <div className="px-6 pb-6">
-          <p className="leading-relaxed text-muted-foreground">{answer}</p>
+      <div
+        className={cn(
+          "grid transition-all duration-300 ease-out",
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+        )}
+      >
+        <div className="overflow-hidden">
+          <p className="px-5 pb-6 leading-relaxed text-muted-foreground sm:px-6">{answer}</p>
         </div>
-      )}
+      </div>
     </div>
   );
 }
