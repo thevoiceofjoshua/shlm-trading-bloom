@@ -14,7 +14,12 @@
  * All colors MUST use oklch format.
  */
 
+@theme {
+  --breakpoint-xs: 24rem;
+}
+
 @theme inline {
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
