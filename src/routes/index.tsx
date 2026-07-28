@@ -181,6 +181,17 @@ function Header({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!href.startsWith("#")) return;
+    const el = document.getElementById(href.slice(1));
+    if (!el) return;
+    e.preventDefault();
+    const rect = el.getBoundingClientRect();
+    const top = window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    history.replaceState(null, "", href);
+  };
+
   return (
     <header
       className={cn(
