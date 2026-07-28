@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getSiteStats, type SiteStats } from "@/lib/site-stats.functions";
 import { createCheckoutSession } from "@/lib/checkout.functions";
+import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
 
 import heroBg from "@/assets/hero-bg.jpg";
 
@@ -98,7 +99,7 @@ function LiveClock({ scrolled }: { scrolled: boolean }) {
     const update = () => {
       setTime(
         new Date().toLocaleTimeString("en-US", {
-          timeZone: "America/Los_Angeles",
+          timeZone: SITE_TIMEZONE,
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
@@ -118,7 +119,7 @@ function LiveClock({ scrolled }: { scrolled: boolean }) {
         scrolled ? "text-muted-foreground" : "text-white/70",
       )}
     >
-      LA {time}
+      {SITE_TIMEZONE_LABEL} {time}
     </span>
   );
 }
