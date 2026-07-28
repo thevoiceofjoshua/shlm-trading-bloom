@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { HomeButton } from "@/components/HomeButton";
 import { supabase } from "@/integrations/supabase/client";
+
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
@@ -52,6 +54,7 @@ function DashboardPage() {
             SHLM
           </Link>
           <div className="flex items-center gap-3">
+            <HomeButton />
             <span className="hidden text-sm text-muted-foreground sm:inline">
               {user?.email}
             </span>
@@ -65,6 +68,7 @@ function DashboardPage() {
           </div>
         </div>
       </header>
+
 
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <h1 className="font-display text-3xl font-medium tracking-tight">

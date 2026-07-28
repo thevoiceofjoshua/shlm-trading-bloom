@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { HomeButton } from "@/components/HomeButton";
+
 
 export const Route = createFileRoute("/program")({
   component: ProgramPage,
@@ -26,37 +28,38 @@ function ProgramPage() {
           <Link to="/" className="font-display text-xl font-semibold tracking-tight text-foreground">
             SHLM
           </Link>
-          <nav className="hidden items-center gap-8 md:flex">
-            <Link
-              to="/program"
-              className="text-sm font-medium text-foreground"
-              activeProps={{ className: "text-sm font-medium text-foreground" }}
-            >
-              Program
-            </Link>
-            <Link
-              to="/"
-              hash="mentorship"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Mentorship
-            </Link>
-            <Link
-              to="/"
-              hash="pricing"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Pricing
-            </Link>
-            <Link
-              to="/"
-              hash="faq"
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              FAQ
-            </Link>
-          </nav>
           <div className="hidden items-center gap-3 md:flex">
+            <nav className="flex items-center gap-8">
+              <Link
+                to="/program"
+                className="text-sm font-medium text-foreground"
+                activeProps={{ className: "text-sm font-medium text-foreground" }}
+              >
+                Program
+              </Link>
+              <Link
+                to="/"
+                hash="mentorship"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Mentorship
+              </Link>
+              <Link
+                to="/"
+                hash="pricing"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Pricing
+              </Link>
+              <Link
+                to="/"
+                hash="faq"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                FAQ
+              </Link>
+            </nav>
+            <HomeButton />
             <Link
               to="/auth"
               search={{ mode: "signin" }}
@@ -72,8 +75,12 @@ function ProgramPage() {
               Create account
             </Link>
           </div>
+          <div className="md:hidden">
+            <HomeButton />
+          </div>
         </div>
       </header>
+
 
       <main>
         <section className="bg-background px-4 pb-16 pt-16 sm:px-6 sm:pt-24 lg:px-8">

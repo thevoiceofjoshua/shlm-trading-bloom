@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { HomeButton } from "@/components/HomeButton";
+
 
 export const Route = createFileRoute("/features/curriculum")({
   head: () => ({
@@ -51,9 +53,10 @@ export function FeatureLayout({ kicker, title, intro, children }: { kicker: stri
         <div className="mt-16">{children}</div>
         <div className="mt-20 flex flex-wrap gap-4">
           <Link to="/apply" className="inline-flex min-h-12 items-center justify-center rounded-full bg-foreground px-8 text-sm font-medium text-background transition-opacity hover:opacity-90">Apply for mentorship</Link>
-          <Link to="/" className="inline-flex min-h-12 items-center justify-center rounded-full border border-border px-8 text-sm font-medium text-foreground transition-colors hover:bg-surface">Back to home</Link>
+          <HomeButton />
         </div>
       </div>
     </main>
   );
 }
+

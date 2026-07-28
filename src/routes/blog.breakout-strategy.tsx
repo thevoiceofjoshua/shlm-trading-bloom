@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { HomeButton } from "@/components/HomeButton";
+
 
 const URL = "https://shlm-trading-bloom.lovable.app/blog/breakout-strategy";
 const TITLE = "The Breakout Strategy: A Trader's Guide to High-Probability Entries";
@@ -41,9 +43,10 @@ function BreakoutStrategyPost() {
       <header className="border-b border-border px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
           <Link to="/" className="font-display text-2xl font-semibold tracking-tight">SHLM</Link>
-          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">← Back home</Link>
+          <HomeButton />
         </div>
       </header>
+
 
       <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Strategy guide</p>

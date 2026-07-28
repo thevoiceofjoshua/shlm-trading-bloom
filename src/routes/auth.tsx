@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate, useSearch, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { z } from "zod";
+import { HomeButton } from "@/components/HomeButton";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+
 
 const searchSchema = z.object({
   mode: z.enum(["signin", "signup"]).optional(),
@@ -91,9 +93,13 @@ function AuthPage() {
   return (
     <div className="min-h-screen bg-background px-4 py-12 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-md">
-        <Link to="/" className="font-display text-xl font-semibold tracking-tight">
-          SHLM
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link to="/" className="font-display text-xl font-semibold tracking-tight">
+            SHLM
+          </Link>
+          <HomeButton />
+        </div>
+
 
         <div className="mt-10 rounded-2xl border border-border bg-card p-6 sm:p-8">
           <div className="flex gap-1 rounded-full border border-border bg-background p-1">
