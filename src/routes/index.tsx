@@ -96,6 +96,7 @@ function Header({
   mobileMenuOpen: boolean;
   setMobileMenuOpen: (open: boolean) => void;
 }) {
+  const [scrolled, setScrolled] = useState(false);
   const navLinks = [
     { label: "Program", href: "/program" },
     { label: "Mentorship", href: "#mentorship" },
@@ -103,10 +104,24 @@ function Header({
     { label: "FAQ", href: "#faq" },
   ];
 
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+    <header
+      className={cn(
+        "sticky top-0 z-50 transition-colors duration-300",
+        scrolled
+          ? "border-b border-border bg-background/80 backdrop-blur-md text-foreground"
+          : "bg-transparent text-white",
+      )}
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <a href="/" className="font-display text-xl font-semibold tracking-tight text-foreground">
+        <a href="/" className="font-display text-xl font-semibold tracking-tight">
           SHLM
         </a>
 
@@ -115,7 +130,10 @@ function Header({
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className={cn(
+                "text-sm font-medium transition-colors",
+                scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/70 hover:text-white",
+              )}
             >
               {link.label}
             </a>
@@ -125,13 +143,23 @@ function Header({
         <div className="hidden items-center gap-3 md:flex">
           <a
             href="/auth?mode=signin"
-            className="rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className={cn(
+              "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+              scrolled
+                ? "border-border bg-background text-foreground hover:bg-accent"
+                : "border-white/20 bg-white/10 text-white hover:bg-white/20",
+            )}
           >
             Log in
           </a>
           <a
             href="/auth?mode=signup"
-            className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className={cn(
+              "rounded-full px-4 py-2 text-sm font-medium transition-colors",
+              scrolled
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "bg-white text-foreground hover:bg-white/90",
+            )}
           >
             Create account
           </a>
@@ -140,7 +168,7 @@ function Header({
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="inline-flex items-center justify-center rounded-md p-2 text-foreground md:hidden"
+          className="inline-flex items-center justify-center rounded-md p-2 md:hidden"
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -148,14 +176,17 @@ function Header({
       </div>
 
       {mobileMenuOpen && (
-        <div className="border-t border-border bg-background px-4 py-4 md:hidden">
+        <div className={cn("border-t px-4 py-4 md:hidden", scrolled ? "border-border bg-background" : "border-white/10 bg-black/90")}>
           <nav className="flex flex-col gap-4">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
+                className={cn(
+                  "text-base font-medium transition-colors",
+                  scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/70 hover:text-white",
+                )}
               >
                 {link.label}
               </a>
@@ -164,14 +195,24 @@ function Header({
               <a
                 href="/auth?mode=signin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-full border border-border bg-background px-4 py-2 text-center text-sm font-medium text-foreground transition-colors hover:bg-accent"
+                className={cn(
+                  "rounded-full border px-4 py-2 text-center text-sm font-medium transition-colors",
+                  scrolled
+                    ? "border-border bg-background text-foreground hover:bg-accent"
+                    : "border-white/20 bg-white/10 text-white hover:bg-white/20",
+                )}
               >
                 Log in
               </a>
               <a
                 href="/auth?mode=signup"
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-full bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                className={cn(
+                  "rounded-full px-4 py-2 text-center text-sm font-medium transition-colors",
+                  scrolled
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-white text-foreground hover:bg-white/90",
+                )}
               >
                 Create account
               </a>
