@@ -242,7 +242,7 @@ function StatsSection({ stats }: { stats: SiteStats }) {
   return (
     <section className="border-y border-border bg-surface px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 sm:grid-cols-4">
-        {stats.map((stat) => (
+        {items.map((stat) => (
           <div key={stat.label} className="text-center">
             <p className="font-display text-3xl font-medium text-foreground sm:text-4xl">{stat.value}</p>
             <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
