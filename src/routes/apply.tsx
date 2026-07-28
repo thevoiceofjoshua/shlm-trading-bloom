@@ -28,7 +28,7 @@ function ApplyPage() {
   const { tier } = useSearch({ from: "/apply" });
   const submit = useServerFn(submitApplication);
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState<null | { timezone: string; scheduledAtLocal: string; scheduledAtLA: string }>(null);
   const [error, setError] = useState<string | null>(null);
   const guessTz = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "America/Los_Angeles";
 
@@ -38,7 +38,7 @@ function ApplyPage() {
     setSubmitting(true);
     const fd = new FormData(e.currentTarget);
     try {
-      await submit({
+      const result = await submit({
         data: {
           tier: (fd.get("tier") as any) || tier || "mentorship",
           fullName: String(fd.get("fullName") || ""),
@@ -50,7 +50,11 @@ function ApplyPage() {
           timezone: String(fd.get("timezone") || guessTz),
         },
       });
-      setDone(true);
+      setDone({
+        timezone: result.timezone,
+        scheduledAtLocal: result.scheduledAtLocal,
+        scheduledAtLA: result.scheduledAtLA,
+      });
     } catch (err: any) {
       setError(err?.message || "Something went wrong. Please try again.");
     } finally {
@@ -66,6 +70,14 @@ function ApplyPage() {
           <p className="mt-4 text-muted-foreground">
             Thanks — your application is in. Joshua will reach out to confirm your discovery call at the time you selected.
           </p>
+          <div className="mt-8 rounded-2xl border border-border bg-background p-6 text-left">
+            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Your timezone</p>
+            <p className="mt-1 text-base font-medium text-foreground">{done.timezone}</p>
+            <p className="mt-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">Your local time</p>
+            <p className="mt-1 text-base font-medium text-foreground">{done.scheduledAtLocal}</p>
+            <p className="mt-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">Joshua's time (LA)</p>
+            <p className="mt-1 text-base font-medium text-foreground">{done.scheduledAtLA}</p>
+          </div>
           <Link
             to="/"
             className="mt-8 inline-flex items-center rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:opacity-90"

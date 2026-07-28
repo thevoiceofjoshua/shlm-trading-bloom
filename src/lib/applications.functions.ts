@@ -36,16 +36,21 @@ export const submitApplication = createServerFn({ method: "POST" })
 
     if (error) throw new Error(error.message);
 
+    const applicantTz = data.timezone || "America/Los_Angeles";
+    const formatIn = (tz: string) =>
+      new Date(scheduledIso).toLocaleString("en-US", {
+        dateStyle: "full",
+        timeStyle: "short",
+        timeZone: tz,
+      });
+    const applicantLocalTime = formatIn(applicantTz);
+    const laTime = formatIn("America/Los_Angeles");
+
     // Fire notification email to admin (fixed recipient via env)
     const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
     if (adminEmail) {
       try {
         const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
-        const prettyDate = new Date(scheduledIso).toLocaleString("en-US", {
-          dateStyle: "full",
-          timeStyle: "short",
-          timeZone: data.timezone || "America/Los_Angeles",
-        });
         await sendTemplateEmail("application-notification", adminEmail, {
           idempotencyKey: `application-notification-${row.id}`,
           replyTo: data.email,
@@ -56,8 +61,9 @@ export const submitApplication = createServerFn({ method: "POST" })
             tier: data.tier,
             experience: data.experience,
             goals: data.goals,
-            scheduledAt: prettyDate,
-            timezone: data.timezone,
+            scheduledAt: applicantLocalTime,
+            scheduledAtLA: laTime,
+            timezone: applicantTz,
           },
         });
       } catch (err) {
@@ -65,5 +71,10 @@ export const submitApplication = createServerFn({ method: "POST" })
       }
     }
 
-    return { id: row.id };
+    return {
+      id: row.id,
+      timezone: applicantTz,
+      scheduledAtLocal: applicantLocalTime,
+      scheduledAtLA: laTime,
+    };
   });
