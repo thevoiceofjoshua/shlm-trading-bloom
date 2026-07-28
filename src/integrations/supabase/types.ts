@@ -22,6 +22,9 @@ export type Database = {
           full_name: string
           goals: string | null
           id: string
+          payment_link_sent_at: string | null
+          payment_link_session_id: string | null
+          payment_link_status: string
           phone: string | null
           scheduled_at: string
           status: string
@@ -35,6 +38,9 @@ export type Database = {
           full_name: string
           goals?: string | null
           id?: string
+          payment_link_sent_at?: string | null
+          payment_link_session_id?: string | null
+          payment_link_status?: string
           phone?: string | null
           scheduled_at: string
           status?: string
@@ -48,6 +54,9 @@ export type Database = {
           full_name?: string
           goals?: string | null
           id?: string
+          payment_link_sent_at?: string | null
+          payment_link_session_id?: string | null
+          payment_link_status?: string
           phone?: string | null
           scheduled_at?: string
           status?: string
