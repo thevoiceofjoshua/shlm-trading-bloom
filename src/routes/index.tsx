@@ -91,6 +91,38 @@ function Index() {
 }
 
 
+function LiveClock({ scrolled }: { scrolled: boolean }) {
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    const update = () => {
+      setTime(
+        new Date().toLocaleTimeString("en-US", {
+          timeZone: "America/New_York",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+        }),
+      );
+    };
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <span
+      className={cn(
+        "font-mono text-sm tabular-nums tracking-tight",
+        scrolled ? "text-muted-foreground" : "text-white/70",
+      )}
+    >
+      NY {time}
+    </span>
+  );
+}
+
 function Header({
   mobileMenuOpen,
   setMobileMenuOpen,
