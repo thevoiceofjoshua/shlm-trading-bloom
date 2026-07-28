@@ -332,7 +332,7 @@ function Header({
                       "flex min-h-12 items-center justify-center rounded-full px-4 text-sm font-semibold transition-colors",
                       scrolled
                         ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                        : "bg-white text-foreground hover:bg-white/90",
+                        : "bg-white text-black hover:bg-white/90",
                     )}
                   >
                     Create account
