@@ -2,7 +2,9 @@ import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
+import { HomeButton } from "@/components/HomeButton";
 import { submitApplication } from "@/lib/applications.functions";
+
 
 const searchSchema = z.object({
   tier: z.enum(["foundation", "mentorship", "elite"]).optional(),
