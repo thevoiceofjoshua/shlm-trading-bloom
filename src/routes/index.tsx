@@ -1193,12 +1193,9 @@ function Footer() {
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-12 md:grid-cols-4">
           <div className="md:col-span-2">
-            <a href="/" className="font-display text-2xl font-semibold tracking-tight text-foreground">
+            <a href="/" className="animate-hero-breathe inline-block font-display text-4xl font-semibold tracking-tight text-foreground">
               SHLM
             </a>
-            <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              Premium trading mentorship for traders committed to discipline, process, and long-term performance.
-            </p>
           </div>
           <div>
             <h4 className="font-display text-sm font-semibold uppercase tracking-widest text-foreground">Program</h4>
