@@ -1098,44 +1098,17 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 function DiscordSection() {
   const inviteUrl = "https://discord.gg/nZRhH42j";
   return (
-    <section id="discord" className="bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
-      <div className="mx-auto max-w-3xl">
-        <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card">
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
-          <div className="grid gap-10 p-8 sm:p-12 lg:grid-cols-[1fr,auto] lg:items-center lg:p-14">
-            <div>
-              <div className="flex items-center gap-3">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
-                <p className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
-                  Community live
-                </p>
-              </div>
-              <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-card-foreground sm:text-4xl">
-                Join the SHLM Discord.
-              </h2>
-              <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-                Live setups, daily journals, and direct mentor access. One room, zero noise.
-              </p>
-            </div>
-            <a
-              href={inviteUrl}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Join the SHLM Discord"
-              className="group mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-foreground text-background transition-all hover:scale-105 hover:rounded-xl lg:mx-0"
-            >
-              <DiscordIcon />
-            </a>
-          </div>
-          <div className="flex items-center justify-between border-t border-border px-8 py-4 sm:px-12 lg:px-14">
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-              Tap icon to join
-            </p>
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-              discord.gg/nZRhH42j
-            </p>
-          </div>
-        </div>
+    <section id="discord" className="bg-background px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+      <div className="mx-auto flex max-w-3xl items-center justify-center">
+        <a
+          href={inviteUrl}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Join the SHLM Discord"
+          className="group flex h-24 w-24 items-center justify-center rounded-3xl bg-foreground text-background transition-all hover:scale-105 hover:rounded-2xl sm:h-28 sm:w-28"
+        >
+          <DiscordIcon />
+        </a>
       </div>
     </section>
   );
