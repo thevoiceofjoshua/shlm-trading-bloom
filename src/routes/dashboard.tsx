@@ -8,8 +8,12 @@ export const Route = createFileRoute("/dashboard")({
     meta: [
       { title: "Member Dashboard — SHLM" },
       { name: "description", content: "Your private SHLM trading mentorship dashboard." },
+      { property: "og:title", content: "Member Dashboard — SHLM" },
+      { property: "og:description", content: "Your private SHLM trading mentorship dashboard." },
+      { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/dashboard" },
       { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "canonical", href: "https://shlm-trading-bloom.lovable.app/dashboard" }],
   }),
 });
 
@@ -70,7 +74,10 @@ function DashboardPage() {
           Your private SHLM member dashboard is being built out. New modules will appear here as the program grows.
         </p>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <h2 className="mt-12 font-display text-xl font-medium tracking-tight text-foreground">
+          Your member modules
+        </h2>
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <DashboardCard title="Curriculum" description="Access your breakout strategy lessons and weekly modules." />
           <DashboardCard title="Mentorship Calls" description="Book and review your live sessions with mentors." />
           <DashboardCard title="Community" description="Join the private Discord and connect with the cohort." />

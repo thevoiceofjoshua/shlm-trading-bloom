@@ -13,8 +13,12 @@ export const Route = createFileRoute("/success")({
     meta: [
       { title: "Welcome to SHLM — Purchase Confirmed" },
       { name: "description", content: "Your SHLM mentorship plan is confirmed. Head to your private dashboard to begin." },
+      { property: "og:title", content: "Welcome to SHLM — Purchase Confirmed" },
+      { property: "og:description", content: "Your SHLM mentorship plan is confirmed. Head to your private dashboard to begin." },
+      { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/success" },
       { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "canonical", href: "https://shlm-trading-bloom.lovable.app/success" }],
   }),
 });
 

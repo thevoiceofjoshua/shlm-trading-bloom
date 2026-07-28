@@ -16,8 +16,12 @@ export const Route = createFileRoute("/auth")({
     meta: [
       { title: "Sign in or create an account — SHLM" },
       { name: "description", content: "Sign in to your SHLM account or create a new one to join the mentorship program." },
+      { property: "og:title", content: "Sign in or create an account — SHLM" },
+      { property: "og:description", content: "Sign in to your SHLM account or create a new one to join the mentorship program." },
+      { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/auth" },
       { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "canonical", href: "https://shlm-trading-bloom.lovable.app/auth" }],
   }),
 });
 

@@ -9,8 +9,10 @@ export const Route = createFileRoute("/privacy")({
       { property: "og:title", content: "Privacy Policy — SHLM" },
       { property: "og:description", content: "How SHLM collects, uses, and protects your personal information." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/privacy" },
       { name: "twitter:card", content: "summary" },
     ],
+    links: [{ rel: "canonical", href: "https://shlm-trading-bloom.lovable.app/privacy" }],
   }),
 });
 

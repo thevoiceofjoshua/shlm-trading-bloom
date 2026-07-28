@@ -10,8 +10,10 @@ export const Route = createFileRoute("/terms")({
       { property: "og:title", content: "Terms of Service — SHLM" },
       { property: "og:description", content: "The terms that govern your use of SHLM's trading mentorship program." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/terms" },
       { name: "twitter:card", content: "summary" },
     ],
+    links: [{ rel: "canonical", href: "https://shlm-trading-bloom.lovable.app/terms" }],
   }),
 });
 

@@ -10,8 +10,10 @@ export const Route = createFileRoute("/refund")({
       { property: "og:title", content: "Refund Policy — SHLM" },
       { property: "og:description", content: "How refunds work for SHLM mentorship purchases and subscriptions." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/refund" },
       { name: "twitter:card", content: "summary" },
     ],
+    links: [{ rel: "canonical", href: "https://shlm-trading-bloom.lovable.app/refund" }],
   }),
 });
 
