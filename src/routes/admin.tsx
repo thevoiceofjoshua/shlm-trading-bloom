@@ -2,8 +2,10 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
+import { HomeButton } from "@/components/HomeButton";
 import { getSiteStats, updateSiteStats, type SiteStats } from "@/lib/site-stats.functions";
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
+
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
@@ -71,10 +73,14 @@ function AdminPage() {
   return (
     <div className="min-h-screen bg-background px-4 py-16 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-2xl">
-        <h1 className="font-display text-4xl font-medium tracking-tight">Live stats</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="font-display text-4xl font-medium tracking-tight">Live stats</h1>
+          <HomeButton />
+        </div>
         <p className="mt-2 text-sm text-muted-foreground">
           Update the numbers shown on the landing page. Changes are published instantly.
         </p>
+
 
         <div className="mt-10 space-y-5 rounded-2xl border border-border bg-card p-6">
           <div>
