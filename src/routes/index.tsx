@@ -235,28 +235,34 @@ function Header({
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          <a
-            href="/auth?mode=signin"
-            className={cn(
-              "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-              scrolled
-                ? "border-border bg-background text-foreground hover:bg-accent"
-                : "border-white/20 bg-white/10 text-white hover:bg-white/20",
-            )}
-          >
-            Log in
-          </a>
-          <a
-            href="/auth?mode=signup"
-            className={cn(
-              "rounded-full px-4 py-2 text-sm font-medium transition-colors",
-              scrolled
-                ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                : "bg-white text-foreground hover:bg-white/90",
-            )}
-          >
-            Create account
-          </a>
+          {user ? (
+            <AccountMenu user={user} scrolled={scrolled} />
+          ) : (
+            <>
+              <a
+                href="/auth?mode=signin"
+                className={cn(
+                  "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+                  scrolled
+                    ? "border-border bg-background text-foreground hover:bg-accent"
+                    : "border-white/20 bg-white/10 text-white hover:bg-white/20",
+                )}
+              >
+                Log in
+              </a>
+              <a
+                href="/auth?mode=signup"
+                className={cn(
+                  "rounded-full px-4 py-2 text-sm font-medium transition-colors",
+                  scrolled
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-white text-foreground hover:bg-white/90",
+                )}
+              >
+                Create account
+              </a>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-2 md:hidden">
