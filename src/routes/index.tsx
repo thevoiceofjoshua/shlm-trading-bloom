@@ -12,6 +12,8 @@ import heroBg from "@/assets/hero-bg.jpg";
 const siteStatsQuery = (fn: () => Promise<SiteStats>) =>
   queryOptions({ queryKey: ["site_stats"], queryFn: fn, staleTime: 30_000 });
 
+const DISCORD_INVITE_URL = "https://discord.com/invite/nZRhH42j";
+
 const HOMEPAGE_FAQS = [
   {
     q: "Do I need trading experience to join?",
@@ -392,7 +394,7 @@ function HeroSection({ stats }: { stats: SiteStats }) {
           </svg>
         </a>
         <a
-          href="https://discord.gg/nZRhH42j"
+          href={DISCORD_INVITE_URL}
           target="_blank"
           rel="noreferrer"
           className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/80 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
@@ -1096,12 +1098,13 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 }
 
 function DiscordSection() {
-  const inviteUrl = "https://discord.gg/nZRhH42j";
   return (
     <section id="discord" className="bg-background px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
       <div className="mx-auto flex max-w-3xl items-center justify-center">
         <a
-          href={inviteUrl}
+          href={DISCORD_INVITE_URL}
+          target="_blank"
+          rel="noreferrer"
           aria-label="Join the SHLM Discord"
           className="group flex h-24 w-24 items-center justify-center rounded-3xl bg-foreground text-background transition-all hover:scale-105 hover:rounded-2xl sm:h-28 sm:w-28"
         >
