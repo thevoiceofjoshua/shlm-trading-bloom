@@ -374,10 +374,6 @@ function HeroSection({ stats }: { stats: SiteStats }) {
         </a>
       </div>
 
-      {/* Scroll hint */}
-      <div className="absolute bottom-8 right-4 z-10 hidden text-right text-xs text-white/40 sm:right-6 lg:right-8 lg:block">
-        <p className="uppercase tracking-widest">Scroll to explore</p>
-      </div>
     </section>
   );
 }
