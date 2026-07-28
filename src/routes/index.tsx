@@ -226,27 +226,29 @@ function Header({
       </div>
 
       {mobileMenuOpen && (
-        <div className={cn("border-t px-4 py-4 md:hidden", scrolled ? "border-border bg-background" : "border-white/10 bg-black/90")}>
-          <nav className="flex flex-col gap-4">
+        <div className={cn("border-t px-4 py-5 md:hidden", scrolled ? "border-border bg-background" : "border-white/10 bg-black/95 backdrop-blur-md")}>
+          <nav className="flex flex-col">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "text-base font-medium transition-colors",
-                  scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/70 hover:text-white",
+                  "flex min-h-12 items-center border-b py-3 text-base font-medium transition-colors",
+                  scrolled
+                    ? "border-border/60 text-foreground hover:text-primary"
+                    : "border-white/10 text-white/80 hover:text-white",
                 )}
               >
                 {link.label}
               </a>
             ))}
-            <div className="mt-2 flex flex-col gap-3">
+            <div className="mt-5 flex flex-col gap-3">
               <a
                 href="/auth?mode=signin"
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "rounded-full border px-4 py-2 text-center text-sm font-medium transition-colors",
+                  "flex min-h-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition-colors",
                   scrolled
                     ? "border-border bg-background text-foreground hover:bg-accent"
                     : "border-white/20 bg-white/10 text-white hover:bg-white/20",
@@ -258,7 +260,7 @@ function Header({
                 href="/auth?mode=signup"
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  "rounded-full px-4 py-2 text-center text-sm font-medium transition-colors",
+                  "flex min-h-12 items-center justify-center rounded-full px-4 text-sm font-semibold transition-colors",
                   scrolled
                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
                     : "bg-white text-foreground hover:bg-white/90",
