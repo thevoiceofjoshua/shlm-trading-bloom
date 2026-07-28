@@ -397,8 +397,8 @@ function LiveEnrollmentTile() {
       setTimeout(() => {
         setIndex((i) => (i + 1) % ENROLLMENTS.length);
         setVisible(true);
-      }, 260);
-    }, 3200);
+      }, 420);
+    }, 6200);
     return () => clearInterval(cycle);
   }, []);
 
