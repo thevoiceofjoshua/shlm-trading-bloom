@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { getSiteStats, updateSiteStats, type SiteStats } from "@/lib/site-stats.functions";
+import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
@@ -113,7 +114,7 @@ function AdminPage() {
           )}
 
           <p className="text-xs text-muted-foreground">
-            Last updated: {new Date(form.updated_at).toLocaleString()}
+            Last updated: {new Date(form.updated_at).toLocaleString("en-US", { timeZone: SITE_TIMEZONE })} {SITE_TIMEZONE_LABEL}
           </p>
         </div>
       </div>
