@@ -4,6 +4,8 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getSiteStats, type SiteStats } from "@/lib/site-stats.functions";
+import { createCheckoutSession } from "@/lib/checkout.functions";
+
 import heroBg from "@/assets/hero-bg.jpg";
 
 const siteStatsQuery = (fn: () => Promise<SiteStats>) =>
@@ -512,17 +514,34 @@ function MentorshipSection() {
 }
 
 function PricingSection() {
+  const checkout = useServerFn(createCheckoutSession);
+  const [loadingTier, setLoadingTier] = useState<string | null>(null);
+
+  const handleCheckout = async (tier: "foundation" | "mentorship" | "elite") => {
+    try {
+      setLoadingTier(tier);
+      const { url } = await checkout({ data: { tier, origin: window.location.origin } });
+      if (url) window.location.href = url;
+    } catch (err) {
+      console.error(err);
+      alert("Unable to start checkout. Please try again or contact support.");
+      setLoadingTier(null);
+    }
+  };
+
   const plans = [
     {
+      key: "foundation" as const,
       name: "Foundation",
       price: "$499",
       period: "one-time",
       description: "Self-paced access to the full curriculum and community.",
       features: ["12-week curriculum", "Private community access", "Weekly group Q&A", "Trade journal templates", "Strategy workbook"],
-      cta: "Get started",
+      cta: "Enroll now",
       featured: false,
     },
     {
+      key: "mentorship" as const,
       name: "Mentorship",
       price: "$1,499",
       period: "one-time",
@@ -535,10 +554,11 @@ function PricingSection() {
         "Priority community support",
         "Lifetime curriculum updates",
       ],
-      cta: "Apply now",
+      cta: "Enroll now",
       featured: true,
     },
     {
+      key: "elite" as const,
       name: "Elite",
       price: "$2,999",
       period: "one-time",
@@ -551,10 +571,11 @@ function PricingSection() {
         "Monthly performance audit",
         "Private onboarding intensive",
       ],
-      cta: "Apply now",
+      cta: "Enroll now",
       featured: false,
     },
   ];
+
 
   return (
     <section id="pricing" className="bg-surface px-4 py-24 sm:px-6 lg:px-8">
@@ -607,16 +628,19 @@ function PricingSection() {
                   </li>
                 ))}
               </ul>
-              <a
-                href="/auth?mode=signup"
-                className={`rounded-full px-6 py-3 text-center text-sm font-semibold transition-colors ${
+              <button
+                type="button"
+                onClick={() => handleCheckout(plan.key)}
+                disabled={loadingTier !== null}
+                className={`rounded-full px-6 py-3 text-center text-sm font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
                   plan.featured
                     ? "bg-primary-foreground text-primary hover:bg-primary-foreground/90"
                     : "bg-primary text-primary-foreground hover:bg-primary/90"
                 }`}
               >
-                {plan.cta}
-              </a>
+                {loadingTier === plan.key ? "Redirecting…" : plan.cta}
+              </button>
+
             </div>
           ))}
         </div>
