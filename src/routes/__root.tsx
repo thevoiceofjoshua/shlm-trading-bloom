@@ -79,11 +79,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SHLM — Trading Mentorship" },
+      { title: "SHLM" },
       { name: "description", content: "SHLM is a premium trading mentorship program built to turn disciplined strategy into consistent performance." },
       { name: "author", content: "SHLM" },
       { property: "og:site_name", content: "SHLM" },
-      { property: "og:title", content: "SHLM — Trading Mentorship" },
+      { property: "og:title", content: "SHLM" },
       { property: "og:description", content: "Premium trading mentorship for traders ready to build discipline, strategy, and consistency." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -100,7 +100,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Grotesk:wght@300..700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
     ],
     scripts: [
       {
