@@ -231,12 +231,12 @@ function HeroSection({ stats }: { stats: SiteStats }) {
   );
 }
 
-function StatsSection() {
-  const stats = [
-    { value: "New", label: "Cohort now enrolling" },
+function StatsSection({ stats }: { stats: SiteStats }) {
+  const items = [
+    { value: stats.cohort_value, label: stats.cohort_label },
     { value: "12", label: "Week structured program" },
     { value: "1:1", label: "Mentor relationship" },
-    { value: "Live", label: "Results tracked from day one" },
+    { value: stats.results_value, label: stats.results_label },
   ];
 
   return (
