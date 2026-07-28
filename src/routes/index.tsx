@@ -37,9 +37,9 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "SHLM — Premium Trading Mentorship for Disciplined Growth" },
+      { title: "SHLM — Premium Trading Mentorship" },
       { name: "description", content: "Join SHLM and learn to trade with discipline, structure, and a mentor-backed system built for long-term consistency." },
-      { property: "og:title", content: "SHLM — Premium Trading Mentorship for Disciplined Growth" },
+      { property: "og:title", content: "SHLM — Premium Trading Mentorship" },
       { property: "og:description", content: "Join SHLM and learn to trade with discipline, structure, and a mentor-backed system built for long-term consistency." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/" },
