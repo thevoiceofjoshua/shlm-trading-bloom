@@ -98,13 +98,17 @@ function ApplyPage() {
   return (
     <main className="min-h-screen bg-background px-4 py-14 sm:px-6 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-2xl">
-        <div className="mb-8 text-center sm:mb-10">
-          <p className="font-display text-xs font-medium uppercase tracking-[0.28em] text-muted-foreground sm:text-sm sm:tracking-widest">Enrollment</p>
-          <h1 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">Apply to SHLM</h1>
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Fill out your application and book your discovery call. Joshua reviews every submission personally.
-          </p>
+        <div className="mb-8 flex items-start justify-between gap-4 text-center sm:mb-10">
+          <div className="flex-1">
+            <p className="font-display text-xs font-medium uppercase tracking-[0.28em] text-muted-foreground sm:text-sm sm:tracking-widest">Enrollment</p>
+            <h1 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">Apply to SHLM</h1>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
+              Fill out your application and book your discovery call. Joshua reviews every submission personally.
+            </p>
+          </div>
+          <HomeButton />
         </div>
+
 
         <form onSubmit={onSubmit} className="space-y-5 rounded-3xl border border-border bg-card p-5 sm:p-8">
           <div>
