@@ -45,8 +45,8 @@ const Email = ({
                 <Text style={promoText}>
                   {discountPercent}% OFF APPLIED — CODE {promoCode}
                 </Text>
-                <Text style={price}>{amount}</Text>
-                <Text style={originalPrice}>Discounted price</Text>
+                <Text style={priceWhite}>{amount}</Text>
+                <Text style={originalPriceWhite}>Discounted price</Text>
               </Section>
             )}
 
