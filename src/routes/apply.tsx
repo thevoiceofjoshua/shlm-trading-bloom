@@ -27,12 +27,18 @@ export const Route = createFileRoute("/apply")({
 });
 
 function ApplyPage() {
-  const { tier } = useSearch({ from: "/apply" });
+  const { tier, promo } = useSearch({ from: "/apply" });
   const submit = useServerFn(submitApplication);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<null | { timezone: string; scheduledAtLocal: string; scheduledAtLA: string }>(null);
   const [error, setError] = useState<string | null>(null);
   const guessTz = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "America/Los_Angeles";
+  const promoApplied = promo?.toUpperCase() === "1MILL";
+  const priceLabel = (base: number) =>
+    promoApplied
+      ? `$${Math.round(base * 0.8).toLocaleString()} (20% off with 1MILL)`
+      : `$${base.toLocaleString()}`;
+
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
