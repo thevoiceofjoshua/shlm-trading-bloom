@@ -1117,7 +1117,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 
 function DiscordSection() {
   return (
-    <section id="discord" className="bg-background px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+    <section id="discord" className="bg-background px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
       <div className="mx-auto flex max-w-3xl items-center justify-center">
         <a
           href={DISCORD_JOIN_URL}
