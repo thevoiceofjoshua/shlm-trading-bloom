@@ -127,20 +127,24 @@ function Header({
           SHLM
         </a>
 
-        <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "text-sm font-medium transition-colors",
-                scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/70 hover:text-white",
-              )}
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
+        <div className="hidden items-center gap-8 md:flex">
+          <LiveClock scrolled={scrolled} />
+
+          <nav className="flex items-center gap-8">
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "text-sm font-medium transition-colors",
+                  scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/70 hover:text-white",
+                )}
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        </div>
 
         <div className="hidden items-center gap-3 md:flex">
           <a
