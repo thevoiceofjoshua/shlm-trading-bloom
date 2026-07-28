@@ -502,7 +502,7 @@ function FeaturesSection() {
   ];
 
   return (
-    <section className="bg-background px-4 py-24 sm:px-6 lg:px-8">
+    <section className="bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="mb-16 max-w-2xl">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">What you receive</p>
@@ -544,7 +544,7 @@ function ProgramSection() {
   ];
 
   return (
-    <section id="program" className="bg-surface px-4 py-24 sm:px-6 lg:px-8">
+    <section id="program" className="bg-surface px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="mb-16 max-w-2xl">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">The curriculum</p>
@@ -572,7 +572,7 @@ function ProgramSection() {
 
 function MentorshipSection() {
   return (
-    <section id="mentorship" className="bg-background px-4 py-24 sm:px-6 lg:px-8">
+    <section id="mentorship" className="bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div className="order-2 lg:order-1">
@@ -701,7 +701,7 @@ function PricingSection() {
 
 
   return (
-    <section id="pricing" className="bg-surface px-4 py-24 sm:px-6 lg:px-8">
+    <section id="pricing" className="bg-surface px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="mb-16 text-center">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">Pricing</p>
@@ -794,7 +794,7 @@ function TestimonialsSection() {
   ];
 
   return (
-    <section className="bg-background px-4 py-24 sm:px-6 lg:px-8">
+    <section className="bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
         <div className="mb-16 max-w-2xl">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">Testimonials</p>
@@ -840,7 +840,7 @@ function FaqSection() {
   ];
 
   return (
-    <section id="faq" className="bg-surface px-4 py-24 sm:px-6 lg:px-8">
+    <section id="faq" className="bg-surface px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-3xl">
         <div className="mb-16 text-center">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">FAQ</p>
@@ -887,7 +887,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 function DiscordSection() {
   const inviteUrl = "https://discord.gg/nZRhH42j";
   return (
-    <section id="discord" className="border-t border-border bg-background px-4 py-24 sm:px-6 lg:px-8">
+    <section id="discord" className="border-t border-border bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-5xl">
         <div className="rounded-3xl border border-border bg-card p-10 sm:p-14">
           <div className="grid gap-10 md:grid-cols-[1.2fr,1fr] md:items-center">
