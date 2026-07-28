@@ -1223,16 +1223,26 @@ function Footer() {
           <div>
             <h4 className="font-display text-sm font-semibold uppercase tracking-widest text-foreground">Account</h4>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <li>
-                <a href="/auth?mode=signin" className="hover:text-foreground">
-                  Log in
-                </a>
-              </li>
-              <li>
-                <a href="/auth?mode=signup" className="hover:text-foreground">
-                  Create account
-                </a>
-              </li>
+              {user ? (
+                <li>
+                  <a href="/dashboard" className="hover:text-foreground">
+                    Dashboard
+                  </a>
+                </li>
+              ) : (
+                <>
+                  <li>
+                    <a href="/auth?mode=signin" className="hover:text-foreground">
+                      Log in
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/auth?mode=signup" className="hover:text-foreground">
+                      Create account
+                    </a>
+                  </li>
+                </>
+              )}
               <li>
                 <a href="#discord" className="hover:text-foreground">
                   Discord
