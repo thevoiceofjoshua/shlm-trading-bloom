@@ -329,10 +329,10 @@ function HeroSection({ stats }: { stats: SiteStats }) {
             <span className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>
         </div>
-        <div className="mt-10 flex items-center justify-center gap-3 text-xs text-white/60 sm:mt-12 sm:text-sm">
-          <span className="inline-flex h-2 w-2 rounded-full bg-white" />
-          <span>{stats.hero_note}</span>
+        <div className="mt-10 flex items-center justify-center sm:mt-12">
+          <LiveEnrollmentTicker />
         </div>
+
       </div>
 
       {/* Social links — bottom left */}
