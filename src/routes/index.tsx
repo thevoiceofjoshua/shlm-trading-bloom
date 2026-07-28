@@ -304,44 +304,44 @@ function HeroSection({ stats }: { stats: SiteStats }) {
         <div className="absolute left-3/4 top-[calc(50%+12px)] h-px w-3 bg-white/20" />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-24 pt-32 text-center sm:px-6 lg:px-8">
-        <p className="font-display text-sm font-medium uppercase tracking-[0.25em] text-white/60">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-36 pt-28 text-center sm:px-6 sm:pb-32 sm:pt-32 lg:px-8">
+        <p className="font-display text-[11px] font-medium uppercase tracking-[0.28em] text-white/60 sm:text-sm sm:tracking-[0.25em]">
           Premium trading mentorship
         </p>
-        <h1 className="mt-6 text-balance font-display text-[clamp(4rem,14vw,12rem)] font-medium leading-[0.85] tracking-tighter text-white">
+        <h1 className="mt-5 text-balance font-display text-[clamp(4.5rem,17vw,12rem)] font-medium leading-[0.85] tracking-tighter text-white sm:mt-6">
           &ldquo;SHLM&rdquo;
         </h1>
-        <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-white/70 sm:text-xl">
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/75 sm:mt-8 sm:text-lg md:text-xl">
           A mentorship program for traders who want a structured system, real feedback, and the discipline to perform consistently in any market.
         </p>
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
           <a
             href="#pricing"
-            className="rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black transition-transform hover:scale-[1.02] hover:bg-white/90"
+            className="flex min-h-12 items-center justify-center rounded-full bg-white px-7 text-sm font-semibold text-black transition-transform hover:scale-[1.02] hover:bg-white/90 sm:min-h-0 sm:py-3.5"
           >
             Start your application
           </a>
           <a
             href="/program"
-            className="group inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+            className="group flex min-h-12 items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-7 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20 sm:min-h-0 sm:py-3.5"
           >
             Explore the program
             <span className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>
         </div>
-        <div className="mt-12 flex items-center justify-center gap-3 text-sm text-white/60">
+        <div className="mt-10 flex items-center justify-center gap-3 text-xs text-white/60 sm:mt-12 sm:text-sm">
           <span className="inline-flex h-2 w-2 rounded-full bg-white" />
           <span>{stats.hero_note}</span>
         </div>
       </div>
 
-      {/* Social links — bottom left, like the reference */}
-      <div className="absolute bottom-8 left-4 z-10 flex items-center gap-3 sm:left-6 lg:left-8">
+      {/* Social links — bottom left */}
+      <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3 sm:bottom-8 sm:left-6 sm:translate-x-0 lg:left-8">
         <a
-          href="https://x.com/"
+          href="https://x.com/thevoiceofjoshua"
           target="_blank"
           rel="noreferrer"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/80 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
           aria-label="X (Twitter)"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -349,10 +349,10 @@ function HeroSection({ stats }: { stats: SiteStats }) {
           </svg>
         </a>
         <a
-          href="https://instagram.com/"
+          href="https://instagram.com/thevoiceofjoshua"
           target="_blank"
           rel="noreferrer"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/80 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
           aria-label="Instagram"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -365,7 +365,7 @@ function HeroSection({ stats }: { stats: SiteStats }) {
           href="https://discord.gg/nZRhH42j"
           target="_blank"
           rel="noreferrer"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/80 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
           aria-label="Discord"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
