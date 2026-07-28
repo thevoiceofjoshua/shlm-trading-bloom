@@ -1098,37 +1098,42 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 function DiscordSection() {
   const inviteUrl = "https://discord.gg/nZRhH42j";
   return (
-    <section id="discord" className="border-t border-border bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
-      <div className="mx-auto max-w-5xl">
-        <div className="rounded-3xl border border-border bg-card p-6 sm:p-10 lg:p-14">
-          <div className="grid gap-10 md:grid-cols-[1.2fr,1fr] md:items-center">
+    <section id="discord" className="bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
+      <div className="mx-auto max-w-3xl">
+        <div className="relative overflow-hidden rounded-[2rem] border border-border bg-card">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
+          <div className="grid gap-10 p-8 sm:p-12 lg:grid-cols-[1fr,auto] lg:items-center lg:p-14">
             <div>
-              <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">Community</p>
-              <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-card-foreground sm:text-4xl">
+              <div className="flex items-center gap-3">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+                <p className="font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+                  Community live
+                </p>
+              </div>
+              <h2 className="mt-4 font-display text-3xl font-medium tracking-tight text-card-foreground sm:text-4xl">
                 Join the SHLM Discord.
               </h2>
-              <p className="mt-6 max-w-lg leading-relaxed text-muted-foreground">
-                Where the breakout strategy comes alive. Live setups, daily journals, mentor feedback,
-                and a private room of committed traders working the same process.
+              <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+                Live setups, daily journals, and direct mentor access. One room, zero noise.
               </p>
-              <ul className="mt-6 space-y-2 text-sm text-muted-foreground">
-                <li>• Real-time breakout callouts and market notes</li>
-                <li>• Weekly community reviews and Q&amp;A</li>
-                <li>• Direct access to mentors and cohort peers</li>
-              </ul>
             </div>
-            <div className="flex flex-col items-center justify-center gap-4">
-              <a
-                href={inviteUrl}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Join the SHLM Discord"
-                className="group flex h-24 w-24 items-center justify-center rounded-3xl bg-primary text-primary-foreground transition-transform hover:scale-105"
-              >
-                <DiscordIcon />
-              </a>
-              <p className="text-center text-sm text-muted-foreground">Tap the icon to join</p>
-            </div>
+            <a
+              href={inviteUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Join the SHLM Discord"
+              className="group mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-foreground text-background transition-all hover:scale-105 hover:rounded-xl lg:mx-0"
+            >
+              <DiscordIcon />
+            </a>
+          </div>
+          <div className="flex items-center justify-between border-t border-border px-8 py-4 sm:px-12 lg:px-14">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              Tap icon to join
+            </p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              discord.gg/nZRhH42j
+            </p>
           </div>
         </div>
       </div>
@@ -1138,11 +1143,12 @@ function DiscordSection() {
 
 function DiscordIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3c-.2.362-.43.85-.588 1.238a18.27 18.27 0 0 0-5.941 0C9.87 3.85 9.634 3.362 9.43 3a19.74 19.74 0 0 0-3.76 1.37C1.858 10.01.99 15.502 1.42 20.912a19.9 19.9 0 0 0 6.045 3.06c.49-.67.926-1.383 1.302-2.13a12.9 12.9 0 0 1-2.052-.983c.172-.127.34-.26.502-.396 3.955 1.83 8.234 1.83 12.14 0 .164.137.332.27.502.396a12.86 12.86 0 0 1-2.055.984c.376.746.812 1.459 1.302 2.13a19.86 19.86 0 0 0 6.048-3.06c.5-6.28-.86-11.72-3.837-16.544ZM8.02 17.29c-1.183 0-2.157-1.086-2.157-2.42 0-1.333.953-2.42 2.157-2.42 1.21 0 2.178 1.093 2.157 2.42 0 1.334-.953 2.42-2.157 2.42Zm7.962 0c-1.183 0-2.157-1.086-2.157-2.42 0-1.333.953-2.42 2.157-2.42 1.21 0 2.178 1.093 2.157 2.42 0 1.334-.947 2.42-2.157 2.42Z" />
     </svg>
   );
 }
+
 
 function CtaSection() {
   return (
