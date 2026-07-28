@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 import { getSiteStats, type SiteStats } from "@/lib/site-stats.functions";
+import heroBg from "@/assets/hero-bg.jpg";
 
 const siteStatsQuery = (fn: () => Promise<SiteStats>) =>
   queryOptions({ queryKey: ["site_stats"], queryFn: fn, staleTime: 30_000 });
@@ -35,9 +37,9 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "SHLM — Premium Trading Mentorship for Disciplined Growth" },
+      { title: "SHLM — Premium Trading Mentorship" },
       { name: "description", content: "Join SHLM and learn to trade with discipline, structure, and a mentor-backed system built for long-term consistency." },
-      { property: "og:title", content: "SHLM — Premium Trading Mentorship for Disciplined Growth" },
+      { property: "og:title", content: "SHLM — Premium Trading Mentorship" },
       { property: "og:description", content: "Join SHLM and learn to trade with discipline, structure, and a mentor-backed system built for long-term consistency." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/" },
@@ -94,6 +96,7 @@ function Header({
   mobileMenuOpen: boolean;
   setMobileMenuOpen: (open: boolean) => void;
 }) {
+  const [scrolled, setScrolled] = useState(false);
   const navLinks = [
     { label: "Program", href: "/program" },
     { label: "Mentorship", href: "#mentorship" },
@@ -101,10 +104,24 @@ function Header({
     { label: "FAQ", href: "#faq" },
   ];
 
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+    <header
+      className={cn(
+        "sticky top-0 z-50 transition-colors duration-300",
+        scrolled
+          ? "border-b border-border bg-background/80 backdrop-blur-md text-foreground"
+          : "bg-transparent text-white",
+      )}
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <a href="/" className="font-display text-xl font-semibold tracking-tight text-foreground">
+        <a href="/" className="font-display text-xl font-semibold tracking-tight">
           SHLM
         </a>
 
@@ -113,7 +130,10 @@ function Header({
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className={cn(
+                "text-sm font-medium transition-colors",
+                scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/70 hover:text-white",
+              )}
             >
               {link.label}
             </a>
@@ -123,13 +143,23 @@ function Header({
         <div className="hidden items-center gap-3 md:flex">
           <a
             href="/auth?mode=signin"
-            className="rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className={cn(
+              "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+              scrolled
+                ? "border-border bg-background text-foreground hover:bg-accent"
+                : "border-white/20 bg-white/10 text-white hover:bg-white/20",
+            )}
           >
             Log in
           </a>
           <a
             href="/auth?mode=signup"
-            className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className={cn(
+              "rounded-full px-4 py-2 text-sm font-medium transition-colors",
+              scrolled
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "bg-white text-foreground hover:bg-white/90",
+            )}
           >
             Create account
           </a>
@@ -138,7 +168,7 @@ function Header({
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="inline-flex items-center justify-center rounded-md p-2 text-foreground md:hidden"
+          className="inline-flex items-center justify-center rounded-md p-2 md:hidden"
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -146,14 +176,17 @@ function Header({
       </div>
 
       {mobileMenuOpen && (
-        <div className="border-t border-border bg-background px-4 py-4 md:hidden">
+        <div className={cn("border-t px-4 py-4 md:hidden", scrolled ? "border-border bg-background" : "border-white/10 bg-black/90")}>
           <nav className="flex flex-col gap-4">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-base font-medium text-muted-foreground transition-colors hover:text-foreground"
+                className={cn(
+                  "text-base font-medium transition-colors",
+                  scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/70 hover:text-white",
+                )}
               >
                 {link.label}
               </a>
@@ -162,14 +195,24 @@ function Header({
               <a
                 href="/auth?mode=signin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-full border border-border bg-background px-4 py-2 text-center text-sm font-medium text-foreground transition-colors hover:bg-accent"
+                className={cn(
+                  "rounded-full border px-4 py-2 text-center text-sm font-medium transition-colors",
+                  scrolled
+                    ? "border-border bg-background text-foreground hover:bg-accent"
+                    : "border-white/20 bg-white/10 text-white hover:bg-white/20",
+                )}
               >
                 Log in
               </a>
               <a
                 href="/auth?mode=signup"
                 onClick={() => setMobileMenuOpen(false)}
-                className="rounded-full bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                className={cn(
+                  "rounded-full px-4 py-2 text-center text-sm font-medium transition-colors",
+                  scrolled
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-white text-foreground hover:bg-white/90",
+                )}
               >
                 Create account
               </a>
@@ -183,85 +226,105 @@ function Header({
 
 function HeroSection({ stats }: { stats: SiteStats }) {
   return (
-    <section className="relative overflow-hidden bg-background px-4 pb-20 pt-24 sm:px-6 sm:pt-32 lg:px-8 lg:pt-40">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-          <div className="max-w-2xl">
-            <p className="mb-4 font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">
-              Premium trading mentorship
-            </p>
-            <h1 className="text-balance font-display text-4xl font-medium leading-[1.1] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              SHLM — Premium Trading Mentorship for Disciplined Growth
-            </h1>
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-              SHLM is a mentorship program for traders who want a structured system, real feedback, and the discipline to perform consistently in any market.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <a
-                href="#pricing"
-                className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] hover:bg-primary/90"
-              >
-                Start your application
-              </a>
-              <a
-                href="/program"
-                className="group inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-accent"
-              >
-                Explore the program
-                <span className="transition-transform group-hover:translate-x-0.5">→</span>
-              </a>
-            </div>
-            <div className="mt-10 flex items-center gap-3 text-sm text-muted-foreground">
-              <span className="inline-flex h-2 w-2 rounded-full bg-foreground" />
-              <span>{stats.hero_note}</span>
-            </div>
-          </div>
+    <section className="dark relative -mt-16 flex min-h-screen items-center justify-center overflow-hidden bg-background">
+      <div className="absolute inset-0">
+        <img
+          src={heroBg}
+          alt="Atmospheric dark background with hands reaching toward light"
+          className="h-full w-full object-cover"
+          width={1920}
+          height={1088}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
+      </div>
 
-          <div className="relative">
-            <div className="relative aspect-square rounded-3xl bg-primary p-8 sm:p-12">
-              <div className="absolute inset-0 rounded-3xl opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
-              <div className="relative flex h-full flex-col justify-between text-primary-foreground">
-                <div>
-                  <p className="font-display text-sm uppercase tracking-widest opacity-70">Live performance</p>
-                  <p className="mt-2 font-display text-5xl font-medium sm:text-6xl">{stats.performance_value}</p>
-                  <p className="mt-1 text-sm opacity-70">
-                    {stats.performance_note}
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-4 sm:gap-6">
-                  <div className="rounded-2xl bg-primary-foreground/10 p-4 backdrop-blur-sm">
-                    <p className="font-display text-2xl font-medium">12</p>
-                    <p className="text-xs opacity-70">Week curriculum</p>
-                  </div>
-                  <div className="rounded-2xl bg-primary-foreground/10 p-4 backdrop-blur-sm">
-                    <p className="font-display text-2xl font-medium">1:1</p>
-                    <p className="text-xs opacity-70">Weekly mentor calls</p>
-                  </div>
-                  <div className="rounded-2xl bg-primary-foreground/10 p-4 backdrop-blur-sm">
-                    <p className="font-display text-2xl font-medium">24/7</p>
-                    <p className="text-xs opacity-70">Community access</p>
-                  </div>
-                  <div className="rounded-2xl bg-primary-foreground/10 p-4 backdrop-blur-sm">
-                    <p className="font-display text-2xl font-medium">100%</p>
-                    <p className="text-xs opacity-70">Strategy backtested</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="absolute -bottom-6 -left-6 hidden h-48 w-48 rounded-2xl border border-border bg-card p-4 shadow-lg lg:block">
-              <div className="flex h-full flex-col justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-chart-2" />
-                  <span className="text-xs font-medium text-muted-foreground">Risk per trade</span>
-                </div>
-                <div>
-                  <p className="font-display text-3xl font-medium">1.5%</p>
-                  <p className="text-xs text-muted-foreground">Max position size</p>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Crosshair / reticle accents */}
+      <div className="pointer-events-none absolute inset-0 hidden md:block">
+        <div className="absolute left-1/4 top-1/2 h-6 w-px bg-white/20" />
+        <div className="absolute left-1/4 top-[calc(50%-12px)] h-px w-3 bg-white/20" />
+        <div className="absolute left-1/4 top-[calc(50%+12px)] h-px w-3 bg-white/20" />
+        <div className="absolute left-1/2 top-1/2 h-6 w-px bg-white/20" />
+        <div className="absolute left-1/2 top-[calc(50%-12px)] h-px w-3 bg-white/20" />
+        <div className="absolute left-1/2 top-[calc(50%+12px)] h-px w-3 bg-white/20" />
+        <div className="absolute left-3/4 top-1/2 h-6 w-px bg-white/20" />
+        <div className="absolute left-3/4 top-[calc(50%-12px)] h-px w-3 bg-white/20" />
+        <div className="absolute left-3/4 top-[calc(50%+12px)] h-px w-3 bg-white/20" />
+      </div>
+
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-24 pt-32 text-center sm:px-6 lg:px-8">
+        <p className="font-display text-sm font-medium uppercase tracking-[0.25em] text-white/60">
+          Premium trading mentorship
+        </p>
+        <h1 className="mt-6 text-balance font-display text-[clamp(4rem,14vw,12rem)] font-medium leading-[0.85] tracking-tighter text-white">
+          &ldquo;SHLM&rdquo;
+        </h1>
+        <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-white/70 sm:text-xl">
+          A mentorship program for traders who want a structured system, real feedback, and the discipline to perform consistently in any market.
+        </p>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <a
+            href="#pricing"
+            className="rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black transition-transform hover:scale-[1.02] hover:bg-white/90"
+          >
+            Start your application
+          </a>
+          <a
+            href="/program"
+            className="group inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+          >
+            Explore the program
+            <span className="transition-transform group-hover:translate-x-0.5">→</span>
+          </a>
         </div>
+        <div className="mt-12 flex items-center justify-center gap-3 text-sm text-white/60">
+          <span className="inline-flex h-2 w-2 rounded-full bg-white" />
+          <span>{stats.hero_note}</span>
+        </div>
+      </div>
+
+      {/* Social links — bottom left, like the reference */}
+      <div className="absolute bottom-8 left-4 z-10 flex items-center gap-3 sm:left-6 lg:left-8">
+        <a
+          href="https://x.com/"
+          target="_blank"
+          rel="noreferrer"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          aria-label="X (Twitter)"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+          </svg>
+        </a>
+        <a
+          href="https://instagram.com/"
+          target="_blank"
+          rel="noreferrer"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          aria-label="Instagram"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+          </svg>
+        </a>
+        <a
+          href="https://discord.gg/shlm"
+          target="_blank"
+          rel="noreferrer"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          aria-label="Discord"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 00-.0852.0085c-.1289.1109-.2612.2219-.3949.3279a.0743.0743 0 00.0099.1204c1.9185.875 3.9675 1.323 6.1024 1.323 2.1349 0 4.1839-.448 6.1023-1.323 2.1349 0 4.1839-.448 6.1023-1.323a.0737.0737 0 00.0099-.1204c-.1337-.106-.267-.217-.3949-.3279a.077.077 0 00-.0852-.0085c-.5979.3428-1.2194.6447-1.8722.8923a.076.076 0 00-.0416.1057c.3529.699 1.0014 1.3638 1.226 1.9942a.0778.0778 0 00.0842.0276c1.9611-.6066 3.9495-1.5219 6.0023-3.0294a.082.082 0 00.0312-.0561c.5006-5.177-.9432-9.6734-3.5487-13.6604a.061.061 0 00-.0312-.0276zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9565-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9565 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9565-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z" />
+          </svg>
+        </a>
+      </div>
+
+      {/* Scroll hint */}
+      <div className="absolute bottom-8 right-4 z-10 hidden text-right text-xs text-white/40 sm:right-6 lg:right-8 lg:block">
+        <p className="uppercase tracking-widest">Scroll to explore</p>
       </div>
     </section>
   );
