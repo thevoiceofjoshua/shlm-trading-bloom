@@ -896,7 +896,7 @@ function DiscordSection() {
   return (
     <section id="discord" className="border-t border-border bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-5xl">
-        <div className="rounded-3xl border border-border bg-card p-10 sm:p-14">
+        <div className="rounded-3xl border border-border bg-card p-6 sm:p-10 lg:p-14">
           <div className="grid gap-10 md:grid-cols-[1.2fr,1fr] md:items-center">
             <div>
               <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">Community</p>
