@@ -173,6 +173,7 @@ function Header({
   setMobileMenuOpen: (open: boolean) => void;
 }) {
   const [scrolled, setScrolled] = useState(false);
+  const { user } = useAuthUser();
   const navLinks = [
     { label: "Program", href: "/program" },
     { label: "Mentorship", href: "#mentorship" },
