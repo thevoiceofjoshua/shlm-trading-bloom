@@ -1,8 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useState } from "react";
+import { getSiteStats, type SiteStats } from "@/lib/site-stats.functions";
+
+const siteStatsQuery = (fn: () => Promise<SiteStats>) =>
+  queryOptions({ queryKey: ["site_stats"], queryFn: fn, staleTime: 30_000 });
 
 export const Route = createFileRoute("/")({
   component: Index,
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(
+      siteStatsQuery(() => getSiteStats()),
+    );
+  },
   head: () => ({
     meta: [
       { title: "SHLM — Premium Trading Mentorship" },
@@ -17,13 +28,15 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const getFn = useServerFn(getSiteStats);
+  const { data: stats } = useSuspenseQuery(siteStatsQuery(() => getFn()));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       <main>
-        <HeroSection />
-        <StatsSection />
+        <HeroSection stats={stats} />
+        <StatsSection stats={stats} />
         <FeaturesSection />
         <ProgramSection />
         <MentorshipSection />
@@ -36,6 +49,7 @@ function Index() {
     </div>
   );
 }
+
 
 function Header({
   mobileMenuOpen,
@@ -131,7 +145,7 @@ function Header({
   );
 }
 
-function HeroSection() {
+function HeroSection({ stats }: { stats: SiteStats }) {
   return (
     <section className="relative overflow-hidden bg-background px-4 pb-20 pt-24 sm:px-6 sm:pt-32 lg:px-8 lg:pt-40">
       <div className="mx-auto max-w-7xl">
@@ -163,7 +177,7 @@ function HeroSection() {
             </div>
             <div className="mt-10 flex items-center gap-3 text-sm text-muted-foreground">
               <span className="inline-flex h-2 w-2 rounded-full bg-foreground" />
-              <span>New cohort now enrolling — results tracked live from day one</span>
+              <span>{stats.hero_note}</span>
             </div>
           </div>
 
@@ -173,9 +187,9 @@ function HeroSection() {
               <div className="relative flex h-full flex-col justify-between text-primary-foreground">
                 <div>
                   <p className="font-display text-sm uppercase tracking-widest opacity-70">Live performance</p>
-                  <p className="mt-2 font-display text-5xl font-medium sm:text-6xl">Tracking</p>
+                  <p className="mt-2 font-display text-5xl font-medium sm:text-6xl">{stats.performance_value}</p>
                   <p className="mt-1 text-sm opacity-70">
-                    Verified member results tracked live from July 2026 — real numbers, published as they happen.
+                    {stats.performance_note}
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-4 sm:gap-6">
@@ -217,18 +231,18 @@ function HeroSection() {
   );
 }
 
-function StatsSection() {
-  const stats = [
-    { value: "New", label: "Cohort now enrolling" },
+function StatsSection({ stats }: { stats: SiteStats }) {
+  const items = [
+    { value: stats.cohort_value, label: stats.cohort_label },
     { value: "12", label: "Week structured program" },
     { value: "1:1", label: "Mentor relationship" },
-    { value: "Live", label: "Results tracked from day one" },
+    { value: stats.results_value, label: stats.results_label },
   ];
 
   return (
     <section className="border-y border-border bg-surface px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 sm:grid-cols-4">
-        {stats.map((stat) => (
+        {items.map((stat) => (
           <div key={stat.label} className="text-center">
             <p className="font-display text-3xl font-medium text-foreground sm:text-4xl">{stat.value}</p>
             <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
