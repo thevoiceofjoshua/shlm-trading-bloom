@@ -90,23 +90,23 @@ function ApplyPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background px-4 py-16 sm:py-24">
+    <main className="min-h-screen bg-background px-4 py-14 sm:px-6 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-2xl">
-        <div className="mb-10 text-center">
-          <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">Enrollment</p>
-          <h1 className="mt-3 font-display text-4xl font-medium tracking-tight text-foreground">Apply to SHLM</h1>
-          <p className="mt-4 text-muted-foreground">
+        <div className="mb-8 text-center sm:mb-10">
+          <p className="font-display text-xs font-medium uppercase tracking-[0.28em] text-muted-foreground sm:text-sm sm:tracking-widest">Enrollment</p>
+          <h1 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">Apply to SHLM</h1>
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
             Fill out your application and book your discovery call. Joshua reviews every submission personally.
           </p>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-5 rounded-3xl border border-border bg-card p-6 sm:p-8">
+        <form onSubmit={onSubmit} className="space-y-5 rounded-3xl border border-border bg-card p-5 sm:p-8">
           <div>
             <label className="block text-sm font-medium text-foreground">Tier</label>
             <select
               name="tier"
               defaultValue={tier || "mentorship"}
-              className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground"
+              className="mt-2 h-12 w-full rounded-xl border border-border bg-background px-4 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="foundation">Foundation — $499</option>
               <option value="mentorship">Mentorship — $1,499</option>
@@ -124,16 +124,14 @@ function ApplyPage() {
           <TextArea label="Trading experience" name="experience" placeholder="How long have you traded and what markets?" />
           <TextArea label="Your goals" name="goals" placeholder="What do you want to accomplish in the next 12 weeks?" />
 
-          <div className="grid gap-5 sm:grid-cols-1">
-            <Field label="Preferred call date & time" name="scheduledAt" type="datetime-local" required />
-          </div>
+          <Field label="Preferred call date & time" name="scheduledAt" type="datetime-local" required />
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-full bg-primary px-6 py-4 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+            className="flex min-h-12 w-full items-center justify-center rounded-full bg-primary px-6 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.01] hover:opacity-90 disabled:opacity-60"
           >
             {submitting ? "Submitting…" : "Submit application"}
           </button>
