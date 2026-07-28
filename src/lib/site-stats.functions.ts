@@ -60,7 +60,7 @@ export const updateSiteStats = createServerFn({ method: "POST" })
       throw new Error("Invalid passcode");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch: Record<string, string> = {};
+    const patch: Partial<SiteStats> = {};
     const fields: (keyof Omit<SiteStats, "updated_at">)[] = [
       "performance_value",
       "performance_note",
