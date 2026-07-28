@@ -14,7 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      site_stats: {
+        Row: {
+          cohort_label: string
+          cohort_value: string
+          hero_note: string
+          id: number
+          performance_note: string
+          performance_value: string
+          results_label: string
+          results_value: string
+          updated_at: string
+        }
+        Insert: {
+          cohort_label?: string
+          cohort_value?: string
+          hero_note?: string
+          id?: number
+          performance_note?: string
+          performance_value?: string
+          results_label?: string
+          results_value?: string
+          updated_at?: string
+        }
+        Update: {
+          cohort_label?: string
+          cohort_value?: string
+          hero_note?: string
+          id?: number
+          performance_note?: string
+          performance_value?: string
+          results_label?: string
+          results_value?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
