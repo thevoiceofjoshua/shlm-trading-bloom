@@ -463,13 +463,13 @@ function StatsSection({ stats }: { stats: SiteStats }) {
   ];
 
   return (
-    <section className="border-y border-border bg-surface px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 sm:grid-cols-4">
+    <section className="border-y border-border bg-surface px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-14">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-y-8 gap-x-6 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-4">
         <LiveEnrollmentTile />
         {items.map((stat) => (
-          <div key={stat.label} className="text-center">
-            <p className="font-display text-3xl font-medium text-foreground sm:text-4xl">{stat.value}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
+          <div key={stat.label} className="flex flex-col items-center text-center">
+            <p className="font-display text-4xl font-medium leading-none text-foreground sm:text-4xl lg:text-5xl">{stat.value}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{stat.label}</p>
           </div>
         ))}
       </div>
