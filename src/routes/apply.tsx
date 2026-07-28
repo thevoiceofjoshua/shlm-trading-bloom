@@ -169,7 +169,7 @@ function Field({
         type={type}
         required={required}
         defaultValue={defaultValue}
-        className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground"
+        className="mt-2 h-12 w-full rounded-xl border border-border bg-background px-4 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
       />
     </div>
   );
@@ -183,7 +183,7 @@ function TextArea({ label, name, placeholder }: { label: string; name: string; p
         name={name}
         rows={4}
         placeholder={placeholder}
-        className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground"
+        className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
       />
     </div>
   );
