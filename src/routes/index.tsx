@@ -713,47 +713,46 @@ function PricingSection() {
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-6 lg:grid-cols-3 lg:items-stretch lg:gap-8">
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative flex flex-col rounded-3xl border p-7 ${
+              className={`relative flex flex-col rounded-3xl border p-7 transition-all sm:p-8 ${
                 plan.featured
-                  ? "border-foreground bg-primary text-primary-foreground"
-                  : "border-border bg-card text-card-foreground"
+                  ? "border-foreground bg-primary text-primary-foreground shadow-xl shadow-black/10 lg:-my-2 lg:scale-[1.03] lg:p-9"
+                  : "border-border bg-card text-card-foreground hover:-translate-y-0.5 hover:shadow-lg"
               }`}
             >
               {plan.featured && (
-                <span className="absolute -top-3 left-6 rounded-full bg-primary-foreground px-3 py-1 text-xs font-semibold text-primary">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary-foreground px-4 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary shadow-sm sm:left-8 sm:translate-x-0">
                   Most popular
                 </span>
               )}
               <div>
-                <h3 className="font-display text-xl font-medium">{plan.name}</h3>
-                <p className={`mt-2 text-sm ${plan.featured ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                <h3 className="font-display text-xl font-medium sm:text-2xl">{plan.name}</h3>
+                <p className={`mt-2 text-sm leading-relaxed ${plan.featured ? "text-primary-foreground/75" : "text-muted-foreground"}`}>
                   {plan.description}
                 </p>
               </div>
-              <div className="my-6">
-                <span className="font-display text-4xl font-medium">{plan.price}</span>
+              <div className="my-6 flex items-baseline gap-2">
+                <span className="font-display text-4xl font-medium sm:text-5xl">{plan.price}</span>
                 <span className={`text-sm ${plan.featured ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                  {" "}
                   / {plan.period}
                 </span>
               </div>
               <ul className="mb-8 flex-1 space-y-3">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3 text-sm">
-                    <span className="mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-foreground/10">
+                  <li key={feature} className="flex items-start gap-3 text-sm leading-relaxed">
+                    <span className={`mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${plan.featured ? "bg-primary-foreground/15" : "bg-foreground/10"}`}>
                       <span className={`h-1.5 w-1.5 rounded-full ${plan.featured ? "bg-primary-foreground" : "bg-foreground"}`} />
                     </span>
-                    {feature}
+                    <span>{feature}</span>
                   </li>
                 ))}
               </ul>
               <a
                 href={`/apply?tier=${plan.key}`}
-                className={`rounded-full px-6 py-3 text-center text-sm font-semibold transition-colors ${
+                className={`flex min-h-12 items-center justify-center rounded-full px-6 text-center text-sm font-semibold transition-transform hover:scale-[1.02] ${
                   plan.featured
                     ? "bg-primary-foreground text-primary hover:bg-primary-foreground/90"
                     : "bg-primary text-primary-foreground hover:bg-primary/90"
@@ -761,10 +760,10 @@ function PricingSection() {
               >
                 {plan.cta}
               </a>
-
             </div>
           ))}
         </div>
+
 
         <p className="mt-8 text-center text-sm text-muted-foreground">
           Payment plans available for Mentorship and Elite. Apply to discuss options.
