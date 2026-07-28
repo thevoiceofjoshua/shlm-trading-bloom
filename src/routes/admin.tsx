@@ -1,9 +1,8 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { HomeButton } from "@/components/HomeButton";
-import { getSiteStats, updateSiteStats, type SiteStats } from "@/lib/site-stats.functions";
 import { listApplications, sendPaymentLink, denyApplication, type ApplicationList } from "@/lib/admin.functions";
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
 
@@ -16,21 +15,13 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
-  const getFn = useServerFn(getSiteStats);
-  const updateFn = useServerFn(updateSiteStats);
   const listFn = useServerFn(listApplications);
   const sendFn = useServerFn(sendPaymentLink);
   const denyFn = useServerFn(denyApplication);
-  const router = useRouter();
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({ queryKey: ["site_stats"], queryFn: () => getFn() });
-
   const [passcode, setPasscode] = useState("");
-  const [tab, setTab] = useState<"stats" | "applications">("stats");
-  const [form, setForm] = useState<SiteStats | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [actingId, setActingId] = useState<string | null>(null);
   const [action, setAction] = useState<"approve" | "deny" | null>(null);
@@ -44,42 +35,9 @@ function AdminPage() {
   } = useQuery({
     queryKey: ["applications", passcode],
     queryFn: () => listFn({ data: { passcode } }),
-    enabled: tab === "applications" && passcode.length > 0,
+    enabled: passcode.length > 0,
     retry: false,
   });
-
-  useEffect(() => {
-    if (data && !form) setForm(data);
-  }, [data, form]);
-
-  const fields: { key: keyof SiteStats; label: string; hint?: string }[] = [
-    { key: "performance_value", label: "Hero performance value", hint: 'e.g. "Tracking", "+12.4%"' },
-    { key: "performance_note", label: "Hero performance note" },
-    { key: "cohort_value", label: "Cohort stat value", hint: 'e.g. "New", "42"' },
-    { key: "cohort_label", label: "Cohort stat label" },
-    { key: "results_value", label: "Results stat value", hint: 'e.g. "Live", "+8.1%"' },
-    { key: "results_label", label: "Results stat label" },
-    { key: "hero_note", label: "Hero banner note" },
-  ];
-
-  const handleSave = async () => {
-    setSaving(true);
-    setMsg(null);
-    try {
-      await updateFn({
-        data: {
-          passcode,
-          stats: Object.fromEntries(fields.map((f) => [f.key, form![f.key]])) as Partial<SiteStats>,
-        },
-      });
-      setMsg({ ok: true, text: "Stats updated. The landing page will reflect them on next load." });
-      router.invalidate();
-    } catch (e) {
-      setMsg({ ok: false, text: e instanceof Error ? e.message : "Update failed" });
-    } finally {
-      setSaving(false);
-    }
-  };
 
   const handleApprove = async (id: string) => {
     if (!confirm("Approve this applicant and send the payment link email?")) return;
@@ -139,13 +97,25 @@ function AdminPage() {
     }
   };
 
-  if (isLoading || !form) {
-    return (
-      <div className="min-h-screen bg-background px-6 py-16 text-foreground">
-        <p className="text-muted-foreground">Loading…</p>
-      </div>
-    );
-  }
+  const statusBadge = (app: ApplicationList[number]) => {
+    if (app.status === "approved") {
+      return (
+        <span className="rounded-full border border-foreground px-3 py-1 text-xs font-medium uppercase tracking-wider text-foreground">
+          Approved
+        </span>
+      );
+    }
+    if (app.status === "denied") {
+      return (
+        <span className="rounded-full border border-border px-3 py-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          Denied
+        </span>
+      );
+    }
+    return null;
+  };
+
+  const selected = apps?.find((a) => a.id === selectedId) ?? null;
 
   return (
     <div className="min-h-screen bg-background px-4 py-16 text-foreground sm:px-6 lg:px-8">
@@ -154,7 +124,7 @@ function AdminPage() {
           <h1 className="font-display text-4xl font-medium tracking-tight">SHLM Admin</h1>
           <HomeButton />
         </div>
-        <p className="mt-2 text-sm text-muted-foreground">Manage live stats and review mentorship applications.</p>
+        <p className="mt-2 text-sm text-muted-foreground">Review mentorship applications.</p>
 
         <div className="mt-8 rounded-2xl border border-border bg-card p-6">
           <label className="text-sm font-medium">Admin passcode</label>
@@ -167,61 +137,99 @@ function AdminPage() {
           />
         </div>
 
-        <div className="mt-6 flex gap-2">
-          <button
-            onClick={() => setTab("stats")}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-opacity ${
-              tab === "stats"
-                ? "bg-primary text-primary-foreground"
-                : "border border-border text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Live stats
-          </button>
-          <button
-            onClick={() => setTab("applications")}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-opacity ${
-              tab === "applications"
-                ? "bg-primary text-primary-foreground"
-                : "border border-border text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Applications
-          </button>
-        </div>
+        {selected ? (
+          <div className="mt-8 rounded-2xl border border-border bg-card p-6">
+            <div className="flex items-center justify-between gap-3">
+              <button
+                onClick={() => setSelectedId(null)}
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                ← Back to applications
+              </button>
+              <button
+                onClick={() => setSelectedId(null)}
+                aria-label="Close"
+                className="rounded-full border border-border px-3 py-1 text-sm text-foreground hover:bg-muted"
+              >
+                Exit
+              </button>
+            </div>
 
-        {tab === "stats" && (
-          <div className="mt-8 space-y-5 rounded-2xl border border-border bg-card p-6">
-            {fields.map((f) => (
-              <div key={f.key}>
-                <label className="text-sm font-medium">{f.label}</label>
-                {f.hint && <p className="text-xs text-muted-foreground">{f.hint}</p>}
-                <input
-                  type="text"
-                  value={(form[f.key] as string) ?? ""}
-                  onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
-                  className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
-                />
+            <div className="mt-6">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="font-display text-2xl font-medium">{selected.full_name}</h2>
+                <span className="rounded-full border border-border px-2 py-0.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  {tierLabel(selected.tier)}
+                </span>
+                {statusBadge(selected)}
               </div>
-            ))}
+              <p className="mt-2 text-sm text-foreground">{selected.email}</p>
+              {selected.phone && <p className="text-sm text-muted-foreground">{selected.phone}</p>}
 
-            <button
-              onClick={handleSave}
-              disabled={saving || !passcode}
-              className="w-full rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-50"
-            >
-              {saving ? "Saving…" : "Save changes"}
-            </button>
+              <div className="mt-6 space-y-4 text-sm">
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground">Scheduled call</p>
+                  <p className="mt-1 text-foreground">
+                    {formatTime(selected.scheduled_at, selected.timezone)} ({selected.timezone || SITE_TIMEZONE_LABEL})
+                  </p>
+                </div>
+                {selected.experience && (
+                  <div>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground">Experience</p>
+                    <p className="mt-1 whitespace-pre-wrap text-foreground">{selected.experience}</p>
+                  </div>
+                )}
+                {selected.goals && (
+                  <div>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground">Goals</p>
+                    <p className="mt-1 whitespace-pre-wrap text-foreground">{selected.goals}</p>
+                  </div>
+                )}
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground">Applied</p>
+                  <p className="mt-1 text-foreground">
+                    {new Date(selected.created_at).toLocaleString("en-US", {
+                      timeZone: SITE_TIMEZONE,
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
+                  </p>
+                </div>
+              </div>
 
-            {msg && <p className={`text-sm ${msg.ok ? "text-foreground" : "text-destructive"}`}>{msg.text}</p>}
+              {selected.status === "new" ? (
+                <div className="mt-8 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => handleApprove(selected.id)}
+                    disabled={actingId === selected.id}
+                    className="rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-50"
+                  >
+                    {actingId === selected.id && action === "approve" ? "Approving…" : "Approve"}
+                  </button>
+                  <button
+                    onClick={() => handleDeny(selected.id)}
+                    disabled={actingId === selected.id}
+                    className="rounded-full border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                  >
+                    {actingId === selected.id && action === "deny" ? "Denying…" : "Deny"}
+                  </button>
+                </div>
+              ) : (
+                <p className="mt-8 text-xs text-muted-foreground">
+                  {selected.status === "approved"
+                    ? `Approved${selected.payment_link_sent_at ? ` · payment link sent ${new Date(selected.payment_link_sent_at).toLocaleDateString("en-US")}` : ""}.`
+                    : "Denied."}
+                </p>
+              )}
 
-            <p className="text-xs text-muted-foreground">
-              Last updated: {new Date(form.updated_at).toLocaleString("en-US", { timeZone: SITE_TIMEZONE })} {SITE_TIMEZONE_LABEL}
-            </p>
+              {sendMsg?.id === selected.id && (
+                <p className={`mt-4 text-sm ${sendMsg.ok ? "text-foreground" : "text-destructive"}`}>
+                  {sendMsg.text}
+                </p>
+              )}
+            </div>
           </div>
-        )}
-
-        {tab === "applications" && (
+        ) : (
           <div className="mt-8 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-xl font-medium">Applications</h2>
@@ -251,72 +259,49 @@ function AdminPage() {
             )}
 
             {passcode && apps && apps.length > 0 && (
-              <div className="space-y-4">
+              <ul className="divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
                 {apps.map((app: ApplicationList[number]) => (
-                  <div key={app.id} className="rounded-2xl border border-border bg-card p-5">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="font-display text-lg font-medium">{app.full_name}</p>
-                          <span className="rounded-full border border-border px-2 py-0.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                            {tierLabel(app.tier)}
-                          </span>
-                        </div>
-                        <p className="mt-1 text-sm text-foreground">{app.email}</p>
-                        {app.phone && <p className="text-sm text-muted-foreground">{app.phone}</p>}
-                        <p className="mt-2 text-xs text-muted-foreground">
-                          Call: {formatTime(app.scheduled_at, app.timezone)} ({app.timezone || SITE_TIMEZONE_LABEL})
-                        </p>
-                        {app.experience && (
-                          <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{app.experience}</p>
-                        )}
-                        {app.goals && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{app.goals}</p>}
-                        <p className="mt-3 text-xs text-muted-foreground">
-                          Applied{" "}
-                          {new Date(app.created_at).toLocaleString("en-US", {
-                            timeZone: SITE_TIMEZONE,
-                            dateStyle: "medium",
-                            timeStyle: "short",
-                          })}
-                        </p>
+                  <li
+                    key={app.id}
+                    className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <button
+                      onClick={() => setSelectedId(app.id)}
+                      className="flex-1 text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="font-display text-lg font-medium text-foreground hover:underline">
+                          {app.full_name}
+                        </span>
+                        {statusBadge(app)}
                       </div>
-                      <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
-                        {app.status === "approved" ? (
-                          <span className="rounded-full border border-foreground px-3 py-1 text-xs font-medium uppercase tracking-wider text-foreground">
-                            Approved{app.payment_link_sent_at ? ` · link sent ${new Date(app.payment_link_sent_at).toLocaleDateString("en-US")}` : ""}
-                          </span>
-                        ) : app.status === "denied" ? (
-                          <span className="rounded-full border border-border px-3 py-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                            Denied
-                          </span>
-                        ) : (
-                          <div className="flex flex-wrap gap-2">
-                            <button
-                              onClick={() => handleApprove(app.id)}
-                              disabled={actingId === app.id}
-                              className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-50"
-                            >
-                              {actingId === app.id && action === "approve" ? "Approving…" : "Approve"}
-                            </button>
-                            <button
-                              onClick={() => handleDeny(app.id)}
-                              disabled={actingId === app.id}
-                              className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
-                            >
-                              {actingId === app.id && action === "deny" ? "Denying…" : "Deny"}
-                            </button>
-                          </div>
-                        )}
-                        {sendMsg?.id === app.id && (
-                          <p className={`text-xs ${sendMsg.ok ? "text-foreground" : "text-destructive"}`}>
-                            {sendMsg.text}
-                          </p>
-                        )}
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {tierLabel(app.tier)} · Applied{" "}
+                        {new Date(app.created_at).toLocaleDateString("en-US", { timeZone: SITE_TIMEZONE })}
+                      </p>
+                    </button>
+
+                    {app.status === "new" ? (
+                      <div className="flex shrink-0 flex-wrap gap-2">
+                        <button
+                          onClick={() => handleApprove(app.id)}
+                          disabled={actingId === app.id}
+                          className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-50"
+                        >
+                          {actingId === app.id && action === "approve" ? "Approving…" : "Approve"}
+                        </button>
+                        <button
+                          onClick={() => handleDeny(app.id)}
+                          disabled={actingId === app.id}
+                          className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                        >
+                          {actingId === app.id && action === "deny" ? "Denying…" : "Deny"}
+                        </button>
                       </div>
-                    </div>
-                  </div>
+                    ) : null}
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
           </div>
         )}
