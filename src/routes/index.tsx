@@ -397,8 +397,8 @@ function LiveEnrollmentTile() {
       setTimeout(() => {
         setIndex((i) => (i + 1) % ENROLLMENTS.length);
         setVisible(true);
-      }, 260);
-    }, 3200);
+      }, 520);
+    }, 6800);
     return () => clearInterval(cycle);
   }, []);
 
@@ -413,7 +413,7 @@ function LiveEnrollmentTile() {
     <div className="text-center">
       <div
         className={cn(
-          "mx-auto flex min-h-[64px] items-center justify-center gap-3 transition-all duration-300 ease-out sm:min-h-[72px]",
+          "mx-auto flex min-h-[64px] items-center justify-center gap-3 transition-all duration-500 ease-out sm:min-h-[72px]",
           visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1",
         )}
       >
