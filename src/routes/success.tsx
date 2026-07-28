@@ -72,25 +72,31 @@ function SuccessPage() {
           </div>
 
           <h1 className="mt-6 font-display text-3xl font-medium tracking-tight">
-            You’re in.
+            {isLoading && session_id ? "Confirming payment…" : showUnverified ? "Payment not verified" : "You’re in."}
           </h1>
           <p className="mt-2 text-muted-foreground">
-            {details.description}
+            {showUnverified
+              ? "We couldn't verify this checkout session. If you were charged, contact support with your receipt."
+              : details.description}
           </p>
 
           <div className="mt-8 rounded-xl border border-border bg-surface p-5 text-left">
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              Confirmed tier
+              {showUnverified ? "Requested tier" : "Confirmed tier"}
             </p>
             <p className="mt-1 font-display text-2xl font-medium">
               {details.title}
             </p>
+            {data?.paid && data.email && (
+              <p className="mt-2 text-xs text-muted-foreground">Receipt sent to {data.email}</p>
+            )}
             {session_id && (
               <p className="mt-2 text-xs text-muted-foreground">
                 Session: {session_id.slice(0, 12)}…
               </p>
             )}
           </div>
+
 
           <ul className="mt-8 space-y-3 text-left">
             {details.perks.map((perk) => (
