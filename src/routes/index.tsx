@@ -487,15 +487,26 @@ function StatsSection({ stats }: { stats: SiteStats }) {
   ];
 
   return (
-    <section className="border-y border-border bg-surface px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-14">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-y-8 gap-x-6 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-4">
-        <LiveEnrollmentTile />
-        {items.map((stat) => (
-          <div key={stat.label} className="flex flex-col items-center text-center">
-            <p className="font-display text-4xl font-medium leading-none text-foreground sm:text-4xl lg:text-5xl">{stat.value}</p>
-            <p className="mt-2 text-sm text-muted-foreground">{stat.label}</p>
+    <section className="bg-foreground px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+      <div className="mx-auto max-w-7xl">
+        <div className="grid grid-cols-1 items-center gap-10 sm:grid-cols-3 lg:grid-cols-4 lg:gap-0">
+          <div className="flex items-center justify-center sm:col-span-3 lg:col-span-1 lg:justify-start lg:pr-10">
+            <LiveEnrollmentTile />
           </div>
-        ))}
+          {items.map((stat) => (
+            <div
+              key={stat.label}
+              className="flex flex-col items-center justify-center text-center lg:border-l lg:border-background/10 lg:pl-10"
+            >
+              <p className="font-display text-5xl font-medium leading-none tracking-tight text-background sm:text-6xl">
+                {stat.value}
+              </p>
+              <p className="mt-3 text-xs font-medium uppercase tracking-[0.2em] text-background/60">
+                {stat.label}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
