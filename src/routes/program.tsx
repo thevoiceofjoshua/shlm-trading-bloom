@@ -263,7 +263,7 @@ function ProgramPage() {
                   </p>
                 </div>
                 <a
-                  href="https://discord.gg/shlm"
+                  href="https://discord.gg/nZRhH42j"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] hover:bg-primary/90"
