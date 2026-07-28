@@ -376,7 +376,7 @@ function HeroSection({ stats }: { stats: SiteStats }) {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-36 pt-28 text-center sm:px-6 sm:pb-32 sm:pt-32 lg:px-8">
-        <h1 className="animate-hero-spin inline-block text-balance font-display text-[clamp(4.5rem,17vw,12rem)] font-medium leading-[0.85] tracking-[0.05em] text-white [transform-style:preserve-3d] [will-change:transform]">
+        <h1 className="animate-hero-breathe inline-block text-balance font-display text-[clamp(5.5rem,18vw,13.5rem)] font-medium leading-[0.85] tracking-[0.06em] text-white [will-change:transform]">
           SHLM
         </h1>
         <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
