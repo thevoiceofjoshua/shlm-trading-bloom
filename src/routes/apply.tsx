@@ -113,9 +113,10 @@ function ApplyPage() {
               defaultValue={tier || "mentorship"}
               className="mt-2 h-12 w-full rounded-xl border border-border bg-background px-4 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              <option value="foundation">Beginner — Foundation ({priceLabel(499)})</option>
-              <option value="mentorship">Intermediate — Mentorship ({priceLabel(1499)})</option>
-              <option value="elite">Advanced — Elite ({priceLabel(2999)})</option>
+              <option value="foundation">Beginner</option>
+              <option value="mentorship">Intermediate</option>
+              <option value="elite">Advanced</option>
+
             </select>
             {promoApplied && (
               <p className="mt-2 text-xs font-medium uppercase tracking-widest text-foreground">
