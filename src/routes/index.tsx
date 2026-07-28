@@ -305,15 +305,9 @@ function HeroSection({ stats }: { stats: SiteStats }) {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-36 pt-28 text-center sm:px-6 sm:pb-32 sm:pt-32 lg:px-8">
-        <p className="font-display text-[11px] font-medium uppercase tracking-[0.28em] text-white/60 sm:text-sm sm:tracking-[0.25em]">
-          Premium trading mentorship
-        </p>
-        <h1 className="mt-5 text-balance font-display text-[clamp(4.5rem,17vw,12rem)] font-medium leading-[0.85] tracking-tighter text-white sm:mt-6">
+        <h1 className="animate-hero-spin inline-block text-balance font-display text-[clamp(4.5rem,17vw,12rem)] font-medium leading-[0.85] tracking-tighter text-white [transform-style:preserve-3d] [will-change:transform]">
           &ldquo;SHLM&rdquo;
         </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/75 sm:mt-8 sm:text-lg md:text-xl">
-          A mentorship program for traders who want a structured system, real feedback, and the discipline to perform consistently in any market.
-        </p>
         <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
           <a
             href="#pricing"
