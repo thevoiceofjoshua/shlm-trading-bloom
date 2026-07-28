@@ -1154,10 +1154,10 @@ function CtaSection() {
         </p>
         <div className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:gap-4">
           <a
-            href="/auth?mode=signup"
+            href="/apply"
             className="flex min-h-12 items-center justify-center rounded-full bg-primary-foreground px-8 text-sm font-semibold text-primary transition-transform hover:scale-[1.02]"
           >
-            Create your account
+            Enroll now
           </a>
           <a
             href="#program"
