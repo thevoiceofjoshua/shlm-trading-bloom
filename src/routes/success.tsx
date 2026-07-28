@@ -1,5 +1,8 @@
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
+import { verifyCheckoutSession } from "@/lib/checkout.functions";
 
 const searchSchema = z.object({
   tier: z.enum(["foundation", "mentorship", "elite"]).optional(),
@@ -41,8 +44,20 @@ const tierDetails: Record<string, { title: string; description: string; perks: s
 };
 
 function SuccessPage() {
-  const { tier = "foundation", session_id } = useSearch({ from: "/success" });
+  const { tier: urlTier, session_id } = useSearch({ from: "/success" });
+  const verify = useServerFn(verifyCheckoutSession);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["verify-checkout", session_id],
+    queryFn: () => verify({ data: { session_id: session_id! } }),
+    enabled: !!session_id,
+    retry: false,
+  });
+
+  const verifiedTier = data?.paid ? data.tier : undefined;
+  const tier = verifiedTier ?? urlTier ?? "foundation";
   const details = tierDetails[tier] ?? tierDetails.foundation;
+  const showUnverified = session_id && !isLoading && (isError || !data?.paid);
+
 
   return (
     <div className="min-h-screen bg-background px-4 py-12 text-foreground sm:px-6 lg:px-8">
