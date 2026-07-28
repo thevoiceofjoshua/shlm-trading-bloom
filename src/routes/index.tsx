@@ -145,7 +145,7 @@ function Header({
   );
 }
 
-function HeroSection() {
+function HeroSection({ stats }: { stats: SiteStats }) {
   return (
     <section className="relative overflow-hidden bg-background px-4 pb-20 pt-24 sm:px-6 sm:pt-32 lg:px-8 lg:pt-40">
       <div className="mx-auto max-w-7xl">
