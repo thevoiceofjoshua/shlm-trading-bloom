@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      applications: {
+        Row: {
+          created_at: string
+          email: string
+          experience: string | null
+          full_name: string
+          goals: string | null
+          id: string
+          phone: string | null
+          scheduled_at: string
+          status: string
+          tier: string
+          timezone: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          experience?: string | null
+          full_name: string
+          goals?: string | null
+          id?: string
+          phone?: string | null
+          scheduled_at: string
+          status?: string
+          tier: string
+          timezone?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          experience?: string | null
+          full_name?: string
+          goals?: string | null
+          id?: string
+          phone?: string | null
+          scheduled_at?: string
+          status?: string
+          tier?: string
+          timezone?: string | null
+        }
+        Relationships: []
+      }
       purchases: {
         Row: {
           amount_total: number | null
