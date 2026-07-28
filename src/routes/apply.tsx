@@ -110,15 +110,16 @@ function ApplyPage() {
 
         <form onSubmit={onSubmit} className="space-y-5 rounded-3xl border border-border bg-card p-5 sm:p-8">
           <div>
-            <label className="block text-sm font-medium text-foreground">Tier</label>
+            <label className="block text-sm font-medium text-foreground">Entry level</label>
+            <p className="mt-1 text-xs text-muted-foreground">What level are you entering the program at?</p>
             <select
               name="tier"
               defaultValue={tier || "mentorship"}
               className="mt-2 h-12 w-full rounded-xl border border-border bg-background px-4 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              <option value="foundation">Foundation — {priceLabel(499)}</option>
-              <option value="mentorship">Mentorship — {priceLabel(1499)}</option>
-              <option value="elite">Elite — {priceLabel(2999)}</option>
+              <option value="foundation">Beginner — Foundation ({priceLabel(499)})</option>
+              <option value="mentorship">Intermediate — Mentorship ({priceLabel(1499)})</option>
+              <option value="elite">Advanced — Elite ({priceLabel(2999)})</option>
             </select>
             {promoApplied && (
               <p className="mt-2 text-xs font-medium uppercase tracking-widest text-foreground">
