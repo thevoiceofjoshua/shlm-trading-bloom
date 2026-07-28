@@ -837,7 +837,11 @@ function TestimonialsSection() {
         <div className="grid gap-6 md:grid-cols-3">
           {testimonials.map((t) => (
             <div key={t.author} className="flex flex-col justify-between rounded-3xl border border-border bg-card p-7">
-              <p className="text-lg leading-relaxed text-card-foreground">“{t.quote}”</p>
+              <p className="text-lg leading-relaxed text-card-foreground">
+                <span className="font-mono text-xl text-muted-foreground">&ldquo;</span>
+                {t.quote}
+                <span className="font-mono text-xl text-muted-foreground">&rdquo;</span>
+              </p>
               <div className="mt-6">
                 <p className="font-display font-medium text-foreground">{t.author}</p>
                 <p className="text-sm text-muted-foreground">{t.role}</p>
