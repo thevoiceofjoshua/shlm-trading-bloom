@@ -483,7 +483,7 @@ function StatsSection({ stats }: { stats: SiteStats }) {
   const items = [
     { value: "12", label: "Week structured program" },
     { value: "1:1", label: "Mentor relationship" },
-    { value: stats.results_value, label: stats.results_label },
+    { value: "Lifetime", label: "Community & mentor support" },
   ];
 
   return (
