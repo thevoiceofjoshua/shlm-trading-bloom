@@ -42,6 +42,7 @@ function Index() {
         <MentorshipSection />
         <PricingSection />
         <TestimonialsSection />
+        <DiscordSection />
         <FaqSection />
         <CtaSection />
       </main>
