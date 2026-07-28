@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HomeButton } from "@/components/HomeButton";
+import { DISCORD_JOIN_URL } from "@/lib/external-links";
 
 
 export const Route = createFileRoute("/program")({
@@ -270,9 +271,9 @@ function ProgramPage() {
                   </p>
                 </div>
                 <a
-                  href="https://discord.gg/nZRhH42j"
+                  href={DISCORD_JOIN_URL}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener"
                   className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] hover:bg-primary/90"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
