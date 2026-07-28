@@ -98,7 +98,7 @@ function LiveClock({ scrolled }: { scrolled: boolean }) {
     const update = () => {
       setTime(
         new Date().toLocaleTimeString("en-US", {
-          timeZone: "America/New_York",
+          timeZone: "America/Los_Angeles",
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
@@ -118,7 +118,7 @@ function LiveClock({ scrolled }: { scrolled: boolean }) {
         scrolled ? "text-muted-foreground" : "text-white/70",
       )}
     >
-      NY {time}
+      LA {time}
     </span>
   );
 }
