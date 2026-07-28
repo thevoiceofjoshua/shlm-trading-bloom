@@ -715,27 +715,43 @@ function MentorshipSection() {
   );
 }
 
-function PricingSection() {
-  const checkout = useServerFn(createCheckoutSession);
-  const [loadingTier, setLoadingTier] = useState<string | null>(null);
+const PROMO_CODE = "1MILL";
+const PROMO_DISCOUNT = 0.2;
 
-  const handleCheckout = async (tier: "foundation" | "mentorship" | "elite") => {
-    try {
-      setLoadingTier(tier);
-      const { url } = await checkout({ data: { tier, origin: window.location.origin } });
-      if (url) window.location.href = url;
-    } catch (err) {
-      console.error(err);
-      alert("Unable to start checkout. Please try again or contact support.");
-      setLoadingTier(null);
+function formatMoney(amount: number) {
+  return `$${amount.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+}
+
+function PricingSection() {
+  const [promoInput, setPromoInput] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
+  const [promoError, setPromoError] = useState<string | null>(null);
+
+  const applyPromo = (e: React.FormEvent) => {
+    e.preventDefault();
+    const code = promoInput.trim().toUpperCase();
+    if (code === PROMO_CODE) {
+      setAppliedPromo(code);
+      setPromoError(null);
+    } else {
+      setAppliedPromo(null);
+      setPromoError("That code isn't valid.");
     }
   };
+
+  const clearPromo = () => {
+    setAppliedPromo(null);
+    setPromoInput("");
+    setPromoError(null);
+  };
+
+  const discounted = appliedPromo === PROMO_CODE;
 
   const plans = [
     {
       key: "foundation" as const,
       name: "Foundation",
-      price: "$499",
+      basePrice: 499,
       period: "one-time",
       description: "Self-paced access to the full curriculum and community.",
       features: ["12-week curriculum", "Private community access", "Weekly group Q&A", "Trade journal templates", "Strategy workbook"],
@@ -745,7 +761,7 @@ function PricingSection() {
     {
       key: "mentorship" as const,
       name: "Mentorship",
-      price: "$1,499",
+      basePrice: 1499,
       period: "one-time",
       description: "The complete experience with 1:1 mentorship and feedback.",
       features: [
@@ -762,7 +778,7 @@ function PricingSection() {
     {
       key: "elite" as const,
       name: "Elite",
-      price: "$2,999",
+      basePrice: 2999,
       period: "one-time",
       description: "Intensive partnership for committed traders.",
       features: [
@@ -778,11 +794,10 @@ function PricingSection() {
     },
   ];
 
-
   return (
     <section id="pricing" className="bg-surface px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-16 text-center">
+        <div className="mb-10 text-center sm:mb-14">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">Pricing</p>
           <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
             Invest in your edge.
@@ -792,55 +807,134 @@ function PricingSection() {
           </p>
         </div>
 
+        <div className="mx-auto mb-10 max-w-xl">
+          <form
+            onSubmit={applyPromo}
+            className={cn(
+              "flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:gap-3 sm:p-3",
+              discounted ? "border-foreground bg-foreground/[0.03]" : "border-border bg-card",
+            )}
+          >
+            <label htmlFor="promo" className="flex-1">
+              <span className="mb-1.5 block text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                Promo code
+              </span>
+              <input
+                id="promo"
+                type="text"
+                value={promoInput}
+                onChange={(e) => {
+                  setPromoInput(e.target.value);
+                  setPromoError(null);
+                }}
+                placeholder="Enter code"
+                autoComplete="off"
+                spellCheck={false}
+                className="h-11 w-full rounded-xl border border-border bg-background px-4 font-mono text-sm uppercase tracking-widest text-foreground focus:border-foreground focus:outline-none"
+                disabled={discounted}
+              />
+            </label>
+            {discounted ? (
+              <button
+                type="button"
+                onClick={clearPromo}
+                className="h-11 shrink-0 rounded-xl border border-border bg-background px-5 text-sm font-medium text-foreground transition-colors hover:bg-accent sm:mt-[22px]"
+              >
+                Remove
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="h-11 shrink-0 rounded-xl bg-foreground px-6 text-sm font-semibold text-background transition-colors hover:bg-foreground/90 sm:mt-[22px]"
+              >
+                Apply
+              </button>
+            )}
+          </form>
+          {promoError && (
+            <p className="mt-2 text-center text-xs text-destructive">{promoError}</p>
+          )}
+          {discounted && (
+            <p className="mt-2 text-center text-xs font-medium uppercase tracking-widest text-foreground">
+              Code <span className="font-mono">{appliedPromo}</span> applied — 20% off all tiers
+            </p>
+          )}
+        </div>
+
         <div className="grid gap-6 lg:grid-cols-3 lg:items-stretch lg:gap-8">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative flex flex-col rounded-3xl border p-7 transition-all sm:p-8 ${
-                plan.featured
-                  ? "border-foreground bg-primary text-primary-foreground shadow-xl shadow-black/10 lg:-my-2 lg:scale-[1.03] lg:p-9"
-                  : "border-border bg-card text-card-foreground hover:-translate-y-0.5 hover:shadow-lg"
-              }`}
-            >
-              {plan.featured && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary-foreground px-4 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary shadow-sm sm:left-8 sm:translate-x-0">
-                  Most popular
-                </span>
-              )}
-              <div>
-                <h3 className="font-display text-xl font-medium sm:text-2xl">{plan.name}</h3>
-                <p className={`mt-2 text-sm leading-relaxed ${plan.featured ? "text-primary-foreground/75" : "text-muted-foreground"}`}>
-                  {plan.description}
-                </p>
-              </div>
-              <div className="my-6 flex items-baseline gap-2">
-                <span className="font-display text-4xl font-medium sm:text-5xl">{plan.price}</span>
-                <span className={`text-sm ${plan.featured ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                  / {plan.period}
-                </span>
-              </div>
-              <ul className="mb-8 flex-1 space-y-3">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3 text-sm leading-relaxed">
-                    <span className={`mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${plan.featured ? "bg-primary-foreground/15" : "bg-foreground/10"}`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${plan.featured ? "bg-primary-foreground" : "bg-foreground"}`} />
-                    </span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <a
-                href={`/apply?tier=${plan.key}`}
-                className={`flex min-h-12 items-center justify-center rounded-full px-6 text-center text-sm font-semibold transition-transform hover:scale-[1.02] ${
+          {plans.map((plan) => {
+            const finalPrice = discounted
+              ? Math.round(plan.basePrice * (1 - PROMO_DISCOUNT))
+              : plan.basePrice;
+            const applyHref = `/apply?tier=${plan.key}${discounted ? `&promo=${PROMO_CODE}` : ""}`;
+            return (
+              <div
+                key={plan.name}
+                className={`relative flex flex-col rounded-3xl border p-7 transition-all sm:p-8 ${
                   plan.featured
-                    ? "bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-                    : "bg-primary text-primary-foreground hover:bg-primary/90"
+                    ? "border-foreground bg-primary text-primary-foreground shadow-xl shadow-black/10 lg:-my-2 lg:scale-[1.03] lg:p-9"
+                    : "border-border bg-card text-card-foreground hover:-translate-y-0.5 hover:shadow-lg"
                 }`}
               >
-                {plan.cta}
-              </a>
-            </div>
-          ))}
+                {plan.featured && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary-foreground px-4 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary shadow-sm sm:left-8 sm:translate-x-0">
+                    Most popular
+                  </span>
+                )}
+                <div>
+                  <h3 className="font-display text-xl font-medium sm:text-2xl">{plan.name}</h3>
+                  <p className={`mt-2 text-sm leading-relaxed ${plan.featured ? "text-primary-foreground/75" : "text-muted-foreground"}`}>
+                    {plan.description}
+                  </p>
+                </div>
+                <div className="my-6">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-display text-4xl font-medium sm:text-5xl">{formatMoney(finalPrice)}</span>
+                    <span className={`text-sm ${plan.featured ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                      / {plan.period}
+                    </span>
+                  </div>
+                  {discounted && (
+                    <div className="mt-1.5 flex items-center gap-2 text-xs">
+                      <span className={`line-through ${plan.featured ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
+                        {formatMoney(plan.basePrice)}
+                      </span>
+                      <span
+                        className={cn(
+                          "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest",
+                          plan.featured
+                            ? "bg-primary-foreground/15 text-primary-foreground"
+                            : "bg-foreground text-background",
+                        )}
+                      >
+                        Save 20%
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <ul className="mb-8 flex-1 space-y-3">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-3 text-sm leading-relaxed">
+                      <span className={`mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${plan.featured ? "bg-primary-foreground/15" : "bg-foreground/10"}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${plan.featured ? "bg-primary-foreground" : "bg-foreground"}`} />
+                      </span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={applyHref}
+                  className={`flex min-h-12 items-center justify-center rounded-full px-6 text-center text-sm font-semibold transition-transform hover:scale-[1.02] ${
+                    plan.featured
+                      ? "bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+                      : "bg-primary text-primary-foreground hover:bg-primary/90"
+                  }`}
+                >
+                  {plan.cta}
+                </a>
+              </div>
+            );
+          })}
         </div>
 
 
@@ -851,6 +945,7 @@ function PricingSection() {
     </section>
   );
 }
+
 
 function TestimonialsSection() {
   const testimonials = [
