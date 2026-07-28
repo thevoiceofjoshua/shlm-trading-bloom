@@ -1102,8 +1102,6 @@ function DiscordSection() {
       <div className="mx-auto flex max-w-3xl items-center justify-center">
         <a
           href={inviteUrl}
-          target="_blank"
-          rel="noreferrer"
           aria-label="Join the SHLM Discord"
           className="group flex h-24 w-24 items-center justify-center rounded-3xl bg-foreground text-background transition-all hover:scale-105 hover:rounded-2xl sm:h-28 sm:w-28"
         >
