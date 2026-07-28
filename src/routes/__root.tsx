@@ -72,6 +72,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+const SITE_URL = "https://shlm-trading-bloom.lovable.app";
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
@@ -80,6 +82,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "SHLM — Trading Mentorship" },
       { name: "description", content: "SHLM is a premium trading mentorship program built to turn disciplined strategy into consistent performance." },
       { name: "author", content: "SHLM" },
+      { property: "og:site_name", content: "SHLM" },
       { property: "og:title", content: "SHLM — Trading Mentorship" },
       { property: "og:description", content: "Premium trading mentorship for traders ready to build discipline, strategy, and consistency." },
       { property: "og:type", content: "website" },
@@ -98,6 +101,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Grotesk:wght@300..700&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              "@id": `${SITE_URL}/#organization`,
+              name: "SHLM",
+              legalName: "SHLM LLC",
+              url: SITE_URL,
+              description:
+                "SHLM is a premium trading mentorship program built to turn disciplined strategy into consistent performance.",
+            },
+            {
+              "@type": "WebSite",
+              "@id": `${SITE_URL}/#website`,
+              url: SITE_URL,
+              name: "SHLM",
+              publisher: { "@id": `${SITE_URL}/#organization` },
+            },
+          ],
+        }),
+      },
     ],
   }),
   shellComponent: RootShell,
