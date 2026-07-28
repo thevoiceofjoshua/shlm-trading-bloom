@@ -11,6 +11,7 @@ export const Route = createFileRoute("/admin")({
       { title: "SHLM Admin — Live Stats" },
       { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "canonical", href: "https://shlm-trading-bloom.lovable.app/admin" }],
   }),
 });
 

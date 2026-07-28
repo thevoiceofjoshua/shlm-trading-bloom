@@ -12,3 +12,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://shlm-trading-bloom.lovable.app/sitemap.xml

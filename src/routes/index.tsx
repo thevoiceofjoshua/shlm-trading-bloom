@@ -7,6 +7,25 @@ import { getSiteStats, type SiteStats } from "@/lib/site-stats.functions";
 const siteStatsQuery = (fn: () => Promise<SiteStats>) =>
   queryOptions({ queryKey: ["site_stats"], queryFn: fn, staleTime: 30_000 });
 
+const HOMEPAGE_FAQS = [
+  {
+    q: "Do I need trading experience to join?",
+    a: "Foundation is beginner-friendly. Mentorship and Elite are best suited for traders who have placed live trades and want to professionalize their process.",
+  },
+  {
+    q: "How long do I have access to the curriculum?",
+    a: "Lifetime. You keep access to every module, template, and update released after your enrollment.",
+  },
+  {
+    q: "What markets does the program cover?",
+    a: "The principles apply across equities, futures, forex, and crypto. Your mentor helps you adapt the system to your preferred market.",
+  },
+  {
+    q: "Can I upgrade after joining Foundation?",
+    a: "Yes. Foundation members can apply to upgrade to Mentorship or Elite at any time and receive credit toward the higher tier.",
+  },
+];
+
 export const Route = createFileRoute("/")({
   component: Index,
   loader: async ({ context }) => {
@@ -16,12 +35,28 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "SHLM — Premium Trading Mentorship" },
+      { title: "SHLM — Premium Trading Mentorship for Disciplined Growth" },
       { name: "description", content: "Join SHLM and learn to trade with discipline, structure, and a mentor-backed system built for long-term consistency." },
-      { property: "og:title", content: "SHLM — Premium Trading Mentorship" },
+      { property: "og:title", content: "SHLM — Premium Trading Mentorship for Disciplined Growth" },
       { property: "og:description", content: "Join SHLM and learn to trade with discipline, structure, and a mentor-backed system built for long-term consistency." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/" },
       { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [{ rel: "canonical", href: "https://shlm-trading-bloom.lovable.app/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: HOMEPAGE_FAQS.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        }),
+      },
     ],
   }),
 });
@@ -156,7 +191,7 @@ function HeroSection({ stats }: { stats: SiteStats }) {
               Premium trading mentorship
             </p>
             <h1 className="text-balance font-display text-4xl font-medium leading-[1.1] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Trade with discipline. Build wealth with clarity.
+              SHLM — Premium Trading Mentorship for Disciplined Growth
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
               SHLM is a mentorship program for traders who want a structured system, real feedback, and the discipline to perform consistently in any market.
