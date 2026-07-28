@@ -15,6 +15,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as ProgramRouteImport } from './routes/program'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as DiscordRouteImport } from './routes/discord'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ApplyRouteImport } from './routes/apply'
@@ -56,6 +57,11 @@ const ProgramRoute = ProgramRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscordRoute = DiscordRouteImport.update({
+  id: '/discord',
+  path: '/discord',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/discord': typeof DiscordRoute
   '/privacy': typeof PrivacyRoute
   '/program': typeof ProgramRoute
   '/refund': typeof RefundRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByTo {
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/discord': typeof DiscordRoute
   '/privacy': typeof PrivacyRoute
   '/program': typeof ProgramRoute
   '/refund': typeof RefundRoute
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/discord': typeof DiscordRoute
   '/privacy': typeof PrivacyRoute
   '/program': typeof ProgramRoute
   '/refund': typeof RefundRoute
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/apply'
     | '/auth'
     | '/dashboard'
+    | '/discord'
     | '/privacy'
     | '/program'
     | '/refund'
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/apply'
     | '/auth'
     | '/dashboard'
+    | '/discord'
     | '/privacy'
     | '/program'
     | '/refund'
@@ -229,6 +240,7 @@ export interface FileRouteTypes {
     | '/apply'
     | '/auth'
     | '/dashboard'
+    | '/discord'
     | '/privacy'
     | '/program'
     | '/refund'
@@ -250,6 +262,7 @@ export interface RootRouteChildren {
   ApplyRoute: typeof ApplyRoute
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
+  DiscordRoute: typeof DiscordRoute
   PrivacyRoute: typeof PrivacyRoute
   ProgramRoute: typeof ProgramRoute
   RefundRoute: typeof RefundRoute
@@ -307,6 +320,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discord': {
+      id: '/discord'
+      path: '/discord'
+      fullPath: '/discord'
+      preLoaderRoute: typeof DiscordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -402,6 +422,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApplyRoute: ApplyRoute,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
+  DiscordRoute: DiscordRoute,
   PrivacyRoute: PrivacyRoute,
   ProgramRoute: ProgramRoute,
   RefundRoute: RefundRoute,

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { DISCORD_JOIN_URL } from "@/lib/external-links";
 import { FeatureLayout } from "./features.curriculum";
 
 export const Route = createFileRoute("/features/community")({
@@ -34,7 +35,7 @@ function CommunityPage() {
         ))}
       </div>
       <div className="mt-10">
-        <a href="https://discord.gg/nZRhH42j" target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center rounded-full bg-foreground px-8 text-sm font-medium text-background transition-opacity hover:opacity-90">Join the Discord</a>
+        <a href={DISCORD_JOIN_URL} target="_blank" rel="noopener" className="inline-flex min-h-12 items-center justify-center rounded-full bg-foreground px-8 text-sm font-medium text-background transition-opacity hover:opacity-90">Join the Discord</a>
       </div>
     </FeatureLayout>
   );
