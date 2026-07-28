@@ -6,7 +6,9 @@ import { submitApplication } from "@/lib/applications.functions";
 
 const searchSchema = z.object({
   tier: z.enum(["foundation", "mentorship", "elite"]).optional(),
+  promo: z.string().max(32).optional(),
 });
+
 
 export const Route = createFileRoute("/apply")({
   validateSearch: (s) => searchSchema.parse(s),
