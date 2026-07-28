@@ -6,7 +6,9 @@ import { submitApplication } from "@/lib/applications.functions";
 
 const searchSchema = z.object({
   tier: z.enum(["foundation", "mentorship", "elite"]).optional(),
+  promo: z.string().max(32).optional(),
 });
+
 
 export const Route = createFileRoute("/apply")({
   validateSearch: (s) => searchSchema.parse(s),
@@ -25,12 +27,18 @@ export const Route = createFileRoute("/apply")({
 });
 
 function ApplyPage() {
-  const { tier } = useSearch({ from: "/apply" });
+  const { tier, promo } = useSearch({ from: "/apply" });
   const submit = useServerFn(submitApplication);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<null | { timezone: string; scheduledAtLocal: string; scheduledAtLA: string }>(null);
   const [error, setError] = useState<string | null>(null);
   const guessTz = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "America/Los_Angeles";
+  const promoApplied = promo?.toUpperCase() === "1MILL";
+  const priceLabel = (base: number) =>
+    promoApplied
+      ? `$${Math.round(base * 0.8).toLocaleString()} (20% off with 1MILL)`
+      : `$${base.toLocaleString()}`;
+
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -108,11 +116,17 @@ function ApplyPage() {
               defaultValue={tier || "mentorship"}
               className="mt-2 h-12 w-full rounded-xl border border-border bg-background px-4 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              <option value="foundation">Foundation — $499</option>
-              <option value="mentorship">Mentorship — $1,499</option>
-              <option value="elite">Elite — $2,999</option>
+              <option value="foundation">Foundation — {priceLabel(499)}</option>
+              <option value="mentorship">Mentorship — {priceLabel(1499)}</option>
+              <option value="elite">Elite — {priceLabel(2999)}</option>
             </select>
+            {promoApplied && (
+              <p className="mt-2 text-xs font-medium uppercase tracking-widest text-foreground">
+                Promo <span className="font-mono">1MILL</span> applied — 20% off
+              </p>
+            )}
           </div>
+
 
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Full name" name="fullName" required />
