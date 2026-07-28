@@ -413,33 +413,31 @@ function LiveEnrollmentTile() {
     .slice(0, 2);
 
   return (
-    <div className="text-center">
-      <div
-        className={cn(
-          "mx-auto flex min-h-[64px] items-center justify-center gap-3 transition-all duration-500 ease-out sm:min-h-[72px]",
-          visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1",
-        )}
-      >
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-foreground font-display text-sm font-medium text-background sm:h-12 sm:w-12">
-          {initials}
-        </div>
-        <div className="text-left">
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-foreground opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-foreground" />
-            </span>
-            <p className="font-display text-sm font-medium text-foreground sm:text-base">
-              {person.name}
-            </p>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Just enrolled · {person.tier}
+    <div
+      className={cn(
+        "flex items-center gap-4 transition-all duration-500 ease-out",
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1",
+      )}
+    >
+      <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-background/10 font-mono text-sm font-medium tracking-tight text-background ring-1 ring-background/20">
+        {initials}
+        <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-background opacity-60" />
+          <span className="relative inline-flex h-full w-full rounded-full bg-background" />
+        </span>
+      </div>
+      <div className="min-w-0 text-left">
+        <div className="flex items-center gap-2">
+          <p className="font-display text-sm font-medium text-background sm:text-base">
+            {person.name}
           </p>
-          <p className="text-[11px] uppercase tracking-widest text-muted-foreground/80">
-            {person.city}
-          </p>
+          <span className="rounded-full bg-background/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-background/80">
+            Just enrolled
+          </span>
         </div>
+        <p className="text-xs text-background/60 sm:text-sm">
+          {person.tier} · {person.city}
+        </p>
       </div>
     </div>
   );
