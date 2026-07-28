@@ -510,7 +510,7 @@ function PricingSection() {
                 ))}
               </ul>
               <a
-                href="#cta"
+                href="/auth?mode=signup"
                 className={`rounded-full px-6 py-3 text-center text-sm font-semibold transition-colors ${
                   plan.featured
                     ? "bg-primary-foreground text-primary hover:bg-primary-foreground/90"
