@@ -369,9 +369,82 @@ function HeroSection({ stats }: { stats: SiteStats }) {
   );
 }
 
+const ENROLLMENTS = [
+  { name: "Marcus T.", city: "Austin, TX", tier: "Mentorship" },
+  { name: "Priya S.", city: "London, UK", tier: "Elite" },
+  { name: "Daniel R.", city: "Miami, FL", tier: "Foundation" },
+  { name: "Chidi O.", city: "Lagos, NG", tier: "Mentorship" },
+  { name: "Sofia L.", city: "Madrid, ES", tier: "Mentorship" },
+  { name: "Kenji A.", city: "Tokyo, JP", tier: "Elite" },
+  { name: "Amara J.", city: "Atlanta, GA", tier: "Foundation" },
+  { name: "Liam W.", city: "Toronto, CA", tier: "Mentorship" },
+  { name: "Noor H.", city: "Dubai, AE", tier: "Elite" },
+  { name: "Ethan B.", city: "Chicago, IL", tier: "Mentorship" },
+  { name: "Isabella F.", city: "São Paulo, BR", tier: "Foundation" },
+  { name: "Jonas M.", city: "Berlin, DE", tier: "Mentorship" },
+  { name: "Ava P.", city: "New York, NY", tier: "Elite" },
+  { name: "Ravi K.", city: "Mumbai, IN", tier: "Mentorship" },
+  { name: "Zara N.", city: "Cape Town, ZA", tier: "Foundation" },
+];
+
+function LiveEnrollmentTile({ label }: { label: string }) {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const cycle = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % ENROLLMENTS.length);
+        setVisible(true);
+      }, 260);
+    }, 3200);
+    return () => clearInterval(cycle);
+  }, []);
+
+  const person = ENROLLMENTS[index];
+  const initials = person.name
+    .split(" ")
+    .map((p) => p[0])
+    .join("")
+    .slice(0, 2);
+
+  return (
+    <div className="text-center">
+      <div
+        className={cn(
+          "mx-auto flex min-h-[64px] items-center justify-center gap-3 transition-all duration-300 ease-out sm:min-h-[72px]",
+          visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1",
+        )}
+      >
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-foreground font-display text-sm font-medium text-background sm:h-12 sm:w-12">
+          {initials}
+        </div>
+        <div className="text-left">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-foreground opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-foreground" />
+            </span>
+            <p className="font-display text-sm font-medium text-foreground sm:text-base">
+              {person.name}
+            </p>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Just enrolled · {person.tier}
+          </p>
+          <p className="text-[11px] uppercase tracking-widest text-muted-foreground/80">
+            {person.city}
+          </p>
+        </div>
+      </div>
+      <p className="mt-2 text-sm text-muted-foreground">{label}</p>
+    </div>
+  );
+}
+
 function StatsSection({ stats }: { stats: SiteStats }) {
   const items = [
-    { value: stats.cohort_value, label: stats.cohort_label },
     { value: "12", label: "Week structured program" },
     { value: "1:1", label: "Mentor relationship" },
     { value: stats.results_value, label: stats.results_label },
@@ -380,6 +453,7 @@ function StatsSection({ stats }: { stats: SiteStats }) {
   return (
     <section className="border-y border-border bg-surface px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 sm:grid-cols-4">
+        <LiveEnrollmentTile label={stats.cohort_label} />
         {items.map((stat) => (
           <div key={stat.label} className="text-center">
             <p className="font-display text-3xl font-medium text-foreground sm:text-4xl">{stat.value}</p>
