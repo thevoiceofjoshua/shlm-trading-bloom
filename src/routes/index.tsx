@@ -161,18 +161,9 @@ function HeroSection() {
                 <span className="transition-transform group-hover:translate-x-0.5">→</span>
               </a>
             </div>
-            <div className="mt-10 flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-secondary text-xs font-medium text-secondary-foreground"
-                  >
-                    {String.fromCharCode(64 + i)}
-                  </div>
-                ))}
-              </div>
-              <span>Trusted by 200+ active traders</span>
+            <div className="mt-10 flex items-center gap-3 text-sm text-muted-foreground">
+              <span className="inline-flex h-2 w-2 rounded-full bg-foreground" />
+              <span>New cohort now enrolling — results tracked live from day one</span>
             </div>
           </div>
 
