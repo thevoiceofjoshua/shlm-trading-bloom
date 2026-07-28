@@ -20,6 +20,7 @@ interface Props {
   experience?: string
   goals?: string
   scheduledAt?: string
+  scheduledAtLA?: string
   timezone?: string
 }
 
@@ -31,6 +32,7 @@ const Email = ({
   experience = '',
   goals = '',
   scheduledAt = '',
+  scheduledAtLA = '',
   timezone = '',
 }: Props) => (
   <Html lang="en" dir="ltr">
@@ -49,8 +51,9 @@ const Email = ({
           <Row label="Phone" value={phone || '—'} />
           <Row label="Tier" value={tier} />
           <Hr style={hr} />
-          <Row label="Scheduled call" value={scheduledAt} />
-          <Row label="Timezone" value={timezone || '—'} />
+          <Row label="Applicant timezone" value={timezone || '—'} />
+          <Row label={`Scheduled call (${timezone || 'applicant local'})`} value={scheduledAt} />
+          <Row label="Scheduled call (LA)" value={scheduledAtLA || scheduledAt} />
         </Section>
 
         <Section style={card}>
@@ -86,8 +89,9 @@ export const template = {
     tier: 'Mentorship',
     experience: '2 years trading futures',
     goals: 'Consistency and risk management',
-    scheduledAt: 'Aug 5, 2026, 2:00 PM',
-    timezone: 'America/Los_Angeles',
+    scheduledAt: 'Wednesday, August 5, 2026 at 5:00 PM',
+    scheduledAtLA: 'Wednesday, August 5, 2026 at 2:00 PM',
+    timezone: 'America/New_York',
   },
 } satisfies TemplateEntry
 
