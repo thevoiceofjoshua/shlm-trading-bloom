@@ -177,7 +177,7 @@ function HeroSection({ stats }: { stats: SiteStats }) {
             </div>
             <div className="mt-10 flex items-center gap-3 text-sm text-muted-foreground">
               <span className="inline-flex h-2 w-2 rounded-full bg-foreground" />
-              <span>New cohort now enrolling — results tracked live from day one</span>
+              <span>{stats.hero_note}</span>
             </div>
           </div>
 
@@ -187,9 +187,9 @@ function HeroSection({ stats }: { stats: SiteStats }) {
               <div className="relative flex h-full flex-col justify-between text-primary-foreground">
                 <div>
                   <p className="font-display text-sm uppercase tracking-widest opacity-70">Live performance</p>
-                  <p className="mt-2 font-display text-5xl font-medium sm:text-6xl">Tracking</p>
+                  <p className="mt-2 font-display text-5xl font-medium sm:text-6xl">{stats.performance_value}</p>
                   <p className="mt-1 text-sm opacity-70">
-                    Verified member results tracked live from July 2026 — real numbers, published as they happen.
+                    {stats.performance_note}
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-4 sm:gap-6">
