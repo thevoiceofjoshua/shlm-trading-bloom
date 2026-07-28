@@ -1,8 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useState } from "react";
+import { getSiteStats, type SiteStats } from "@/lib/site-stats.functions";
+
+const siteStatsQuery = (fn: () => Promise<SiteStats>) =>
+  queryOptions({ queryKey: ["site_stats"], queryFn: fn, staleTime: 30_000 });
 
 export const Route = createFileRoute("/")({
   component: Index,
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(
+      siteStatsQuery(() => getSiteStats()),
+    );
+  },
   head: () => ({
     meta: [
       { title: "SHLM — Premium Trading Mentorship" },
@@ -17,13 +28,15 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const getFn = useServerFn(getSiteStats);
+  const { data: stats } = useSuspenseQuery(siteStatsQuery(() => getFn()));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       <main>
-        <HeroSection />
-        <StatsSection />
+        <HeroSection stats={stats} />
+        <StatsSection stats={stats} />
         <FeaturesSection />
         <ProgramSection />
         <MentorshipSection />
@@ -36,6 +49,7 @@ function Index() {
     </div>
   );
 }
+
 
 function Header({
   mobileMenuOpen,
