@@ -13,6 +13,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SuccessRouteImport } from './routes/success'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RefundRouteImport } from './routes/refund'
+import { Route as ProgramRouteImport } from './routes/program'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -38,6 +39,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const RefundRoute = RefundRouteImport.update({
   id: '/refund',
   path: '/refund',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramRoute = ProgramRouteImport.update({
+  id: '/program',
+  path: '/program',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/privacy': typeof PrivacyRoute
+  '/program': typeof ProgramRoute
   '/refund': typeof RefundRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/success': typeof SuccessRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/privacy': typeof PrivacyRoute
+  '/program': typeof ProgramRoute
   '/refund': typeof RefundRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/success': typeof SuccessRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/privacy': typeof PrivacyRoute
+  '/program': typeof ProgramRoute
   '/refund': typeof RefundRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/success': typeof SuccessRoute
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/privacy'
+    | '/program'
     | '/refund'
     | '/sitemap.xml'
     | '/success'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/privacy'
+    | '/program'
     | '/refund'
     | '/sitemap.xml'
     | '/success'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/privacy'
+    | '/program'
     | '/refund'
     | '/sitemap.xml'
     | '/success'
@@ -153,6 +165,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   PrivacyRoute: typeof PrivacyRoute
+  ProgramRoute: typeof ProgramRoute
   RefundRoute: typeof RefundRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SuccessRoute: typeof SuccessRoute
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/refund'
       fullPath: '/refund'
       preLoaderRoute: typeof RefundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/program': {
+      id: '/program'
+      path: '/program'
+      fullPath: '/program'
+      preLoaderRoute: typeof ProgramRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -241,6 +261,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   PrivacyRoute: PrivacyRoute,
+  ProgramRoute: ProgramRoute,
   RefundRoute: RefundRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SuccessRoute: SuccessRoute,
@@ -250,13 +271,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

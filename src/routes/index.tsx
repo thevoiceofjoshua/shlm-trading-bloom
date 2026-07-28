@@ -95,7 +95,7 @@ function Header({
   setMobileMenuOpen: (open: boolean) => void;
 }) {
   const navLinks = [
-    { label: "Program", href: "#program" },
+    { label: "Program", href: "/program" },
     { label: "Mentorship", href: "#mentorship" },
     { label: "Pricing", href: "#pricing" },
     { label: "FAQ", href: "#faq" },
@@ -204,7 +204,7 @@ function HeroSection({ stats }: { stats: SiteStats }) {
                 Start your application
               </a>
               <a
-                href="#program"
+                href="/program"
                 className="group inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-accent"
               >
                 Explore the program
