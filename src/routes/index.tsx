@@ -329,10 +329,10 @@ function HeroSection({ stats }: { stats: SiteStats }) {
             <span className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>
         </div>
-        <div className="mt-10 flex items-center justify-center gap-3 text-xs text-white/60 sm:mt-12 sm:text-sm">
-          <span className="inline-flex h-2 w-2 rounded-full bg-white" />
-          <span>{stats.hero_note}</span>
+        <div className="mt-10 flex items-center justify-center sm:mt-12">
+          <LiveEnrollmentTicker />
         </div>
+
       </div>
 
       {/* Social links — bottom left */}
@@ -451,6 +451,42 @@ function LiveEnrollmentTile() {
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function LiveEnrollmentTicker() {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const cycle = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % ENROLLMENTS.length);
+        setVisible(true);
+      }, 520);
+    }, 6800);
+    return () => clearInterval(cycle);
+  }, []);
+
+  const person = ENROLLMENTS[index];
+
+  return (
+    <div className="flex items-center gap-3 text-xs text-white/70 sm:text-sm">
+      <span className="relative flex h-2 w-2 shrink-0">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-60" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+      </span>
+      <span
+        className={cn(
+          "transition-all duration-500 ease-out",
+          visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1",
+        )}
+      >
+        <span className="font-medium text-white">{person.name}</span>
+        <span className="text-white/50"> just enrolled · {person.tier} · {person.city}</span>
+      </span>
     </div>
   );
 }
