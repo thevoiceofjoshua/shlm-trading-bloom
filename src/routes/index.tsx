@@ -142,23 +142,21 @@ function PromoBanner() {
           <button
             type="button"
             onClick={copy}
-            className="mx-0.5 inline-flex items-center gap-1 rounded-sm bg-background/10 px-1.5 py-0.5 font-mono font-bold tracking-widest text-background transition-colors hover:bg-background/20"
+            className={cn(
+              "mx-0.5 inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 font-mono font-bold tracking-widest text-background transition-colors",
+              copied ? "bg-background/25" : "bg-background/10 hover:bg-background/20",
+            )}
             aria-label="Copy promo code 1MILL"
           >
             1MILL
-            <span className="text-[9px] font-normal opacity-70">
-              {copied ? "copied" : "copy"}
-            </span>
           </button>{" "}
           for 20% off
         </span>
-        <a href="#pricing" className="hidden underline-offset-2 hover:underline sm:inline">
-          Claim →
-        </a>
       </div>
     </div>
   );
 }
+
 
 function Header({
   mobileMenuOpen,
