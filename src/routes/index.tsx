@@ -182,8 +182,10 @@ function HeroSection() {
               <div className="relative flex h-full flex-col justify-between text-primary-foreground">
                 <div>
                   <p className="font-display text-sm uppercase tracking-widest opacity-70">Live performance</p>
-                  <p className="mt-2 font-display text-5xl font-medium sm:text-6xl">+47.3%</p>
-                  <p className="mt-1 text-sm opacity-70">Average member return, trailing 12 months</p>
+                  <p className="mt-2 font-display text-5xl font-medium sm:text-6xl">Tracking</p>
+                  <p className="mt-1 text-sm opacity-70">
+                    Verified member results tracked live from July 2026 — real numbers, published as they happen.
+                  </p>
                 </div>
                 <div className="grid grid-cols-2 gap-4 sm:gap-6">
                   <div className="rounded-2xl bg-primary-foreground/10 p-4 backdrop-blur-sm">
