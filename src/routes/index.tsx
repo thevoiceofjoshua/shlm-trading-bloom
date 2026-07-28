@@ -181,6 +181,17 @@ function Header({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!href.startsWith("#")) return;
+    const el = document.getElementById(href.slice(1));
+    if (!el) return;
+    e.preventDefault();
+    const rect = el.getBoundingClientRect();
+    const top = window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    history.replaceState(null, "", href);
+  };
+
   return (
     <header
       className={cn(
@@ -205,6 +216,7 @@ function Header({
               <a
                 key={link.href}
                 href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
                 className={cn(
                   "text-sm font-medium transition-colors",
                   scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/70 hover:text-white",
@@ -269,7 +281,10 @@ function Header({
               <a
                 key={link.href}
                 href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={(e) => {
+                  setMobileMenuOpen(false);
+                  handleNavClick(e, link.href);
+                }}
                 className={cn(
                   "flex min-h-12 items-center border-b py-3 text-base font-medium transition-colors",
                   scrolled
