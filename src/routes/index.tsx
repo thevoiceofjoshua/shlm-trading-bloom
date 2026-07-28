@@ -664,18 +664,16 @@ function PricingSection() {
                   </li>
                 ))}
               </ul>
-              <button
-                type="button"
-                onClick={() => handleCheckout(plan.key)}
-                disabled={loadingTier !== null}
-                className={`rounded-full px-6 py-3 text-center text-sm font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
+              <a
+                href={`/apply?tier=${plan.key}`}
+                className={`rounded-full px-6 py-3 text-center text-sm font-semibold transition-colors ${
                   plan.featured
                     ? "bg-primary-foreground text-primary hover:bg-primary-foreground/90"
                     : "bg-primary text-primary-foreground hover:bg-primary/90"
                 }`}
               >
-                {loadingTier === plan.key ? "Redirecting…" : plan.cta}
-              </button>
+                {plan.cta}
+              </a>
 
             </div>
           ))}
