@@ -34,10 +34,6 @@ function ApplyPage() {
   const [error, setError] = useState<string | null>(null);
   const guessTz = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "America/Los_Angeles";
   const promoApplied = promo?.toUpperCase() === "1MILL";
-  const priceLabel = (base: number) =>
-    promoApplied
-      ? `$${Math.round(base * 0.8).toLocaleString()} (20% off with 1MILL)`
-      : `$${base.toLocaleString()}`;
 
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
