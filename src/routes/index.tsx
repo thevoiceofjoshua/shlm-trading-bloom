@@ -216,6 +216,7 @@ function Header({
               <a
                 key={link.href}
                 href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
                 className={cn(
                   "text-sm font-medium transition-colors",
                   scrolled ? "text-muted-foreground hover:text-foreground" : "text-white/70 hover:text-white",
