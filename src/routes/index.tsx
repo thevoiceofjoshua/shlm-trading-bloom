@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getSiteStats, type SiteStats } from "@/lib/site-stats.functions";
 import { DISCORD_JOIN_URL } from "@/lib/external-links";
+import { useAuthUser } from "@/hooks/use-auth-user";
+import { AccountMenu } from "@/components/AccountMenu";
 
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
 
@@ -171,6 +173,7 @@ function Header({
   setMobileMenuOpen: (open: boolean) => void;
 }) {
   const [scrolled, setScrolled] = useState(false);
+  const { user } = useAuthUser();
   const navLinks = [
     { label: "Program", href: "/program" },
     { label: "Mentorship", href: "#mentorship" },
@@ -233,28 +236,34 @@ function Header({
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          <a
-            href="/auth?mode=signin"
-            className={cn(
-              "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-              scrolled
-                ? "border-border bg-background text-foreground hover:bg-accent"
-                : "border-white/20 bg-white/10 text-white hover:bg-white/20",
-            )}
-          >
-            Log in
-          </a>
-          <a
-            href="/auth?mode=signup"
-            className={cn(
-              "rounded-full px-4 py-2 text-sm font-medium transition-colors",
-              scrolled
-                ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                : "bg-white text-foreground hover:bg-white/90",
-            )}
-          >
-            Create account
-          </a>
+          {user ? (
+            <AccountMenu user={user} scrolled={scrolled} />
+          ) : (
+            <>
+              <a
+                href="/auth?mode=signin"
+                className={cn(
+                  "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+                  scrolled
+                    ? "border-border bg-background text-foreground hover:bg-accent"
+                    : "border-white/20 bg-white/10 text-white hover:bg-white/20",
+                )}
+              >
+                Log in
+              </a>
+              <a
+                href="/auth?mode=signup"
+                className={cn(
+                  "rounded-full px-4 py-2 text-sm font-medium transition-colors",
+                  scrolled
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-white text-foreground hover:bg-white/90",
+                )}
+              >
+                Create account
+              </a>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-2 md:hidden">
@@ -300,30 +309,36 @@ function Header({
               </a>
             ))}
             <div className="mt-5 flex flex-col gap-3">
-              <a
-                href="/auth?mode=signin"
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  "flex min-h-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition-colors",
-                  scrolled
-                    ? "border-border bg-background text-foreground hover:bg-accent"
-                    : "border-white/20 bg-white/10 text-white hover:bg-white/20",
-                )}
-              >
-                Log in
-              </a>
-              <a
-                href="/auth?mode=signup"
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  "flex min-h-12 items-center justify-center rounded-full px-4 text-sm font-semibold transition-colors",
-                  scrolled
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                    : "bg-white text-foreground hover:bg-white/90",
-                )}
-              >
-                Create account
-              </a>
+              {user ? (
+                <AccountMenu user={user} scrolled={scrolled} variant="mobile" />
+              ) : (
+                <>
+                  <a
+                    href="/auth?mode=signin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      "flex min-h-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition-colors",
+                      scrolled
+                        ? "border-border bg-background text-foreground hover:bg-accent"
+                        : "border-white/20 bg-white/10 text-white hover:bg-white/20",
+                    )}
+                  >
+                    Log in
+                  </a>
+                  <a
+                    href="/auth?mode=signup"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      "flex min-h-12 items-center justify-center rounded-full px-4 text-sm font-semibold transition-colors",
+                      scrolled
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                        : "bg-white text-foreground hover:bg-white/90",
+                    )}
+                  >
+                    Create account
+                  </a>
+                </>
+              )}
             </div>
           </nav>
         </div>
@@ -1172,6 +1187,7 @@ function CtaSection() {
 }
 
 function Footer() {
+  const { user } = useAuthUser();
   return (
     <footer className="border-t border-border bg-background px-4 py-16 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
@@ -1207,16 +1223,26 @@ function Footer() {
           <div>
             <h4 className="font-display text-sm font-semibold uppercase tracking-widest text-foreground">Account</h4>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-              <li>
-                <a href="/auth?mode=signin" className="hover:text-foreground">
-                  Log in
-                </a>
-              </li>
-              <li>
-                <a href="/auth?mode=signup" className="hover:text-foreground">
-                  Create account
-                </a>
-              </li>
+              {user ? (
+                <li>
+                  <a href="/dashboard" className="hover:text-foreground">
+                    Dashboard
+                  </a>
+                </li>
+              ) : (
+                <>
+                  <li>
+                    <a href="/auth?mode=signin" className="hover:text-foreground">
+                      Log in
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/auth?mode=signup" className="hover:text-foreground">
+                      Create account
+                    </a>
+                  </li>
+                </>
+              )}
               <li>
                 <a href="#discord" className="hover:text-foreground">
                   Discord
