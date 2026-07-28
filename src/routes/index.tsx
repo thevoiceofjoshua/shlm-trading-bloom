@@ -936,22 +936,22 @@ function CtaSection() {
   return (
     <section id="cta" className="bg-primary px-4 py-20 text-primary-foreground sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-4xl text-center">
-        <h2 className="font-display text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl">
+        <h2 className="font-display text-[clamp(2rem,6vw,3.5rem)] font-medium leading-[1.05] tracking-tight">
           Ready to stop guessing and start building your edge?
         </h2>
-        <p className="mx-auto mt-6 max-w-2xl text-lg opacity-80">
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed opacity-80 sm:text-lg">
           Applications are reviewed weekly. If SHLM is the right fit, we’ll invite you to enroll and begin the onboarding process.
         </p>
-        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <div className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:gap-4">
           <a
             href="/auth?mode=signup"
-            className="rounded-full bg-primary-foreground px-8 py-4 text-sm font-semibold text-primary transition-transform hover:scale-[1.02]"
+            className="flex min-h-12 items-center justify-center rounded-full bg-primary-foreground px-8 text-sm font-semibold text-primary transition-transform hover:scale-[1.02]"
           >
             Create your account
           </a>
           <a
             href="#program"
-            className="rounded-full border border-primary-foreground/30 px-8 py-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/10"
+            className="flex min-h-12 items-center justify-center rounded-full border border-primary-foreground/30 px-8 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-foreground/10"
           >
             Review the curriculum
           </a>
