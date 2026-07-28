@@ -9,10 +9,15 @@ export const TIERS = {
 
 export type TierKey = keyof typeof TIERS;
 
+const PROMO_CODES: Record<string, number> = {
+  "1MILL": 0.2,
+};
+
 const inputSchema = z.object({
   tier: z.enum(["foundation", "mentorship", "elite"]),
   email: z.string().email().optional(),
   origin: z.string().url(),
+  promoCode: z.string().trim().max(32).optional(),
 });
 
 export const createCheckoutSession = createServerFn({ method: "POST" })
@@ -24,6 +29,11 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     const stripe = new Stripe(secret);
 
     const tier = TIERS[data.tier];
+    const normalizedCode = data.promoCode?.toUpperCase();
+    const discount = normalizedCode ? PROMO_CODES[normalizedCode] ?? 0 : 0;
+    const finalAmount = Math.round(tier.amount * (1 - discount));
+    const productName = discount > 0 ? `${tier.name} (${normalizedCode} • ${Math.round(discount * 100)}% off)` : tier.name;
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -31,20 +41,25 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         {
           price_data: {
             currency: "usd",
-            product_data: { name: tier.name },
-            unit_amount: tier.amount,
+            product_data: { name: productName },
+            unit_amount: finalAmount,
           },
           quantity: 1,
         },
       ],
       customer_email: data.email,
-      metadata: { tier: data.tier },
+      metadata: {
+        tier: data.tier,
+        promo_code: discount > 0 ? normalizedCode! : "",
+        original_amount: String(tier.amount),
+      },
       success_url: `${data.origin}/success?tier=${data.tier}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${data.origin}/#pricing`,
     });
 
     return { url: session.url };
   });
+
 
 const verifySchema = z.object({ session_id: z.string().min(1) });
 
