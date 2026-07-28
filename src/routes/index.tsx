@@ -114,7 +114,7 @@ function Header({
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 transition-colors duration-300",
+        "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
         scrolled
           ? "border-b border-border bg-background/80 backdrop-blur-md text-foreground"
           : "bg-transparent text-white",
@@ -226,7 +226,7 @@ function Header({
 
 function HeroSection({ stats }: { stats: SiteStats }) {
   return (
-    <section className="dark relative -mt-16 flex min-h-screen items-center justify-center overflow-hidden bg-background">
+    <section className="dark relative flex min-h-screen items-center justify-center overflow-hidden bg-background">
       <div className="absolute inset-0">
         <img
           src={heroBg}
