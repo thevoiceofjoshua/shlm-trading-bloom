@@ -348,7 +348,7 @@ function HeroSection({ stats }: { stats: SiteStats }) {
           </svg>
         </a>
         <a
-          href="https://discord.gg/shlm"
+          href="https://discord.gg/nZRhH42j"
           target="_blank"
           rel="noreferrer"
           className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
@@ -800,7 +800,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
 }
 
 function DiscordSection() {
-  const inviteUrl = "https://discord.gg/shlm";
+  const inviteUrl = "https://discord.gg/nZRhH42j";
   return (
     <section id="discord" className="border-t border-border bg-background px-4 py-24 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
