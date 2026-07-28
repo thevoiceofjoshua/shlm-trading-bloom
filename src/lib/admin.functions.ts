@@ -127,10 +127,46 @@ export const sendPaymentLink = createServerFn({ method: "POST" })
         payment_link_sent_at: new Date().toISOString(),
         payment_link_session_id: session.id,
         payment_link_status: "sent",
+        status: "approved",
       })
       .eq("id", app.id);
 
     if (updateError) throw new Error(updateError.message);
 
     return { sent: true, sessionId: session.id };
+  });
+
+const denySchema = z.object({
+  passcode: z.string().min(1),
+  applicationId: z.string().uuid(),
+});
+
+export const denyApplication = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => denySchema.parse(data))
+  .handler(async ({ data }) => {
+    verifyPasscode(data.passcode);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: app, error: fetchError } = await supabaseAdmin
+      .from("applications")
+      .select("id, full_name, email")
+      .eq("id", data.applicationId)
+      .single();
+
+    if (fetchError || !app) throw new Error(fetchError?.message || "Application not found");
+
+    const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+    await sendTemplateEmail("application-denial", app.email, {
+      idempotencyKey: `denial-${app.id}`,
+      templateData: { fullName: app.full_name },
+    });
+
+    const { error: updateError } = await supabaseAdmin
+      .from("applications")
+      .update({ status: "denied" })
+      .eq("id", app.id);
+
+    if (updateError) throw new Error(updateError.message);
+
+    return { denied: true };
   });
