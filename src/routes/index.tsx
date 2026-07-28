@@ -151,19 +151,19 @@ function Header({
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-colors duration-300",
         scrolled
-          ? "border-b border-border bg-background/80 backdrop-blur-md text-foreground"
+          ? "border-b border-border bg-background/85 backdrop-blur-md text-foreground"
           : "bg-transparent text-white",
       )}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <a href="/" className="font-display text-xl font-semibold tracking-tight">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6 sm:py-4 lg:px-8">
+        <a href="/" className="font-display text-lg font-semibold tracking-tight sm:text-xl">
           SHLM
         </a>
 
         <div className="hidden items-center gap-8 md:flex">
           <LiveClock scrolled={scrolled} />
 
-          <nav className="flex items-center gap-8">
+          <nav className="flex items-center gap-7 lg:gap-8">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -204,14 +204,25 @@ function Header({
           </a>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="inline-flex items-center justify-center rounded-md p-2 md:hidden"
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <span className="hidden xs:inline-flex">
+            <LiveClock scrolled={scrolled} />
+          </span>
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className={cn(
+              "inline-flex h-11 w-11 items-center justify-center rounded-full border transition-colors",
+              scrolled
+                ? "border-border text-foreground hover:bg-accent"
+                : "border-white/20 text-white hover:bg-white/10",
+            )}
+            aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
+        </div>
       </div>
 
       {mobileMenuOpen && (
