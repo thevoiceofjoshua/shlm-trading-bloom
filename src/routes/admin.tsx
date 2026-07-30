@@ -25,7 +25,7 @@ function AdminPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [actingId, setActingId] = useState<string | null>(null);
-  const [action, setAction] = useState<"approve" | "deny" | null>(null);
+  const [action, setAction] = useState<"approve" | "deny" | "resend" | null>(null);
   const [sendMsg, setSendMsg] = useState<{ id: string; ok: boolean; text: string } | null>(null);
   const [emailState, setEmailState] = useState<Record<string, "sending" | "sent" | "failed">>({});
 
@@ -57,6 +57,28 @@ function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
     } catch (e) {
       setSendMsg({ id, ok: false, text: e instanceof Error ? e.message : "Failed to send" });
+      setEmailState((s) => ({ ...s, [id]: "failed" }));
+    } finally {
+      setActingId(null);
+      setAction(null);
+    }
+  };
+
+  const handleResend = async (id: string) => {
+    if (!confirm("Resend the payment link email to this applicant?")) return;
+    setActingId(id);
+    setAction("resend");
+    setSendMsg(null);
+    setEmailState((s) => ({ ...s, [id]: "sending" }));
+    try {
+      await sendFn({
+        data: { passcode, applicationId: id, origin: window.location.origin, promoCode: "1MILL" },
+      });
+      setSendMsg({ id, ok: true, text: "Payment link email resent." });
+      setEmailState((s) => ({ ...s, [id]: "sent" }));
+      queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
+    } catch (e) {
+      setSendMsg({ id, ok: false, text: e instanceof Error ? e.message : "Failed to resend" });
       setEmailState((s) => ({ ...s, [id]: "failed" }));
     } finally {
       setActingId(null);
@@ -265,11 +287,22 @@ function AdminPage() {
                   </button>
                 </div>
               ) : (
-                <p className="mt-8 text-xs text-muted-foreground">
+                <div className="mt-8 space-y-3">
+                  {selected.status === "approved" && (
+                    <button
+                      onClick={() => handleResend(selected.id)}
+                      disabled={actingId === selected.id}
+                      className="rounded-full border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                    >
+                      {actingId === selected.id && action === "resend" ? "Resending…" : "Resend email"}
+                    </button>
+                  )}
+                <p className="text-xs text-muted-foreground">
                   {selected.status === "approved"
                     ? `Approved${selected.payment_link_sent_at ? ` · payment link sent ${new Date(selected.payment_link_sent_at).toLocaleDateString("en-US")}` : ""}.`
                     : "Denied."}
                 </p>
+                </div>
               )}
 
               {sendMsg?.id === selected.id && (
@@ -347,6 +380,16 @@ function AdminPage() {
                           className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
                         >
                           {actingId === app.id && action === "deny" ? "Denying…" : "Deny"}
+                        </button>
+                      </div>
+                    ) : app.status === "approved" ? (
+                      <div className="flex shrink-0 flex-wrap gap-2">
+                        <button
+                          onClick={() => handleResend(app.id)}
+                          disabled={actingId === app.id}
+                          className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                        >
+                          {actingId === app.id && action === "resend" ? "Resending…" : "Resend email"}
                         </button>
                       </div>
                     ) : null}
