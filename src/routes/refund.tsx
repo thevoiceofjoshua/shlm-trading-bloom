@@ -32,7 +32,7 @@ function RefundPage() {
         future renewals; the current billing period is not prorated.
       </p>
       <h2>How to request a refund</h2>
-      <p>Email support@shlmllc.com from the address on your account with your order details. We respond within 3 business days.</p>
+      <p>Email support@shlmtrdng.com from the address on your account with your order details. We respond within 3 business days.</p>
       <h2>Chargebacks</h2>
       <p>Please contact us before initiating a chargeback so we can resolve the issue directly.</p>
     </LegalShell>
