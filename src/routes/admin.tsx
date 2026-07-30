@@ -50,7 +50,7 @@ function AdminPage() {
     setEmailState((s) => ({ ...s, [id]: "sending" }));
     try {
       await sendFn({
-        data: { passcode, applicationId: id, origin: window.location.origin, promoCode: "1MILL" },
+        data: { passcode, applicationId: id, origin: window.location.origin },
       });
       setSendMsg({ id, ok: true, text: "Approved — payment link sent." });
       setEmailState((s) => ({ ...s, [id]: "sent" }));
@@ -72,7 +72,7 @@ function AdminPage() {
     setEmailState((s) => ({ ...s, [id]: "sending" }));
     try {
       await sendFn({
-        data: { passcode, applicationId: id, origin: window.location.origin, promoCode: "1MILL" },
+        data: { passcode, applicationId: id, origin: window.location.origin },
       });
       setSendMsg({ id, ok: true, text: "Payment link email resent." });
       setEmailState((s) => ({ ...s, [id]: "sent" }));
