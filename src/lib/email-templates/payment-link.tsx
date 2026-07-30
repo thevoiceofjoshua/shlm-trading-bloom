@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text } from '@react-email/components'
+import { Body, Button, Container, Head, Heading, Hr, Html, Preview, Section, Text } from '@react-email/components'
 import type { TemplateEntry } from './registry'
 
 interface Props {
@@ -23,46 +23,59 @@ const Email = ({
   return (
     <Html lang="en" dir="ltr">
       <Head />
-      <Preview>Your SHLM mentorship invitation is ready — complete your enrollment</Preview>
+      <Preview>Your SHLM Mentorship invitation is ready — complete your enrollment</Preview>
       <Body style={main}>
-        <Container style={container}>
-          <Section style={header}>
-            <Text style={monogram}>SHLM</Text>
+        <Container style={outer}>
+          {/* Hero panel */}
+          <Section style={hero}>
+            <Text style={heroGlow}>&nbsp;</Text>
+            <Text style={monogram}>S H L M</Text>
+            <Text style={heroRule}>&nbsp;</Text>
+            <Text style={heroKicker}>Application approved</Text>
+            <Heading style={heroTitle}>You&rsquo;re in.</Heading>
+            <Text style={heroSub}>{tier}</Text>
           </Section>
 
+          {/* Body panel */}
           <Section style={card}>
-            <Heading style={h1}>You're invited.</Heading>
-            <Text style={lead}>
-              Hi {firstName}, your application has been approved. You’re invited to join {tier}.
-            </Text>
-
+            <Text style={lead}>Hi {firstName},</Text>
             <Text style={body}>
-              Spots are limited and filled on a first-come basis. Complete your enrollment below to secure your place in the next cohort.
+              Congratulations — after reviewing your application, we&rsquo;d like to welcome you into the SHLM Mentorship.
+              You showed the discipline and intent we look for in a trader we can actually move the needle for.
+            </Text>
+            <Text style={body}>
+              Cohorts are kept intentionally small so every member gets direct, personal mentorship. Your seat is reserved
+              on a first-come basis — complete your enrollment below to lock it in.
             </Text>
 
-            {promoCode && discountPercent && (
-              <Section style={promoBadge}>
-                <Text style={promoText}>
-                  {discountPercent}% OFF APPLIED — CODE {promoCode}
-                </Text>
+            {promoCode && discountPercent ? (
+              <Section style={priceDark}>
+                <Text style={promoText}>{discountPercent}% off applied &middot; code {promoCode}</Text>
                 <Text style={priceWhite}>{amount}</Text>
-                <Text style={originalPriceWhite}>Discounted price</Text>
+                <Text style={priceCaptionLight}>Total due today</Text>
+              </Section>
+            ) : (
+              <Section style={priceDark}>
+                <Text style={priceWhite}>{amount}</Text>
+                <Text style={priceCaptionLight}>Total due today</Text>
               </Section>
             )}
 
-            {!promoCode && (
-              <Section style={priceBlock}>
-                <Text style={price}>{amount}</Text>
-                <Text style={originalPrice}>Total due today</Text>
-              </Section>
-            )}
+            <Section style={{ textAlign: 'center' as const }}>
+              <Button href={checkoutUrl} style={cta}>
+                Complete enrollment
+              </Button>
+            </Section>
 
-            <Button href={checkoutUrl} style={cta}>
-              Complete enrollment
-            </Button>
+            <Hr style={hr} />
+
+            <Text style={whatsNext}>What happens next</Text>
+            <Text style={step}><span style={stepNum}>01</span>&nbsp;&nbsp;Secure your seat through the link above.</Text>
+            <Text style={step}><span style={stepNum}>02</span>&nbsp;&nbsp;Receive your private dashboard and community access.</Text>
+            <Text style={step}><span style={stepNum}>03</span>&nbsp;&nbsp;We schedule your onboarding call and start building your plan.</Text>
 
             <Text style={finePrint}>
-              This secure link is personalized for you. If you have questions, reply to this email and Joshua will respond directly.
+              This link is personalized for you. Questions? Reply to this email and Joshua will respond directly.
             </Text>
           </Section>
 
@@ -91,22 +104,91 @@ export const template = {
   },
 } satisfies TemplateEntry
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Helvetica, Arial, sans-serif' }
-const container = { padding: '40px 24px', maxWidth: '600px', margin: '0 auto' }
-const header = { textAlign: 'center' as const, marginBottom: '32px' }
-const monogram = { fontSize: '28px', fontWeight: 700, letterSpacing: '0.18em', color: '#0a0a0a', margin: '0' }
-const card = { border: '1px solid #0a0a0a', borderRadius: '0px', padding: '40px', backgroundColor: '#ffffff' }
-const h1 = { fontSize: '32px', fontWeight: 600, letterSpacing: '-0.02em', color: '#0a0a0a', margin: '0 0 16px', lineHeight: '1.1' }
-const lead = { fontSize: '16px', color: '#171717', margin: '0 0 20px', lineHeight: '1.6' }
-const body = { fontSize: '15px', color: '#404040', margin: '0 0 28px', lineHeight: '1.6' }
-const promoBadge = { backgroundColor: '#0a0a0a', padding: '24px', textAlign: 'center' as const, marginBottom: '28px' }
-const promoText = { fontSize: '11px', fontWeight: 600, letterSpacing: '0.15em', color: '#ffffff', margin: '0 0 8px', textTransform: 'uppercase' as const }
-const priceBlock = { border: '1px solid #e5e5e5', padding: '24px', textAlign: 'center' as const, marginBottom: '28px' }
-const price = { fontSize: '36px', fontWeight: 600, letterSpacing: '-0.02em', color: '#0a0a0a', margin: '0' }
-const originalPrice = { fontSize: '12px', color: '#737373', margin: '6px 0 0', textTransform: 'uppercase' as const, letterSpacing: '0.1em' }
-const priceWhite = { fontSize: '36px', fontWeight: 600, letterSpacing: '-0.02em', color: '#ffffff', margin: '0' }
-const originalPriceWhite = { fontSize: '12px', color: '#a3a3a3', margin: '6px 0 0', textTransform: 'uppercase' as const, letterSpacing: '0.1em' }
-const cta = { backgroundColor: '#0a0a0a', color: '#ffffff', fontSize: '14px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' as const, padding: '18px 32px', textDecoration: 'none', display: 'inline-block', width: '100%', textAlign: 'center' as const, boxSizing: 'border-box' as const }
-const finePrint = { fontSize: '12px', color: '#a3a3a3', margin: '24px 0 0', lineHeight: '1.5', textAlign: 'center' as const }
-const footer = { fontSize: '12px', color: '#a3a3a3', textAlign: 'center' as const, marginTop: '32px', lineHeight: '1.6' }
+const main = { backgroundColor: '#ffffff', fontFamily: 'Helvetica, Arial, sans-serif', margin: '0', padding: '0' }
+const outer = { padding: '32px 20px 48px', maxWidth: '600px', margin: '0 auto' }
+
+const hero = {
+  backgroundColor: '#0a0a0a',
+  backgroundImage:
+    'linear-gradient(135deg, #000000 0%, #101010 45%, #1c1c1c 70%, #0a0a0a 100%)',
+  padding: '52px 40px 44px',
+  textAlign: 'center' as const,
+}
+const heroGlow = {
+  margin: '0 auto 28px',
+  height: '2px',
+  width: '64px',
+  backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, #ffffff 50%, rgba(255,255,255,0) 100%)',
+  fontSize: '1px',
+  lineHeight: '2px',
+}
+const monogram = { fontSize: '22px', fontWeight: 700, letterSpacing: '0.34em', color: '#ffffff', margin: '0' }
+const heroRule = {
+  margin: '22px auto',
+  height: '1px',
+  width: '40px',
+  backgroundColor: '#3a3a3a',
+  fontSize: '1px',
+  lineHeight: '1px',
+}
+const heroKicker = {
+  fontSize: '10px',
+  letterSpacing: '0.28em',
+  textTransform: 'uppercase' as const,
+  color: '#9c9c9c',
+  margin: '0 0 12px',
+}
+const heroTitle = { fontSize: '42px', fontWeight: 600, letterSpacing: '-0.03em', color: '#ffffff', margin: '0', lineHeight: '1.05' }
+const heroSub = { fontSize: '13px', letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: '#bdbdbd', margin: '14px 0 0' }
+
+const card = { border: '1px solid #e8e8e8', borderTop: 'none', padding: '40px', backgroundColor: '#ffffff' }
+const lead = { fontSize: '16px', color: '#0a0a0a', margin: '0 0 14px', lineHeight: '1.6', fontWeight: 600 }
+const body = { fontSize: '15px', color: '#454545', margin: '0 0 16px', lineHeight: '1.75' }
+
+const priceDark = {
+  backgroundColor: '#0a0a0a',
+  backgroundImage: 'linear-gradient(135deg, #0a0a0a 0%, #1e1e1e 100%)',
+  padding: '28px 24px',
+  textAlign: 'center' as const,
+  margin: '28px 0',
+}
+const promoText = {
+  fontSize: '10px',
+  fontWeight: 600,
+  letterSpacing: '0.2em',
+  color: '#c8c8c8',
+  margin: '0 0 10px',
+  textTransform: 'uppercase' as const,
+}
+const priceWhite = { fontSize: '40px', fontWeight: 600, letterSpacing: '-0.03em', color: '#ffffff', margin: '0', lineHeight: '1' }
+const priceCaptionLight = { fontSize: '10px', color: '#8f8f8f', margin: '10px 0 0', textTransform: 'uppercase' as const, letterSpacing: '0.2em' }
+
+const cta = {
+  backgroundColor: '#0a0a0a',
+  color: '#ffffff',
+  fontSize: '13px',
+  fontWeight: 600,
+  letterSpacing: '0.14em',
+  textTransform: 'uppercase' as const,
+  padding: '18px 32px',
+  textDecoration: 'none',
+  display: 'inline-block',
+  width: '100%',
+  textAlign: 'center' as const,
+  boxSizing: 'border-box' as const,
+}
+
+const hr = { borderColor: '#ececec', margin: '32px 0 24px' }
+const whatsNext = {
+  fontSize: '10px',
+  letterSpacing: '0.24em',
+  textTransform: 'uppercase' as const,
+  color: '#8f8f8f',
+  margin: '0 0 14px',
+}
+const step = { fontSize: '14px', color: '#2a2a2a', margin: '0 0 10px', lineHeight: '1.6' }
+const stepNum = { fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', color: '#b0b0b0' }
+
+const finePrint = { fontSize: '12px', color: '#a3a3a3', margin: '28px 0 0', lineHeight: '1.6', textAlign: 'center' as const }
+const footer = { fontSize: '12px', color: '#a3a3a3', textAlign: 'center' as const, marginTop: '28px', lineHeight: '1.7' }
 const footerLink = { color: '#737373', textDecoration: 'none' }
