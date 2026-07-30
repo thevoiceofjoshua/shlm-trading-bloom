@@ -23,6 +23,12 @@ export const TIERS: Record<TierKey, { name: string; amount: number; blurb: strin
 /** Program term used for upgrade proration. */
 export const TERM_MONTHS = 12;
 
+/**
+ * Proration is only offered when the member upgrades within this window of
+ * their original purchase. After that, upgrades are full price.
+ */
+export const PRORATION_WINDOW_DAYS = 42; // 6 weeks
+
 export function isTierKey(value: string | null | undefined): value is TierKey {
   return !!value && (TIER_ORDER as readonly string[]).includes(value);
 }
@@ -53,6 +59,9 @@ export type UpgradeQuote = {
   targetAmount: number;
   credit: number;
   amountDue: number;
+  prorated: boolean;
+  daysSincePurchase: number;
+  prorationWindowDays: number;
 };
 
 /**
@@ -69,9 +78,25 @@ export function quoteUpgrade(
   const remaining = TERM_MONTHS - used;
   const paid = TIERS[from].amount;
   const targetAmount = TIERS[to].amount;
-  const credit = Math.round((paid * remaining) / TERM_MONTHS);
-  const amountDue = Math.max(targetAmount - credit, 100);
-  return { from, to, monthsUsed: used, monthsRemaining: remaining, targetAmount, credit, amountDue };
+  const start = typeof purchasedAt === "string" ? new Date(purchasedAt) : purchasedAt;
+  const daysSincePurchase = Number.isNaN(start.getTime())
+    ? Number.POSITIVE_INFINITY
+    : Math.max(0, Math.floor((now.getTime() - start.getTime()) / 86_400_000));
+  const prorated = daysSincePurchase <= PRORATION_WINDOW_DAYS;
+  const credit = prorated ? Math.round((paid * remaining) / TERM_MONTHS) : 0;
+  const amountDue = prorated ? Math.max(targetAmount - credit, 100) : targetAmount;
+  return {
+    from,
+    to,
+    monthsUsed: used,
+    monthsRemaining: remaining,
+    targetAmount,
+    credit,
+    amountDue,
+    prorated,
+    daysSincePurchase: Number.isFinite(daysSincePurchase) ? daysSincePurchase : 9999,
+    prorationWindowDays: PRORATION_WINDOW_DAYS,
+  };
 }
 
 export function formatUsd(cents: number) {

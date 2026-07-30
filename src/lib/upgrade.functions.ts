@@ -83,7 +83,9 @@ export const createUpgradeCheckout = createServerFn({ method: "POST" })
             currency: "usd",
             product_data: {
               name: `Upgrade to ${TIERS[data.to].name}`,
-              description: `Prorated upgrade from ${TIERS[from].name} — ${quote.monthsUsed} of 12 months used, credit applied for ${quote.monthsRemaining} remaining.`,
+              description: quote.prorated
+                ? `Prorated upgrade from ${TIERS[from].name} — ${quote.monthsUsed} of 12 months used, credit applied for ${quote.monthsRemaining} remaining.`
+                : `Upgrade from ${TIERS[from].name} — full price (proration window of ${quote.prorationWindowDays} days has passed).`,
             },
             unit_amount: quote.amountDue,
           },
@@ -95,6 +97,7 @@ export const createUpgradeCheckout = createServerFn({ method: "POST" })
         tier: data.to,
         upgrade_from: from,
         upgrade_credit: String(quote.credit),
+        upgrade_prorated: String(quote.prorated),
         months_used: String(quote.monthsUsed),
         user_id: context.userId,
       },

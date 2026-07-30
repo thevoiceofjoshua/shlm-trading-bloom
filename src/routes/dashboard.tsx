@@ -223,7 +223,9 @@ function MembershipPanel() {
         <div>
           <h3 className="font-display text-xl font-medium tracking-tight">Upgrade your access</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Prorated pricing — you’re credited for the months of {info.name} you haven’t used yet.
+            {data.upgrades[0]?.prorated
+              ? `Prorated pricing — you’re credited for the months of ${info.name} you haven’t used yet. Available for the first ${data.upgrades[0].prorationWindowDays} days after purchase.`
+              : `Your ${data.upgrades[0]?.prorationWindowDays ?? 42}-day proration window has passed, so upgrades are at full price.`}
           </p>
           <div className="mt-6 grid gap-6 sm:grid-cols-2">
             {data.upgrades.map((q: UpgradeQuote) => (
@@ -233,13 +235,15 @@ function MembershipPanel() {
 
                 <div className="mt-5 space-y-2 border-t border-border pt-4 text-sm">
                   <Row label={`${TIERS[q.to].name} full price`} value={formatUsd(q.targetAmount)} />
-                  <Row
-                    label={`Credit · ${q.monthsRemaining} of ${TERM_MONTHS} months unused`}
-                    value={`− ${formatUsd(q.credit)}`}
-                  />
+                  {q.prorated && (
+                    <Row
+                      label={`Credit · ${q.monthsRemaining} of ${TERM_MONTHS} months unused`}
+                      value={`− ${formatUsd(q.credit)}`}
+                    />
+                  )}
                   <div className="flex items-baseline justify-between border-t border-border pt-3">
                     <span className="text-xs uppercase tracking-widest text-muted-foreground">
-                      Prorated today
+                      {q.prorated ? "Prorated today" : "Due today"}
                     </span>
                     <span className="font-display text-2xl font-medium">{formatUsd(q.amountDue)}</span>
                   </div>
