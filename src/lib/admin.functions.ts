@@ -56,52 +56,17 @@ export const sendPaymentLink = createServerFn({ method: "POST" })
       throw new Error("Invalid tier");
     }
 
-    const secret = process.env.STRIPE_LIVE_API_KEY;
-    if (!secret) throw new Error("Stripe not configured");
-    const { default: Stripe } = await import("stripe");
-    const stripe = new Stripe(secret);
+    const SITE_URL = "https://shlmtrdng.com";
 
-    const TIERS = {
-      foundation: { name: "SHLM Foundation", amount: 49900 },
-      mentorship: { name: "SHLM Mentorship", amount: 149900 },
-      elite: { name: "SHLM Elite", amount: 299900 },
-    } as const;
-
-    const PROMO_CODES: Record<string, number> = { "1MILL": 0.2 };
-
-    const tierInfo = TIERS[tier];
-    const normalizedCode = data.promoCode?.toUpperCase();
-    const discount = normalizedCode ? PROMO_CODES[normalizedCode] ?? 0 : 0;
-    const finalAmount = Math.round(tierInfo.amount * (1 - discount));
-    const productName = discount > 0
-      ? `${tierInfo.name} (${normalizedCode} • ${Math.round(discount * 100)}% off)`
-      : tierInfo.name;
-
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: { name: productName },
-            unit_amount: finalAmount,
-          },
-          quantity: 1,
-        },
-      ],
-      customer_email: app.email,
-      metadata: {
+    const { createApplicationCheckout } = await import("@/lib/enroll.server");
+    const { session, tierInfo, finalAmount, normalizedCode, discount } =
+      await createApplicationCheckout({
+        applicationId: app.id,
+        email: app.email,
         tier,
-        promo_code: discount > 0 ? normalizedCode! : "",
-        original_amount: String(tierInfo.amount),
-        application_id: app.id,
-      },
-      success_url: `${data.origin}/success?tier=${tier}&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${data.origin}/#pricing`,
-    });
-
-    if (!session.url) throw new Error("Failed to create checkout session");
+        origin: SITE_URL,
+        promoCode: data.promoCode,
+      });
 
     const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
     const displayAmount = new Intl.NumberFormat("en-US", {
@@ -114,7 +79,7 @@ export const sendPaymentLink = createServerFn({ method: "POST" })
       templateData: {
         fullName: app.full_name,
         tier: tierInfo.name,
-        checkoutUrl: session.url,
+        checkoutUrl: `${SITE_URL}/api/public/enroll/${app.id}`,
         amount: displayAmount,
         promoCode: normalizedCode,
         discountPercent: discount > 0 ? `${Math.round(discount * 100)}` : undefined,
