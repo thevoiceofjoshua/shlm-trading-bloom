@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {
   Body,
+  Button,
   Container,
   Head,
   Heading,
@@ -37,13 +38,18 @@ const Email = ({
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>{`New SHLM application — ${fullName} (${tier})`}</Preview>
+    <Preview>{`${fullName} · ${tier} · call ${scheduledAtLA || scheduledAt}`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={h1}>New SHLM Application</Heading>
         <Text style={lead}>
           You have a new client call scheduled. Details below.
         </Text>
+
+        <Button style={cta} href="https://shlmtrdng.com/admin">
+          Review in admin portal
+        </Button>
+
 
         <Section style={card}>
           <Row label="Name" value={fullName} />
@@ -77,10 +83,23 @@ const Row = ({ label, value }: { label: string; value: string }) => (
   </div>
 )
 
+const cta = {
+  display: 'block',
+  backgroundColor: '#0a0a0a',
+  color: '#ffffff',
+  borderRadius: '999px',
+  padding: '12px 24px',
+  fontSize: '14px',
+  fontWeight: 600,
+  textAlign: 'center' as const,
+  textDecoration: 'none',
+  margin: '0 0 20px',
+}
+
 export const template = {
   component: Email,
   subject: (data: Record<string, any>) =>
-    `New SHLM application — ${data.fullName ?? 'Applicant'} (${data.tier ?? ''})`,
+    `🔔 New applicant: ${data.fullName ?? 'Applicant'}${data.tier ? ` — ${data.tier}` : ''}`,
   displayName: 'Application notification (admin)',
   previewData: {
     fullName: 'Jane Doe',
