@@ -20,12 +20,15 @@ function AdminPage() {
   const denyFn = useServerFn(denyApplication);
   const queryClient = useQueryClient();
 
+  const [passcodeInput, setPasscodeInput] = useState("");
   const [passcode, setPasscode] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [actingId, setActingId] = useState<string | null>(null);
   const [action, setAction] = useState<"approve" | "deny" | null>(null);
   const [sendMsg, setSendMsg] = useState<{ id: string; ok: boolean; text: string } | null>(null);
+  const [emailState, setEmailState] = useState<Record<string, "sending" | "sent" | "failed">>({});
+
 
   const {
     data: apps,
@@ -44,14 +47,17 @@ function AdminPage() {
     setActingId(id);
     setAction("approve");
     setSendMsg(null);
+    setEmailState((s) => ({ ...s, [id]: "sending" }));
     try {
       await sendFn({
         data: { passcode, applicationId: id, origin: window.location.origin, promoCode: "1MILL" },
       });
       setSendMsg({ id, ok: true, text: "Approved — payment link sent." });
+      setEmailState((s) => ({ ...s, [id]: "sent" }));
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
     } catch (e) {
       setSendMsg({ id, ok: false, text: e instanceof Error ? e.message : "Failed to send" });
+      setEmailState((s) => ({ ...s, [id]: "failed" }));
     } finally {
       setActingId(null);
       setAction(null);
@@ -63,17 +69,21 @@ function AdminPage() {
     setActingId(id);
     setAction("deny");
     setSendMsg(null);
+    setEmailState((s) => ({ ...s, [id]: "sending" }));
     try {
       await denyFn({ data: { passcode, applicationId: id } });
       setSendMsg({ id, ok: true, text: "Denied — email sent." });
+      setEmailState((s) => ({ ...s, [id]: "sent" }));
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
     } catch (e) {
       setSendMsg({ id, ok: false, text: e instanceof Error ? e.message : "Failed to deny" });
+      setEmailState((s) => ({ ...s, [id]: "failed" }));
     } finally {
       setActingId(null);
       setAction(null);
     }
   };
+
 
   const tierLabel = (tier: string) => {
     const map: Record<string, string> = {
@@ -115,6 +125,31 @@ function AdminPage() {
     return null;
   };
 
+  const emailBadge = (app: ApplicationList[number]) => {
+    const live = emailState[app.id];
+    let text: string | null = null;
+    if (live === "sending") text = "Email sending…";
+    else if (live === "sent") text = "Email delivered";
+    else if (live === "failed") text = "Email failed";
+    else if (app.status === "approved") text = app.payment_link_sent_at ? "Email delivered" : "Email pending";
+    else if (app.status === "denied") text = "Email delivered";
+    if (!text) return null;
+    const failed = live === "failed";
+    return (
+      <span
+        className={`rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-wider ${
+          failed
+            ? "border-destructive text-destructive"
+            : live === "sending"
+              ? "border-border text-muted-foreground"
+              : "border-border text-foreground"
+        }`}
+      >
+        {text}
+      </span>
+    );
+  };
+
   const selected = apps?.find((a) => a.id === selectedId) ?? null;
 
   return (
@@ -126,16 +161,30 @@ function AdminPage() {
         </div>
         <p className="mt-2 text-sm text-muted-foreground">Review mentorship applications.</p>
 
-        <div className="mt-8 rounded-2xl border border-border bg-card p-6">
-          <label className="text-sm font-medium">Admin passcode</label>
+        <form
+          className="mt-8 rounded-2xl border border-border bg-card p-6"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setPasscode(passcodeInput.trim());
+          }}
+        >
+          <label className="text-sm font-medium" htmlFor="admin-passcode">
+            Admin passcode
+          </label>
           <input
+            id="admin-passcode"
             type="password"
-            value={passcode}
-            onChange={(e) => setPasscode(e.target.value)}
-            placeholder="Enter passcode to unlock admin features"
+            value={passcodeInput}
+            onChange={(e) => setPasscodeInput(e.target.value)}
+            placeholder="Type passcode and press Enter"
             className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
           />
-        </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {passcode ? "Unlocked." : "Press Enter to unlock applications."}
+          </p>
+          <button type="submit" className="hidden" aria-hidden="true" tabIndex={-1} />
+        </form>
+
 
         {selected ? (
           <div className="mt-8 rounded-2xl border border-border bg-card p-6">
@@ -162,6 +211,7 @@ function AdminPage() {
                   {tierLabel(selected.tier)}
                 </span>
                 {statusBadge(selected)}
+                {emailBadge(selected)}
               </div>
               <p className="mt-2 text-sm text-foreground">{selected.email}</p>
               {selected.phone && <p className="text-sm text-muted-foreground">{selected.phone}</p>}
@@ -269,11 +319,12 @@ function AdminPage() {
                       onClick={() => setSelectedId(app.id)}
                       className="flex-1 text-left"
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="font-display text-lg font-medium text-foreground hover:underline">
                           {app.full_name}
                         </span>
                         {statusBadge(app)}
+                        {emailBadge(app)}
                       </div>
                       <p className="mt-0.5 text-xs text-muted-foreground">
                         {tierLabel(app.tier)} · Applied{" "}
