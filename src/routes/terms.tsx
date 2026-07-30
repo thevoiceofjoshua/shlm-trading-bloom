@@ -40,7 +40,7 @@ function TermsPage() {
       <h2>Disclaimer</h2>
       <p>The service is provided "as is" without warranties of any kind. To the maximum extent permitted by law, SHLM is not liable for indirect, incidental, or consequential damages, including trading losses.</p>
       <h2>Contact</h2>
-      <p>support@shlmllc.com</p>
+      <p>support@shlmtrdng.com</p>
     </LegalShell>
   );
 }

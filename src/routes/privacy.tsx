@@ -40,9 +40,9 @@ function PrivacyPage() {
       <h2>Sharing</h2>
       <p>We do not sell your data. We share it only with vendors that help us run the service (auth, hosting, payments) under confidentiality obligations.</p>
       <h2>Your rights</h2>
-      <p>You may request access, correction, or deletion of your data by emailing support@shlmllc.com.</p>
+      <p>You may request access, correction, or deletion of your data by emailing support@shlmtrdng.com.</p>
       <h2>Contact</h2>
-      <p>Questions? Email support@shlmllc.com.</p>
+      <p>Questions? Email support@shlmtrdng.com.</p>
     </LegalShell>
   );
 }
