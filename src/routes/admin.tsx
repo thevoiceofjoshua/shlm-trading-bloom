@@ -211,6 +211,7 @@ function AdminPage() {
                   {tierLabel(selected.tier)}
                 </span>
                 {statusBadge(selected)}
+                {emailBadge(selected)}
               </div>
               <p className="mt-2 text-sm text-foreground">{selected.email}</p>
               {selected.phone && <p className="text-sm text-muted-foreground">{selected.phone}</p>}
@@ -323,6 +324,7 @@ function AdminPage() {
                           {app.full_name}
                         </span>
                         {statusBadge(app)}
+                        {emailBadge(app)}
                       </div>
                       <p className="mt-0.5 text-xs text-muted-foreground">
                         {tierLabel(app.tier)} · Applied{" "}
