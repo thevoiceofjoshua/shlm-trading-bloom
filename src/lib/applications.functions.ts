@@ -50,6 +50,11 @@ export const submitApplication = createServerFn({ method: "POST" })
     const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
     if (adminEmail) {
       try {
+        const tierLabels: Record<string, string> = {
+          foundation: "Beginner",
+          mentorship: "Intermediate",
+          elite: "Advanced",
+        };
         const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
         await sendTemplateEmail("application-notification", adminEmail, {
           idempotencyKey: `application-notification-${row.id}`,
@@ -58,7 +63,7 @@ export const submitApplication = createServerFn({ method: "POST" })
             fullName: data.fullName,
             email: data.email,
             phone: data.phone,
-            tier: data.tier,
+            tier: tierLabels[data.tier] ?? data.tier,
             experience: data.experience,
             goals: data.goals,
             scheduledAt: applicantLocalTime,
