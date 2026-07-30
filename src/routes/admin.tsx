@@ -161,16 +161,30 @@ function AdminPage() {
         </div>
         <p className="mt-2 text-sm text-muted-foreground">Review mentorship applications.</p>
 
-        <div className="mt-8 rounded-2xl border border-border bg-card p-6">
-          <label className="text-sm font-medium">Admin passcode</label>
+        <form
+          className="mt-8 rounded-2xl border border-border bg-card p-6"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setPasscode(passcodeInput.trim());
+          }}
+        >
+          <label className="text-sm font-medium" htmlFor="admin-passcode">
+            Admin passcode
+          </label>
           <input
+            id="admin-passcode"
             type="password"
-            value={passcode}
-            onChange={(e) => setPasscode(e.target.value)}
-            placeholder="Enter passcode to unlock admin features"
+            value={passcodeInput}
+            onChange={(e) => setPasscodeInput(e.target.value)}
+            placeholder="Type passcode and press Enter"
             className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
           />
-        </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {passcode ? "Unlocked." : "Press Enter to unlock applications."}
+          </p>
+          <button type="submit" className="hidden" aria-hidden="true" tabIndex={-1} />
+        </form>
+
 
         {selected ? (
           <div className="mt-8 rounded-2xl border border-border bg-card p-6">
