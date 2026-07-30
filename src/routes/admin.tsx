@@ -125,6 +125,31 @@ function AdminPage() {
     return null;
   };
 
+  const emailBadge = (app: ApplicationList[number]) => {
+    const live = emailState[app.id];
+    let text: string | null = null;
+    if (live === "sending") text = "Email sending…";
+    else if (live === "sent") text = "Email delivered";
+    else if (live === "failed") text = "Email failed";
+    else if (app.status === "approved") text = app.payment_link_sent_at ? "Email delivered" : "Email pending";
+    else if (app.status === "denied") text = "Email delivered";
+    if (!text) return null;
+    const failed = live === "failed";
+    return (
+      <span
+        className={`rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-wider ${
+          failed
+            ? "border-destructive text-destructive"
+            : live === "sending"
+              ? "border-border text-muted-foreground"
+              : "border-border text-foreground"
+        }`}
+      >
+        {text}
+      </span>
+    );
+  };
+
   const selected = apps?.find((a) => a.id === selectedId) ?? null;
 
   return (
