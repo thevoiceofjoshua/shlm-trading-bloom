@@ -319,7 +319,7 @@ function AdminPage() {
                       onClick={() => setSelectedId(app.id)}
                       className="flex-1 text-left"
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="font-display text-lg font-medium text-foreground hover:underline">
                           {app.full_name}
                         </span>
