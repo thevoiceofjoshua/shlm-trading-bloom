@@ -27,7 +27,6 @@ import { Route as FeaturesCurriculumRouteImport } from './routes/features.curric
 import { Route as FeaturesCommunityRouteImport } from './routes/features.community'
 import { Route as BlogBreakoutStrategyRouteImport } from './routes/blog.breakout-strategy'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
-import { Route as ApiPublicEmailTestRouteImport } from './routes/api/public/email-test'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const TermsRoute = TermsRouteImport.update({
@@ -120,11 +119,6 @@ const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   path: '/api/public/stripe-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicEmailTestRoute = ApiPublicEmailTestRouteImport.update({
-  id: '/api/public/email-test',
-  path: '/api/public/email-test',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
     id: '/lovable/email/transactional/preview',
@@ -150,7 +144,6 @@ export interface FileRoutesByFullPath {
   '/features/curriculum': typeof FeaturesCurriculumRoute
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
-  '/api/public/email-test': typeof ApiPublicEmailTestRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -172,7 +165,6 @@ export interface FileRoutesByTo {
   '/features/curriculum': typeof FeaturesCurriculumRoute
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
-  '/api/public/email-test': typeof ApiPublicEmailTestRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -195,7 +187,6 @@ export interface FileRoutesById {
   '/features/curriculum': typeof FeaturesCurriculumRoute
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
-  '/api/public/email-test': typeof ApiPublicEmailTestRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -219,7 +210,6 @@ export interface FileRouteTypes {
     | '/features/curriculum'
     | '/features/mentorship'
     | '/features/risk'
-    | '/api/public/email-test'
     | '/api/public/stripe-webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -241,7 +231,6 @@ export interface FileRouteTypes {
     | '/features/curriculum'
     | '/features/mentorship'
     | '/features/risk'
-    | '/api/public/email-test'
     | '/api/public/stripe-webhook'
     | '/lovable/email/transactional/preview'
   id:
@@ -263,7 +252,6 @@ export interface FileRouteTypes {
     | '/features/curriculum'
     | '/features/mentorship'
     | '/features/risk'
-    | '/api/public/email-test'
     | '/api/public/stripe-webhook'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
@@ -286,7 +274,6 @@ export interface RootRouteChildren {
   FeaturesCurriculumRoute: typeof FeaturesCurriculumRoute
   FeaturesMentorshipRoute: typeof FeaturesMentorshipRoute
   FeaturesRiskRoute: typeof FeaturesRiskRoute
-  ApiPublicEmailTestRoute: typeof ApiPublicEmailTestRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
@@ -419,13 +406,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/email-test': {
-      id: '/api/public/email-test'
-      path: '/api/public/email-test'
-      fullPath: '/api/public/email-test'
-      preLoaderRoute: typeof ApiPublicEmailTestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
       path: '/lovable/email/transactional/preview'
@@ -454,7 +434,6 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturesCurriculumRoute: FeaturesCurriculumRoute,
   FeaturesMentorshipRoute: FeaturesMentorshipRoute,
   FeaturesRiskRoute: FeaturesRiskRoute,
-  ApiPublicEmailTestRoute: ApiPublicEmailTestRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
