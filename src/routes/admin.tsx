@@ -20,12 +20,15 @@ function AdminPage() {
   const denyFn = useServerFn(denyApplication);
   const queryClient = useQueryClient();
 
+  const [passcodeInput, setPasscodeInput] = useState("");
   const [passcode, setPasscode] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [actingId, setActingId] = useState<string | null>(null);
   const [action, setAction] = useState<"approve" | "deny" | null>(null);
   const [sendMsg, setSendMsg] = useState<{ id: string; ok: boolean; text: string } | null>(null);
+  const [emailState, setEmailState] = useState<Record<string, "sending" | "sent" | "failed">>({});
+
 
   const {
     data: apps,
@@ -44,14 +47,17 @@ function AdminPage() {
     setActingId(id);
     setAction("approve");
     setSendMsg(null);
+    setEmailState((s) => ({ ...s, [id]: "sending" }));
     try {
       await sendFn({
         data: { passcode, applicationId: id, origin: window.location.origin, promoCode: "1MILL" },
       });
       setSendMsg({ id, ok: true, text: "Approved — payment link sent." });
+      setEmailState((s) => ({ ...s, [id]: "sent" }));
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
     } catch (e) {
       setSendMsg({ id, ok: false, text: e instanceof Error ? e.message : "Failed to send" });
+      setEmailState((s) => ({ ...s, [id]: "failed" }));
     } finally {
       setActingId(null);
       setAction(null);
@@ -63,17 +69,21 @@ function AdminPage() {
     setActingId(id);
     setAction("deny");
     setSendMsg(null);
+    setEmailState((s) => ({ ...s, [id]: "sending" }));
     try {
       await denyFn({ data: { passcode, applicationId: id } });
       setSendMsg({ id, ok: true, text: "Denied — email sent." });
+      setEmailState((s) => ({ ...s, [id]: "sent" }));
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
     } catch (e) {
       setSendMsg({ id, ok: false, text: e instanceof Error ? e.message : "Failed to deny" });
+      setEmailState((s) => ({ ...s, [id]: "failed" }));
     } finally {
       setActingId(null);
       setAction(null);
     }
   };
+
 
   const tierLabel = (tier: string) => {
     const map: Record<string, string> = {
