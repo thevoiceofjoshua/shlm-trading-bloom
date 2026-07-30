@@ -83,10 +83,23 @@ const Row = ({ label, value }: { label: string; value: string }) => (
   </div>
 )
 
+const cta = {
+  display: 'block',
+  backgroundColor: '#0a0a0a',
+  color: '#ffffff',
+  borderRadius: '999px',
+  padding: '12px 24px',
+  fontSize: '14px',
+  fontWeight: 600,
+  textAlign: 'center' as const,
+  textDecoration: 'none',
+  margin: '0 0 20px',
+}
+
 export const template = {
   component: Email,
   subject: (data: Record<string, any>) =>
-    `New SHLM application — ${data.fullName ?? 'Applicant'} (${data.tier ?? ''})`,
+    `🔔 New applicant: ${data.fullName ?? 'Applicant'}${data.tier ? ` — ${data.tier}` : ''}`,
   displayName: 'Application notification (admin)',
   previewData: {
     fullName: 'Jane Doe',
