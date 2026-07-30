@@ -38,13 +38,18 @@ const Email = ({
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>{`New SHLM application — ${fullName} (${tier})`}</Preview>
+    <Preview>{`${fullName} · ${tier} · call ${scheduledAtLA || scheduledAt}`}</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={h1}>New SHLM Application</Heading>
         <Text style={lead}>
           You have a new client call scheduled. Details below.
         </Text>
+
+        <Button style={cta} href="https://shlmtrdng.com/admin">
+          Review in admin portal
+        </Button>
+
 
         <Section style={card}>
           <Row label="Name" value={fullName} />
