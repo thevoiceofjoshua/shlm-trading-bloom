@@ -28,6 +28,7 @@ import { Route as FeaturesCommunityRouteImport } from './routes/features.communi
 import { Route as BlogBreakoutStrategyRouteImport } from './routes/blog.breakout-strategy'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
+import { Route as ApiPublicEnrollApplicationIdRouteImport } from './routes/api/public/enroll.$applicationId'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -125,6 +126,12 @@ const LovableEmailTransactionalPreviewRoute =
     path: '/lovable/email/transactional/preview',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicEnrollApplicationIdRoute =
+  ApiPublicEnrollApplicationIdRouteImport.update({
+    id: '/api/public/enroll/$applicationId',
+    path: '/api/public/enroll/$applicationId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesByTo {
@@ -166,6 +174,7 @@ export interface FileRoutesByTo {
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesById {
@@ -188,6 +197,7 @@ export interface FileRoutesById {
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRouteTypes {
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/features/mentorship'
     | '/features/risk'
     | '/api/public/stripe-webhook'
+    | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/features/mentorship'
     | '/features/risk'
     | '/api/public/stripe-webhook'
+    | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   id:
     | '__root__'
@@ -253,6 +265,7 @@ export interface FileRouteTypes {
     | '/features/mentorship'
     | '/features/risk'
     | '/api/public/stripe-webhook'
+    | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
 }
@@ -275,6 +288,7 @@ export interface RootRouteChildren {
   FeaturesMentorshipRoute: typeof FeaturesMentorshipRoute
   FeaturesRiskRoute: typeof FeaturesRiskRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
+  ApiPublicEnrollApplicationIdRoute: typeof ApiPublicEnrollApplicationIdRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
@@ -413,6 +427,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/enroll/$applicationId': {
+      id: '/api/public/enroll/$applicationId'
+      path: '/api/public/enroll/$applicationId'
+      fullPath: '/api/public/enroll/$applicationId'
+      preLoaderRoute: typeof ApiPublicEnrollApplicationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -435,6 +456,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturesMentorshipRoute: FeaturesMentorshipRoute,
   FeaturesRiskRoute: FeaturesRiskRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
+  ApiPublicEnrollApplicationIdRoute: ApiPublicEnrollApplicationIdRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
