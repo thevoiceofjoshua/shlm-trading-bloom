@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Body, Button, Container, Head, Heading, Hr, Html, Preview, Section, Text } from '@react-email/components'
+import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text } from '@react-email/components'
 import type { TemplateEntry } from './registry'
 
 interface Props {
@@ -25,65 +25,71 @@ const Email = ({
       <Head />
       <Preview>Your SHLM Mentorship invitation is ready — complete your enrollment</Preview>
       <Body style={main}>
-        <Container style={outer}>
-          {/* Hero panel */}
+        <Container style={shell}>
+          {/* Hero with watermark monogram */}
           <Section style={hero}>
-            <Text style={heroGlow}>&nbsp;</Text>
-            <Text style={monogram}>S H L M</Text>
-            <Text style={heroRule}>&nbsp;</Text>
-            <Text style={heroKicker}>Application approved</Text>
-            <Heading style={heroTitle}>You&rsquo;re in.</Heading>
-            <Text style={heroSub}>{tier}</Text>
+            <Text style={watermark}>SHLM</Text>
+            <Text style={wordmark}>S H L M</Text>
+            <Text style={heroCaption}>Breakout strategy mentorship</Text>
           </Section>
 
-          {/* Body panel */}
-          <Section style={card}>
-            <Text style={lead}>Hi {firstName},</Text>
+          <Section style={panel}>
+            <Section style={{ textAlign: 'center' as const }}>
+              <Text style={pill}>&#9679;&nbsp;&nbsp;APPLICATION APPROVED</Text>
+            </Section>
+
+            <Heading style={title}>You&rsquo;re in.</Heading>
+
+            <Text style={body}>Hi {firstName},</Text>
             <Text style={body}>
-              Congratulations — after reviewing your application, we&rsquo;d like to welcome you into the SHLM Mentorship.
-              You showed the discipline and intent we look for in a trader we can actually move the needle for.
+              After reviewing your application, we&rsquo;d like to welcome you into the {tier}. You showed the discipline
+              and intent we look for in a trader we can actually move the needle for.
             </Text>
             <Text style={body}>
-              Cohorts are kept intentionally small so every member gets direct, personal mentorship. Your seat is reserved
-              on a first-come basis — complete your enrollment below to lock it in.
+              Cohorts are kept intentionally small so every member gets direct, personal mentorship. Your seat is held on
+              a first-come basis — complete your enrollment below to lock it in.
             </Text>
 
-            {promoCode && discountPercent ? (
-              <Section style={priceDark}>
-                <Text style={promoText}>{discountPercent}% off applied &middot; code {promoCode}</Text>
-                <Text style={priceWhite}>{amount}</Text>
-                <Text style={priceCaptionLight}>Total due today</Text>
-              </Section>
-            ) : (
-              <Section style={priceDark}>
-                <Text style={priceWhite}>{amount}</Text>
-                <Text style={priceCaptionLight}>Total due today</Text>
-              </Section>
-            )}
+            {/* Price card */}
+            <Section style={innerCard}>
+              <Text style={cardKicker}>
+                {promoCode && discountPercent ? (
+                  <>
+                    ENROLLMENT&nbsp;&nbsp;<span style={accent}>{discountPercent}% OFF · {promoCode}</span>
+                  </>
+                ) : (
+                  <>ENROLLMENT&nbsp;&nbsp;<span style={accent}>TOTAL DUE TODAY</span></>
+                )}
+              </Text>
+              <Text style={price}>{amount}</Text>
+              <Text style={divider}>&nbsp;</Text>
+              <Text style={arrowRow}><span style={arrow}>&rarr;</span>&nbsp;&nbsp;Live sessions and direct mentorship access</Text>
+              <Text style={arrowRow}><span style={arrow}>&rarr;</span>&nbsp;&nbsp;Full breakout strategy curriculum and playbook</Text>
+              <Text style={arrowRow}><span style={arrow}>&rarr;</span>&nbsp;&nbsp;Private member dashboard and community</Text>
+            </Section>
 
             <Section style={{ textAlign: 'center' as const }}>
               <Button href={checkoutUrl} style={cta}>
-                Complete enrollment
+                Complete Enrollment&nbsp;&nbsp;&#8599;
               </Button>
             </Section>
 
-            <Hr style={hr} />
-
-            <Text style={whatsNext}>What happens next</Text>
-            <Text style={step}><span style={stepNum}>01</span>&nbsp;&nbsp;Secure your seat through the link above.</Text>
-            <Text style={step}><span style={stepNum}>02</span>&nbsp;&nbsp;Receive your private dashboard and community access.</Text>
-            <Text style={step}><span style={stepNum}>03</span>&nbsp;&nbsp;We schedule your onboarding call and start building your plan.</Text>
-
-            <Text style={finePrint}>
-              This link is personalized for you. Questions? Reply to this email and Joshua will respond directly.
-            </Text>
+            {/* Next steps card */}
+            <Section style={innerCard}>
+              <Text style={cardKicker}>WHAT HAPPENS NEXT</Text>
+              <Text style={arrowRow}><span style={arrow}>01</span>&nbsp;&nbsp;Secure your seat through the link above</Text>
+              <Text style={arrowRow}><span style={arrow}>02</span>&nbsp;&nbsp;Receive your private dashboard and community access</Text>
+              <Text style={arrowRow}><span style={arrow}>03</span>&nbsp;&nbsp;We schedule onboarding and start building your plan</Text>
+              <Text style={cardNote}>This link is personalized for you. Reply to this email and Joshua responds directly.</Text>
+            </Section>
           </Section>
 
-          <Text style={footer}>
-            SHLM Trading — Breakout strategy mentorship
-            <br />
-            <a href="https://shlmtrdng.com" style={footerLink}>shlmtrdng.com</a>
-          </Text>
+          <Section style={footerBar}>
+            <Text style={footerText}>SHLM Trading &middot; Breakout strategy mentorship</Text>
+            <Text style={footerText}>
+              <a href="https://shlmtrdng.com" style={footerLink}>shlmtrdng.com</a>
+            </Text>
+          </Section>
         </Container>
       </Body>
     </Html>
@@ -104,91 +110,66 @@ export const template = {
   },
 } satisfies TemplateEntry
 
+/* ---------- styles ---------- */
 const main = { backgroundColor: '#ffffff', fontFamily: 'Helvetica, Arial, sans-serif', margin: '0', padding: '0' }
-const outer = { padding: '32px 20px 48px', maxWidth: '600px', margin: '0 auto' }
+const shell = { maxWidth: '600px', margin: '0 auto', backgroundColor: '#0a0a0a', padding: '0' }
 
 const hero = {
-  backgroundColor: '#0a0a0a',
-  backgroundImage:
-    'linear-gradient(135deg, #000000 0%, #101010 45%, #1c1c1c 70%, #0a0a0a 100%)',
-  padding: '52px 40px 44px',
+  backgroundColor: '#000000',
+  backgroundImage: 'linear-gradient(160deg, #1a1a1a 0%, #0d0d0d 45%, #000000 100%)',
+  padding: '46px 40px 40px',
   textAlign: 'center' as const,
+  borderBottom: '1px solid #1f1f1f',
 }
-const heroGlow = {
-  margin: '0 auto 28px',
-  height: '2px',
-  width: '64px',
-  backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, #ffffff 50%, rgba(255,255,255,0) 100%)',
-  fontSize: '1px',
-  lineHeight: '2px',
+const watermark = {
+  margin: '0 0 -34px',
+  fontSize: '86px',
+  fontWeight: 700,
+  letterSpacing: '0.08em',
+  color: '#141414',
+  lineHeight: '1',
 }
-const monogram = { fontSize: '22px', fontWeight: 700, letterSpacing: '0.34em', color: '#ffffff', margin: '0' }
-const heroRule = {
-  margin: '22px auto',
-  height: '1px',
-  width: '40px',
-  backgroundColor: '#3a3a3a',
-  fontSize: '1px',
-  lineHeight: '1px',
-}
-const heroKicker = {
-  fontSize: '10px',
-  letterSpacing: '0.28em',
-  textTransform: 'uppercase' as const,
-  color: '#9c9c9c',
-  margin: '0 0 12px',
-}
-const heroTitle = { fontSize: '42px', fontWeight: 600, letterSpacing: '-0.03em', color: '#ffffff', margin: '0', lineHeight: '1.05' }
-const heroSub = { fontSize: '13px', letterSpacing: '0.16em', textTransform: 'uppercase' as const, color: '#bdbdbd', margin: '14px 0 0' }
+const wordmark = { margin: '0', fontSize: '26px', fontWeight: 700, letterSpacing: '0.36em', color: '#ffffff' }
+const heroCaption = { margin: '16px 0 0', fontSize: '10px', letterSpacing: '0.26em', textTransform: 'uppercase' as const, color: '#7a7a7a' }
 
-const card = { border: '1px solid #e8e8e8', borderTop: 'none', padding: '40px', backgroundColor: '#ffffff' }
-const lead = { fontSize: '16px', color: '#0a0a0a', margin: '0 0 14px', lineHeight: '1.6', fontWeight: 600 }
-const body = { fontSize: '15px', color: '#454545', margin: '0 0 16px', lineHeight: '1.75' }
+const panel = { backgroundColor: '#0a0a0a', padding: '34px 32px 8px' }
 
-const priceDark = {
-  backgroundColor: '#0a0a0a',
-  backgroundImage: 'linear-gradient(135deg, #0a0a0a 0%, #1e1e1e 100%)',
-  padding: '28px 24px',
-  textAlign: 'center' as const,
-  margin: '28px 0',
-}
-const promoText = {
+const pill = {
+  display: 'inline-block',
+  border: '1px solid #2a2a2a',
+  borderRadius: '999px',
+  padding: '9px 20px',
   fontSize: '10px',
-  fontWeight: 600,
+  fontWeight: 700,
   letterSpacing: '0.2em',
-  color: '#c8c8c8',
-  margin: '0 0 10px',
-  textTransform: 'uppercase' as const,
+  color: '#d4d4d4',
+  margin: '0 0 22px',
 }
-const priceWhite = { fontSize: '40px', fontWeight: 600, letterSpacing: '-0.03em', color: '#ffffff', margin: '0', lineHeight: '1' }
-const priceCaptionLight = { fontSize: '10px', color: '#8f8f8f', margin: '10px 0 0', textTransform: 'uppercase' as const, letterSpacing: '0.2em' }
+
+const title = { fontSize: '40px', fontWeight: 700, letterSpacing: '-0.035em', color: '#ffffff', margin: '0 0 22px', lineHeight: '1.06', textAlign: 'center' as const }
+const body = { fontSize: '15px', color: '#a8a8a8', margin: '0 0 15px', lineHeight: '1.75' }
+
+const innerCard = { backgroundColor: '#111111', border: '1px solid #1f1f1f', borderRadius: '14px', padding: '24px 22px', margin: '26px 0' }
+const cardKicker = { fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', color: '#6f6f6f', margin: '0 0 12px' }
+const accent = { color: '#ffffff' }
+const price = { fontSize: '38px', fontWeight: 700, letterSpacing: '-0.03em', color: '#ffffff', margin: '0', lineHeight: '1' }
+const divider = { height: '1px', backgroundColor: '#1f1f1f', margin: '20px 0', fontSize: '1px', lineHeight: '1px' }
+const arrowRow = { fontSize: '14px', color: '#cfcfcf', margin: '0 0 10px', lineHeight: '1.6' }
+const arrow = { color: '#6f6f6f', fontWeight: 700 }
+const cardNote = { fontSize: '12px', color: '#6f6f6f', margin: '16px 0 0', lineHeight: '1.6' }
 
 const cta = {
-  backgroundColor: '#0a0a0a',
-  color: '#ffffff',
+  backgroundColor: '#ffffff',
+  color: '#0a0a0a',
   fontSize: '13px',
-  fontWeight: 600,
-  letterSpacing: '0.14em',
-  textTransform: 'uppercase' as const,
-  padding: '18px 32px',
+  fontWeight: 700,
+  letterSpacing: '0.1em',
+  padding: '17px 34px',
+  borderRadius: '999px',
   textDecoration: 'none',
   display: 'inline-block',
-  width: '100%',
-  textAlign: 'center' as const,
-  boxSizing: 'border-box' as const,
 }
 
-const hr = { borderColor: '#ececec', margin: '32px 0 24px' }
-const whatsNext = {
-  fontSize: '10px',
-  letterSpacing: '0.24em',
-  textTransform: 'uppercase' as const,
-  color: '#8f8f8f',
-  margin: '0 0 14px',
-}
-const step = { fontSize: '14px', color: '#2a2a2a', margin: '0 0 10px', lineHeight: '1.6' }
-const stepNum = { fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', color: '#b0b0b0' }
-
-const finePrint = { fontSize: '12px', color: '#a3a3a3', margin: '28px 0 0', lineHeight: '1.6', textAlign: 'center' as const }
-const footer = { fontSize: '12px', color: '#a3a3a3', textAlign: 'center' as const, marginTop: '28px', lineHeight: '1.7' }
-const footerLink = { color: '#737373', textDecoration: 'none' }
+const footerBar = { backgroundColor: '#000000', borderTop: '1px solid #1f1f1f', padding: '24px 32px 30px', textAlign: 'center' as const }
+const footerText = { fontSize: '11px', color: '#5f5f5f', margin: '0 0 4px', letterSpacing: '0.06em', lineHeight: '1.6' }
+const footerLink = { color: '#9a9a9a', textDecoration: 'none' }
