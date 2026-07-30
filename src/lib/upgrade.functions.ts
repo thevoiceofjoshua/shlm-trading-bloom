@@ -68,6 +68,11 @@ export const createUpgradeCheckout = createServerFn({ method: "POST" })
     if (!higherTiers(from).includes(data.to)) throw new Error("Not an upgrade");
 
     const quote = quoteUpgrade(from, data.to, current.created_at);
+    if (!quote.eligible) {
+      throw new Error(
+        `Upgrades are only available within ${quote.prorationWindowDays} days of your original purchase.`,
+      );
+    }
 
     const secret = process.env.STRIPE_LIVE_API_KEY;
     if (!secret) throw new Error("Stripe not configured");
@@ -83,9 +88,7 @@ export const createUpgradeCheckout = createServerFn({ method: "POST" })
             currency: "usd",
             product_data: {
               name: `Upgrade to ${TIERS[data.to].name}`,
-              description: quote.prorated
-                ? `Prorated upgrade from ${TIERS[from].name} — ${quote.monthsUsed} of 12 months used, credit applied for ${quote.monthsRemaining} remaining.`
-                : `Upgrade from ${TIERS[from].name} — full price (proration window of ${quote.prorationWindowDays} days has passed).`,
+              description: `Prorated upgrade from ${TIERS[from].name} — ${quote.monthsUsed} of 12 months used, credit applied for ${quote.monthsRemaining} remaining.`,
             },
             unit_amount: quote.amountDue,
           },

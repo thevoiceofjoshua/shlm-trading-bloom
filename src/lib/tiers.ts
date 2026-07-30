@@ -60,7 +60,9 @@ export type UpgradeQuote = {
   credit: number;
   amountDue: number;
   prorated: boolean;
+  eligible: boolean;
   daysSincePurchase: number;
+  daysRemainingInWindow: number;
   prorationWindowDays: number;
 };
 
@@ -94,6 +96,8 @@ export function quoteUpgrade(
     credit,
     amountDue,
     prorated,
+    eligible: prorated,
+    daysRemainingInWindow: Math.max(0, PRORATION_WINDOW_DAYS - (Number.isFinite(daysSincePurchase) ? daysSincePurchase : PRORATION_WINDOW_DAYS)),
     daysSincePurchase: Number.isFinite(daysSincePurchase) ? daysSincePurchase : 9999,
     prorationWindowDays: PRORATION_WINDOW_DAYS,
   };

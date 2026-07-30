@@ -219,59 +219,85 @@ function MembershipPanel() {
         </div>
       )}
 
-      {data.upgrades.length > 0 && (
-        <div>
-          <h3 className="font-display text-xl font-medium tracking-tight">Upgrade your access</h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {data.upgrades[0]?.prorated
-              ? `Prorated pricing — you’re credited for the months of ${info.name} you haven’t used yet. Available for the first ${data.upgrades[0].prorationWindowDays} days after purchase.`
-              : `Your ${data.upgrades[0]?.prorationWindowDays ?? 42}-day proration window has passed, so upgrades are at full price.`}
-          </p>
-          <div className="mt-6 grid gap-6 sm:grid-cols-2">
-            {data.upgrades.map((q: UpgradeQuote) => (
-              <div key={q.to} className="rounded-2xl border border-border bg-card p-6">
-                <h4 className="font-display text-lg font-medium">{TIERS[q.to].name}</h4>
-                <p className="mt-2 text-sm text-muted-foreground">{TIERS[q.to].blurb}</p>
+      {data.upgrades.length > 0 &&
+        (data.upgrades[0].eligible ? (
+          <div>
+            <h3 className="font-display text-xl font-medium tracking-tight">Upgrade your access</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Prorated pricing — you’re credited for the months of {info.name} you haven’t used
+              yet. {data.upgrades[0].daysRemainingInWindow} day
+              {data.upgrades[0].daysRemainingInWindow === 1 ? "" : "s"} left in your{" "}
+              {data.upgrades[0].prorationWindowDays}-day upgrade window.
+            </p>
+            <div className="mt-6 grid gap-6 sm:grid-cols-2">
+              {data.upgrades.map((q: UpgradeQuote) => (
+                <div key={q.to} className="rounded-2xl border border-border bg-card p-6">
+                  <h4 className="font-display text-lg font-medium">{TIERS[q.to].name}</h4>
+                  <p className="mt-2 text-sm text-muted-foreground">{TIERS[q.to].blurb}</p>
 
-                <div className="mt-5 space-y-2 border-t border-border pt-4 text-sm">
-                  <Row label={`${TIERS[q.to].name} full price`} value={formatUsd(q.targetAmount)} />
-                  {q.prorated && (
+                  <div className="mt-5 space-y-2 border-t border-border pt-4 text-sm">
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground">
+                      Proration breakdown
+                    </p>
+                    <Row label={`${TIERS[q.to].name} full price`} value={formatUsd(q.targetAmount)} />
                     <Row
-                      label={`Credit · ${q.monthsRemaining} of ${TERM_MONTHS} months unused`}
+                      label={`${info.name} paid`}
+                      value={formatUsd(TIERS[q.from].amount)}
+                    />
+                    <Row
+                      label={`Months used · ${q.monthsUsed} of ${TERM_MONTHS}`}
+                      value={`${q.monthsRemaining} unused`}
+                    />
+                    <Row
+                      label={`Credit · ${q.monthsRemaining}/${TERM_MONTHS} of ${formatUsd(TIERS[q.from].amount)}`}
                       value={`− ${formatUsd(q.credit)}`}
                     />
-                  )}
-                  <div className="flex items-baseline justify-between border-t border-border pt-3">
-                    <span className="text-xs uppercase tracking-widest text-muted-foreground">
-                      {q.prorated ? "Prorated today" : "Due today"}
-                    </span>
-                    <span className="font-display text-2xl font-medium">{formatUsd(q.amountDue)}</span>
+                    <div className="flex items-baseline justify-between border-t border-border pt-3">
+                      <span className="text-xs uppercase tracking-widest text-muted-foreground">
+                        Final charge today
+                      </span>
+                      <span className="font-display text-2xl font-medium">{formatUsd(q.amountDue)}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Charged once at checkout. No further payment for the remainder of your{" "}
+                      {TERM_MONTHS}-month term.
+                    </p>
                   </div>
-                </div>
 
-                <button
-                  type="button"
-                  disabled={upgrade.isPending}
-                  onClick={() => {
-                    setPendingTier(q.to);
-                    upgrade.mutate(q.to);
-                  }}
-                  className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
-                >
-                  {upgrade.isPending && pendingTier === q.to
-                    ? "Opening checkout…"
-                    : `Upgrade for ${formatUsd(q.amountDue)}`}
-                </button>
-              </div>
-            ))}
+                  <button
+                    type="button"
+                    disabled={upgrade.isPending}
+                    onClick={() => {
+                      setPendingTier(q.to);
+                      upgrade.mutate(q.to);
+                    }}
+                    className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+                  >
+                    {upgrade.isPending && pendingTier === q.to
+                      ? "Opening checkout…"
+                      : `Upgrade for ${formatUsd(q.amountDue)}`}
+                  </button>
+                </div>
+              ))}
+            </div>
+            {upgrade.isError && (
+              <p className="mt-4 text-sm text-destructive">
+                We couldn’t start that upgrade. Please try again or contact support.
+              </p>
+            )}
           </div>
-          {upgrade.isError && (
-            <p className="mt-4 text-sm text-destructive">
-              We couldn’t start that upgrade. Please try again or contact support.
+        ) : (
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <h3 className="font-display text-lg font-medium">Upgrade window closed</h3>
+            <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+              Prorated upgrades are available for the first{" "}
+              {data.upgrades[0].prorationWindowDays} days after purchase. Your{" "}
+              {info.name} purchase is {data.upgrades[0].daysSincePurchase} days old, so upgrading
+              online is no longer available — reach out and we’ll review your options
+              directly.
             </p>
-          )}
-        </div>
-      )}
+          </div>
+        ))}
     </section>
   );
 }
