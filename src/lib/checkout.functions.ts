@@ -1,17 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { TIERS, type TierKey } from "@/lib/tiers";
 
-export const TIERS = {
-  foundation: { name: "SHLM Foundation", amount: 49900 },
-  mentorship: { name: "SHLM Mentorship", amount: 149900 },
-  elite: { name: "SHLM Elite", amount: 299900 },
-} as const;
-
-export type TierKey = keyof typeof TIERS;
+export { TIERS };
+export type { TierKey };
 
 const PROMO_CODES: Record<string, number> = {
   "1MILL": 0.2,
 };
+
 
 const inputSchema = z.object({
   tier: z.enum(["foundation", "mentorship", "elite"]),
