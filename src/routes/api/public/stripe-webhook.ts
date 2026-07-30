@@ -39,7 +39,9 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
             {
               email,
               tier,
+              user_id: (session.metadata?.user_id as string | undefined) || null,
               stripe_session_id: session.id,
+
               stripe_payment_intent:
                 typeof session.payment_intent === "string" ? session.payment_intent : null,
               amount_total: session.amount_total,
