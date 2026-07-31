@@ -401,25 +401,26 @@ function AdminPage() {
                       </p>
                     </button>
 
-                    {app.status === "new" ? (
-                      <div className="flex shrink-0 flex-wrap gap-2">
-                        <button
-                          onClick={() => handleApprove(app.id)}
-                          disabled={actingId === app.id}
-                          className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-50"
-                        >
-                          {actingId === app.id && action === "approve" ? "Approving…" : "Approve"}
-                        </button>
-                        <button
-                          onClick={() => handleDeny(app.id)}
-                          disabled={actingId === app.id}
-                          className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
-                        >
-                          {actingId === app.id && action === "deny" ? "Denying…" : "Deny"}
-                        </button>
-                      </div>
-                    ) : app.status === "approved" ? (
-                      <div className="flex shrink-0 flex-wrap gap-2">
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      {app.status === "new" && (
+                        <>
+                          <button
+                            onClick={() => handleApprove(app.id)}
+                            disabled={actingId === app.id}
+                            className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-50"
+                          >
+                            {actingId === app.id && action === "approve" ? "Approving…" : "Approve"}
+                          </button>
+                          <button
+                            onClick={() => handleDeny(app.id)}
+                            disabled={actingId === app.id}
+                            className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                          >
+                            {actingId === app.id && action === "deny" ? "Denying…" : "Deny"}
+                          </button>
+                        </>
+                      )}
+                      {app.status === "approved" && (
                         <button
                           onClick={() => handleResend(app.id)}
                           disabled={actingId === app.id}
@@ -427,8 +428,15 @@ function AdminPage() {
                         >
                           {actingId === app.id && action === "resend" ? "Resending…" : "Resend email"}
                         </button>
-                      </div>
-                    ) : null}
+                      )}
+                      <button
+                        onClick={() => handleRemove(app.id)}
+                        disabled={actingId === app.id}
+                        className="rounded-full border border-destructive px-4 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
+                      >
+                        {actingId === app.id && action === "remove" ? "Removing…" : "Remove"}
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
