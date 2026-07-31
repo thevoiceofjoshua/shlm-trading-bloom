@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { HomeButton } from "@/components/HomeButton";
-import { listApplications, sendPaymentLink, denyApplication, type ApplicationList } from "@/lib/admin.functions";
+import { listApplications, sendPaymentLink, denyApplication, removeApplication, type ApplicationList } from "@/lib/admin.functions";
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
 
 export const Route = createFileRoute("/admin")({
@@ -18,6 +18,7 @@ function AdminPage() {
   const listFn = useServerFn(listApplications);
   const sendFn = useServerFn(sendPaymentLink);
   const denyFn = useServerFn(denyApplication);
+  const removeFn = useServerFn(removeApplication);
   const queryClient = useQueryClient();
 
   const [passcodeInput, setPasscodeInput] = useState("");
@@ -25,7 +26,7 @@ function AdminPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [actingId, setActingId] = useState<string | null>(null);
-  const [action, setAction] = useState<"approve" | "deny" | "resend" | null>(null);
+  const [action, setAction] = useState<"approve" | "deny" | "resend" | "remove" | null>(null);
   const [sendMsg, setSendMsg] = useState<{ id: string; ok: boolean; text: string } | null>(null);
   const [emailState, setEmailState] = useState<Record<string, "sending" | "sent" | "failed">>({});
 
@@ -105,6 +106,25 @@ function AdminPage() {
       setAction(null);
     }
   };
+
+  const handleRemove = async (id: string) => {
+    if (!confirm("Remove this applicant permanently? This cannot be undone.")) return;
+    setActingId(id);
+    setAction("remove");
+    setSendMsg(null);
+    try {
+      await removeFn({ data: { passcode, applicationId: id } });
+      setSelectedId((cur) => (cur === id ? null : cur));
+      queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
+    } catch (e) {
+      setSendMsg({ id, ok: false, text: e instanceof Error ? e.message : "Failed to remove" });
+    } finally {
+      setActingId(null);
+      setAction(null);
+    }
+  };
+
+
 
 
   const tierLabel = (tier: string) => {
@@ -285,18 +305,34 @@ function AdminPage() {
                   >
                     {actingId === selected.id && action === "deny" ? "Denying…" : "Deny"}
                   </button>
+                  <button
+                    onClick={() => handleRemove(selected.id)}
+                    disabled={actingId === selected.id}
+                    className="rounded-full border border-destructive px-5 py-2.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
+                  >
+                    {actingId === selected.id && action === "remove" ? "Removing…" : "Remove"}
+                  </button>
                 </div>
               ) : (
                 <div className="mt-8 space-y-3">
-                  {selected.status === "approved" && (
+                  <div className="flex flex-wrap gap-2">
+                    {selected.status === "approved" && (
+                      <button
+                        onClick={() => handleResend(selected.id)}
+                        disabled={actingId === selected.id}
+                        className="rounded-full border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                      >
+                        {actingId === selected.id && action === "resend" ? "Resending…" : "Resend email"}
+                      </button>
+                    )}
                     <button
-                      onClick={() => handleResend(selected.id)}
+                      onClick={() => handleRemove(selected.id)}
                       disabled={actingId === selected.id}
-                      className="rounded-full border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                      className="rounded-full border border-destructive px-5 py-2.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
                     >
-                      {actingId === selected.id && action === "resend" ? "Resending…" : "Resend email"}
+                      {actingId === selected.id && action === "remove" ? "Removing…" : "Remove"}
                     </button>
-                  )}
+                  </div>
                 <p className="text-xs text-muted-foreground">
                   {selected.status === "approved"
                     ? `Approved${selected.payment_link_sent_at ? ` · payment link sent ${new Date(selected.payment_link_sent_at).toLocaleDateString("en-US")}` : ""}.`
@@ -365,25 +401,26 @@ function AdminPage() {
                       </p>
                     </button>
 
-                    {app.status === "new" ? (
-                      <div className="flex shrink-0 flex-wrap gap-2">
-                        <button
-                          onClick={() => handleApprove(app.id)}
-                          disabled={actingId === app.id}
-                          className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-50"
-                        >
-                          {actingId === app.id && action === "approve" ? "Approving…" : "Approve"}
-                        </button>
-                        <button
-                          onClick={() => handleDeny(app.id)}
-                          disabled={actingId === app.id}
-                          className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
-                        >
-                          {actingId === app.id && action === "deny" ? "Denying…" : "Deny"}
-                        </button>
-                      </div>
-                    ) : app.status === "approved" ? (
-                      <div className="flex shrink-0 flex-wrap gap-2">
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      {app.status === "new" && (
+                        <>
+                          <button
+                            onClick={() => handleApprove(app.id)}
+                            disabled={actingId === app.id}
+                            className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-50"
+                          >
+                            {actingId === app.id && action === "approve" ? "Approving…" : "Approve"}
+                          </button>
+                          <button
+                            onClick={() => handleDeny(app.id)}
+                            disabled={actingId === app.id}
+                            className="rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                          >
+                            {actingId === app.id && action === "deny" ? "Denying…" : "Deny"}
+                          </button>
+                        </>
+                      )}
+                      {app.status === "approved" && (
                         <button
                           onClick={() => handleResend(app.id)}
                           disabled={actingId === app.id}
@@ -391,8 +428,15 @@ function AdminPage() {
                         >
                           {actingId === app.id && action === "resend" ? "Resending…" : "Resend email"}
                         </button>
-                      </div>
-                    ) : null}
+                      )}
+                      <button
+                        onClick={() => handleRemove(app.id)}
+                        disabled={actingId === app.id}
+                        className="rounded-full border border-destructive px-4 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
+                      >
+                        {actingId === app.id && action === "remove" ? "Removing…" : "Remove"}
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>

@@ -135,3 +135,24 @@ export const denyApplication = createServerFn({ method: "POST" })
 
     return { denied: true };
   });
+
+const removeSchema = z.object({
+  passcode: z.string().min(1),
+  applicationId: z.string().uuid(),
+});
+
+export const removeApplication = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => removeSchema.parse(data))
+  .handler(async ({ data }) => {
+    verifyPasscode(data.passcode);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("applications")
+      .delete()
+      .eq("id", data.applicationId);
+
+    if (error) throw new Error(error.message);
+
+    return { removed: true };
+  });
