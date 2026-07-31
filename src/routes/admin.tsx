@@ -107,6 +107,25 @@ function AdminPage() {
     }
   };
 
+  const handleRemove = async (id: string) => {
+    if (!confirm("Remove this applicant permanently? This cannot be undone.")) return;
+    setActingId(id);
+    setAction("remove");
+    setSendMsg(null);
+    try {
+      await removeFn({ data: { passcode, applicationId: id } });
+      setSelectedId((cur) => (cur === id ? null : cur));
+      queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
+    } catch (e) {
+      setSendMsg({ id, ok: false, text: e instanceof Error ? e.message : "Failed to remove" });
+    } finally {
+      setActingId(null);
+      setAction(null);
+    }
+  };
+
+
+
 
   const tierLabel = (tier: string) => {
     const map: Record<string, string> = {
