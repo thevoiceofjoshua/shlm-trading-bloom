@@ -5,28 +5,31 @@ import type { TemplateEntry } from './registry'
 interface Props {
   fullName?: string
   tier?: string
-  checkoutUrl?: string
   amount?: string
-  promoCode?: string
-  discountPercent?: string
+  invoiceNumber?: string
+  paymentDate?: string
+  paymentMethod?: string
+  dashboardUrl?: string
+  billedTo?: string
 }
 
 const Email = ({
   fullName = 'there',
   tier = 'SHLM Mentorship',
-  checkoutUrl = '#',
   amount = '$1,499.00',
-  promoCode,
-  discountPercent,
+  invoiceNumber = 'SHLM-0000',
+  paymentDate = '',
+  paymentMethod = 'Card',
+  dashboardUrl = 'https://shlmtrdng.com/dashboard',
+  billedTo = '',
 }: Props) => {
   const firstName = fullName.split(' ')[0]
   return (
     <Html lang="en" dir="ltr">
       <Head />
-      <Preview>Your SHLM Mentorship invitation is ready — complete your enrollment</Preview>
+      <Preview>Payment confirmed — your SHLM Mentorship receipt and access details</Preview>
       <Body style={main}>
         <Container style={shell}>
-          {/* Hero with watermark monogram */}
           <Section style={hero}>
             <Text style={watermark}>SHLM</Text>
             <Text style={wordmark}>S H L M</Text>
@@ -35,52 +38,45 @@ const Email = ({
 
           <Section style={panel}>
             <Section style={{ textAlign: 'center' as const }}>
-              <Text style={pill}>&#9679;&nbsp;&nbsp;APPLICATION APPROVED</Text>
+              <Text style={pill}>&#9679;&nbsp;&nbsp;PAYMENT CONFIRMED</Text>
             </Section>
 
-            <Heading style={title}>You&rsquo;re in.</Heading>
+            <Heading style={title}>Enrollment confirmed.</Heading>
 
             <Text style={body}>Hi {firstName},</Text>
             <Text style={body}>
-              After reviewing your application, we&rsquo;d like to welcome you into the {tier}. You showed the discipline
-              and intent we look for in a trader we can actually move the needle for.
-            </Text>
-            <Text style={body}>
-              Cohorts are kept intentionally small so every member gets direct, personal mentorship. Your seat is held on
-              a first-come basis — complete your enrollment below to lock it in.
+              Your payment has been received and your place in the {tier} is secured. A summary of your transaction is
+              below — keep this email for your records.
             </Text>
 
-            {/* Price card */}
             <Section style={innerCard}>
               <Text style={cardKicker}>
-                {promoCode && discountPercent ? (
-                  <>
-                    ENROLLMENT&nbsp;&nbsp;<span style={accent}>{discountPercent}% OFF · {promoCode}</span>
-                  </>
-                ) : (
-                  <>ENROLLMENT&nbsp;&nbsp;<span style={accent}>TOTAL DUE TODAY</span></>
-                )}
+                RECEIPT&nbsp;&nbsp;<span style={accent}>TOTAL PAID</span>
               </Text>
               <Text style={price}>{amount}</Text>
               <Text style={divider}>&nbsp;</Text>
-              <Text style={arrowRow}><span style={arrow}>&rarr;</span>&nbsp;&nbsp;Live sessions and direct mentorship access</Text>
-              <Text style={arrowRow}><span style={arrow}>&rarr;</span>&nbsp;&nbsp;Full breakout strategy curriculum and playbook</Text>
-              <Text style={arrowRow}><span style={arrow}>&rarr;</span>&nbsp;&nbsp;Private member dashboard and community</Text>
+              <Row label="Invoice" value={invoiceNumber} />
+              {paymentDate ? <Row label="Date" value={paymentDate} /> : null}
+              <Row label="Program" value={tier} />
+              <Row label="Payment method" value={paymentMethod} />
+              {billedTo ? <Row label="Billed to" value={billedTo} /> : null}
+              <Row label="Status" value="Paid in full" />
             </Section>
 
             <Section style={{ textAlign: 'center' as const }}>
-              <Button href={checkoutUrl} style={cta}>
-                Complete Enrollment&nbsp;&nbsp;&#8599;
+              <Button href={dashboardUrl} style={cta}>
+                Open Member Dashboard&nbsp;&nbsp;&#8599;
               </Button>
             </Section>
 
-            {/* Next steps card */}
             <Section style={innerCard}>
               <Text style={cardKicker}>WHAT HAPPENS NEXT</Text>
-              <Text style={arrowRow}><span style={arrow}>01</span>&nbsp;&nbsp;Secure your seat through the link above</Text>
-              <Text style={arrowRow}><span style={arrow}>02</span>&nbsp;&nbsp;Receive your private dashboard and community access</Text>
-              <Text style={arrowRow}><span style={arrow}>03</span>&nbsp;&nbsp;We schedule onboarding and start building your plan</Text>
-              <Text style={cardNote}>This link is personalized for you. Reply to this email and Joshua responds directly.</Text>
+              <Text style={arrowRow}><span style={arrow}>01</span>&nbsp;&nbsp;Your member dashboard and curriculum are unlocked</Text>
+              <Text style={arrowRow}><span style={arrow}>02</span>&nbsp;&nbsp;Join the private community for daily breakdowns</Text>
+              <Text style={arrowRow}><span style={arrow}>03</span>&nbsp;&nbsp;We schedule onboarding and build your trading plan</Text>
+              <Text style={cardNote}>
+                Questions about this transaction? Reply to this email and Joshua responds directly.
+              </Text>
             </Section>
           </Section>
 
@@ -96,17 +92,27 @@ const Email = ({
   )
 }
 
+const Row = ({ label, value }: { label: string; value: string }) => (
+  <Section style={{ marginBottom: '10px' }}>
+    <Text style={rowLabel}>{label}</Text>
+    <Text style={rowValue}>{value}</Text>
+  </Section>
+)
+
 export const template = {
   component: Email,
-  subject: 'Your SHLM Mentorship enrollment invitation',
-  displayName: 'Payment link (applicant)',
+  subject: (data: Record<string, any>) =>
+    `Payment received — your SHLM Mentorship receipt${data.invoiceNumber ? ` (${data.invoiceNumber})` : ''}`,
+  displayName: 'Payment receipt (client)',
   previewData: {
     fullName: 'Jane Doe',
     tier: 'SHLM Mentorship',
-    checkoutUrl: 'https://shlmtrdng.com/success?tier=mentorship&session_id=preview',
-    amount: '$1,199.20',
-    promoCode: '1MILL',
-    discountPercent: '20',
+    amount: '$1,499.00',
+    invoiceNumber: 'SHLM-4821',
+    paymentDate: 'July 31, 2026',
+    paymentMethod: 'Visa ending 4242',
+    billedTo: 'jane@example.com',
+    dashboardUrl: 'https://shlmtrdng.com/dashboard',
   },
 } satisfies TemplateEntry
 
@@ -154,6 +160,8 @@ const cardKicker = { fontSize: '10px', fontWeight: 700, letterSpacing: '0.2em', 
 const accent = { color: '#ffffff' }
 const price = { fontSize: '38px', fontWeight: 700, letterSpacing: '-0.03em', color: '#ffffff', margin: '0', lineHeight: '1' }
 const divider = { height: '1px', backgroundColor: '#1f1f1f', margin: '20px 0', fontSize: '1px', lineHeight: '1px' }
+const rowLabel = { fontSize: '10px', fontWeight: 700, letterSpacing: '0.18em', color: '#6f6f6f', margin: '0 0 3px', textTransform: 'uppercase' as const }
+const rowValue = { fontSize: '15px', color: '#e6e6e6', margin: '0', lineHeight: '1.5' }
 const arrowRow = { fontSize: '14px', color: '#cfcfcf', margin: '0 0 10px', lineHeight: '1.6' }
 const arrow = { color: '#6f6f6f', fontWeight: 700 }
 const cardNote = { fontSize: '12px', color: '#6f6f6f', margin: '16px 0 0', lineHeight: '1.6' }
