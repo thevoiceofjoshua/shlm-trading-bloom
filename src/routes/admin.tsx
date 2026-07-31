@@ -305,6 +305,13 @@ function AdminPage() {
                   >
                     {actingId === selected.id && action === "deny" ? "Denying…" : "Deny"}
                   </button>
+                  <button
+                    onClick={() => handleRemove(selected.id)}
+                    disabled={actingId === selected.id}
+                    className="rounded-full border border-destructive px-5 py-2.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
+                  >
+                    {actingId === selected.id && action === "remove" ? "Removing…" : "Remove"}
+                  </button>
                 </div>
               ) : (
                 <div className="mt-8 space-y-3">
