@@ -58,7 +58,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
   });
 
 
-/** $1.00 throwaway product used only to exercise the live checkout + webhook flow. */
+/** $0.50 throwaway product used only to exercise the live checkout + webhook flow. */
 export const createTestCheckoutSession = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => z.object({ origin: z.string().url() }).parse(data))
   .handler(async ({ data }) => {
@@ -75,7 +75,7 @@ export const createTestCheckoutSession = createServerFn({ method: "POST" })
           price_data: {
             currency: "usd",
             product_data: { name: "SHLM Test Product (checkout verification)" },
-            unit_amount: 100,
+            unit_amount: 50,
           },
           quantity: 1,
         },
