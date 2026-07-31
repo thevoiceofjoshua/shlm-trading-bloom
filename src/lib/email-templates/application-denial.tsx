@@ -75,7 +75,7 @@ const Email = ({ fullName = 'there', reason = DEFAULT_REASON }: Props) => {
 
 export const template = {
   component: Email,
-  subject: 'An update on your SHLM Mentorship application',
+  subject: 'Regarding your SHLM Mentorship application',
   displayName: 'Application denial',
   previewData: { fullName: 'Jane Doe' },
 } satisfies TemplateEntry

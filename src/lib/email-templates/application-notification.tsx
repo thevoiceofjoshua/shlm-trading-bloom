@@ -101,7 +101,7 @@ const Row = ({ label, value, highlight }: { label: string; value: string; highli
 export const template = {
   component: Email,
   subject: (data: Record<string, any>) =>
-    `🔔 New applicant: ${data.fullName ?? 'Applicant'}${data.tier ? ` — ${data.tier}` : ''}`,
+    `New mentorship application — ${data.fullName ?? 'Applicant'}${data.tier ? ` (${data.tier})` : ''}`,
   displayName: 'Application notification (admin)',
   previewData: {
     fullName: 'Jane Doe',

@@ -98,7 +98,7 @@ const Email = ({
 
 export const template = {
   component: Email,
-  subject: 'Your SHLM Mentorship invitation is ready',
+  subject: 'Your SHLM Mentorship enrollment invitation',
   displayName: 'Payment link (applicant)',
   previewData: {
     fullName: 'Jane Doe',
