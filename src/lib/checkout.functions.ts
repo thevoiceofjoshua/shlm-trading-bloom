@@ -58,6 +58,36 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
   });
 
 
+/** $1.00 throwaway product used only to exercise the live checkout + webhook flow. */
+export const createTestCheckoutSession = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({ origin: z.string().url() }).parse(data))
+  .handler(async ({ data }) => {
+    const secret = process.env.STRIPE_LIVE_API_KEY;
+    if (!secret) throw new Error("Stripe not configured");
+    const { default: Stripe } = await import("stripe");
+    const stripe = new Stripe(secret);
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: { name: "SHLM Test Product (checkout verification)" },
+            unit_amount: 100,
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: { tier: "foundation", test_product: "true" },
+      success_url: `${data.origin}/success?tier=foundation&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${data.origin}/test-checkout`,
+    });
+
+    return { url: session.url };
+  });
+
 const verifySchema = z.object({ session_id: z.string().min(1) });
 
 export const verifyCheckoutSession = createServerFn({ method: "POST" })
