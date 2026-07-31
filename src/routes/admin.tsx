@@ -315,15 +315,24 @@ function AdminPage() {
                 </div>
               ) : (
                 <div className="mt-8 space-y-3">
-                  {selected.status === "approved" && (
+                  <div className="flex flex-wrap gap-2">
+                    {selected.status === "approved" && (
+                      <button
+                        onClick={() => handleResend(selected.id)}
+                        disabled={actingId === selected.id}
+                        className="rounded-full border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                      >
+                        {actingId === selected.id && action === "resend" ? "Resending…" : "Resend email"}
+                      </button>
+                    )}
                     <button
-                      onClick={() => handleResend(selected.id)}
+                      onClick={() => handleRemove(selected.id)}
                       disabled={actingId === selected.id}
-                      className="rounded-full border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+                      className="rounded-full border border-destructive px-5 py-2.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
                     >
-                      {actingId === selected.id && action === "resend" ? "Resending…" : "Resend email"}
+                      {actingId === selected.id && action === "remove" ? "Removing…" : "Remove"}
                     </button>
-                  )}
+                  </div>
                 <p className="text-xs text-muted-foreground">
                   {selected.status === "approved"
                     ? `Approved${selected.payment_link_sent_at ? ` · payment link sent ${new Date(selected.payment_link_sent_at).toLocaleDateString("en-US")}` : ""}.`
