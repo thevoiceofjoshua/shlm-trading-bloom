@@ -18,6 +18,7 @@ function AdminPage() {
   const listFn = useServerFn(listApplications);
   const sendFn = useServerFn(sendPaymentLink);
   const denyFn = useServerFn(denyApplication);
+  const removeFn = useServerFn(removeApplication);
   const queryClient = useQueryClient();
 
   const [passcodeInput, setPasscodeInput] = useState("");
@@ -25,7 +26,7 @@ function AdminPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [actingId, setActingId] = useState<string | null>(null);
-  const [action, setAction] = useState<"approve" | "deny" | "resend" | null>(null);
+  const [action, setAction] = useState<"approve" | "deny" | "resend" | "remove" | null>(null);
   const [sendMsg, setSendMsg] = useState<{ id: string; ok: boolean; text: string } | null>(null);
   const [emailState, setEmailState] = useState<Record<string, "sending" | "sent" | "failed">>({});
 
