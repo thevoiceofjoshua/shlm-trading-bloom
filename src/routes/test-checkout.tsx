@@ -56,11 +56,11 @@ function TestCheckoutPage() {
           </p>
           <h1 className="text-3xl font-semibold tracking-tight">SHLM Test Product</h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            A $1.00 charge used to verify the full checkout flow: Stripe payment, webhook
+            A $0.50 charge used to verify the full checkout flow: Stripe payment, webhook
             recording in the database, and the automated receipt email.
           </p>
           <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-semibold">$1</span>
+            <span className="text-4xl font-semibold">$0.50</span>
             <span className="text-sm text-muted-foreground">one-time</span>
           </div>
           <Button
