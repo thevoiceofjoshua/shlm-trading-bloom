@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TestCheckoutRouteImport } from './routes/test-checkout'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SuccessRouteImport } from './routes/success'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -30,6 +31,11 @@ import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as ApiPublicEnrollApplicationIdRouteImport } from './routes/api/public/enroll.$applicationId'
 
+const TestCheckoutRoute = TestCheckoutRouteImport.update({
+  id: '/test-checkout',
+  path: '/test-checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -146,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/success': typeof SuccessRoute
   '/terms': typeof TermsRoute
+  '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
   '/features/community': typeof FeaturesCommunityRoute
   '/features/curriculum': typeof FeaturesCurriculumRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/success': typeof SuccessRoute
   '/terms': typeof TermsRoute
+  '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
   '/features/community': typeof FeaturesCommunityRoute
   '/features/curriculum': typeof FeaturesCurriculumRoute
@@ -191,6 +199,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/success': typeof SuccessRoute
   '/terms': typeof TermsRoute
+  '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
   '/features/community': typeof FeaturesCommunityRoute
   '/features/curriculum': typeof FeaturesCurriculumRoute
@@ -215,6 +224,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/success'
     | '/terms'
+    | '/test-checkout'
     | '/blog/breakout-strategy'
     | '/features/community'
     | '/features/curriculum'
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/success'
     | '/terms'
+    | '/test-checkout'
     | '/blog/breakout-strategy'
     | '/features/community'
     | '/features/curriculum'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/success'
     | '/terms'
+    | '/test-checkout'
     | '/blog/breakout-strategy'
     | '/features/community'
     | '/features/curriculum'
@@ -282,6 +294,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SuccessRoute: typeof SuccessRoute
   TermsRoute: typeof TermsRoute
+  TestCheckoutRoute: typeof TestCheckoutRoute
   BlogBreakoutStrategyRoute: typeof BlogBreakoutStrategyRoute
   FeaturesCommunityRoute: typeof FeaturesCommunityRoute
   FeaturesCurriculumRoute: typeof FeaturesCurriculumRoute
@@ -294,6 +307,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/test-checkout': {
+      id: '/test-checkout'
+      path: '/test-checkout'
+      fullPath: '/test-checkout'
+      preLoaderRoute: typeof TestCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -450,6 +470,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SuccessRoute: SuccessRoute,
   TermsRoute: TermsRoute,
+  TestCheckoutRoute: TestCheckoutRoute,
   BlogBreakoutStrategyRoute: BlogBreakoutStrategyRoute,
   FeaturesCommunityRoute: FeaturesCommunityRoute,
   FeaturesCurriculumRoute: FeaturesCurriculumRoute,
