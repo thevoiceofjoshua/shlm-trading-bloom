@@ -51,7 +51,64 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
             },
             { onConflict: "stripe_session_id" },
           );
+
+          // Send the client their receipt once the payment is fully processed.
+          if (session.payment_status === "paid" && email) {
+            try {
+              const { TIERS } = await import("@/lib/tiers");
+              const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+
+              const tierName = (TIERS as Record<string, { name: string }>)[tier]?.name
+                ? `SHLM ${(TIERS as Record<string, { name: string }>)[tier].name}`
+                : "SHLM Mentorship";
+
+              const amount = new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: (session.currency ?? "usd").toUpperCase(),
+              }).format((session.amount_total ?? 0) / 100);
+
+              let paymentMethod = "Card";
+              let invoiceNumber = `SHLM-${session.id.slice(-8).toUpperCase()}`;
+              try {
+                if (typeof session.payment_intent === "string") {
+                  const pi = await stripe.paymentIntents.retrieve(session.payment_intent, {
+                    expand: ["latest_charge"],
+                  });
+                  const charge = pi.latest_charge as import("stripe").Stripe.Charge | null;
+                  const card = charge?.payment_method_details?.card;
+                  if (card) {
+                    paymentMethod = `${(card.brand ?? "Card").replace(/^\w/, (c) => c.toUpperCase())} ending ${card.last4}`;
+                  }
+                  if (charge?.receipt_number) invoiceNumber = charge.receipt_number;
+                }
+              } catch {
+                // Non-fatal: fall back to defaults above.
+              }
+
+              await sendTemplateEmail("payment-receipt", email, {
+                idempotencyKey: `payment-receipt-${session.id}`,
+                templateData: {
+                  fullName: session.customer_details?.name ?? "there",
+                  tier: tierName,
+                  amount,
+                  invoiceNumber,
+                  paymentDate: new Date().toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                    timeZone: "America/Los_Angeles",
+                  }),
+                  paymentMethod,
+                  billedTo: email,
+                  dashboardUrl: "https://shlmtrdng.com/dashboard",
+                },
+              });
+            } catch (err) {
+              console.error("Receipt email failed", err);
+            }
+          }
         }
+
 
         return new Response("ok", { status: 200 });
       },
