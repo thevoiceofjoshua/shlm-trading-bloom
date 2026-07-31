@@ -2,6 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { HomeButton } from "@/components/HomeButton";
 import { DISCORD_JOIN_URL } from "@/lib/external-links";
 
+// Set to true when the course overview video is ready to go live.
+const SHOW_VIDEO_SECTION = false;
+
 
 export const Route = createFileRoute("/program")({
   component: ProgramPage,
@@ -98,6 +101,7 @@ function ProgramPage() {
           </div>
         </section>
 
+        {SHOW_VIDEO_SECTION && (
         <section className="bg-surface px-4 py-16 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-5xl">
             <div className="overflow-hidden rounded-3xl border border-border bg-card">
@@ -133,6 +137,8 @@ function ProgramPage() {
             </div>
           </div>
         </section>
+        )}
+
 
         <section className="bg-background px-4 py-24 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
