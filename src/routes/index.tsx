@@ -12,6 +12,9 @@ import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
 import chartNasdaq from "@/assets/chart-nasdaq.png.asset.json";
 import chartDow from "@/assets/chart-dow.png.asset.json";
 import chartEntry from "@/assets/chart-entry.png.asset.json";
+import pnl5145 from "@/assets/pnl-5145.jpg.asset.json";
+import liveTrade from "@/assets/live-trade-gold.mp4.asset.json";
+
 import pnlCard from "@/assets/pnl-card.png.asset.json";
 import accountsPnl from "@/assets/accounts-pnl.png.asset.json";
 import payouts from "@/assets/payouts.jpg.asset.json";
