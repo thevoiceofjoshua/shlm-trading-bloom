@@ -1056,6 +1056,22 @@ function ProofSection() {
       fit: "object-contain p-4",
     },
     {
+      src: liveTrade.url,
+      kind: "video" as const,
+      alt: "Screen recording of a live Micro Gold futures trade showing a position up 2,775 dollars",
+      caption: "Live execution — Micro Gold, +$2,775 in open profit.",
+      className: "md:col-span-2",
+      aspect: "min-h-[420px] sm:min-h-[520px]",
+    },
+    {
+      src: pnl5145.url,
+      alt: "Daily profit and loss card showing plus 5,145 dollars",
+      caption: "+$5,145 in a single session.",
+      className: "md:col-span-4",
+      aspect: "min-h-[240px] sm:min-h-[520px]",
+      fit: "object-contain p-3",
+    },
+    {
       src: chartEntry.url,
       alt: "Close-up chart of a reversal entry with risk and reward zones",
       caption: "One setup. Repeated with discipline.",
@@ -1063,6 +1079,7 @@ function ProofSection() {
       aspect: "min-h-[280px] sm:min-h-[420px]",
     },
   ];
+
 
   return (
     <section id="proof" className="bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
