@@ -28,10 +28,15 @@ export const Route = createFileRoute("/dashboard")({
 
 function DashboardPage() {
   const navigate = useNavigate();
+  const { demo } = useSearch({ from: "/dashboard" });
   const [user, setUser] = useState<{ email?: string | null; name?: string | null } | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!demo);
 
   useEffect(() => {
+    if (demo) {
+      setUser({ email: "demo@shlmtrdng.com", name: "Demo Member" });
+      return;
+    }
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
         navigate({ to: "/auth", search: { mode: "signin", redirect: "/dashboard" }, replace: true });
@@ -43,7 +48,7 @@ function DashboardPage() {
       });
       setLoading(false);
     });
-  }, [navigate]);
+  }, [navigate, demo]);
 
   if (loading) {
     return (
@@ -76,7 +81,6 @@ function DashboardPage() {
         </div>
       </header>
 
-
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <h1 className="font-display text-3xl font-medium tracking-tight">
           Welcome back{user?.name ? `, ${user.name}` : ""}
@@ -85,7 +89,7 @@ function DashboardPage() {
           Your private SHLM member dashboard is being built out. New modules will appear here as the program grows.
         </p>
 
-        <MembershipPanel />
+        <MembershipPanel demo={demo} />
 
         <h2 className="mt-12 font-display text-xl font-medium tracking-tight text-foreground">
           Your member modules
