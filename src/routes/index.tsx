@@ -1023,42 +1023,43 @@ function ProofSection() {
       alt: "Micro E-mini Nasdaq-100 five-minute chart with a breakout entry, stop loss and take profit zones marked",
       caption: "Nasdaq breakout — entry, stop and target mapped before the trade.",
       className: "md:col-span-4",
-      aspect: "aspect-[16/9]",
+      aspect: "min-h-[300px] sm:min-h-[440px]",
     },
     {
       src: payouts.url,
       alt: "Three payout notifications from a proprietary trading firm",
       caption: "Payouts, not promises.",
       className: "md:col-span-2",
-      aspect: "aspect-[4/3]",
+      aspect: "min-h-[220px]",
     },
     {
       src: chartDow.url,
       alt: "Micro E-mini Dow futures chart showing a break of structure and a managed short position",
       caption: "Break of structure, then execution.",
       className: "md:col-span-2",
-      aspect: "aspect-[4/3]",
+      aspect: "min-h-[220px]",
     },
     {
       src: pnlCard.url,
       alt: "Group profit and loss card showing a daily group result",
       caption: "Group P&L, tracked daily.",
       className: "md:col-span-2",
-      aspect: "aspect-[4/3]",
+      aspect: "min-h-[220px]",
     },
     {
       src: accountsPnl.url,
       alt: "Funded account table showing per-account totals and drawdown distance",
       caption: "Risk-managed across every funded account.",
       className: "md:col-span-2",
-      aspect: "aspect-[4/3]",
+      aspect: "min-h-[220px]",
+      fit: "object-contain p-4",
     },
     {
       src: chartEntry.url,
       alt: "Close-up chart of a reversal entry with risk and reward zones",
       caption: "One setup. Repeated with discipline.",
       className: "md:col-span-6",
-      aspect: "aspect-[21/9]",
+      aspect: "min-h-[280px] sm:min-h-[420px]",
     },
   ];
 
@@ -1089,7 +1090,7 @@ function ProofSection() {
                   src={tile.src}
                   alt={tile.alt}
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                  className={`absolute inset-0 h-full w-full object-center transition-transform duration-700 ease-out group-hover:scale-[1.03] ${"fit" in tile ? (tile as { fit: string }).fit : "object-cover"}`}
                 />
               </div>
               <figcaption className="border-t border-border px-5 py-4 text-sm text-muted-foreground">
