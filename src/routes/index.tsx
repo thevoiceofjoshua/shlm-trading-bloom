@@ -53,9 +53,10 @@ const HOMEPAGE_FAQS = [
 export const Route = createFileRoute("/")({
   component: Index,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(
-      siteStatsQuery(() => getSiteStats()),
-    );
+    await Promise.all([
+      context.queryClient.ensureQueryData(siteStatsQuery(() => getSiteStats())),
+      context.queryClient.ensureQueryData(reviewsQuery(() => getReviews())),
+    ]);
   },
   head: () => ({
     meta: [
