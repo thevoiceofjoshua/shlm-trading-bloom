@@ -18,9 +18,9 @@ export const Route = createFileRoute("/features/curriculum")({
 
 function CurriculumPage() {
   const phases = [
-    { weeks: "Weeks 01-04", title: "Foundations & market structure", points: ["Reading price action and liquidity", "Identifying trend, range, and transition", "Session-based bias building", "Journaling framework setup"] },
-    { weeks: "Weeks 05-08", title: "The breakout strategy", points: ["Consolidation and compression zones", "Breakout triggers and confirmation rules", "Entry mechanics and invalidation", "Backtesting your playbook"] },
-    { weeks: "Weeks 09-12", title: "Execution, risk & scaling", points: ["Position sizing and portfolio heat", "Trade management and partial exits", "Psychology and routine design", "Live trading with mentor oversight"] },
+    { weeks: "Weeks 01-03", title: "Foundations & market structure", points: ["Reading price action and liquidity", "Identifying trend, range, and transition", "Session-based bias building", "Journaling framework setup"] },
+    { weeks: "Weeks 04-06", title: "The breakout strategy", points: ["Consolidation and compression zones", "Breakout triggers and confirmation rules", "Entry mechanics and invalidation", "Backtesting your playbook"] },
+    { weeks: "Weeks 07-08", title: "Execution, risk & scaling", points: ["Position sizing and portfolio heat", "Trade management and partial exits", "Psychology and routine design", "Live trading with mentor oversight"] },
   ];
 
   return (
