@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -6,10 +6,13 @@ import { HomeButton } from "@/components/HomeButton";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyMembership } from "@/lib/membership.functions";
 import { createExtensionCheckoutSession } from "@/lib/checkout.functions";
-import { EXTENSION, PROGRAM, addMonths, extensionTotal, formatUsd } from "@/lib/tiers";
+import { EXTENSION, PROGRAM, addMonths, accessWindow, extensionTotal, formatUsd } from "@/lib/tiers";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    demo: search.demo === "expired" ? "expired" : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Member Dashboard — SHLM" },
