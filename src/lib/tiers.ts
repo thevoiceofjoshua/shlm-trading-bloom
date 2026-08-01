@@ -1,106 +1,91 @@
-export const TIER_ORDER = ["foundation", "mentorship", "elite"] as const;
+/**
+ * SHLM pricing model.
+ *
+ * One-time enrollment: $500 for 8 weeks of the program.
+ * Extensions: $150 per additional month after the initial 8 weeks.
+ */
 
-export type TierKey = (typeof TIER_ORDER)[number];
-
-export const TIERS: Record<TierKey, { name: string; amount: number; blurb: string }> = {
-  foundation: {
-    name: "SHLM Foundation",
-    amount: 49900,
-    blurb: "Self-paced breakout curriculum and private community access.",
-  },
-  mentorship: {
-    name: "SHLM Mentorship",
-    amount: 149900,
-    blurb: "Weekly group mentorship, live trade reviews and Q&A.",
-  },
-  elite: {
-    name: "SHLM Elite",
-    amount: 299900,
-    blurb: "1-on-1 mentor calls, private channel and priority support.",
-  },
+export const PROGRAM = {
+  key: "program" as const,
+  name: "SHLM Mentorship",
+  amount: 50_000, // $500.00 in cents
+  weeks: 8,
+  blurb: "8 weeks of full mentorship access — curriculum, live sessions and community.",
 };
 
-/** Program term used for upgrade proration. */
-export const TERM_MONTHS = 12;
+export const EXTENSION = {
+  key: "extension" as const,
+  name: "SHLM Monthly Extension",
+  amount: 15_000, // $150.00 per month in cents
+  blurb: "Add another month of mentorship, community and live sessions.",
+};
 
-/**
- * Proration is only offered when the member upgrades within this window of
- * their original purchase. After that, upgrades are full price.
- */
-export const PRORATION_WINDOW_DAYS = 42; // 6 weeks
+export type PurchaseKind = typeof PROGRAM.key | typeof EXTENSION.key;
 
-export function isTierKey(value: string | null | undefined): value is TierKey {
-  return !!value && (TIER_ORDER as readonly string[]).includes(value);
+export const PURCHASE_KINDS: PurchaseKind[] = [PROGRAM.key, EXTENSION.key];
+
+export function isPurchaseKind(value: string | null | undefined): value is PurchaseKind {
+  return !!value && (PURCHASE_KINDS as string[]).includes(value);
 }
 
-export function tierRank(tier: TierKey) {
-  return TIER_ORDER.indexOf(tier);
+/** Legacy tier keys from the old three-tier model still present in old rows. */
+const LEGACY_NAMES: Record<string, string> = {
+  foundation: "SHLM Foundation (legacy)",
+  mentorship: "SHLM Mentorship (legacy)",
+  elite: "SHLM Elite (legacy)",
+};
+
+export function purchaseName(tier: string) {
+  if (tier === PROGRAM.key) return PROGRAM.name;
+  if (tier === EXTENSION.key) return EXTENSION.name;
+  return LEGACY_NAMES[tier] ?? "SHLM Mentorship";
 }
 
-export function higherTiers(tier: TierKey): TierKey[] {
-  return TIER_ORDER.slice(tierRank(tier) + 1);
+export const DAY_MS = 86_400_000;
+
+export function addDays(date: Date, days: number) {
+  return new Date(date.getTime() + days * DAY_MS);
 }
 
-export function monthsElapsed(since: string | Date, now: Date = new Date()) {
-  const start = typeof since === "string" ? new Date(since) : since;
-  if (Number.isNaN(start.getTime())) return 0;
-  const months =
-    (now.getFullYear() - start.getFullYear()) * 12 +
-    (now.getMonth() - start.getMonth()) -
-    (now.getDate() < start.getDate() ? 1 : 0);
-  return Math.min(Math.max(months, 0), TERM_MONTHS);
+export function addMonths(date: Date, months: number) {
+  const d = new Date(date.getTime());
+  d.setMonth(d.getMonth() + months);
+  return d;
 }
 
-export type UpgradeQuote = {
-  from: TierKey;
-  to: TierKey;
-  monthsUsed: number;
-  monthsRemaining: number;
-  targetAmount: number;
-  credit: number;
-  amountDue: number;
-  prorated: boolean;
-  eligible: boolean;
-  daysSincePurchase: number;
-  daysRemainingInWindow: number;
-  prorationWindowDays: number;
+export type AccessWindow = {
+  startedAt: string;
+  /** Months added on top of the initial 8-week term. */
+  extensionMonths: number;
+  endsAt: string;
+  daysRemaining: number;
+  active: boolean;
 };
 
 /**
- * Prorated upgrade price: full price of the higher tier minus a credit for the
- * months of the current tier the member has not yet used.
+ * Access runs 8 weeks from the enrollment purchase, plus one month for every
+ * extension month purchased.
  */
-export function quoteUpgrade(
-  from: TierKey,
-  to: TierKey,
+export function accessWindow(
   purchasedAt: string | Date,
+  extensionMonths = 0,
   now: Date = new Date(),
-): UpgradeQuote {
-  const used = monthsElapsed(purchasedAt, now);
-  const remaining = TERM_MONTHS - used;
-  const paid = TIERS[from].amount;
-  const targetAmount = TIERS[to].amount;
+): AccessWindow {
   const start = typeof purchasedAt === "string" ? new Date(purchasedAt) : purchasedAt;
-  const daysSincePurchase = Number.isNaN(start.getTime())
-    ? Number.POSITIVE_INFINITY
-    : Math.max(0, Math.floor((now.getTime() - start.getTime()) / 86_400_000));
-  const prorated = daysSincePurchase <= PRORATION_WINDOW_DAYS;
-  const credit = prorated ? Math.round((paid * remaining) / TERM_MONTHS) : 0;
-  const amountDue = prorated ? Math.max(targetAmount - credit, 100) : targetAmount;
+  const base = addDays(start, PROGRAM.weeks * 7);
+  const end = extensionMonths > 0 ? addMonths(base, extensionMonths) : base;
+  const daysRemaining = Math.ceil((end.getTime() - now.getTime()) / DAY_MS);
   return {
-    from,
-    to,
-    monthsUsed: used,
-    monthsRemaining: remaining,
-    targetAmount,
-    credit,
-    amountDue,
-    prorated,
-    eligible: prorated,
-    daysRemainingInWindow: Math.max(0, PRORATION_WINDOW_DAYS - (Number.isFinite(daysSincePurchase) ? daysSincePurchase : PRORATION_WINDOW_DAYS)),
-    daysSincePurchase: Number.isFinite(daysSincePurchase) ? daysSincePurchase : 9999,
-    prorationWindowDays: PRORATION_WINDOW_DAYS,
+    startedAt: start.toISOString(),
+    extensionMonths,
+    endsAt: end.toISOString(),
+    daysRemaining,
+    active: daysRemaining > 0,
   };
+}
+
+export function extensionTotal(months: number) {
+  return EXTENSION.amount * Math.max(1, months);
 }
 
 export function formatUsd(cents: number) {
