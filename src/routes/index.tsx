@@ -4,6 +4,8 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getSiteStats, type SiteStats } from "@/lib/site-stats.functions";
+import { getReviews, type Review } from "@/lib/reviews.functions";
+import { ReviewsCarousel } from "@/components/ReviewsCarousel";
 import { DISCORD_JOIN_URL } from "@/lib/external-links";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { AccountMenu } from "@/components/AccountMenu";
