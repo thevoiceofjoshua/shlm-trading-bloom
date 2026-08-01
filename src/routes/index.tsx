@@ -29,7 +29,7 @@ const siteStatsQuery = (fn: () => Promise<SiteStats>) =>
 const HOMEPAGE_FAQS = [
   {
     q: "Do I need trading experience to join?",
-    a: "Foundation is beginner-friendly. Mentorship and Elite are best suited for traders who have placed live trades and want to professionalize their process.",
+    a: "Every level is welcome. Beginners get the full foundation, while experienced traders use the mentorship to professionalize their process.",
   },
   {
     q: "How long do I have access to the curriculum?",
@@ -40,8 +40,8 @@ const HOMEPAGE_FAQS = [
     a: "The principles apply across equities, futures, forex, and crypto. Your mentor helps you adapt the system to your preferred market.",
   },
   {
-    q: "Can I upgrade after joining Foundation?",
-    a: "Yes. Foundation members can apply to upgrade to Mentorship or Elite at any time and receive credit toward the higher tier.",
+    q: "What happens after the 8 weeks?",
+    a: "You can extend your access for $150 per month, for as long as you want to keep the mentorship, live sessions, and community.",
   },
 ];
 
@@ -457,21 +457,21 @@ function HeroSection({ stats }: { stats: SiteStats }) {
 }
 
 const ENROLLMENTS = [
-  { name: "Marcus T.", city: "Austin, TX", tier: "Mentorship" },
-  { name: "Priya S.", city: "London, UK", tier: "Elite" },
-  { name: "Daniel R.", city: "Miami, FL", tier: "Foundation" },
-  { name: "Chidi O.", city: "Lagos, NG", tier: "Mentorship" },
-  { name: "Sofia L.", city: "Madrid, ES", tier: "Mentorship" },
-  { name: "Kenji A.", city: "Tokyo, JP", tier: "Elite" },
-  { name: "Amara J.", city: "Atlanta, GA", tier: "Foundation" },
-  { name: "Liam W.", city: "Toronto, CA", tier: "Mentorship" },
-  { name: "Noor H.", city: "Dubai, AE", tier: "Elite" },
-  { name: "Ethan B.", city: "Chicago, IL", tier: "Mentorship" },
-  { name: "Isabella F.", city: "São Paulo, BR", tier: "Foundation" },
-  { name: "Jonas M.", city: "Berlin, DE", tier: "Mentorship" },
-  { name: "Ava P.", city: "New York, NY", tier: "Elite" },
-  { name: "Ravi K.", city: "Mumbai, IN", tier: "Mentorship" },
-  { name: "Zara N.", city: "Cape Town, ZA", tier: "Foundation" },
+  { name: "Marcus T.", city: "Austin, TX", tier: "Intermediate" },
+  { name: "Priya S.", city: "London, UK", tier: "Advanced" },
+  { name: "Daniel R.", city: "Miami, FL", tier: "Beginner" },
+  { name: "Chidi O.", city: "Lagos, NG", tier: "Intermediate" },
+  { name: "Sofia L.", city: "Madrid, ES", tier: "Intermediate" },
+  { name: "Kenji A.", city: "Tokyo, JP", tier: "Advanced" },
+  { name: "Amara J.", city: "Atlanta, GA", tier: "Beginner" },
+  { name: "Liam W.", city: "Toronto, CA", tier: "Intermediate" },
+  { name: "Noor H.", city: "Dubai, AE", tier: "Advanced" },
+  { name: "Ethan B.", city: "Chicago, IL", tier: "Intermediate" },
+  { name: "Isabella F.", city: "São Paulo, BR", tier: "Beginner" },
+  { name: "Jonas M.", city: "Berlin, DE", tier: "Intermediate" },
+  { name: "Ava P.", city: "New York, NY", tier: "Advanced" },
+  { name: "Ravi K.", city: "Mumbai, IN", tier: "Intermediate" },
+  { name: "Zara N.", city: "Cape Town, ZA", tier: "Beginner" },
 ];
 
 function LiveEnrollmentTile() {
@@ -628,7 +628,7 @@ function FeaturesSection() {
   const features = [
     {
       title: "Structured curriculum",
-      description: "A 12-week progression from market structure to advanced execution. No shortcuts. Every module builds on the last.",
+      description: "An 8-week progression from market structure to advanced execution. No shortcuts. Every module builds on the last.",
       span: "md:col-span-2 md:row-span-2",
       to: "/features/curriculum" as const,
     },
@@ -688,12 +688,12 @@ function FeaturesSection() {
 
 function ProgramSection() {
   const modules = [
-    { week: "01-02", title: "Foundations & market structure", description: "Reading price action, liquidity, and the anatomy of a trend." },
-    { week: "03-04", title: "Strategy development", description: "Building a rules-based system with entry, exit, and invalidation criteria." },
-    { week: "05-06", title: "Risk & position sizing", description: "Defining risk per trade, correlation limits, and portfolio heat." },
-    { week: "07-08", title: "Execution & journaling", description: "Order flow, slippage management, and structured trade review." },
-    { week: "09-10", title: "Psychology & discipline", description: "Emotional regulation, routines, and protecting your edge." },
-    { week: "11-12", title: "Live trading & feedback", description: "Trade live with mentor oversight and refine your personal playbook." },
+    { week: "WEEK 01", title: "Foundations & market structure", description: "Reading price action, liquidity, and the anatomy of a trend." },
+    { week: "WEEK 02", title: "Strategy development", description: "Building a rules-based system with entry, exit, and invalidation criteria." },
+    { week: "WEEK 03-04", title: "Risk & position sizing", description: "Defining risk per trade, correlation limits, and portfolio heat." },
+    { week: "WEEK 05", title: "Execution & journaling", description: "Order flow, slippage management, and structured trade review." },
+    { week: "WEEK 06", title: "Psychology & discipline", description: "Emotional regulation, routines, and protecting your edge." },
+    { week: "WEEK 07-08", title: "Live trading & feedback", description: "Trade live with mentor oversight and refine your personal playbook." },
   ];
 
   return (
@@ -702,7 +702,7 @@ function ProgramSection() {
         <div className="mb-16 max-w-2xl">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">The curriculum</p>
           <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-            Twelve weeks. One clear path.
+            Eight weeks. One clear path.
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
             Each phase is designed to move you from theory to repeatable, real-market execution.
@@ -820,52 +820,18 @@ function PricingSection() {
   };
 
   const discounted = appliedPromo === PROMO_CODE;
+  const basePrice = 500;
+  const monthlyExtension = 150;
+  const finalPrice = discounted ? Math.round(basePrice * (1 - PROMO_DISCOUNT)) : basePrice;
+  const applyHref = `/apply${discounted ? `?promo=${PROMO_CODE}` : ""}`;
 
-  const plans = [
-    {
-      key: "foundation" as const,
-      name: "Foundation",
-      basePrice: 499,
-      period: "one-time",
-      description: "Self-paced access to the full curriculum and community.",
-      features: ["12-week curriculum", "Private community access", "Weekly group Q&A", "Trade journal templates", "Strategy workbook"],
-      cta: "Enroll now",
-      featured: false,
-    },
-    {
-      key: "mentorship" as const,
-      name: "Mentorship",
-      basePrice: 1499,
-      period: "one-time",
-      description: "The complete experience with 1:1 mentorship and feedback.",
-      features: [
-        "Everything in Foundation",
-        "12 weekly 1:1 mentor calls",
-        "Asynchronous trade review",
-        "Custom playbook development",
-        "Priority community support",
-        "Lifetime curriculum updates",
-      ],
-      cta: "Enroll now",
-      featured: true,
-    },
-    {
-      key: "elite" as const,
-      name: "Elite",
-      basePrice: 2999,
-      period: "one-time",
-      description: "Intensive partnership for committed traders.",
-      features: [
-        "Everything in Mentorship",
-        "24 weekly 1:1 mentor calls",
-        "Live trading sessions",
-        "Direct mentor messaging",
-        "Monthly performance audit",
-        "Private onboarding intensive",
-      ],
-      cta: "Enroll now",
-      featured: false,
-    },
+  const included = [
+    "8 weeks of full mentorship access",
+    "Complete breakout strategy curriculum",
+    "Weekly live sessions and trade reviews",
+    "Risk and position sizing framework",
+    "Private community access",
+    "Trade journal and playbook templates",
   ];
 
   return (
@@ -874,10 +840,11 @@ function PricingSection() {
         <div className="mb-10 text-center sm:mb-14">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">Pricing</p>
           <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-            Invest in your edge.
+            One price. Eight weeks.
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
-            Choose the level of support that matches your commitment. Every plan includes lifetime access to the curriculum.
+            A single one-time payment for the full program. Want to keep going after eight weeks?
+            Extend month to month for {formatMoney(monthlyExtension)}.
           </p>
         </div>
 
@@ -925,95 +892,93 @@ function PricingSection() {
               </button>
             )}
           </form>
-          {promoError && (
-            <p className="mt-2 text-center text-xs text-destructive">{promoError}</p>
-          )}
+          {promoError && <p className="mt-2 text-center text-xs text-destructive">{promoError}</p>}
           {discounted && (
             <p className="mt-2 text-center text-xs font-medium uppercase tracking-widest text-foreground">
-              Code <span className="font-mono">{appliedPromo}</span> applied — 20% off all tiers
+              Code <span className="font-mono">{appliedPromo}</span> applied — 20% off enrollment
             </p>
           )}
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3 lg:items-stretch lg:gap-8">
-          {plans.map((plan) => {
-            const finalPrice = discounted
-              ? Math.round(plan.basePrice * (1 - PROMO_DISCOUNT))
-              : plan.basePrice;
-            const applyHref = `/apply?tier=${plan.key}${discounted ? `&promo=${PROMO_CODE}` : ""}`;
-            return (
-              <div
-                key={plan.name}
-                className={`relative flex flex-col rounded-3xl border p-7 transition-all sm:p-8 ${
-                  plan.featured
-                    ? "border-foreground bg-primary text-primary-foreground shadow-xl shadow-black/10 lg:-my-2 lg:scale-[1.03] lg:p-9"
-                    : "border-border bg-card text-card-foreground hover:-translate-y-0.5 hover:shadow-lg"
-                }`}
-              >
-                {plan.featured && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary-foreground px-4 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary shadow-sm sm:left-8 sm:translate-x-0">
-                    Most popular
-                  </span>
-                )}
-                <div>
-                  <h3 className="font-display text-xl font-medium sm:text-2xl">{plan.name}</h3>
-                  <p className={`mt-2 text-sm leading-relaxed ${plan.featured ? "text-primary-foreground/75" : "text-muted-foreground"}`}>
-                    {plan.description}
-                  </p>
-                </div>
-                <div className="my-6">
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-display text-4xl font-medium sm:text-5xl">{formatMoney(finalPrice)}</span>
-                    <span className={`text-sm ${plan.featured ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                      / {plan.period}
-                    </span>
-                  </div>
-                  {discounted && (
-                    <div className="mt-1.5 flex items-center gap-2 text-xs">
-                      <span className={`line-through ${plan.featured ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
-                        {formatMoney(plan.basePrice)}
-                      </span>
-                      <span
-                        className={cn(
-                          "rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest",
-                          plan.featured
-                            ? "bg-primary-foreground/15 text-primary-foreground"
-                            : "bg-foreground text-background",
-                        )}
-                      >
-                        Save 20%
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <ul className="mb-8 flex-1 space-y-3">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3 text-sm leading-relaxed">
-                      <span className={`mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${plan.featured ? "bg-primary-foreground/15" : "bg-foreground/10"}`}>
-                        <span className={`h-1.5 w-1.5 rounded-full ${plan.featured ? "bg-primary-foreground" : "bg-foreground"}`} />
-                      </span>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href={applyHref}
-                  className={`flex min-h-12 items-center justify-center rounded-full px-6 text-center text-sm font-semibold transition-transform hover:scale-[1.02] ${
-                    plan.featured
-                      ? "bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-                      : "bg-primary text-primary-foreground hover:bg-primary/90"
-                  }`}
-                >
-                  {plan.cta}
-                </a>
+        <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-5 lg:items-stretch lg:gap-8">
+          <div className="relative flex flex-col rounded-3xl border border-foreground bg-primary p-7 text-primary-foreground shadow-xl shadow-black/10 sm:p-9 lg:col-span-3">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary-foreground px-4 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary shadow-sm sm:left-9 sm:translate-x-0">
+              Full program
+            </span>
+            <div>
+              <h3 className="font-display text-xl font-medium sm:text-2xl">SHLM Mentorship</h3>
+              <p className="mt-2 text-sm leading-relaxed text-primary-foreground/75">
+                Everything you need to trade the breakout strategy with discipline — mentorship,
+                curriculum and community for a full 8 weeks.
+              </p>
+            </div>
+            <div className="my-6">
+              <div className="flex items-baseline gap-2">
+                <span className="font-display text-5xl font-medium">{formatMoney(finalPrice)}</span>
+                <span className="text-sm text-primary-foreground/70">/ one-time · 8 weeks</span>
               </div>
-            );
-          })}
+              {discounted && (
+                <div className="mt-1.5 flex items-center gap-2 text-xs">
+                  <span className="text-primary-foreground/60 line-through">{formatMoney(basePrice)}</span>
+                  <span className="rounded-full bg-primary-foreground/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary-foreground">
+                    Save 20%
+                  </span>
+                </div>
+              )}
+            </div>
+            <ul className="mb-8 flex-1 space-y-3">
+              {included.map((feature) => (
+                <li key={feature} className="flex items-start gap-3 text-sm leading-relaxed">
+                  <span className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary-foreground/15">
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />
+                  </span>
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+            <a
+              href={applyHref}
+              className="flex min-h-12 items-center justify-center rounded-full bg-primary-foreground px-6 text-center text-sm font-semibold text-primary transition-transform hover:scale-[1.02] hover:bg-primary-foreground/90"
+            >
+              Enroll now
+            </a>
+          </div>
+
+          <div className="flex flex-col rounded-3xl border border-border bg-card p-7 text-card-foreground sm:p-9 lg:col-span-2">
+            <div>
+              <h3 className="font-display text-xl font-medium sm:text-2xl">Monthly extension</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Optional. Only after your first 8 weeks — add months whenever you want to keep going.
+              </p>
+            </div>
+            <div className="my-6 flex items-baseline gap-2">
+              <span className="font-display text-4xl font-medium">{formatMoney(monthlyExtension)}</span>
+              <span className="text-sm text-muted-foreground">/ month</span>
+            </div>
+            <ul className="mb-8 flex-1 space-y-3">
+              {[
+                "Continued mentorship and live sessions",
+                "Continued community access",
+                "Extend one month at a time",
+                "Cancel simply by not extending",
+              ].map((feature) => (
+                <li key={feature} className="flex items-start gap-3 text-sm leading-relaxed">
+                  <span className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-foreground/10">
+                    <span className="h-1.5 w-1.5 rounded-full bg-foreground" />
+                  </span>
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-muted-foreground">
+              Extensions are purchased from your member dashboard once you’re enrolled.
+            </p>
+          </div>
         </div>
 
-
         <p className="mt-8 text-center text-sm text-muted-foreground">
-          Payment plans available for Mentorship and Elite. Apply to discuss options.
+          One-time {formatMoney(basePrice)} enrollment · {formatMoney(monthlyExtension)}/month after 8
+          weeks if you choose to extend.
         </p>
       </div>
     </section>
@@ -1203,7 +1168,7 @@ function FaqSection() {
   const faqs = [
     {
       question: "Do I need trading experience to join?",
-      answer: "Foundation is beginner-friendly. Mentorship and Elite are best suited for traders who have placed live trades and want to professionalize their process.",
+      answer: "Every level is welcome. Beginners get the full foundation, while experienced traders use the mentorship to professionalize their process.",
     },
     {
       question: "How long do I have access to the curriculum?",
@@ -1214,8 +1179,8 @@ function FaqSection() {
       answer: "The principles apply across equities, futures, forex, and crypto. Your mentor helps you adapt the system to your preferred market.",
     },
     {
-      question: "Can I upgrade after joining Foundation?",
-      answer: "Yes. Foundation members can apply to upgrade to Mentorship or Elite at any time and receive credit toward the higher tier.",
+      question: "What happens after the 8 weeks?",
+      answer: "You can extend your access for $150 per month, for as long as you want to keep the mentorship, live sessions, and community.",
     },
   ];
 

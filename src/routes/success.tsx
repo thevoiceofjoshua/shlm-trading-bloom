@@ -4,10 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { HomeButton } from "@/components/HomeButton";
 import { verifyCheckoutSession } from "@/lib/checkout.functions";
+import { EXTENSION, PROGRAM, formatUsd } from "@/lib/tiers";
 
 
 const searchSchema = z.object({
-  tier: z.enum(["foundation", "mentorship", "elite"]).optional(),
+  kind: z.enum(["program", "extension"]).optional(),
+  /** Legacy links from the old three-tier model. */
+  tier: z.string().optional(),
   session_id: z.string().optional(),
 });
 
@@ -27,26 +30,30 @@ export const Route = createFileRoute("/success")({
   }),
 });
 
-const tierDetails: Record<string, { title: string; description: string; perks: string[] }> = {
-  foundation: {
-    title: "Foundation",
-    description: "Your self-paced learning path is unlocked.",
-    perks: ["Breakout strategy core curriculum", "12-week structured program", "Private community access"],
+const purchaseDetails: Record<string, { title: string; description: string; perks: string[] }> = {
+  program: {
+    title: `${PROGRAM.name} — ${PROGRAM.weeks} weeks`,
+    description: `Your ${PROGRAM.weeks}-week mentorship access is unlocked.`,
+    perks: [
+      "Breakout strategy curriculum",
+      `${PROGRAM.weeks} weeks of live mentorship and trade reviews`,
+      "Private community access",
+      `Extend any time for ${formatUsd(EXTENSION.amount)}/month`,
+    ],
   },
-  mentorship: {
-    title: "Mentorship",
-    description: "Group mentorship + live sessions are now unlocked.",
-    perks: ["Everything in Foundation", "Weekly group mentorship calls", "Live trade reviews & Q&A"],
-  },
-  elite: {
-    title: "Elite",
-    description: "Full 1-on-1 mentorship + priority access unlocked.",
-    perks: ["Everything in Mentorship", "1-on-1 mentor calls", "Direct private channel access", "Priority support"],
+  extension: {
+    title: EXTENSION.name,
+    description: "Your mentorship access has been extended.",
+    perks: [
+      "Continued live mentorship and trade reviews",
+      "Continued private community access",
+      "New access end date shown on your dashboard",
+    ],
   },
 };
 
 function SuccessPage() {
-  const { tier: urlTier, session_id } = useSearch({ from: "/success" });
+  const { kind: urlKind, tier: legacyTier, session_id } = useSearch({ from: "/success" });
   const verify = useServerFn(verifyCheckoutSession);
   const { data, isLoading, isError } = useQuery({
     queryKey: ["verify-checkout", session_id],
@@ -55,9 +62,9 @@ function SuccessPage() {
     retry: false,
   });
 
-  const verifiedTier = data?.paid ? data.tier : undefined;
-  const tier = verifiedTier ?? urlTier ?? "foundation";
-  const details = tierDetails[tier] ?? tierDetails.foundation;
+  const verifiedKind = data?.paid ? data.kind : undefined;
+  const kind = verifiedKind ?? urlKind ?? (legacyTier ? "program" : "program");
+  const details = purchaseDetails[kind] ?? purchaseDetails.program;
   const showUnverified = session_id && !isLoading && (isError || !data?.paid);
 
 
@@ -84,11 +91,16 @@ function SuccessPage() {
 
           <div className="mt-8 rounded-xl border border-border bg-surface p-5 text-left">
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-              {showUnverified ? "Requested tier" : "Confirmed tier"}
+              {showUnverified ? "Requested purchase" : "Confirmed purchase"}
             </p>
             <p className="mt-1 font-display text-2xl font-medium">
               {details.title}
             </p>
+            {kind === "extension" && data?.months ? (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {data.months} additional month{data.months === 1 ? "" : "s"}
+              </p>
+            ) : null}
             {data?.paid && data.email && (
               <p className="mt-2 text-xs text-muted-foreground">Receipt sent to {data.email}</p>
             )}

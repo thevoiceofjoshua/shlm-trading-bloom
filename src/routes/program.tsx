@@ -10,10 +10,10 @@ export const Route = createFileRoute("/program")({
   component: ProgramPage,
   head: () => ({
     meta: [
-      { title: "How the SHLM Program Works — 12-Week Trading Mentorship" },
-      { name: "description", content: "Inside the SHLM 12-week trading program: a structured curriculum, weekly mentorship, risk architecture, and a private community built around the breakout strategy." },
-      { property: "og:title", content: "How the SHLM Program Works — 12-Week Trading Mentorship" },
-      { property: "og:description", content: "Inside the SHLM 12-week trading program: structured curriculum, weekly mentorship, risk architecture, and a private community." },
+      { title: "How the SHLM Program Works — 8-Week Trading Mentorship" },
+      { name: "description", content: "Inside the SHLM 8-week trading program: a structured curriculum, weekly mentorship, risk architecture, and a private community built around the breakout strategy." },
+      { property: "og:title", content: "How the SHLM Program Works — 8-Week Trading Mentorship" },
+      { property: "og:description", content: "Inside the SHLM 8-week trading program: structured curriculum, weekly mentorship, risk architecture, and a private community." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/program" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -96,7 +96,7 @@ function ProgramPage() {
               How the program works
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              A 12-week system that takes you from understanding the breakout strategy to executing it with discipline, risk control, and mentor feedback.
+              An 8-week system that takes you from understanding the breakout strategy to executing it with discipline, risk control, and mentor feedback.
             </p>
           </div>
         </section>
@@ -147,7 +147,7 @@ function ProgramPage() {
                 The curriculum
               </p>
               <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-                Twelve weeks. One clear path.
+                Eight weeks. One clear path.
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
                 Each phase is designed to move you from theory to repeatable, real-market execution. You cannot skip a phase — mastery builds sequentially.
@@ -158,37 +158,37 @@ function ProgramPage() {
               {[
                 {
                   phase: "Phase 1",
-                  weeks: "Weeks 1–2",
+                  weeks: "Week 1",
                   title: "Foundations & market structure",
                   description: "Learn how to read price action, identify liquidity, and understand the anatomy of a trend. The breakout strategy only works if you can see where the market is likely to move.",
                 },
                 {
                   phase: "Phase 2",
-                  weeks: "Weeks 3–4",
+                  weeks: "Week 2",
                   title: "Strategy development",
                   description: "Build your rules-based system: entry criteria, invalidation points, profit targets, and the specific breakout patterns that fit your market and schedule.",
                 },
                 {
                   phase: "Phase 3",
-                  weeks: "Weeks 5–6",
+                  weeks: "Weeks 3–4",
                   title: "Risk & position sizing",
                   description: "Define risk per trade, correlation limits, max daily loss, and portfolio heat. Survival comes before growth.",
                 },
                 {
                   phase: "Phase 4",
-                  weeks: "Weeks 7–8",
+                  weeks: "Week 5",
                   title: "Execution & journaling",
                   description: "Master order flow, slippage management, and the structured trade review process that turns every trade into a lesson.",
                 },
                 {
                   phase: "Phase 5",
-                  weeks: "Weeks 9–10",
+                  weeks: "Week 6",
                   title: "Psychology & discipline",
                   description: "Develop routines, emotional regulation, and the mental guardrails that protect your edge during losing streaks.",
                 },
                 {
                   phase: "Phase 6",
-                  weeks: "Weeks 11–12",
+                  weeks: "Weeks 7–8",
                   title: "Live trading & feedback",
                   description: "Trade live with mentor oversight, receive personalized feedback, and finalize your personal playbook for long-term consistency.",
                 },
@@ -225,7 +225,7 @@ function ProgramPage() {
                 </p>
                 <ul className="mt-8 space-y-4">
                   {[
-                    "Weekly 1:1 review calls (Mentorship tier and above)",
+                    "Weekly 1:1 review calls",
                     "Asynchronous trade review between calls",
                     "Custom playbook development for your schedule",
                     "Private mentor channel for urgent questions",

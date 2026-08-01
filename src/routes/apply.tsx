@@ -140,7 +140,7 @@ function ApplyPage() {
           </div>
 
           <TextArea label="Trading experience" name="experience" placeholder="How long have you traded and what markets?" />
-          <TextArea label="Your goals" name="goals" placeholder="What do you want to accomplish in the next 12 weeks?" />
+          <TextArea label="Your goals" name="goals" placeholder="What do you want to accomplish in the next 8 weeks?" />
 
           <Field label="Preferred call date & time" name="scheduledAt" type="datetime-local" required />
 

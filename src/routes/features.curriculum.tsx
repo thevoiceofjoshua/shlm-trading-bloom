@@ -6,9 +6,9 @@ export const Route = createFileRoute("/features/curriculum")({
   head: () => ({
     meta: [
       { title: "Structured Curriculum — SHLM Trading Mentorship" },
-      { name: "description", content: "A 12-week progression from market structure to advanced breakout execution. No shortcuts — every module builds on the last." },
+      { name: "description", content: "An 8-week progression from market structure to advanced breakout execution. No shortcuts — every module builds on the last." },
       { property: "og:title", content: "Structured Curriculum — SHLM" },
-      { property: "og:description", content: "A deliberate 12-week path from foundations to live breakout execution." },
+      { property: "og:description", content: "A deliberate 8-week path from foundations to live breakout execution." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -18,13 +18,13 @@ export const Route = createFileRoute("/features/curriculum")({
 
 function CurriculumPage() {
   const phases = [
-    { weeks: "Weeks 01-04", title: "Foundations & market structure", points: ["Reading price action and liquidity", "Identifying trend, range, and transition", "Session-based bias building", "Journaling framework setup"] },
-    { weeks: "Weeks 05-08", title: "The breakout strategy", points: ["Consolidation and compression zones", "Breakout triggers and confirmation rules", "Entry mechanics and invalidation", "Backtesting your playbook"] },
-    { weeks: "Weeks 09-12", title: "Execution, risk & scaling", points: ["Position sizing and portfolio heat", "Trade management and partial exits", "Psychology and routine design", "Live trading with mentor oversight"] },
+    { weeks: "Weeks 01-03", title: "Foundations & market structure", points: ["Reading price action and liquidity", "Identifying trend, range, and transition", "Session-based bias building", "Journaling framework setup"] },
+    { weeks: "Weeks 04-06", title: "The breakout strategy", points: ["Consolidation and compression zones", "Breakout triggers and confirmation rules", "Entry mechanics and invalidation", "Backtesting your playbook"] },
+    { weeks: "Weeks 07-08", title: "Execution, risk & scaling", points: ["Position sizing and portfolio heat", "Trade management and partial exits", "Psychology and routine design", "Live trading with mentor oversight"] },
   ];
 
   return (
-    <FeatureLayout kicker="Structured curriculum" title="A 12-week path from theory to repeatable execution." intro="No filler modules. Every week is engineered to compound on the last, ending with you trading a defined breakout playbook live.">
+    <FeatureLayout kicker="Structured curriculum" title="An 8-week path from theory to repeatable execution." intro="No filler modules. Every week is engineered to compound on the last, ending with you trading a defined breakout playbook live.">
       <div className="grid gap-6 md:grid-cols-3">
         {phases.map((p) => (
           <div key={p.title} className="rounded-3xl border border-border bg-card p-7">
