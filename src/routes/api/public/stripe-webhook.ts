@@ -55,12 +55,10 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
           // Send the client their receipt once the payment is fully processed.
           if (session.payment_status === "paid" && email) {
             try {
-              const { TIERS } = await import("@/lib/tiers");
+              const { purchaseName } = await import("@/lib/tiers");
               const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
 
-              const tierName = (TIERS as Record<string, { name: string }>)[tier]?.name
-                ? `SHLM ${(TIERS as Record<string, { name: string }>)[tier].name}`
-                : "SHLM Mentorship";
+              const tierName = purchaseName(tier);
 
               const amount = new Intl.NumberFormat("en-US", {
                 style: "currency",
