@@ -9,6 +9,12 @@ import { useAuthUser } from "@/hooks/use-auth-user";
 import { AccountMenu } from "@/components/AccountMenu";
 
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
+import chartNasdaq from "@/assets/chart-nasdaq.png.asset.json";
+import chartDow from "@/assets/chart-dow.png.asset.json";
+import chartEntry from "@/assets/chart-entry.png.asset.json";
+import pnlCard from "@/assets/pnl-card.png.asset.json";
+import accountsPnl from "@/assets/accounts-pnl.png.asset.json";
+import payouts from "@/assets/payouts.jpg.asset.json";
 
 import heroBg from "@/assets/hero-bg.jpg";
 
@@ -88,7 +94,9 @@ function Index() {
         <ProgramSection />
         <MentorshipSection />
         <PricingSection />
+        <ProofSection />
         <TestimonialsSection />
+
         <DiscordSection />
         <FaqSection />
         <CtaSection />
@@ -1008,7 +1016,103 @@ function PricingSection() {
 }
 
 
+function ProofSection() {
+  const tiles = [
+    {
+      src: chartNasdaq.url,
+      alt: "Micro E-mini Nasdaq-100 five-minute chart with a breakout entry, stop loss and take profit zones marked",
+      caption: "Nasdaq breakout — entry, stop and target mapped before the trade.",
+      className: "md:col-span-4",
+      aspect: "min-h-[280px] sm:min-h-[380px]",
+    },
+    {
+      src: payouts.url,
+      alt: "Three payout notifications from a proprietary trading firm",
+      caption: "Payouts, not promises.",
+      className: "md:col-span-2",
+      aspect: "min-h-[220px]",
+      fit: "object-contain p-3",
+    },
+    {
+      src: chartDow.url,
+      alt: "Micro E-mini Dow futures chart showing a break of structure and a managed short position",
+      caption: "Break of structure, then execution.",
+      className: "md:col-span-3",
+      aspect: "min-h-[220px]",
+    },
+    {
+      src: pnlCard.url,
+      alt: "Group profit and loss card showing a daily group result",
+      caption: "Group P&L, tracked daily.",
+      className: "md:col-span-3",
+      aspect: "min-h-[220px]",
+    },
+    {
+      src: accountsPnl.url,
+      alt: "Funded account table showing per-account totals and drawdown distance",
+      caption: "Risk-managed across every funded account.",
+      className: "md:col-span-6",
+      aspect: "min-h-[140px] sm:min-h-[180px]",
+      fit: "object-contain p-4",
+    },
+    {
+      src: chartEntry.url,
+      alt: "Close-up chart of a reversal entry with risk and reward zones",
+      caption: "One setup. Repeated with discipline.",
+      className: "md:col-span-6",
+      aspect: "min-h-[280px] sm:min-h-[420px]",
+    },
+  ];
+
+  return (
+    <section id="proof" className="bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-12 max-w-2xl sm:mb-16">
+          <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">
+            The work
+          </p>
+          <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+            Real charts. Real execution. Real payouts.
+          </h2>
+          <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+            Every setup you see here comes from the same breakout framework taught inside the
+            mentorship — marked in advance, executed with defined risk.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-6">
+          {tiles.map((tile) => (
+            <figure
+              key={tile.src}
+              className={`group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card ${tile.className}`}
+            >
+              <div className={`relative w-full flex-1 overflow-hidden ${tile.aspect}`}>
+                <img
+                  src={tile.src}
+                  alt={tile.alt}
+                  loading="lazy"
+                  className={`absolute inset-0 h-full w-full object-center transition-transform duration-700 ease-out group-hover:scale-[1.03] ${"fit" in tile ? (tile as { fit: string }).fit : "object-cover"}`}
+                />
+              </div>
+              <figcaption className="border-t border-border px-5 py-4 text-sm text-muted-foreground">
+                {tile.caption}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+
+
+        <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
+          Past performance is not indicative of future results. Trading futures involves substantial
+          risk of loss.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function TestimonialsSection() {
+
   const testimonials = [
     {
       quote: "SHLM replaced the noise with a process. My win rate improved, but more importantly my drawdowns became controlled.",
