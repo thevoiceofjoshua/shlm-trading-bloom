@@ -89,7 +89,7 @@ function DashboardPage() {
           Your private SHLM member dashboard is being built out. New modules will appear here as the program grows.
         </p>
 
-        <MembershipPanel demo={demo} />
+        <MembershipPanel demo={demo === "expired" ? "expired" : undefined} />
 
         <h2 className="mt-12 font-display text-xl font-medium tracking-tight text-foreground">
           Your member modules
