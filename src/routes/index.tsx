@@ -12,6 +12,11 @@ import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
 import chartNasdaq from "@/assets/chart-nasdaq.png.asset.json";
 import chartDow from "@/assets/chart-dow.png.asset.json";
 import chartEntry from "@/assets/chart-entry.png.asset.json";
+import pnl5145 from "@/assets/pnl-5145.jpg.asset.json";
+import liveTrade from "@/assets/live-trade-gold.mp4.asset.json";
+import liveTradePoster from "@/assets/live-trade-poster.jpg.asset.json";
+
+
 import pnlCard from "@/assets/pnl-card.png.asset.json";
 import accountsPnl from "@/assets/accounts-pnl.png.asset.json";
 import payouts from "@/assets/payouts.jpg.asset.json";
@@ -1056,6 +1061,22 @@ function ProofSection() {
       fit: "object-contain p-4",
     },
     {
+      src: liveTrade.url,
+      kind: "video" as const,
+      alt: "Screen recording of a live Micro Gold futures trade showing a position up 2,775 dollars",
+      caption: "Live execution — Micro Gold, +$2,775 in open profit.",
+      className: "md:col-span-2",
+      aspect: "min-h-[420px] sm:min-h-[520px]",
+    },
+    {
+      src: pnl5145.url,
+      alt: "Daily profit and loss card showing plus 5,145 dollars",
+      caption: "+$5,145 in a single session.",
+      className: "md:col-span-4",
+      aspect: "min-h-[240px] sm:min-h-[520px]",
+      fit: "object-contain p-3",
+    },
+    {
       src: chartEntry.url,
       alt: "Close-up chart of a reversal entry with risk and reward zones",
       caption: "One setup. Repeated with discipline.",
@@ -1063,6 +1084,7 @@ function ProofSection() {
       aspect: "min-h-[280px] sm:min-h-[420px]",
     },
   ];
+
 
   return (
     <section id="proof" className="bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
@@ -1087,13 +1109,29 @@ function ProofSection() {
               className={`group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card ${tile.className}`}
             >
               <div className={`relative w-full flex-1 overflow-hidden ${tile.aspect}`}>
-                <img
-                  src={tile.src}
-                  alt={tile.alt}
-                  loading="lazy"
-                  className={`absolute inset-0 h-full w-full object-center transition-transform duration-700 ease-out group-hover:scale-[1.03] ${"fit" in tile ? (tile as { fit: string }).fit : "object-cover"}`}
-                />
+                {"kind" in tile && (tile as { kind: string }).kind === "video" ? (
+                  <video
+                    src={tile.src}
+                    aria-label={tile.alt}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    poster={liveTradePoster.url}
+
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                  />
+                ) : (
+                  <img
+                    src={tile.src}
+                    alt={tile.alt}
+                    loading="lazy"
+                    className={`absolute inset-0 h-full w-full object-center transition-transform duration-700 ease-out group-hover:scale-[1.03] ${"fit" in tile ? (tile as { fit: string }).fit : "object-cover"}`}
+                  />
+                )}
               </div>
+
               <figcaption className="border-t border-border px-5 py-4 text-sm text-muted-foreground">
                 {tile.caption}
               </figcaption>
