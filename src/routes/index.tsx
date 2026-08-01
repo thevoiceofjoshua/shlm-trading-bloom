@@ -96,12 +96,12 @@ function Index() {
         <HeroSection stats={stats} />
         <StatsSection stats={stats} />
         <FeaturesSection />
+        <CtaSection />
         <ProgramSection />
         <MentorshipSection />
         <ProofSection />
         <TestimonialsSection />
         <DiscordSection />
-        <CtaSection />
         <PricingSection />
         <FaqSection />
       </main>
