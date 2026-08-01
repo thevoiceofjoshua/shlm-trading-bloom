@@ -10,7 +10,7 @@ export const Route = createFileRoute("/api/public/enroll/$applicationId")({
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const { data: app, error } = await supabaseAdmin
             .from("applications")
-            .select("id, email, tier, status")
+            .select("id, full_name, email, phone, tier, status")
             .eq("id", params.applicationId)
             .single();
 
@@ -24,6 +24,8 @@ export const Route = createFileRoute("/api/public/enroll/$applicationId")({
           const { session } = await createApplicationCheckout({
             applicationId: app.id,
             email: app.email,
+            fullName: app.full_name,
+            phone: app.phone,
             tier: app.tier,
             origin,
           });

@@ -45,7 +45,7 @@ export const sendPaymentLink = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: app, error: fetchError } = await supabaseAdmin
       .from("applications")
-      .select("id, full_name, email, tier")
+      .select("id, full_name, email, phone, tier")
       .eq("id", data.applicationId)
       .single();
 
@@ -61,6 +61,8 @@ export const sendPaymentLink = createServerFn({ method: "POST" })
       await createApplicationCheckout({
         applicationId: app.id,
         email: app.email,
+        fullName: app.full_name,
+        phone: app.phone,
         tier: entryLevel,
         origin: SITE_URL,
         promoCode: data.promoCode,

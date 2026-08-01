@@ -13,6 +13,8 @@ const PROMO_CODES: Record<string, number> = { "1MILL": 0.2 };
 export async function createApplicationCheckout(opts: {
   applicationId: string;
   email: string;
+  fullName?: string | null;
+  phone?: string | null;
   tier?: string;
   origin: string;
   promoCode?: string;
@@ -31,6 +33,25 @@ export async function createApplicationCheckout(opts: {
       ? `${baseName} (${normalizedCode} • ${Math.round(discount * 100)}% off)`
       : baseName;
 
+  // Pre-fill the applicant's details at checkout by reusing/creating a Stripe
+  // customer built from what they entered on the SHLM application.
+  let customerId: string | undefined;
+  try {
+    const existing = await stripe.customers.list({ email: opts.email, limit: 1 });
+    const details = {
+      email: opts.email,
+      ...(opts.fullName ? { name: opts.fullName } : {}),
+      ...(opts.phone ? { phone: opts.phone } : {}),
+      metadata: { application_id: opts.applicationId },
+    };
+    const customer = existing.data[0]
+      ? await stripe.customers.update(existing.data[0].id, details)
+      : await stripe.customers.create(details);
+    customerId = customer.id;
+  } catch {
+    customerId = undefined;
+  }
+
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
     payment_method_types: ["card"],
@@ -44,7 +65,9 @@ export async function createApplicationCheckout(opts: {
         quantity: 1,
       },
     ],
-    customer_email: opts.email,
+    ...(customerId ? { customer: customerId } : { customer_email: opts.email }),
+    customer_update: customerId ? { name: "auto", address: "auto" } : undefined,
+    phone_number_collection: { enabled: true },
     metadata: {
       tier: PROGRAM.key,
       entry_level: opts.tier ?? "",
