@@ -98,13 +98,13 @@ function Index() {
         <FeaturesSection />
         <ProgramSection />
         <MentorshipSection />
-        <PricingSection />
         <ProofSection />
         <TestimonialsSection />
-
         <DiscordSection />
         <FaqSection />
         <CtaSection />
+        <PricingSection />
+
       </main>
       <Footer />
     </div>
