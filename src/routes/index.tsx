@@ -29,7 +29,7 @@ const siteStatsQuery = (fn: () => Promise<SiteStats>) =>
 const HOMEPAGE_FAQS = [
   {
     q: "Do I need trading experience to join?",
-    a: "Foundation is beginner-friendly. Mentorship and Elite are best suited for traders who have placed live trades and want to professionalize their process.",
+    a: "Every level is welcome. Beginners get the full foundation, while experienced traders use the mentorship to professionalize their process.",
   },
   {
     q: "How long do I have access to the curriculum?",
@@ -457,21 +457,21 @@ function HeroSection({ stats }: { stats: SiteStats }) {
 }
 
 const ENROLLMENTS = [
-  { name: "Marcus T.", city: "Austin, TX", tier: "Mentorship" },
-  { name: "Priya S.", city: "London, UK", tier: "Elite" },
-  { name: "Daniel R.", city: "Miami, FL", tier: "Foundation" },
-  { name: "Chidi O.", city: "Lagos, NG", tier: "Mentorship" },
-  { name: "Sofia L.", city: "Madrid, ES", tier: "Mentorship" },
-  { name: "Kenji A.", city: "Tokyo, JP", tier: "Elite" },
-  { name: "Amara J.", city: "Atlanta, GA", tier: "Foundation" },
-  { name: "Liam W.", city: "Toronto, CA", tier: "Mentorship" },
-  { name: "Noor H.", city: "Dubai, AE", tier: "Elite" },
-  { name: "Ethan B.", city: "Chicago, IL", tier: "Mentorship" },
-  { name: "Isabella F.", city: "São Paulo, BR", tier: "Foundation" },
-  { name: "Jonas M.", city: "Berlin, DE", tier: "Mentorship" },
-  { name: "Ava P.", city: "New York, NY", tier: "Elite" },
-  { name: "Ravi K.", city: "Mumbai, IN", tier: "Mentorship" },
-  { name: "Zara N.", city: "Cape Town, ZA", tier: "Foundation" },
+  { name: "Marcus T.", city: "Austin, TX", tier: "Intermediate" },
+  { name: "Priya S.", city: "London, UK", tier: "Advanced" },
+  { name: "Daniel R.", city: "Miami, FL", tier: "Beginner" },
+  { name: "Chidi O.", city: "Lagos, NG", tier: "Intermediate" },
+  { name: "Sofia L.", city: "Madrid, ES", tier: "Intermediate" },
+  { name: "Kenji A.", city: "Tokyo, JP", tier: "Advanced" },
+  { name: "Amara J.", city: "Atlanta, GA", tier: "Beginner" },
+  { name: "Liam W.", city: "Toronto, CA", tier: "Intermediate" },
+  { name: "Noor H.", city: "Dubai, AE", tier: "Advanced" },
+  { name: "Ethan B.", city: "Chicago, IL", tier: "Intermediate" },
+  { name: "Isabella F.", city: "São Paulo, BR", tier: "Beginner" },
+  { name: "Jonas M.", city: "Berlin, DE", tier: "Intermediate" },
+  { name: "Ava P.", city: "New York, NY", tier: "Advanced" },
+  { name: "Ravi K.", city: "Mumbai, IN", tier: "Intermediate" },
+  { name: "Zara N.", city: "Cape Town, ZA", tier: "Beginner" },
 ];
 
 function LiveEnrollmentTile() {
@@ -628,7 +628,7 @@ function FeaturesSection() {
   const features = [
     {
       title: "Structured curriculum",
-      description: "A 12-week progression from market structure to advanced execution. No shortcuts. Every module builds on the last.",
+      description: "An 8-week progression from market structure to advanced execution. No shortcuts. Every module builds on the last.",
       span: "md:col-span-2 md:row-span-2",
       to: "/features/curriculum" as const,
     },
@@ -1168,7 +1168,7 @@ function FaqSection() {
   const faqs = [
     {
       question: "Do I need trading experience to join?",
-      answer: "Foundation is beginner-friendly. Mentorship and Elite are best suited for traders who have placed live trades and want to professionalize their process.",
+      answer: "Every level is welcome. Beginners get the full foundation, while experienced traders use the mentorship to professionalize their process.",
     },
     {
       question: "How long do I have access to the curriculum?",
