@@ -9,6 +9,12 @@ import { useAuthUser } from "@/hooks/use-auth-user";
 import { AccountMenu } from "@/components/AccountMenu";
 
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
+import chartNasdaq from "@/assets/chart-nasdaq.png.asset.json";
+import chartDow from "@/assets/chart-dow.png.asset.json";
+import chartEntry from "@/assets/chart-entry.png.asset.json";
+import pnlCard from "@/assets/pnl-card.png.asset.json";
+import accountsPnl from "@/assets/accounts-pnl.png.asset.json";
+import payouts from "@/assets/payouts.jpg.asset.json";
 
 import heroBg from "@/assets/hero-bg.jpg";
 
