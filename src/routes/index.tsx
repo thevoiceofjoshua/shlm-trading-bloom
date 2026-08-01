@@ -1082,14 +1082,14 @@ function ProofSection() {
           {tiles.map((tile) => (
             <figure
               key={tile.src}
-              className={`group overflow-hidden rounded-3xl border border-border bg-card ${tile.className}`}
+              className={`group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card ${tile.className}`}
             >
-              <div className={`overflow-hidden ${tile.aspect}`}>
+              <div className={`relative w-full flex-1 overflow-hidden ${tile.aspect}`}>
                 <img
                   src={tile.src}
                   alt={tile.alt}
                   loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                  className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                 />
               </div>
               <figcaption className="border-t border-border px-5 py-4 text-sm text-muted-foreground">
@@ -1098,6 +1098,7 @@ function ProofSection() {
             </figure>
           ))}
         </div>
+
 
         <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
           Past performance is not indicative of future results. Trading futures involves substantial
