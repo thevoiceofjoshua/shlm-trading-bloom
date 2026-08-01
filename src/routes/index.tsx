@@ -99,9 +99,9 @@ function Index() {
         <ProgramSection />
         <MentorshipSection />
         <ProofSection />
+        <CtaSection />
         <TestimonialsSection />
         <DiscordSection />
-        <CtaSection />
         <PricingSection />
         <FaqSection />
       </main>
