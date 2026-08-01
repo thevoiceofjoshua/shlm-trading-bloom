@@ -4,8 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { HomeButton } from "@/components/HomeButton";
 import { supabase } from "@/integrations/supabase/client";
-import { createUpgradeCheckout, getMyMembership } from "@/lib/upgrade.functions";
-import { TERM_MONTHS, TIERS, formatUsd, type TierKey, type UpgradeQuote } from "@/lib/tiers";
+import { getMyMembership } from "@/lib/membership.functions";
+import { createExtensionCheckoutSession } from "@/lib/checkout.functions";
+import { EXTENSION, PROGRAM, addMonths, extensionTotal, formatUsd } from "@/lib/tiers";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
