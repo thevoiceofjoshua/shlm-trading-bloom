@@ -1023,7 +1023,7 @@ function ProofSection() {
       alt: "Micro E-mini Nasdaq-100 five-minute chart with a breakout entry, stop loss and take profit zones marked",
       caption: "Nasdaq breakout — entry, stop and target mapped before the trade.",
       className: "md:col-span-4",
-      aspect: "min-h-[300px] sm:min-h-[440px]",
+      aspect: "min-h-[280px] sm:min-h-[380px]",
     },
     {
       src: payouts.url,
