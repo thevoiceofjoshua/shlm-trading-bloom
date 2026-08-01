@@ -107,6 +107,42 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          author: string
+          created_at: string
+          id: string
+          published: boolean
+          quote: string
+          rating: number
+          role: string
+          sort_order: number
+          verified: boolean
+        }
+        Insert: {
+          author: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          quote: string
+          rating?: number
+          role?: string
+          sort_order?: number
+          verified?: boolean
+        }
+        Update: {
+          author?: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          quote?: string
+          rating?: number
+          role?: string
+          sort_order?: number
+          verified?: boolean
+        }
+        Relationships: []
+      }
       site_stats: {
         Row: {
           cohort_label: string
