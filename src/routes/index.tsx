@@ -4,6 +4,8 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getSiteStats, type SiteStats } from "@/lib/site-stats.functions";
+import { getReviews, type Review } from "@/lib/reviews.functions";
+import { ReviewsCarousel } from "@/components/ReviewsCarousel";
 import { DISCORD_JOIN_URL } from "@/lib/external-links";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { AccountMenu } from "@/components/AccountMenu";
@@ -25,6 +27,9 @@ import heroBg from "@/assets/hero-bg.jpg";
 
 const siteStatsQuery = (fn: () => Promise<SiteStats>) =>
   queryOptions({ queryKey: ["site_stats"], queryFn: fn, staleTime: 30_000 });
+
+const reviewsQuery = (fn: () => Promise<Review[]>) =>
+  queryOptions({ queryKey: ["reviews"], queryFn: fn, staleTime: 60_000 });
 
 const HOMEPAGE_FAQS = [
   {
@@ -48,9 +53,10 @@ const HOMEPAGE_FAQS = [
 export const Route = createFileRoute("/")({
   component: Index,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(
-      siteStatsQuery(() => getSiteStats()),
-    );
+    await Promise.all([
+      context.queryClient.ensureQueryData(siteStatsQuery(() => getSiteStats())),
+      context.queryClient.ensureQueryData(reviewsQuery(() => getReviews())),
+    ]);
   },
   head: () => ({
     meta: [
@@ -1114,54 +1120,32 @@ function ProofSection() {
 }
 
 function TestimonialsSection() {
+  const getFn = useServerFn(getReviews);
+  const { data: reviews } = useSuspenseQuery(reviewsQuery(() => getFn()));
 
-  const testimonials = [
-    {
-      quote: "SHLM replaced the noise with a process. My win rate improved, but more importantly my drawdowns became controlled.",
-      author: "Marcus T.",
-      role: "Futures trader, 18 months",
-    },
-    {
-      quote: "The 1:1 mentorship is the difference maker. Having someone review my actual trades every week accelerated everything.",
-      author: "Daniela R.",
-      role: "Forex trader, 8 months",
-    },
-    {
-      quote: "I had taken courses before. This was the first time I left with a system I actually trust and follow.",
-      author: "James L.",
-      role: "Crypto trader, 12 months",
-    },
-  ];
+  if (!reviews || reviews.length === 0) return null;
 
   return (
     <section className="bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-16 max-w-2xl">
-          <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">Testimonials</p>
-          <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-            Traders who outlasted the learning curve.
-          </h2>
+        <div className="mb-12 grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 sm:mb-16">
+          <div className="min-w-0 max-w-2xl">
+            <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">Reviews</p>
+            <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+              Traders who outlasted the learning curve.
+            </h2>
+          </div>
+          <p className="hidden shrink-0 text-sm text-muted-foreground sm:block">
+            {reviews.length} verified reviews
+          </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
-          {testimonials.map((t) => (
-            <div key={t.author} className="flex flex-col justify-between rounded-3xl border border-border bg-card p-7">
-              <p className="text-lg leading-relaxed text-card-foreground">
-                <span className="font-mono text-xl text-muted-foreground">&ldquo;</span>
-                {t.quote}
-                <span className="font-mono text-xl text-muted-foreground">&rdquo;</span>
-              </p>
-              <div className="mt-6">
-                <p className="font-display font-medium text-foreground">{t.author}</p>
-                <p className="text-sm text-muted-foreground">{t.role}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <ReviewsCarousel reviews={reviews} />
       </div>
     </section>
   );
 }
+
 
 function FaqSection() {
   const faqs = [
