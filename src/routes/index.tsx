@@ -94,7 +94,9 @@ function Index() {
         <ProgramSection />
         <MentorshipSection />
         <PricingSection />
+        <ProofSection />
         <TestimonialsSection />
+
         <DiscordSection />
         <FaqSection />
         <CtaSection />
