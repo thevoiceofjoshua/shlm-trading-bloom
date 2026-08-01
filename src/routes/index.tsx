@@ -688,12 +688,12 @@ function FeaturesSection() {
 
 function ProgramSection() {
   const modules = [
-    { week: "01-02", title: "Foundations & market structure", description: "Reading price action, liquidity, and the anatomy of a trend." },
-    { week: "03-04", title: "Strategy development", description: "Building a rules-based system with entry, exit, and invalidation criteria." },
-    { week: "05-06", title: "Risk & position sizing", description: "Defining risk per trade, correlation limits, and portfolio heat." },
-    { week: "07-08", title: "Execution & journaling", description: "Order flow, slippage management, and structured trade review." },
-    { week: "09-10", title: "Psychology & discipline", description: "Emotional regulation, routines, and protecting your edge." },
-    { week: "11-12", title: "Live trading & feedback", description: "Trade live with mentor oversight and refine your personal playbook." },
+    { week: "WEEK 01", title: "Foundations & market structure", description: "Reading price action, liquidity, and the anatomy of a trend." },
+    { week: "WEEK 02", title: "Strategy development", description: "Building a rules-based system with entry, exit, and invalidation criteria." },
+    { week: "WEEK 03-04", title: "Risk & position sizing", description: "Defining risk per trade, correlation limits, and portfolio heat." },
+    { week: "WEEK 05", title: "Execution & journaling", description: "Order flow, slippage management, and structured trade review." },
+    { week: "WEEK 06", title: "Psychology & discipline", description: "Emotional regulation, routines, and protecting your edge." },
+    { week: "WEEK 07-08", title: "Live trading & feedback", description: "Trade live with mentor oversight and refine your personal playbook." },
   ];
 
   return (
@@ -702,7 +702,7 @@ function ProgramSection() {
         <div className="mb-16 max-w-2xl">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">The curriculum</p>
           <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-            Twelve weeks. One clear path.
+            Eight weeks. One clear path.
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
             Each phase is designed to move you from theory to repeatable, real-market execution.
