@@ -1107,13 +1107,27 @@ function ProofSection() {
               className={`group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card ${tile.className}`}
             >
               <div className={`relative w-full flex-1 overflow-hidden ${tile.aspect}`}>
-                <img
-                  src={tile.src}
-                  alt={tile.alt}
-                  loading="lazy"
-                  className={`absolute inset-0 h-full w-full object-center transition-transform duration-700 ease-out group-hover:scale-[1.03] ${"fit" in tile ? (tile as { fit: string }).fit : "object-cover"}`}
-                />
+                {"kind" in tile && (tile as { kind: string }).kind === "video" ? (
+                  <video
+                    src={tile.src}
+                    aria-label={tile.alt}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    className="absolute inset-0 h-full w-full object-cover object-center"
+                  />
+                ) : (
+                  <img
+                    src={tile.src}
+                    alt={tile.alt}
+                    loading="lazy"
+                    className={`absolute inset-0 h-full w-full object-center transition-transform duration-700 ease-out group-hover:scale-[1.03] ${"fit" in tile ? (tile as { fit: string }).fit : "object-cover"}`}
+                  />
+                )}
               </div>
+
               <figcaption className="border-t border-border px-5 py-4 text-sm text-muted-foreground">
                 {tile.caption}
               </figcaption>
