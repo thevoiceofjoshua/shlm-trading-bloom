@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -6,10 +6,13 @@ import { HomeButton } from "@/components/HomeButton";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyMembership } from "@/lib/membership.functions";
 import { createExtensionCheckoutSession } from "@/lib/checkout.functions";
-import { EXTENSION, PROGRAM, addMonths, extensionTotal, formatUsd } from "@/lib/tiers";
+import { EXTENSION, PROGRAM, addMonths, accessWindow, extensionTotal, formatUsd } from "@/lib/tiers";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    demo: search.demo === "expired" ? "expired" : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Member Dashboard — SHLM" },
@@ -25,10 +28,15 @@ export const Route = createFileRoute("/dashboard")({
 
 function DashboardPage() {
   const navigate = useNavigate();
+  const { demo } = useSearch({ from: "/dashboard" });
   const [user, setUser] = useState<{ email?: string | null; name?: string | null } | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!demo);
 
   useEffect(() => {
+    if (demo) {
+      setUser({ email: "demo@shlmtrdng.com", name: "Demo Member" });
+      return;
+    }
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
         navigate({ to: "/auth", search: { mode: "signin", redirect: "/dashboard" }, replace: true });
@@ -40,7 +48,7 @@ function DashboardPage() {
       });
       setLoading(false);
     });
-  }, [navigate]);
+  }, [navigate, demo]);
 
   if (loading) {
     return (
@@ -73,7 +81,6 @@ function DashboardPage() {
         </div>
       </header>
 
-
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <h1 className="font-display text-3xl font-medium tracking-tight">
           Welcome back{user?.name ? `, ${user.name}` : ""}
@@ -82,7 +89,7 @@ function DashboardPage() {
           Your private SHLM member dashboard is being built out. New modules will appear here as the program grows.
         </p>
 
-        <MembershipPanel />
+        <MembershipPanel demo={demo} />
 
         <h2 className="mt-12 font-display text-xl font-medium tracking-tight text-foreground">
           Your member modules
@@ -100,14 +107,17 @@ function DashboardPage() {
   );
 }
 
-function MembershipPanel() {
+function MembershipPanel({ demo }: { demo?: "expired" }) {
   const fetchMembership = useServerFn(getMyMembership);
   const startExtension = useServerFn(createExtensionCheckoutSession);
   const [months, setMonths] = useState(1);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["my-membership"],
-    queryFn: () => fetchMembership({ data: undefined }),
+    queryKey: ["my-membership", demo],
+    queryFn: () => {
+      if (demo === "expired") return makeExpiredMembershipMock();
+      return fetchMembership({ data: undefined });
+    },
     retry: false,
   });
 
@@ -160,6 +170,12 @@ function MembershipPanel() {
 
   return (
     <section className="mt-10 space-y-6">
+      {demo === "expired" && (
+        <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          Preview mode: this shows how the dashboard looks at the end of the {PROGRAM.weeks}-week program.
+        </div>
+      )}
+
       <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -274,6 +290,31 @@ function MembershipPanel() {
       </div>
     </section>
   );
+}
+
+function makeExpiredMembershipMock() {
+  const enrolledAt = new Date();
+  enrolledAt.setDate(enrolledAt.getDate() - PROGRAM.weeks * 7);
+  const access = accessWindow(enrolledAt.toISOString(), 0);
+  return {
+    purchases: [
+      {
+        id: "demo-purchase",
+        tier: PROGRAM.key,
+        name: PROGRAM.name,
+        amount_total: PROGRAM.amount,
+        currency: "usd",
+        created_at: enrolledAt.toISOString(),
+      },
+    ],
+    enrollment: {
+      id: "demo-purchase",
+      name: PROGRAM.name,
+      amount_total: PROGRAM.amount,
+      created_at: enrolledAt.toISOString(),
+    },
+    access,
+  };
 }
 
 function Row({ label, value }: { label: string; value: string }) {
