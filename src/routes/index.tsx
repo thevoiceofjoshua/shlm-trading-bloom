@@ -40,8 +40,8 @@ const HOMEPAGE_FAQS = [
     a: "The principles apply across equities, futures, forex, and crypto. Your mentor helps you adapt the system to your preferred market.",
   },
   {
-    q: "Can I upgrade after joining Foundation?",
-    a: "Yes. Foundation members can apply to upgrade to Mentorship or Elite at any time and receive credit toward the higher tier.",
+    q: "What happens after the 8 weeks?",
+    a: "You can extend your access for $150 per month, for as long as you want to keep the mentorship, live sessions, and community.",
   },
 ];
 
@@ -1214,8 +1214,8 @@ function FaqSection() {
       answer: "The principles apply across equities, futures, forex, and crypto. Your mentor helps you adapt the system to your preferred market.",
     },
     {
-      question: "Can I upgrade after joining Foundation?",
-      answer: "Yes. Foundation members can apply to upgrade to Mentorship or Elite at any time and receive credit toward the higher tier.",
+      question: "What happens after the 8 weeks?",
+      answer: "You can extend your access for $150 per month, for as long as you want to keep the mentorship, live sessions, and community.",
     },
   ];
 
