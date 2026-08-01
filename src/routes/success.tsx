@@ -7,7 +7,9 @@ import { verifyCheckoutSession } from "@/lib/checkout.functions";
 
 
 const searchSchema = z.object({
-  tier: z.enum(["foundation", "mentorship", "elite"]).optional(),
+  kind: z.enum(["program", "extension"]).optional(),
+  /** Legacy links from the old three-tier model. */
+  tier: z.string().optional(),
   session_id: z.string().optional(),
 });
 
