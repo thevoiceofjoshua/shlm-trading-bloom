@@ -28,6 +28,9 @@ import heroBg from "@/assets/hero-bg.jpg";
 const siteStatsQuery = (fn: () => Promise<SiteStats>) =>
   queryOptions({ queryKey: ["site_stats"], queryFn: fn, staleTime: 30_000 });
 
+const reviewsQuery = (fn: () => Promise<Review[]>) =>
+  queryOptions({ queryKey: ["reviews"], queryFn: fn, staleTime: 60_000 });
+
 const HOMEPAGE_FAQS = [
   {
     q: "Do I need trading experience to join?",
