@@ -61,7 +61,7 @@ export const sendPaymentLink = createServerFn({ method: "POST" })
       await createApplicationCheckout({
         applicationId: app.id,
         email: app.email,
-        tier,
+        tier: entryLevel,
         origin: SITE_URL,
         promoCode: data.promoCode,
       });
