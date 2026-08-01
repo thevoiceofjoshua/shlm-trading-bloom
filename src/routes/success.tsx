@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { HomeButton } from "@/components/HomeButton";
 import { verifyCheckoutSession } from "@/lib/checkout.functions";
+import { EXTENSION, PROGRAM, formatUsd } from "@/lib/tiers";
 
 
 const searchSchema = z.object({
