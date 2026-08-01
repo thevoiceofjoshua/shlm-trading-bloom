@@ -107,14 +107,17 @@ function DashboardPage() {
   );
 }
 
-function MembershipPanel() {
+function MembershipPanel({ demo }: { demo?: "expired" }) {
   const fetchMembership = useServerFn(getMyMembership);
   const startExtension = useServerFn(createExtensionCheckoutSession);
   const [months, setMonths] = useState(1);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["my-membership"],
-    queryFn: () => fetchMembership({ data: undefined }),
+    queryKey: ["my-membership", demo],
+    queryFn: () => {
+      if (demo === "expired") return makeExpiredMembershipMock();
+      return fetchMembership({ data: undefined });
+    },
     retry: false,
   });
 
@@ -167,6 +170,12 @@ function MembershipPanel() {
 
   return (
     <section className="mt-10 space-y-6">
+      {demo === "expired" && (
+        <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          Preview mode: this shows how the dashboard looks at the end of the {PROGRAM.weeks}-week program.
+        </div>
+      )}
+
       <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -281,6 +290,31 @@ function MembershipPanel() {
       </div>
     </section>
   );
+}
+
+function makeExpiredMembershipMock() {
+  const enrolledAt = new Date();
+  enrolledAt.setDate(enrolledAt.getDate() - PROGRAM.weeks * 7);
+  const access = accessWindow(enrolledAt.toISOString(), 0);
+  return {
+    purchases: [
+      {
+        id: "demo-purchase",
+        tier: PROGRAM.key,
+        name: PROGRAM.name,
+        amount_total: PROGRAM.amount,
+        currency: "usd",
+        created_at: enrolledAt.toISOString(),
+      },
+    ],
+    enrollment: {
+      id: "demo-purchase",
+      name: PROGRAM.name,
+      amount_total: PROGRAM.amount,
+      created_at: enrolledAt.toISOString(),
+    },
+    access,
+  };
 }
 
 function Row({ label, value }: { label: string; value: string }) {
