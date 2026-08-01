@@ -124,7 +124,7 @@ function SuccessPage() {
           <div className="mt-10 flex flex-col gap-3">
             <Link
               to="/dashboard"
-              search={{}}
+              search={{ demo: undefined }}
               className="inline-flex w-full items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
               Go to your dashboard
