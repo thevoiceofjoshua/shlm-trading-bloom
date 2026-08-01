@@ -101,10 +101,9 @@ function Index() {
         <ProofSection />
         <TestimonialsSection />
         <DiscordSection />
-        <FaqSection />
         <CtaSection />
         <PricingSection />
-
+        <FaqSection />
       </main>
       <Footer />
     </div>
