@@ -51,10 +51,8 @@ export const sendPaymentLink = createServerFn({ method: "POST" })
 
     if (fetchError || !app) throw new Error(fetchError?.message || "Application not found");
 
-    const tier = app.tier as "foundation" | "mentorship" | "elite";
-    if (!["foundation", "mentorship", "elite"].includes(tier)) {
-      throw new Error("Invalid tier");
-    }
+    const entryLevel = (app.tier as string | null) ?? "";
+
 
     const SITE_URL = "https://shlmtrdng.com";
 
