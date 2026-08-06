@@ -905,8 +905,9 @@ function PricingSection() {
           )}
         </div>
 
-        <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-5 lg:items-stretch lg:gap-8">
-          <div className="relative flex flex-col rounded-3xl border border-foreground bg-primary p-7 text-primary-foreground shadow-xl shadow-black/10 sm:p-9 lg:col-span-3">
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-3 lg:items-stretch lg:gap-8">
+          <div className="relative flex flex-col rounded-3xl border border-foreground bg-primary p-7 text-primary-foreground shadow-xl shadow-black/10 sm:p-9">
+
             <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary-foreground px-4 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary shadow-sm sm:left-9 sm:translate-x-0">
               Full program
             </span>
@@ -949,7 +950,47 @@ function PricingSection() {
             </a>
           </div>
 
-          <div className="flex flex-col rounded-3xl border border-border bg-card p-7 text-card-foreground sm:p-9 lg:col-span-2">
+          <div className="relative flex flex-col rounded-3xl border border-border bg-card p-7 text-card-foreground sm:p-9">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-foreground px-4 py-1 text-[11px] font-semibold uppercase tracking-widest text-background shadow-sm sm:left-9 sm:translate-x-0">
+              Free access
+            </span>
+            <div>
+              <h3 className="font-display text-xl font-medium sm:text-2xl">Live trading</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Sit in on live sessions and watch the breakout strategy traded in real time. No card,
+                no commitment.
+              </p>
+            </div>
+            <div className="my-6 flex items-baseline gap-2">
+              <span className="font-display text-5xl font-medium">$0</span>
+              <span className="text-sm text-muted-foreground">/ always free</span>
+            </div>
+            <ul className="mb-8 flex-1 space-y-3">
+              {[
+                "Live trading sessions as they happen",
+                "Watch real entries, stops and targets",
+                "Live market commentary",
+                "Community chat access",
+                "No payment details required",
+              ].map((feature) => (
+                <li key={feature} className="flex items-start gap-3 text-sm leading-relaxed">
+                  <span className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-foreground/10">
+                    <span className="h-1.5 w-1.5 rounded-full bg-foreground" />
+                  </span>
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+            <a
+              href="/discord"
+              className="flex min-h-12 items-center justify-center rounded-full border border-foreground bg-background px-6 text-center text-sm font-semibold text-foreground transition-transform hover:scale-[1.02] hover:bg-accent"
+            >
+              Join free
+            </a>
+          </div>
+
+          <div className="flex flex-col rounded-3xl border border-border bg-card p-7 text-card-foreground sm:p-9">
+
             <div>
               <h3 className="font-display text-xl font-medium sm:text-2xl">Monthly extension</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
