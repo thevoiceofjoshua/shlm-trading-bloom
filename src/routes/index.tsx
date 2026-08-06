@@ -1363,11 +1363,6 @@ function Footer() {
                 </>
               )}
               <li>
-                <a href="#discord" className="hover:text-foreground">
-                  Discord
-                </a>
-              </li>
-              <li>
                 <a href="#faq" className="hover:text-foreground">
                   FAQ
                 </a>
