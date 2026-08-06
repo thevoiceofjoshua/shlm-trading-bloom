@@ -107,7 +107,7 @@ function Index() {
         <ProofSection />
         <CtaSection />
         <TestimonialsSection />
-        <DiscordSection />
+        
         <PricingSection />
         <FaqSection />
       </main>
