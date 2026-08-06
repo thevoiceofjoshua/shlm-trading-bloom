@@ -107,7 +107,7 @@ function Index() {
         <ProofSection />
         <CtaSection />
         <TestimonialsSection />
-        <DiscordSection />
+        
         <PricingSection />
         <FaqSection />
       </main>
@@ -442,17 +442,6 @@ function HeroSection({ stats }: { stats: SiteStats }) {
             <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
             <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
             <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-          </svg>
-        </a>
-        <a
-          href={DISCORD_JOIN_URL}
-          target="_blank"
-          rel="noopener"
-          className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white/80 backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-white"
-          aria-label="Discord"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 00-.0852.0085c-.1289.1109-.2612.2219-.3949.3279a.0743.0743 0 00.0099.1204c1.9185.875 3.9675 1.323 6.1024 1.323 2.1349 0 4.1839-.448 6.1023-1.323 2.1349 0 4.1839-.448 6.1023-1.323a.0737.0737 0 00.0099-.1204c-.1337-.106-.267-.217-.3949-.3279a.077.077 0 00-.0852-.0085c-.5979.3428-1.2194.6447-1.8722.8923a.076.076 0 00-.0416.1057c.3529.699 1.0014 1.3638 1.226 1.9942a.0778.0778 0 00.0842.0276c1.9611-.6066 3.9495-1.5219 6.0023-3.0294a.082.082 0 00.0312-.0561c.5006-5.177-.9432-9.6734-3.5487-13.6604a.061.061 0 00-.0312-.0276zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9565-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9565 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9565-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z" />
           </svg>
         </a>
       </div>
@@ -982,10 +971,12 @@ function PricingSection() {
               ))}
             </ul>
             <a
-              href="/discord"
+              href={DISCORD_JOIN_URL}
+              target="_blank"
+              rel="noopener"
               className="flex min-h-12 items-center justify-center rounded-full border border-foreground bg-background px-6 text-center text-sm font-semibold text-foreground transition-transform hover:scale-[1.02] hover:bg-accent"
             >
-              Join free
+              Join Live Trading
             </a>
           </div>
 
@@ -1261,31 +1252,6 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
   );
 }
 
-function DiscordSection() {
-  return (
-    <section id="discord" className="bg-background px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
-      <div className="mx-auto flex max-w-3xl items-center justify-center">
-        <a
-          href={DISCORD_JOIN_URL}
-          target="_blank"
-          rel="noopener"
-          aria-label="Join the SHLM Discord"
-          className="group flex h-24 w-24 items-center justify-center rounded-3xl bg-foreground text-background transition-all hover:scale-105 hover:rounded-2xl sm:h-28 sm:w-28"
-        >
-          <DiscordIcon />
-        </a>
-      </div>
-    </section>
-  );
-}
-
-function DiscordIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3c-.2.362-.43.85-.588 1.238a18.27 18.27 0 0 0-5.941 0C9.87 3.85 9.634 3.362 9.43 3a19.74 19.74 0 0 0-3.76 1.37C1.858 10.01.99 15.502 1.42 20.912a19.9 19.9 0 0 0 6.045 3.06c.49-.67.926-1.383 1.302-2.13a12.9 12.9 0 0 1-2.052-.983c.172-.127.34-.26.502-.396 3.955 1.83 8.234 1.83 12.14 0 .164.137.332.27.502.396a12.86 12.86 0 0 1-2.055.984c.376.746.812 1.459 1.302 2.13a19.86 19.86 0 0 0 6.048-3.06c.5-6.28-.86-11.72-3.837-16.544ZM8.02 17.29c-1.183 0-2.157-1.086-2.157-2.42 0-1.333.953-2.42 2.157-2.42 1.21 0 2.178 1.093 2.157 2.42 0 1.334-.953 2.42-2.157 2.42Zm7.962 0c-1.183 0-2.157-1.086-2.157-2.42 0-1.333.953-2.42 2.157-2.42 1.21 0 2.178 1.093 2.157 2.42 0 1.334-.947 2.42-2.157 2.42Z" />
-    </svg>
-  );
-}
 
 
 function CtaSection() {
@@ -1371,11 +1337,6 @@ function Footer() {
                   </li>
                 </>
               )}
-              <li>
-                <a href="#discord" className="hover:text-foreground">
-                  Discord
-                </a>
-              </li>
               <li>
                 <a href="#faq" className="hover:text-foreground">
                   FAQ

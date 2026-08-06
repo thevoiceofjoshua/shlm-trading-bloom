@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HomeButton } from "@/components/HomeButton";
-import { DISCORD_JOIN_URL } from "@/lib/external-links";
 
 // Set to true when the course overview video is ready to go live.
 const SHOW_VIDEO_SECTION = false;
@@ -265,30 +264,10 @@ function ProgramPage() {
                 You are not trading alone.
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Inside the private SHLM community, members share setups, journals, and feedback in real time. Join the Discord for daily commentary, trade reviews, and direct access to mentors.
+                Inside the private SHLM community, members share setups, journals, and feedback in real time — daily commentary, trade reviews, and direct access to mentors.
               </p>
             </div>
-            <div className="rounded-3xl border border-border bg-card p-8 sm:p-12">
-              <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h3 className="font-display text-2xl font-medium text-card-foreground">Join the private Discord</h3>
-                  <p className="mt-2 text-muted-foreground">
-                    Connect with mentors and fellow traders. Ask questions, share setups, and get feedback on your breakout trades.
-                  </p>
-                </div>
-                <a
-                  href={DISCORD_JOIN_URL}
-                  target="_blank"
-                  rel="noopener"
-                  className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02] hover:bg-primary/90"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 00-.0852.0085c-.1289.1109-.2612.2219-.3949.3279a.0743.0743 0 00.0099.1204c1.9185.875 3.9675 1.323 6.1024 1.323 2.1349 0 4.1839-.448 6.1023-1.323a.0737.0737 0 00.0099-.1204c-.1337-.106-.267-.217-.3949-.3279a.077.077 0 00-.0852-.0085c-.5979.3428-1.2194.6447-1.8722.8923a.076.076 0 00-.0416.1057c.3529.699 1.0014 1.3638 1.226 1.9942a.0778.0778 0 00.0842.0276c1.9611-.6066 3.9495-1.5219 6.0023-3.0294a.082.082 0 00.0312-.0561c.5006-5.177-.9432-9.6734-3.5487-13.6604a.061.061 0 00-.0312-.0276zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9565-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9565 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9565-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z" />
-                  </svg>
-                  Join Discord
-                </a>
-              </div>
-            </div>
+
           </div>
         </section>
 
