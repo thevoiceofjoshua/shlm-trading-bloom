@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HomeButton } from "@/components/HomeButton";
-import { DISCORD_JOIN_URL } from "@/lib/external-links";
 
 // Set to true when the course overview video is ready to go live.
 const SHOW_VIDEO_SECTION = false;

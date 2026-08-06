@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DISCORD_JOIN_URL } from "@/lib/external-links";
 import { FeatureLayout } from "./features.curriculum";
 
 export const Route = createFileRoute("/features/community")({
