@@ -1,0 +1,1 @@
+delete from public.applications where email = 'qa-smoke-test@example.com';
