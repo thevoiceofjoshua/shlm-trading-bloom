@@ -65,7 +65,7 @@ function EnrollGate() {
         <div className="mt-8 rounded-2xl border border-border bg-card p-6">
           <div className="flex items-baseline justify-between">
             <span className="text-sm text-muted-foreground">{PROGRAM.name}</span>
-            <span className="font-display text-2xl">{formatUsd(PROGRAM.price)}</span>
+            <span className="font-display text-2xl">{formatUsd(PROGRAM.amount)}</span>
           </div>
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
             One-time enrollment · 8 weeks of mentorship · extensions available from your

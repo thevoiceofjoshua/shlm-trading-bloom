@@ -26,6 +26,7 @@ import { Route as FeaturesRiskRouteImport } from './routes/features.risk'
 import { Route as FeaturesMentorshipRouteImport } from './routes/features.mentorship'
 import { Route as FeaturesCurriculumRouteImport } from './routes/features.curriculum'
 import { Route as FeaturesCommunityRouteImport } from './routes/features.community'
+import { Route as EnrollApplicationIdRouteImport } from './routes/enroll.$applicationId'
 import { Route as BlogBreakoutStrategyRouteImport } from './routes/blog.breakout-strategy'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -116,6 +117,11 @@ const FeaturesCommunityRoute = FeaturesCommunityRouteImport.update({
   path: '/features/community',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EnrollApplicationIdRoute = EnrollApplicationIdRouteImport.update({
+  id: '/enroll/$applicationId',
+  path: '/enroll/$applicationId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogBreakoutStrategyRoute = BlogBreakoutStrategyRouteImport.update({
   id: '/blog/breakout-strategy',
   path: '/blog/breakout-strategy',
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/enroll/$applicationId': typeof EnrollApplicationIdRoute
   '/features/community': typeof FeaturesCommunityRoute
   '/features/curriculum': typeof FeaturesCurriculumRoute
   '/features/mentorship': typeof FeaturesMentorshipRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/enroll/$applicationId': typeof EnrollApplicationIdRoute
   '/features/community': typeof FeaturesCommunityRoute
   '/features/curriculum': typeof FeaturesCurriculumRoute
   '/features/mentorship': typeof FeaturesMentorshipRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/enroll/$applicationId': typeof EnrollApplicationIdRoute
   '/features/community': typeof FeaturesCommunityRoute
   '/features/curriculum': typeof FeaturesCurriculumRoute
   '/features/mentorship': typeof FeaturesMentorshipRoute
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/test-checkout'
     | '/blog/breakout-strategy'
+    | '/enroll/$applicationId'
     | '/features/community'
     | '/features/curriculum'
     | '/features/mentorship'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/test-checkout'
     | '/blog/breakout-strategy'
+    | '/enroll/$applicationId'
     | '/features/community'
     | '/features/curriculum'
     | '/features/mentorship'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/test-checkout'
     | '/blog/breakout-strategy'
+    | '/enroll/$applicationId'
     | '/features/community'
     | '/features/curriculum'
     | '/features/mentorship'
@@ -296,6 +308,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TestCheckoutRoute: typeof TestCheckoutRoute
   BlogBreakoutStrategyRoute: typeof BlogBreakoutStrategyRoute
+  EnrollApplicationIdRoute: typeof EnrollApplicationIdRoute
   FeaturesCommunityRoute: typeof FeaturesCommunityRoute
   FeaturesCurriculumRoute: typeof FeaturesCurriculumRoute
   FeaturesMentorshipRoute: typeof FeaturesMentorshipRoute
@@ -426,6 +439,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeaturesCommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/enroll/$applicationId': {
+      id: '/enroll/$applicationId'
+      path: '/enroll/$applicationId'
+      fullPath: '/enroll/$applicationId'
+      preLoaderRoute: typeof EnrollApplicationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/breakout-strategy': {
       id: '/blog/breakout-strategy'
       path: '/blog/breakout-strategy'
@@ -472,6 +492,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TestCheckoutRoute: TestCheckoutRoute,
   BlogBreakoutStrategyRoute: BlogBreakoutStrategyRoute,
+  EnrollApplicationIdRoute: EnrollApplicationIdRoute,
   FeaturesCommunityRoute: FeaturesCommunityRoute,
   FeaturesCurriculumRoute: FeaturesCurriculumRoute,
   FeaturesMentorshipRoute: FeaturesMentorshipRoute,
@@ -483,3 +504,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
