@@ -79,7 +79,7 @@ export const sendPaymentLink = createServerFn({ method: "POST" })
       templateData: {
         fullName: app.full_name,
         tier: tierInfo.name,
-        checkoutUrl: `${SITE_URL}/api/public/enroll/${app.id}`,
+        checkoutUrl: `${SITE_URL}/enroll/${app.id}`,
         amount: displayAmount,
         promoCode: normalizedCode,
         discountPercent: discount > 0 ? `${Math.round(discount * 100)}` : undefined,
