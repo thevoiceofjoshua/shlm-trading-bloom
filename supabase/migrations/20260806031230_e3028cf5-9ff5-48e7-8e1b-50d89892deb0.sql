@@ -1,0 +1,1 @@
+update public.applications set status = 'approved' where id = '7edc88c3-a100-40ff-9105-7b485a6b18d7';
