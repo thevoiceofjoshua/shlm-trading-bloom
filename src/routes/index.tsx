@@ -905,8 +905,9 @@ function PricingSection() {
           )}
         </div>
 
-        <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-5 lg:items-stretch lg:gap-8">
-          <div className="relative flex flex-col rounded-3xl border border-foreground bg-primary p-7 text-primary-foreground shadow-xl shadow-black/10 sm:p-9 lg:col-span-3">
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-3 lg:items-stretch lg:gap-8">
+          <div className="relative flex flex-col rounded-3xl border border-foreground bg-primary p-7 text-primary-foreground shadow-xl shadow-black/10 sm:p-9">
+
             <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary-foreground px-4 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary shadow-sm sm:left-9 sm:translate-x-0">
               Full program
             </span>
