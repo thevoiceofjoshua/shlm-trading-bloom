@@ -971,10 +971,12 @@ function PricingSection() {
               ))}
             </ul>
             <a
-              href="/discord"
+              href={DISCORD_JOIN_URL}
+              target="_blank"
+              rel="noopener"
               className="flex min-h-12 items-center justify-center rounded-full border border-foreground bg-background px-6 text-center text-sm font-semibold text-foreground transition-transform hover:scale-[1.02] hover:bg-accent"
             >
-              Join free
+              Join Live Trading
             </a>
           </div>
 
