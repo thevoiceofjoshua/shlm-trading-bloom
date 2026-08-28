@@ -13,7 +13,7 @@ Inside the existing member dashboard, a new "Market Hub" section sits above the 
 ## What the hub shows
 
 **1. Session command bar (top)**
-- Live LA clock plus your three named windows: NY Open (NASDAQ/US30), Midday, and Gold Session (5:00–7:15pm PST).
+- Live LA clock plus your two named windows: NY Open (NASDAQ/US30) and Gold Session (5:00–7:15pm PST).
 - The active window is highlighted; the others show a countdown to open ("Gold session opens in 4h 12m").
 - Weekend/holiday state: "Markets closed — next session Monday 6:30am PST."
 
