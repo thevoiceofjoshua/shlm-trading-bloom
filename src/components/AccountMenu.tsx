@@ -15,6 +15,7 @@ export function AccountMenu({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const { isAdmin, adminMode, exit, reopenPrompt } = useAdminMode();
 
   useEffect(() => {
     if (!open) return;
