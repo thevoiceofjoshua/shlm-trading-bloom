@@ -336,3 +336,31 @@ function DashboardCard({ title, description }: { title: string; description: str
     </div>
   );
 }
+
+function MarketHubTeaser() {
+  return (
+    <section className="mt-10 overflow-hidden rounded-2xl border border-foreground/15 bg-card p-6 sm:p-8">
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="max-w-xl">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Members-only
+          </p>
+          <h2 className="mt-2 font-display text-2xl font-medium tracking-tight">
+            SHLM Centre
+          </h2>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Your live trading command center — NASDAQ & US30 watchlists, Mag 7 and Dow 30
+            drivers, a Gold desk, the US economic calendar, and an AI session analyst that flags
+            the zero-volume and highest-volume opens each day.
+          </p>
+        </div>
+        <Link
+          to="/dashboard/hub"
+          className="inline-flex min-h-12 items-center justify-center rounded-full bg-foreground px-7 text-sm font-medium text-background transition-opacity hover:opacity-90"
+        >
+          Open SHLM Centre
+        </Link>
+      </div>
+    </section>
+  );
+}
