@@ -118,6 +118,7 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
   const fetchMembership = useServerFn(getMyMembership);
   const startExtension = useServerFn(createExtensionCheckoutSession);
   const [months, setMonths] = useState(1);
+  const { adminUnlocked } = useAdminMode();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["my-membership", demo],
