@@ -18,6 +18,8 @@ import { sessionStatuses } from "@/lib/hub-session";
 export interface HubAccess {
   hasAccess: boolean;
   isAdmin: boolean;
+  /** True when a paid membership grants access (independent of admin role). */
+  memberAccess: boolean;
   reason?: string;
 }
 
