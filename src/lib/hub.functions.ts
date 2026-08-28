@@ -45,7 +45,7 @@ async function checkAccess(context: any): Promise<HubAccess> {
     .select("role")
     .eq("user_id", context.userId)
     .maybeSingle();
-  if (roleRow?.role === "admin") return { hasAccess: true, isAdmin: true };
+  const isAdmin = roleRow?.role === "admin";
 
   // Paid membership check
   const email = (context.claims.email as string | undefined) ?? null;
@@ -56,11 +56,13 @@ async function checkAccess(context: any): Promise<HubAccess> {
     .order("created_at", { ascending: true });
   if (email) query = query.or(`user_id.eq.${context.userId},email.eq.${email}`);
   const { data } = await query;
-  const rows = data ?? [];
-  if (rows.length === 0) {
-    return { hasAccess: false, isAdmin: false, reason: "no-membership" };
+  const memberAccess = (data ?? []).length > 0;
+
+  if (isAdmin) return { hasAccess: true, isAdmin: true, memberAccess };
+  if (!memberAccess) {
+    return { hasAccess: false, isAdmin: false, memberAccess: false, reason: "no-membership" };
   }
-  return { hasAccess: true, isAdmin: false };
+  return { hasAccess: true, isAdmin: false, memberAccess: true };
 }
 
 export const getHubData = createServerFn({ method: "POST" })
