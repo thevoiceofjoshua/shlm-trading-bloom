@@ -7,7 +7,7 @@ Trim the descriptive subtext beneath each SHLM Centre heading so it reads cleane
 
 | Heading | Current subtext | New subtext |
 |---|---|---|
-| SHLM Analyst (h3) | "AI session review — reads every panel and flags the zero-volume and high-volume open calls." | "AI review with zero-volume and high-volume calls." |
+| SHLM Analyst (h3) | "AI session review — reads every panel and flags the zero-volume (choppy) and high-volume (volatile) open calls." | "AI review with zero-volume and high-volume calls." |
 | Dow 30 drivers — US30 (h3) | "What's moving US30: {payload.dowMovers.label}" | "{payload.dowMovers.label}" (drop the "What's moving US30:" prefix; the heading already says US30) |
 | Economic calendar (h3) | "Next: {title} — {time} your time" | "Next: {title} — {time}" (drop "your time"; local conversion is implied) |
 | SHLM Centre (h1) | "{DATA_LABEL}" e.g. "Sample data — live feed coming soon" | Keep as-is — this is the required data-source label, not decorative copy. |
