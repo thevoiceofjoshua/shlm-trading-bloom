@@ -37,6 +37,11 @@ function DashboardPage() {
       setUser({ email: "demo@shlmtrdng.com", name: "Demo Member" });
       return;
     }
+    // Only run auth gate on the exact /dashboard route — child routes (e.g. /dashboard/hub) handle their own auth.
+    if (window.location.pathname !== "/dashboard") {
+      setLoading(false);
+      return;
+    }
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
         navigate({ to: "/auth", search: { mode: "signin", redirect: "/dashboard" }, replace: true });
