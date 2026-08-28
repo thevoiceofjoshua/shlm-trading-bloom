@@ -18,6 +18,7 @@ import { Route as ProgramRouteImport } from './routes/program'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as DiscordRouteImport } from './routes/discord'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CentreRouteImport } from './routes/centre'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -75,6 +76,11 @@ const DiscordRoute = DiscordRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CentreRoute = CentreRouteImport.update({
+  id: '/centre',
+  path: '/centre',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
+  '/centre': typeof CentreRoute
   '/dashboard': typeof DashboardRoute
   '/discord': typeof DiscordRoute
   '/privacy': typeof PrivacyRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
+  '/centre': typeof CentreRoute
   '/dashboard': typeof DashboardRoute
   '/discord': typeof DiscordRoute
   '/privacy': typeof PrivacyRoute
@@ -199,6 +207,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
+  '/centre': typeof CentreRoute
   '/dashboard': typeof DashboardRoute
   '/discord': typeof DiscordRoute
   '/privacy': typeof PrivacyRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/apply'
     | '/auth'
+    | '/centre'
     | '/dashboard'
     | '/discord'
     | '/privacy'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/apply'
     | '/auth'
+    | '/centre'
     | '/dashboard'
     | '/discord'
     | '/privacy'
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/apply'
     | '/auth'
+    | '/centre'
     | '/dashboard'
     | '/discord'
     | '/privacy'
@@ -298,6 +310,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   ApplyRoute: typeof ApplyRoute
   AuthRoute: typeof AuthRoute
+  CentreRoute: typeof CentreRoute
   DashboardRoute: typeof DashboardRoute
   DiscordRoute: typeof DiscordRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -381,6 +394,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/centre': {
+      id: '/centre'
+      path: '/centre'
+      fullPath: '/centre'
+      preLoaderRoute: typeof CentreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -482,6 +502,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   ApplyRoute: ApplyRoute,
   AuthRoute: AuthRoute,
+  CentreRoute: CentreRoute,
   DashboardRoute: DashboardRoute,
   DiscordRoute: DiscordRoute,
   PrivacyRoute: PrivacyRoute,
