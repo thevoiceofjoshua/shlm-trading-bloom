@@ -91,6 +91,7 @@ function CentrePage() {
                 <h1 className="font-display text-3xl font-medium tracking-tight">SHLM Centre</h1>
                 <p className="mt-1 text-sm text-muted-foreground">{DATA_LABEL[payload.dataState]}</p>
               </div>
+              {payload.access.isAdmin && !payload.access.memberAccess && <AdminPreviewTag />}
             </div>
 
             <SessionBar payload={payload} />
