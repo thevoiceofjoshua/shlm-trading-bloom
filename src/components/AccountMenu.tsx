@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import type { AuthUser } from "@/hooks/use-auth-user";
+import { useAdminMode } from "@/hooks/use-admin-mode";
 
 export function AccountMenu({
   user,
