@@ -1,32 +1,25 @@
-# Make the site rank for "shlmtrdng"
+# Fix the invisible favicon in search results
 
-Right now the brand signals are split across two domains. The pages you serve at shlmtrdng.com tell Google their real address is `shlm-trading-bloom.lovable.app` — canonical tags, structured data, the sitemap, and robots.txt all point there. Google follows those and credits the lovable.app URL, so searches for "shlmtrdng" have a weak brand signal to attach to. On top of that, the word "shlmtrdng" appears nowhere in any page title, description, or on-page text, so there's nothing for Google to match the query against.
+The favicon files in the project are a white "SHLM" wordmark on a **transparent** background. Google composites favicons onto a light circle, so white-on-transparent renders as an empty white disc — exactly what you're seeing. The tag and structured-data logo are wired correctly; the image itself is the problem.
 
 ## What changes
 
-1. Consolidate every URL signal on `https://shlmtrdng.com`
-   - Homepage canonical (currently the lovable.app URL).
-   - Legal page canonicals and og:url on `/privacy`, `/terms`, `/refund`.
-   - Organization / WebSite structured data URLs and logo URL.
-   - Sitemap base URL and the `Sitemap:` line in robots.txt.
+Replace the three icon files with versions that have a solid black background and the white SHLM mark on top, so the mark is visible on any surface:
 
-2. Put the brand string into the metadata
-   - Homepage title becomes `SHLM Trading — Trading Mentorship | shlmtrdng.com` (brand plus the searched term, under 60 chars).
-   - Homepage description mentions SHLM Trading (shlmtrdng) once, naturally.
-   - Add brand alternates to the Organization structured data: `alternateName: ["SHLM Trading", "shlmtrdng", "SHLM Trading Mentorship"]`, plus `sameAs` links to the Instagram and X accounts already used on the site — that's how Google associates a shorthand spelling with a brand entity.
-   - Add a `WebSite` `SearchAction`-free `alternateName` entry so the sitename shown in results is SHLM Trading.
+- `public/favicon.png` (512x512)
+- `public/favicon-32.png` (32x32, legible at tiny size — mark only, tighter crop)
+- `public/apple-touch-icon.png` (180x180)
 
-3. Add a light on-page brand mention
-   - The footer already shows the brand; include "shlmtrdng.com" as visible text next to it so the term appears in the crawled body, not only in tags.
+The 32px version gets slightly heavier letter weight and less padding, since a 4-letter wordmark disappears at that size otherwise.
+
+Also add a `public/favicon.ico` fallback, because some crawlers and clients request `/favicon.ico` directly and ignore the `<link>` tags.
 
 ## Technical notes
 
-- Files touched: `src/routes/__root.tsx`, `src/routes/index.tsx`, `src/routes/privacy.tsx`, `src/routes/terms.tsx`, `src/routes/refund.tsx`, `src/routes/sitemap[.]xml.ts`, `public/robots.txt`.
-- No new routes, no design changes beyond the one footer line, no database work.
-- Feature/blog routes keep their existing titles; they get self-referencing canonicals on shlmtrdng.com where missing.
+- New icons are generated as a square black tile with the white SHLM wordmark, then downscaled with padding preserved (no stretching).
+- `src/routes/__root.tsx` keeps its existing icon `links`; a `rel="icon"` entry for the `.ico` fallback is added.
+- The Organization structured-data `logo` already points at `/favicon.png`, so it picks up the new image automatically.
 
-## What this can and can't do
+## Timing
 
-These are the on-page fixes fully under our control, and the canonical consolidation is the important one — without it Google has been told to ignore shlmtrdng.com. Ranking for a brand term also depends on Google re-crawling and on the domain accumulating a little external reference (your social profiles linking to shlmtrdng.com helps most). Expect days, not minutes, for search results to reflect it.
-
-Optionally after this ships: verify shlmtrdng.com in Google Search Console and submit the sitemap so indexing is requested rather than waited on.
+Google caches favicons aggressively — the white circle will persist in search results until it re-crawls the site, typically days. The browser tab and shared-link icon update as soon as this ships (hard-refresh to clear the local cache).
