@@ -283,7 +283,7 @@ export const runSessionReview = createServerFn({ method: "POST" })
         {
           user_id: context.userId,
           review_date: today,
-          payload: parsed as unknown,
+          payload: JSON.parse(JSON.stringify(parsed)) as any,
         },
         { onConflict: "user_id,review_date" },
       );
