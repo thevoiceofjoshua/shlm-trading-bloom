@@ -21,8 +21,15 @@ function AdminPage() {
   const removeFn = useServerFn(removeApplication);
   const queryClient = useQueryClient();
 
+  // Admin mode already verified the passcode this session — reuse it so the
+  // console unlocks without retyping. Manual entry still works as a fallback.
+  const { adminMode, passcode: sessionPasscode } = useAdminMode();
   const [passcodeInput, setPasscodeInput] = useState("");
   const [passcode, setPasscode] = useState("");
+
+  useEffect(() => {
+    if (adminMode && sessionPasscode && !passcode) setPasscode(sessionPasscode);
+  }, [adminMode, sessionPasscode, passcode]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [actingId, setActingId] = useState<string | null>(null);
