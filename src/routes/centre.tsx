@@ -11,8 +11,8 @@ import { IndexCards, MagSevenBoard, DowBoard, GoldDesk } from "@/components/hub/
 import { EconomicCalendar, BiasJournal } from "@/components/hub/EconomicCalendar";
 import { SessionAnalyst } from "@/components/hub/SessionAnalyst";
 
-export const Route = createFileRoute("/dashboard/hub")({
-  component: HubPage,
+export const Route = createFileRoute("/centre")({
+  component: CentrePage,
   head: () => ({
     meta: [
       { title: "SHLM Centre — SHLM" },
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/dashboard/hub")({
   }),
 });
 
-function HubPage() {
+function CentrePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState<{ id?: string; email?: string | null; name?: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,7 @@ function HubPage() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (!data.session) {
-        navigate({ to: "/auth", search: { mode: "signin", redirect: "/dashboard/hub" }, replace: true });
+        navigate({ to: "/auth", search: { mode: "signin", redirect: "/centre" }, replace: true });
         return;
       }
       setUser({
