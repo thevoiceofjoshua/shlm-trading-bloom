@@ -104,6 +104,20 @@ export function AccountMenu({
           >
             Dashboard
           </a>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                if (adminMode) exit();
+                else reopenPrompt();
+              }}
+              className="flex w-full items-center border-t border-border px-4 py-2.5 text-left text-sm hover:bg-accent"
+              role="menuitem"
+            >
+              {adminMode ? "Exit admin mode" : "Enter admin mode"}
+            </button>
+          )}
           <button
             type="button"
             onClick={handleSignOut}
