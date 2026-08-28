@@ -153,6 +153,29 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
     );
   }
 
+  if ((!data?.enrollment || !data.access) && adminUnlocked) {
+    const preview = makeActiveMembershipMock();
+    return (
+      <section className="mt-10 space-y-6">
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+          <AdminPreviewTag />
+          <p className="text-sm text-muted-foreground">
+            You have no real purchase on this account, so the membership panel is shown with sample
+            data. Extension checkout below is live.
+          </p>
+        </div>
+        <MembershipView
+          enrollment={preview.enrollment}
+          access={preview.access}
+          purchases={preview.purchases}
+          months={months}
+          setMonths={setMonths}
+          extend={extend}
+        />
+      </section>
+    );
+  }
+
   if (!data?.enrollment || !data.access) {
     return (
       <section className="mt-10 rounded-2xl border border-border bg-card p-6">
