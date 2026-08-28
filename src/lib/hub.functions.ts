@@ -63,8 +63,18 @@ async function checkAccess(context: any): Promise<HubAccess> {
 
 export const getHubData = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const access = await checkAccess(context);
+  .inputValidator((data: unknown) => {
+    const d = (data ?? {}) as Record<string, unknown>;
+    return { asMember: d.asMember === true };
+  })
+  .handler(async ({ context, data }) => {
+    const resolved = await checkAccess(context);
+    // "View as member" lets an admin confirm the real member-side gate.
+    const access: HubAccess = data.asMember
+      ? resolved.isAdmin && !resolved.hasAccessAsMember
+        ? { hasAccess: false, isAdmin: false, reason: "no-membership" }
+        : { ...resolved, isAdmin: false }
+      : resolved;
     const now = new Date();
 
     const payload: HubPayload = {
