@@ -250,11 +250,11 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
         </p>
       </div>
 
-      {data.purchases.length > 1 && (
+      {view.purchases.length > 1 && (
         <div className="rounded-2xl border border-border bg-card p-6">
           <h3 className="font-display text-lg font-medium">Purchase history</h3>
           <ul className="mt-4 divide-y divide-border">
-            {data.purchases.map((p) => (
+            {view.purchases.map((p) => (
               <li key={p.id} className="flex items-center justify-between py-3 text-sm">
                 <span>{p.name}</span>
                 <span className="text-muted-foreground">
