@@ -44,10 +44,11 @@ function CentrePage() {
     });
   }, [navigate]);
 
+  const { viewAsMember } = useAdminMode();
   const fetchHub = useServerFn(getHubData);
   const { data: payload, isLoading } = useQuery({
-    queryKey: ["hub-data"],
-    queryFn: () => fetchHub({ data: undefined }),
+    queryKey: ["hub-data", viewAsMember],
+    queryFn: () => fetchHub({ data: { asMember: viewAsMember } }),
     enabled: !loading,
     retry: false,
   });
