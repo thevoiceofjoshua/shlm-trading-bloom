@@ -87,12 +87,6 @@ export const getHubData = createServerFn({ method: "POST" })
 
 /* ----------------------- Bias journal (member notes) ----------------------- */
 
-const noteSchema = {
-  noteDate: (v: unknown) => (typeof v === "string" ? v : ""),
-  session: (v: unknown) => (typeof v === "string" ? v : ""),
-  body: (v: unknown) => (typeof v === "string" ? v : ""),
-};
-
 export const getMemberNotes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => {
