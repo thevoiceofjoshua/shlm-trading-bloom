@@ -8,7 +8,7 @@ Members-only. The hub is gated behind an active paid membership (already tracked
 
 ## Entry point
 
-Inside the existing member dashboard, a new "Market Hub" section sits above the member modules grid: a wide featured panel showing the current session status and a live snapshot line (NASDAQ, US30, Gold), with an "Open Market Hub" action that takes the member into the full hub page. Nothing existing on the dashboard is removed or moved.
+Inside the existing member dashboard, a new "SHLM Centre" section sits above the member modules grid: a wide featured panel showing the current session status and a live snapshot line (NASDAQ, US30, Gold), with an "Open SHLM Centre" action that takes the member into the full hub page. Nothing existing on the dashboard is removed or moved.
 
 ## What the hub shows
 
