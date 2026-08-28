@@ -47,7 +47,7 @@ Same black-and-white luxury language as the rest of the site — Space Grotesk h
 
 ## Technical notes
 
-- New route `src/routes/dashboard.hub.tsx` (linked from the dashboard) plus extracted components under `src/components/hub/`: `SessionBar`, `IndexCard`, `MagSevenBoard`, `GoldDesk`, `EconomicCalendar`, `BiasJournal`.
+- `src/routes/dashboard.tsx` gains a `MarketHubTeaser` section linking to a new route `src/routes/dashboard.hub.tsx`, which renders components under `src/components/hub/`: `SessionBar`, `IndexCard`, `MagSevenBoard`, `GoldDesk`, `EconomicCalendar`, `BiasJournal`.
 - Session windows and all time math derive from `SITE_TIMEZONE` in `src/lib/time.ts` — no new timezone constants.
 - `src/lib/market-data.ts` holds typed sample quotes/calendar plus session-window helpers (pure, no I/O at module scope).
 - Membership gating reuses `getMyMembership` from `src/lib/membership.functions.ts`; a new `hub.functions.ts` server fn (with `requireSupabaseAuth`) returns access state plus hub payload so the gate is enforced server-side, not just in the UI.
