@@ -318,6 +318,31 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
   );
 }
 
+/** Admin-preview sample membership: mid-program, active. */
+function makeActiveMembershipMock() {
+  const enrolledAt = new Date();
+  enrolledAt.setDate(enrolledAt.getDate() - 14);
+  return {
+    purchases: [
+      {
+        id: "admin-preview-purchase",
+        tier: PROGRAM.key,
+        name: PROGRAM.name,
+        amount_total: PROGRAM.amount,
+        currency: "usd",
+        created_at: enrolledAt.toISOString(),
+      },
+    ],
+    enrollment: {
+      id: "admin-preview-purchase",
+      name: PROGRAM.name,
+      amount_total: PROGRAM.amount,
+      created_at: enrolledAt.toISOString(),
+    },
+    access: accessWindow(enrolledAt.toISOString(), 0),
+  };
+}
+
 function makeExpiredMembershipMock() {
   const enrolledAt = new Date();
   enrolledAt.setDate(enrolledAt.getDate() - PROGRAM.weeks * 7);
