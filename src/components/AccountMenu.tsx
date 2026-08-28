@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import type { AuthUser } from "@/hooks/use-auth-user";
+import { useAdminMode } from "@/hooks/use-admin-mode";
 
 export function AccountMenu({
   user,
@@ -14,6 +15,7 @@ export function AccountMenu({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const { isAdmin, adminMode, exit, reopenPrompt } = useAdminMode();
 
   useEffect(() => {
     if (!open) return;
@@ -104,6 +106,20 @@ export function AccountMenu({
           >
             Dashboard
           </a>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                if (adminMode) exit();
+                else reopenPrompt();
+              }}
+              className="flex w-full items-center border-t border-border px-4 py-2.5 text-left text-sm hover:bg-accent"
+              role="menuitem"
+            >
+              {adminMode ? "Exit admin mode" : "Enter admin mode"}
+            </button>
+          )}
           <button
             type="button"
             onClick={handleSignOut}

@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { HomeButton } from "@/components/HomeButton";
+import { AdminPreviewTag } from "@/components/AdminBar";
+import { useAdminMode } from "@/hooks/use-admin-mode";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyMembership } from "@/lib/membership.functions";
 import { createExtensionCheckoutSession } from "@/lib/checkout.functions";
@@ -118,6 +120,7 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
   const fetchMembership = useServerFn(getMyMembership);
   const startExtension = useServerFn(createExtensionCheckoutSession);
   const [months, setMonths] = useState(1);
+  const { adminUnlocked } = useAdminMode();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["my-membership", demo],
@@ -153,7 +156,15 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
     );
   }
 
-  if (!data?.enrollment || !data.access) {
+  // Admin mode: with no real purchase on the account, preview the panel with sample data.
+  const view =
+    data?.enrollment && data.access
+      ? data
+      : adminUnlocked
+        ? makeActiveMembershipMock()
+        : null;
+
+  if (!view?.enrollment || !view.access) {
     return (
       <section className="mt-10 rounded-2xl border border-border bg-card p-6">
         <h2 className="font-display text-xl font-medium tracking-tight">No active plan yet</h2>
@@ -171,12 +182,22 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
     );
   }
 
-  const { enrollment, access } = data;
+  const { enrollment, access } = view;
+  const isAdminPreview = !data?.enrollment && adminUnlocked;
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
   return (
     <section className="mt-10 space-y-6">
+      {isAdminPreview && (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+          <AdminPreviewTag />
+          <p className="text-sm text-muted-foreground">
+            No real purchase on this account — membership shown with sample data. Extension checkout
+            below is live Stripe.
+          </p>
+        </div>
+      )}
       {demo === "expired" && (
         <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           Preview mode: this shows how the dashboard looks at the end of the {PROGRAM.weeks}-week program.
@@ -232,11 +253,11 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
         </p>
       </div>
 
-      {data.purchases.length > 1 && (
+      {view.purchases.length > 1 && (
         <div className="rounded-2xl border border-border bg-card p-6">
           <h3 className="font-display text-lg font-medium">Purchase history</h3>
           <ul className="mt-4 divide-y divide-border">
-            {data.purchases.map((p) => (
+            {view.purchases.map((p) => (
               <li key={p.id} className="flex items-center justify-between py-3 text-sm">
                 <span>{p.name}</span>
                 <span className="text-muted-foreground">
@@ -297,6 +318,31 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
       </div>
     </section>
   );
+}
+
+/** Admin-preview sample membership: mid-program, active. */
+function makeActiveMembershipMock() {
+  const enrolledAt = new Date();
+  enrolledAt.setDate(enrolledAt.getDate() - 14);
+  return {
+    purchases: [
+      {
+        id: "admin-preview-purchase",
+        tier: PROGRAM.key,
+        name: PROGRAM.name,
+        amount_total: PROGRAM.amount,
+        currency: "usd",
+        created_at: enrolledAt.toISOString(),
+      },
+    ],
+    enrollment: {
+      id: "admin-preview-purchase",
+      name: PROGRAM.name,
+      amount_total: PROGRAM.amount,
+      created_at: enrolledAt.toISOString(),
+    },
+    access: accessWindow(enrolledAt.toISOString(), 0),
+  };
 }
 
 function makeExpiredMembershipMock() {

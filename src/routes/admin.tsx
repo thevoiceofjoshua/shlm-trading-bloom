@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAdminMode } from "@/hooks/use-admin-mode";
 import { HomeButton } from "@/components/HomeButton";
 import { listApplications, sendPaymentLink, denyApplication, removeApplication, type ApplicationList } from "@/lib/admin.functions";
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
@@ -21,8 +22,15 @@ function AdminPage() {
   const removeFn = useServerFn(removeApplication);
   const queryClient = useQueryClient();
 
+  // Admin mode already verified the passcode this session — reuse it so the
+  // console unlocks without retyping. Manual entry still works as a fallback.
+  const { adminMode, passcode: sessionPasscode } = useAdminMode();
   const [passcodeInput, setPasscodeInput] = useState("");
   const [passcode, setPasscode] = useState("");
+
+  useEffect(() => {
+    if (adminMode && sessionPasscode && !passcode) setPasscode(sessionPasscode);
+  }, [adminMode, sessionPasscode, passcode]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [actingId, setActingId] = useState<string | null>(null);

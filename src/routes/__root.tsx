@@ -11,6 +11,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { AdminBar } from "@/components/AdminBar";
+import { AdminModePrompt } from "@/components/AdminModePrompt";
 
 function NotFoundComponent() {
   return (
@@ -156,6 +158,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AdminBar />
+      <AdminModePrompt />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>

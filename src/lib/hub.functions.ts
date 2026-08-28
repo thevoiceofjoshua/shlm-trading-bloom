@@ -18,6 +18,8 @@ import { sessionStatuses } from "@/lib/hub-session";
 export interface HubAccess {
   hasAccess: boolean;
   isAdmin: boolean;
+  /** True when a paid membership grants access (independent of admin role). */
+  memberAccess: boolean;
   reason?: string;
 }
 
@@ -43,7 +45,7 @@ async function checkAccess(context: any): Promise<HubAccess> {
     .select("role")
     .eq("user_id", context.userId)
     .maybeSingle();
-  if (roleRow?.role === "admin") return { hasAccess: true, isAdmin: true };
+  const isAdmin = roleRow?.role === "admin";
 
   // Paid membership check
   const email = (context.claims.email as string | undefined) ?? null;
@@ -54,17 +56,32 @@ async function checkAccess(context: any): Promise<HubAccess> {
     .order("created_at", { ascending: true });
   if (email) query = query.or(`user_id.eq.${context.userId},email.eq.${email}`);
   const { data } = await query;
-  const rows = data ?? [];
-  if (rows.length === 0) {
-    return { hasAccess: false, isAdmin: false, reason: "no-membership" };
+  const memberAccess = (data ?? []).length > 0;
+
+  if (isAdmin) return { hasAccess: true, isAdmin: true, memberAccess };
+  if (!memberAccess) {
+    return { hasAccess: false, isAdmin: false, memberAccess: false, reason: "no-membership" };
   }
-  return { hasAccess: true, isAdmin: false };
+  return { hasAccess: true, isAdmin: false, memberAccess: true };
 }
 
 export const getHubData = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const access = await checkAccess(context);
+  .inputValidator((data: unknown) => {
+    const d = (data ?? {}) as Record<string, unknown>;
+    return { asMember: d.asMember === true };
+  })
+  .handler(async ({ context, data }) => {
+    const resolved = await checkAccess(context);
+    // "View as member" lets an admin confirm the real member-side gate.
+    const access: HubAccess = data.asMember
+      ? {
+          hasAccess: resolved.memberAccess,
+          isAdmin: false,
+          memberAccess: resolved.memberAccess,
+          ...(resolved.memberAccess ? {} : { reason: "no-membership" }),
+        }
+      : resolved;
     const now = new Date();
 
     const payload: HubPayload = {

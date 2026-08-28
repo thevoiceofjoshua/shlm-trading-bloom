@@ -10,6 +10,8 @@ import { SessionBar } from "@/components/hub/SessionBar";
 import { IndexCards, MagSevenBoard, DowBoard, GoldDesk } from "@/components/hub/MarketBoards";
 import { EconomicCalendar, BiasJournal } from "@/components/hub/EconomicCalendar";
 import { SessionAnalyst } from "@/components/hub/SessionAnalyst";
+import { AdminPreviewTag } from "@/components/AdminBar";
+import { useAdminMode } from "@/hooks/use-admin-mode";
 
 export const Route = createFileRoute("/centre")({
   component: CentrePage,
@@ -44,10 +46,11 @@ function CentrePage() {
     });
   }, [navigate]);
 
+  const { viewAsMember } = useAdminMode();
   const fetchHub = useServerFn(getHubData);
   const { data: payload, isLoading } = useQuery({
-    queryKey: ["hub-data"],
-    queryFn: () => fetchHub({ data: undefined }),
+    queryKey: ["hub-data", viewAsMember],
+    queryFn: () => fetchHub({ data: { asMember: viewAsMember } }),
     enabled: !loading,
     retry: false,
   });
@@ -88,6 +91,7 @@ function CentrePage() {
                 <h1 className="font-display text-3xl font-medium tracking-tight">SHLM Centre</h1>
                 <p className="mt-1 text-sm text-muted-foreground">{DATA_LABEL[payload.dataState]}</p>
               </div>
+              {payload.access.isAdmin && !payload.access.memberAccess && <AdminPreviewTag />}
             </div>
 
             <SessionBar payload={payload} />
