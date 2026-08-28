@@ -6,6 +6,10 @@ Turn the member dashboard into a trading command center built around your actual
 
 Members-only. The hub is gated behind an active paid membership (already tracked by your purchase records). Signed-in users without an active membership see a locked preview with an "Apply to enroll" prompt instead of the hub contents. Admins always get access.
 
+## Entry point
+
+Inside the existing member dashboard, a new "Market Hub" section sits above the member modules grid: a wide featured panel showing the current session status and a live snapshot line (NASDAQ, US30, Gold), with an "Open Market Hub" action that takes the member into the full hub page. Nothing existing on the dashboard is removed or moved.
+
 ## What the hub shows
 
 **1. Session command bar (top)**
@@ -43,7 +47,7 @@ Same black-and-white luxury language as the rest of the site — Space Grotesk h
 
 ## Technical notes
 
-- New route `src/routes/dashboard.hub.tsx` (linked from the dashboard) plus extracted components under `src/components/hub/`: `SessionBar`, `IndexCard`, `MagSevenBoard`, `GoldDesk`, `EconomicCalendar`, `BiasJournal`.
+- `src/routes/dashboard.tsx` gains a `MarketHubTeaser` section linking to a new route `src/routes/dashboard.hub.tsx`, which renders components under `src/components/hub/`: `SessionBar`, `IndexCard`, `MagSevenBoard`, `GoldDesk`, `EconomicCalendar`, `BiasJournal`.
 - Session windows and all time math derive from `SITE_TIMEZONE` in `src/lib/time.ts` — no new timezone constants.
 - `src/lib/market-data.ts` holds typed sample quotes/calendar plus session-window helpers (pure, no I/O at module scope).
 - Membership gating reuses `getMyMembership` from `src/lib/membership.functions.ts`; a new `hub.functions.ts` server fn (with `requireSupabaseAuth`) returns access state plus hub payload so the gate is enforced server-side, not just in the UI.
