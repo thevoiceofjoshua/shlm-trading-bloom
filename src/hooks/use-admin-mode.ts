@@ -134,6 +134,7 @@ export function useAdminMode() {
     enter,
     exit,
     dismissPrompt,
+    reopenPrompt,
     toggleViewAsMember,
   };
 }
