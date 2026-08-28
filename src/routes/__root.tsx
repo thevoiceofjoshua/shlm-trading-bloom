@@ -118,6 +118,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               name: "SHLM",
               legalName: "SHLM LLC",
               url: SITE_URL,
+              logo: {
+                "@type": "ImageObject",
+                url: `${SITE_URL}/favicon.png`,
+                width: 512,
+                height: 512,
+              },
+              image: `${SITE_URL}/favicon.png`,
               description:
                 "SHLM is a premium trading mentorship program built to turn disciplined strategy into consistent performance.",
             },
