@@ -13,7 +13,7 @@ Inside the existing member dashboard, a new "SHLM Centre" section sits above the
 ## What the hub shows
 
 **1. Session command bar (top)**
-- Live LA clock plus your two named windows: NY Open (NASDAQ/US30) and Gold Session (5:00–7:15pm PST).
+- Live clock in the viewer's local time zone plus your two named windows: NY Open (NASDAQ/US30) and Gold Session (5:00–7:15pm PST).
 - The active window is highlighted; the others show a countdown to open ("Gold session opens in 4h 12m").
 - Weekend/holiday state: "Markets closed — next session Monday 6:30am PST."
 
@@ -37,7 +37,7 @@ Inside the existing member dashboard, a new "SHLM Centre" section sits above the
 
 **5. Economic calendar**
 - Today + this week's US high-impact releases: CPI, PPI, NFP, jobless claims, FOMC/Fed speakers, GDP, PCE, retail sales, ISM.
-- All times converted to LA time, with impact badges (high/medium) and a countdown on the next release.
+- All times converted to the viewer's local time zone, with impact badges (high/medium) and a countdown on the next release.
 - A "heads up" banner when a high-impact release lands inside one of your trading windows.
 
 **6. SHLM Analyst (AI session agent)**
@@ -62,7 +62,7 @@ Same black-and-white luxury language as the rest of the site — Space Grotesk h
 ## Technical notes
 
 - `src/routes/dashboard.tsx` gains a `MarketHubTeaser` section linking to a new route `src/routes/dashboard.hub.tsx`, which renders components under `src/components/hub/`: `SessionBar`, `IndexCard`, `MagSevenBoard`, `GoldDesk`, `EconomicCalendar`, `BiasJournal`.
-- Session windows and all time math derive from `SITE_TIMEZONE` in `src/lib/time.ts` — no new timezone constants.
+- Session windows are defined in PST (`SITE_TIMEZONE` in `src/lib/time.ts`); all displayed times — clock, countdowns, calendar, analyst timestamps — are converted to the viewer's local time zone at render, with no new timezone constants.
 - `src/lib/market-data.ts` holds typed sample quotes/calendar plus session-window helpers (pure, no I/O at module scope).
 - Membership gating reuses `getMyMembership` from `src/lib/membership.functions.ts`; a new `hub.functions.ts` server fn (with `requireSupabaseAuth`) returns access state plus hub payload so the gate is enforced server-side, not just in the UI.
 - Bias journal: new `public.member_notes` table (user_id, note_date, session, body) with GRANTs and owner-scoped RLS on `auth.uid()`, read/written through an authenticated server function.
