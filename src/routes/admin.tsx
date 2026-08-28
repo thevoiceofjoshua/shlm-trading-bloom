@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAdminMode } from "@/hooks/use-admin-mode";
 import { HomeButton } from "@/components/HomeButton";
 import { listApplications, sendPaymentLink, denyApplication, removeApplication, type ApplicationList } from "@/lib/admin.functions";
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
