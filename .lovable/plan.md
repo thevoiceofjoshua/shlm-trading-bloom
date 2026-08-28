@@ -45,7 +45,7 @@ Inside the existing member dashboard, a new "SHLM Centre" section sits above the
 - Output is split into two panels:
   - **Session review** — one block per window: the pairs in play, what the current data implies for each, key levels to watch, and any high-impact release landing inside that window.
   - **Volume outlook** — two explicit calls: the pair most likely to open with effectively zero volume at its session open, and the pair likely to see the heaviest volume today, each with a one-line reason tied to the reviewed data (e.g. "CPI at 5:30am PST lands before NY Open").
-- Each call is timestamped in LA time and labeled with the data source state (sample vs live) so a member knows what the read was based on. Members can re-run it; the latest run is shown by default.
+- Each call is timestamped in the viewer's own local time zone and labeled with the data source state (sample vs live) so a member knows what the read was based on. Members can re-run it; the latest run is shown by default.
 
 **7. Trading notes / bias journal**
 - A per-day note field where a member logs their bias and plan for each session, saved to their account.
