@@ -179,12 +179,22 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
     );
   }
 
-  const { enrollment, access } = data;
+  const { enrollment, access } = view;
+  const isAdminPreview = !data?.enrollment && adminUnlocked;
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
   return (
     <section className="mt-10 space-y-6">
+      {isAdminPreview && (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+          <AdminPreviewTag />
+          <p className="text-sm text-muted-foreground">
+            No real purchase on this account — membership shown with sample data. Extension checkout
+            below is live Stripe.
+          </p>
+        </div>
+      )}
       {demo === "expired" && (
         <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           Preview mode: this shows how the dashboard looks at the end of the {PROGRAM.weeks}-week program.
