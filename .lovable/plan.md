@@ -6,6 +6,10 @@ Turn the member dashboard into a trading command center built around your actual
 
 Members-only. The hub is gated behind an active paid membership (already tracked by your purchase records). Signed-in users without an active membership see a locked preview with an "Apply to enroll" prompt instead of the hub contents. Admins always get access.
 
+## Entry point
+
+Inside the existing member dashboard, a new "Market Hub" section sits above the member modules grid: a wide featured panel showing the current session status and a live snapshot line (NASDAQ, US30, Gold), with an "Open Market Hub" action that takes the member into the full hub page. Nothing existing on the dashboard is removed or moved.
+
 ## What the hub shows
 
 **1. Session command bar (top)**
