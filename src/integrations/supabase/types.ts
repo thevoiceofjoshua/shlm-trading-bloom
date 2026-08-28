@@ -65,6 +65,36 @@ export type Database = {
         }
         Relationships: []
       }
+      member_notes: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          note_date: string
+          session: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          note_date: string
+          session: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          note_date?: string
+          session?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       purchases: {
         Row: {
           amount_total: number | null
@@ -140,6 +170,30 @@ export type Database = {
           role?: string
           sort_order?: number
           verified?: boolean
+        }
+        Relationships: []
+      }
+      session_reviews: {
+        Row: {
+          created_at: string
+          id: string
+          payload: Json
+          review_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payload: Json
+          review_date: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          review_date?: string
+          user_id?: string
         }
         Relationships: []
       }
