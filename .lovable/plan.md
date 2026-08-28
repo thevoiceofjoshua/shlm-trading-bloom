@@ -25,10 +25,11 @@ Inside the existing member dashboard, a new "SHLM Centre" section sits above the
 - AAPL, MSFT, NVDA, AMZN, GOOGL, META, TSLA in a compact grid: price, % change, and a color-coded strength bar.
 - A "Mag 7 breadth" summary line (e.g. "5 of 7 green — index tailwind") since these names drive NASDAQ direction.
 
-**3b. Dow 30 drivers board (US30)**
-- The heaviest-weighted Dow components — price-weighted, so the movers that actually push US30: UNH, GS, MSFT, HD, CAT, MCD, V, AMGN, CRM, TRV — in the same compact grid with price, % change, and strength bar.
-- A "Dow breadth" summary line plus a "points contribution" note calling out which one or two names are driving the index right now.
-- A macro strip for Dow-specific sensitivity: 10-year yield, oil (WTI), and USD — each with a one-line read on what it means for US30 (industrials, energy, and multinational earnings exposure).
+**3b. Dow 30 drivers board (US30) — beginner-friendly**
+- The heaviest-weighted Dow components — UNH, GS, MSFT, HD, CAT, MCD, V, AMGN, CRM, TRV — shown simply: ticker, price, % change, and a green/red strength bar. No jargon.
+- A plain-English one-liner per row like "This stock is pulling the index up today" so a beginner sees the cause-and-effect without knowing price-weighting math.
+- A "What's moving US30 right now" headline that names the one or two stocks doing most of the work (e.g. "Goldman Sachs is driving the Dow higher") — the points-contribution insight, translated.
+- A beginner macro strip: 10-year yield, oil (WTI), and USD — each shown with a simple up/down arrow and a one-line plain-English read ("Rising rates often pressure the Dow"), plus a tap-to-expand sentence of context for each.
 
 **4. Gold desk**
 - XAU/USD price card sized for your evening session, with your session window highlighted.
