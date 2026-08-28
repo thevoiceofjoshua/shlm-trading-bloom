@@ -75,9 +75,12 @@ export const getHubData = createServerFn({ method: "POST" })
     const resolved = await checkAccess(context);
     // "View as member" lets an admin confirm the real member-side gate.
     const access: HubAccess = data.asMember
-      ? resolved.isAdmin && !resolved.hasAccessAsMember
-        ? { hasAccess: false, isAdmin: false, reason: "no-membership" }
-        : { ...resolved, isAdmin: false }
+      ? {
+          hasAccess: resolved.memberAccess,
+          isAdmin: false,
+          memberAccess: resolved.memberAccess,
+          ...(resolved.memberAccess ? {} : { reason: "no-membership" }),
+        }
       : resolved;
     const now = new Date();
 
