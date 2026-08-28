@@ -92,7 +92,7 @@ export function DowBoard({ payload }: { payload: HubPayload }) {
     <div className="rounded-2xl border border-border bg-card p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-display text-lg font-medium">Dow 30 drivers — US30</h3>
-        <span className="text-xs text-muted-foreground">What's moving US30: {payload.dowMovers.label}</span>
+        <span className="text-xs text-muted-foreground">{payload.dowMovers.label}</span>
       </div>
       <div className="mt-4 overflow-x-auto">
         <div className="grid min-w-[480px] grid-cols-2 gap-2 sm:grid-cols-5">

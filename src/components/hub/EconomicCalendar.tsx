@@ -19,7 +19,7 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
         <h3 className="font-display text-lg font-medium">Economic calendar</h3>
         {next && (
           <span className="text-xs text-muted-foreground">
-            Next: {next.title} — {econTimeToLocal(next.date, next.time)} your time
+            Next: {next.title} — {econTimeToLocal(next.date, next.time)}
           </span>
         )}
       </div>

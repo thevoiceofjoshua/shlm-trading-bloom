@@ -27,7 +27,7 @@ export function SessionAnalyst({ payload }: { payload: HubPayload }) {
         <div>
           <h3 className="font-display text-xl font-medium tracking-tight">SHLM Analyst</h3>
           <p className="mt-1 text-xs text-muted-foreground">
-            AI session review — reads every panel and flags the zero-volume and high-volume open calls.
+            AI review — choppy-open and volatile-open calls.
           </p>
         </div>
         <button
