@@ -108,6 +108,11 @@ export function useAdminMode() {
     write({ decided: true });
   }, []);
 
+  /** Re-opens the "Enter admin mode?" dialog (used from the account menu). */
+  const reopenPrompt = useCallback(() => {
+    write({ decided: false });
+  }, []);
+
   const toggleViewAsMember = useCallback(() => {
     write({ viewAsMember: !read().viewAsMember });
   }, []);
