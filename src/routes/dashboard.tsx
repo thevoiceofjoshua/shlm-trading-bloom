@@ -356,6 +356,7 @@ function MarketHubTeaser() {
         </div>
         <Link
           to="/dashboard/hub"
+          search={{ demo: undefined }}
           className="inline-flex min-h-12 items-center justify-center rounded-full bg-foreground px-7 text-sm font-medium text-background transition-opacity hover:opacity-90"
         >
           Open SHLM Centre

@@ -64,7 +64,7 @@ function HubPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-20 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <Link to="/dashboard" className="font-display text-xl font-semibold tracking-tight">
+          <Link to="/dashboard" search={{ demo: undefined }} className="font-display text-xl font-semibold tracking-tight">
             ← SHLM Centre
           </Link>
           <div className="flex items-center gap-3">
@@ -126,7 +126,7 @@ function LockedPreview() {
       >
         Apply to enroll
       </Link>
-      <Link to="/dashboard" className="mt-4 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground">
+      <Link to="/dashboard" search={{ demo: undefined }} className="mt-4 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground">
         Back to dashboard
       </Link>
     </div>

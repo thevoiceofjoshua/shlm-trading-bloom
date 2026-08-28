@@ -19,7 +19,7 @@ export function SessionAnalyst({ payload }: { payload: HubPayload }) {
     onError: (err: Error) => setError(err.message),
   });
 
-  const dataLabel = payload.dataState === "live" ? "Live data" : "Sample data";
+  const dataLabel = (payload.dataState as string) === "live" ? "Live data" : "Sample data";
 
   return (
     <div className="rounded-2xl border border-foreground/20 bg-card p-5 sm:p-6">

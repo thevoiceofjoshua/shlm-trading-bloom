@@ -183,7 +183,7 @@ export const runSessionReview = createServerFn({ method: "POST" })
       .eq("review_date", today)
       .maybeSingle();
     if (cached?.payload) {
-      return cached.payload as SessionReview;
+      return cached.payload as unknown as SessionReview;
     }
 
     const apiKey = process.env.LOVABLE_API_KEY;
@@ -283,7 +283,7 @@ export const runSessionReview = createServerFn({ method: "POST" })
         {
           user_id: context.userId,
           review_date: today,
-          payload: parsed,
+          payload: parsed as unknown,
         },
         { onConflict: "user_id,review_date" },
       );
