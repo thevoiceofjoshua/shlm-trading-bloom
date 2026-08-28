@@ -10,6 +10,8 @@ import { SessionBar } from "@/components/hub/SessionBar";
 import { IndexCards, MagSevenBoard, DowBoard, GoldDesk } from "@/components/hub/MarketBoards";
 import { EconomicCalendar, BiasJournal } from "@/components/hub/EconomicCalendar";
 import { SessionAnalyst } from "@/components/hub/SessionAnalyst";
+import { AdminPreviewTag } from "@/components/AdminBar";
+import { useAdminMode } from "@/hooks/use-admin-mode";
 
 export const Route = createFileRoute("/centre")({
   component: CentrePage,
