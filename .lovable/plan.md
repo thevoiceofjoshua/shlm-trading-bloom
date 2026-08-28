@@ -21,9 +21,14 @@ Inside the existing member dashboard, a new "SHLM Centre" section sits above the
 - Two large cards: price, change, % change, day range, and a session bias tag.
 - Each card lists its key levels (prior day high/low, premarket high/low) as fields you can maintain.
 
-**3. Mag 7 board**
+**3. Mag 7 board (NASDAQ drivers)**
 - AAPL, MSFT, NVDA, AMZN, GOOGL, META, TSLA in a compact grid: price, % change, and a color-coded strength bar.
 - A "Mag 7 breadth" summary line (e.g. "5 of 7 green — index tailwind") since these names drive NASDAQ direction.
+
+**3b. Dow 30 drivers board (US30)**
+- The heaviest-weighted Dow components — price-weighted, so the movers that actually push US30: UNH, GS, MSFT, HD, CAT, MCD, V, AMGN, CRM, TRV — in the same compact grid with price, % change, and strength bar.
+- A "Dow breadth" summary line plus a "points contribution" note calling out which one or two names are driving the index right now.
+- A macro strip for Dow-specific sensitivity: 10-year yield, oil (WTI), and USD — each with a one-line read on what it means for US30 (industrials, energy, and multinational earnings exposure).
 
 **4. Gold desk**
 - XAU/USD price card sized for your evening session, with your session window highlighted.
