@@ -27,6 +27,7 @@ import { Route as FeaturesMentorshipRouteImport } from './routes/features.mentor
 import { Route as FeaturesCurriculumRouteImport } from './routes/features.curriculum'
 import { Route as FeaturesCommunityRouteImport } from './routes/features.community'
 import { Route as EnrollApplicationIdRouteImport } from './routes/enroll.$applicationId'
+import { Route as DashboardHubRouteImport } from './routes/dashboard.hub'
 import { Route as BlogBreakoutStrategyRouteImport } from './routes/blog.breakout-strategy'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -122,6 +123,11 @@ const EnrollApplicationIdRoute = EnrollApplicationIdRouteImport.update({
   path: '/enroll/$applicationId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardHubRoute = DashboardHubRouteImport.update({
+  id: '/hub',
+  path: '/hub',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const BlogBreakoutStrategyRoute = BlogBreakoutStrategyRouteImport.update({
   id: '/blog/breakout-strategy',
   path: '/blog/breakout-strategy',
@@ -150,7 +156,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/discord': typeof DiscordRoute
   '/privacy': typeof PrivacyRoute
   '/program': typeof ProgramRoute
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/dashboard/hub': typeof DashboardHubRoute
   '/enroll/$applicationId': typeof EnrollApplicationIdRoute
   '/features/community': typeof FeaturesCommunityRoute
   '/features/curriculum': typeof FeaturesCurriculumRoute
@@ -174,7 +181,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/discord': typeof DiscordRoute
   '/privacy': typeof PrivacyRoute
   '/program': typeof ProgramRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/dashboard/hub': typeof DashboardHubRoute
   '/enroll/$applicationId': typeof EnrollApplicationIdRoute
   '/features/community': typeof FeaturesCommunityRoute
   '/features/curriculum': typeof FeaturesCurriculumRoute
@@ -199,7 +207,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/discord': typeof DiscordRoute
   '/privacy': typeof PrivacyRoute
   '/program': typeof ProgramRoute
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/dashboard/hub': typeof DashboardHubRoute
   '/enroll/$applicationId': typeof EnrollApplicationIdRoute
   '/features/community': typeof FeaturesCommunityRoute
   '/features/curriculum': typeof FeaturesCurriculumRoute
@@ -235,6 +244,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/test-checkout'
     | '/blog/breakout-strategy'
+    | '/dashboard/hub'
     | '/enroll/$applicationId'
     | '/features/community'
     | '/features/curriculum'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/test-checkout'
     | '/blog/breakout-strategy'
+    | '/dashboard/hub'
     | '/enroll/$applicationId'
     | '/features/community'
     | '/features/curriculum'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/test-checkout'
     | '/blog/breakout-strategy'
+    | '/dashboard/hub'
     | '/enroll/$applicationId'
     | '/features/community'
     | '/features/curriculum'
@@ -298,7 +310,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   ApplyRoute: typeof ApplyRoute
   AuthRoute: typeof AuthRoute
-  DashboardRoute: typeof DashboardRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   DiscordRoute: typeof DiscordRoute
   PrivacyRoute: typeof PrivacyRoute
   ProgramRoute: typeof ProgramRoute
@@ -446,6 +458,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnrollApplicationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/hub': {
+      id: '/dashboard/hub'
+      path: '/hub'
+      fullPath: '/dashboard/hub'
+      preLoaderRoute: typeof DashboardHubRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/blog/breakout-strategy': {
       id: '/blog/breakout-strategy'
       path: '/blog/breakout-strategy'
@@ -477,12 +496,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface DashboardRouteChildren {
+  DashboardHubRoute: typeof DashboardHubRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardHubRoute: DashboardHubRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   ApplyRoute: ApplyRoute,
   AuthRoute: AuthRoute,
-  DashboardRoute: DashboardRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   DiscordRoute: DiscordRoute,
   PrivacyRoute: PrivacyRoute,
   ProgramRoute: ProgramRoute,
