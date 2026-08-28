@@ -1,5 +1,8 @@
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import type { HubPayload } from "@/lib/hub.functions";
+import { getMemberNotes, saveMemberNote } from "@/lib/hub.functions";
 import { econTimeToLocal } from "@/lib/hub-session";
 
 export function EconomicCalendar({ payload }: { payload: HubPayload }) {
@@ -59,10 +62,6 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
 }
 
 /* ----------------------- Bias journal ----------------------- */
-
-import { useServerFn } from "@tanstack/react-start";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { getMemberNotes, saveMemberNote } from "@/lib/hub.functions";
 
 export function BiasJournal({ userId }: { userId: string }) {
   const today = new Date().toISOString().slice(0, 10);

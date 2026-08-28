@@ -89,6 +89,8 @@ function DashboardPage() {
           Your private SHLM member dashboard is being built out. New modules will appear here as the program grows.
         </p>
 
+        <MarketHubTeaser />
+
         <MembershipPanel demo={demo === "expired" ? "expired" : undefined} />
 
         <h2 className="mt-12 font-display text-xl font-medium tracking-tight text-foreground">

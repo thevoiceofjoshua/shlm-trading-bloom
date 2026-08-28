@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { getMyMembership } from "@/lib/membership.functions";
 import {
   DATA_STATE,
   INDEX_QUOTES,
