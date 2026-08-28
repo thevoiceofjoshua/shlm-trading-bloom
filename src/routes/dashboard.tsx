@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { HomeButton } from "@/components/HomeButton";
+import { AdminPreviewTag } from "@/components/AdminBar";
+import { useAdminMode } from "@/hooks/use-admin-mode";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyMembership } from "@/lib/membership.functions";
 import { createExtensionCheckoutSession } from "@/lib/checkout.functions";
