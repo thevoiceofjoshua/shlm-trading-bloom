@@ -40,8 +40,16 @@ Inside the existing member dashboard, a new "SHLM Centre" section sits above the
 - All times converted to LA time, with impact badges (high/medium) and a countdown on the next release.
 - A "heads up" banner when a high-impact release lands inside one of your trading windows.
 
-**6. Trading notes / bias journal**
+**6. SHLM Analyst (AI session agent)**
+- A "Run session review" action at the top of the hub. The agent reads everything the hub currently holds — both session windows, the pairs traded in each (NASDAQ/US30 at NY Open, XAU/USD in the evening window), index and Mag 7 / Dow driver data, the gold driver strip, and today's economic calendar — and writes a plain-English review.
+- Output is split into two panels:
+  - **Session review** — one block per window: the pairs in play, what the current data implies for each, key levels to watch, and any high-impact release landing inside that window.
+  - **Volume outlook** — two explicit calls: the pair most likely to open with effectively zero volume at its session open, and the pair likely to see the heaviest volume today, each with a one-line reason tied to the reviewed data (e.g. "CPI at 5:30am PST lands before NY Open").
+- Each call is timestamped in LA time and labeled with the data source state (sample vs live) so a member knows what the read was based on. Members can re-run it; the latest run is shown by default.
+
+**7. Trading notes / bias journal**
 - A per-day note field where a member logs their bias and plan for each session, saved to their account.
+
 
 ## Data approach
 
@@ -58,6 +66,9 @@ Same black-and-white luxury language as the rest of the site — Space Grotesk h
 - `src/lib/market-data.ts` holds typed sample quotes/calendar plus session-window helpers (pure, no I/O at module scope).
 - Membership gating reuses `getMyMembership` from `src/lib/membership.functions.ts`; a new `hub.functions.ts` server fn (with `requireSupabaseAuth`) returns access state plus hub payload so the gate is enforced server-side, not just in the UI.
 - Bias journal: new `public.member_notes` table (user_id, note_date, session, body) with GRANTs and owner-scoped RLS on `auth.uid()`, read/written through an authenticated server function.
+- SHLM Analyst: a `runSessionReview` server fn in `hub.functions.ts` (auth + membership gated) builds a structured snapshot from `market-data.ts` and calls Lovable AI (`google/gemini-3.7-flash`) with a strict JSON schema — `sessions[]` plus `zeroVolumePair` and `highVolumePair`, each with `pair`, `reason`. No keys for you to add; gateway errors (rate limit / credits) surface as a readable message rather than a blank panel.
+- Analyst output renders in `src/components/hub/SessionAnalyst.tsx`; runs are cached per member per day in a `public.session_reviews` table (owner-scoped RLS + GRANTs) so re-opening the hub doesn't burn a new call.
+
 - Existing dashboard membership/extension panels stay exactly as they are.
 
 ## Next step after this
