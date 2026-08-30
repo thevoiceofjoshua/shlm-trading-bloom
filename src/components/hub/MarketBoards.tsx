@@ -72,7 +72,7 @@ export function MagSevenBoard({ payload }: { payload: HubPayload }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="font-display text-lg font-medium">NASDAQ drivers — US100</h3>
+        <h3 className="font-display text-lg font-medium">NASDAQ drivers</h3>
         <span className="text-xs text-muted-foreground">{payload.nasdaqMovers?.label}</span>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
