@@ -33,15 +33,15 @@ export function AdminModePrompt() {
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-foreground shadow-2xl">
         <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-          {isMod ? "SHLM MOD" : "SHLM Admin"}
+          {isMod ? "SHLM MOD" : "SHLM Founder"}
         </p>
         <h2 className="mt-3 font-display text-2xl tracking-tight">
-          {isMod ? "Enter SHLM MOD access?" : "Enter admin mode?"}
+          {isMod ? "Enter SHLM MOD access?" : "Enter SHLM Founder mode?"}
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           {isMod
             ? "SHLM MOD unlocks the full SHLM Centre — boards, analyst, calendar and journal. Program settings, applications and member data stay locked."
-            : "Admin mode unlocks every page and member function across the store so you can test it end to end. Customer-facing actions still ask for confirmation."}
+            : "SHLM Founder mode unlocks every page and member function across the store so you can test it end to end. Customer-facing actions still ask for confirmation."}
         </p>
 
         {email && <p className="mt-2 text-xs text-muted-foreground">Signed in as {email}</p>}
@@ -53,7 +53,7 @@ export function AdminModePrompt() {
               onClick={() => setStep("passcode")}
               className="flex min-h-12 flex-1 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
             >
-              {isMod ? "Enter SHLM MOD" : "Enter admin mode"}
+              {isMod ? "Enter SHLM MOD" : "Enter SHLM Founder"}
             </button>
             <button
               type="button"
@@ -66,7 +66,7 @@ export function AdminModePrompt() {
         ) : (
           <form onSubmit={submit} className="mt-6 space-y-3">
             <label className="block text-xs font-medium text-muted-foreground" htmlFor="admin-passcode">
-              {isMod ? "SHLM MOD passcode" : "Admin passcode"}
+              {isMod ? "SHLM MOD passcode" : "SHLM Founder passcode"}
             </label>
             <input
               id="admin-passcode"
@@ -85,7 +85,7 @@ export function AdminModePrompt() {
                 disabled={busy || passcode.trim().length === 0}
                 className="flex min-h-12 flex-1 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
               >
-                {busy ? "Verifying…" : isMod ? "Unlock SHLM MOD" : "Unlock admin mode"}
+                {busy ? "Verifying…" : isMod ? "Unlock SHLM MOD" : "Unlock SHLM Founder"}
               </button>
               <button
                 type="button"

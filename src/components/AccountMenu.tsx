@@ -117,7 +117,7 @@ export function AccountMenu({
               className="flex w-full items-center border-t border-border px-4 py-2.5 text-left text-sm hover:bg-accent"
               role="menuitem"
             >
-              {adminMode ? (modOnly ? "Exit SHLM MOD" : "Exit admin mode") : "Enter admin mode"}
+              {adminMode ? (modOnly ? "Exit SHLM MOD" : "Exit SHLM Founder") : (modOnly ? "Enter SHLM MOD" : "Enter SHLM Founder")}
             </button>
           )}
 
