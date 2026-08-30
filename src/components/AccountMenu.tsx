@@ -15,7 +15,7 @@ export function AccountMenu({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { isAdmin, adminMode, exit, reopenPrompt } = useAdminMode();
+  const { isStaff, modOnly, adminMode, exit, reopenPrompt } = useAdminMode();
 
   useEffect(() => {
     if (!open) return;
@@ -106,7 +106,7 @@ export function AccountMenu({
           >
             Dashboard
           </a>
-          {isAdmin && (
+          {isStaff && (
             <button
               type="button"
               onClick={() => {
@@ -117,9 +117,10 @@ export function AccountMenu({
               className="flex w-full items-center border-t border-border px-4 py-2.5 text-left text-sm hover:bg-accent"
               role="menuitem"
             >
-              {adminMode ? "Exit admin mode" : "Enter admin mode"}
+              {adminMode ? (modOnly ? "Exit SHLM MOD" : "Exit admin mode") : "Enter admin mode"}
             </button>
           )}
+
           <button
             type="button"
             onClick={handleSignOut}

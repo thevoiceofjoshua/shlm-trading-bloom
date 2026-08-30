@@ -24,13 +24,16 @@ function AdminPage() {
 
   // Admin mode already verified the passcode this session — reuse it so the
   // console unlocks without retyping. Manual entry still works as a fallback.
-  const { adminMode, passcode: sessionPasscode } = useAdminMode();
+  const { adminMode, passcode: sessionPasscode, role, checked } = useAdminMode();
+  const modOnlyAccount = checked && role === "shlm_mod";
   const [passcodeInput, setPasscodeInput] = useState("");
   const [passcode, setPasscode] = useState("");
 
   useEffect(() => {
+    if (modOnlyAccount) return;
     if (adminMode && sessionPasscode && !passcode) setPasscode(sessionPasscode);
-  }, [adminMode, sessionPasscode, passcode]);
+  }, [adminMode, sessionPasscode, passcode, modOnlyAccount]);
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [actingId, setActingId] = useState<string | null>(null);
@@ -201,6 +204,34 @@ function AdminPage() {
   };
 
   const selected = apps?.find((a) => a.id === selectedId) ?? null;
+
+  if (modOnlyAccount) {
+    return (
+      <div className="min-h-screen bg-background px-4 py-16 text-foreground sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-lg rounded-2xl border border-border bg-card p-8 text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+            SHLM MOD
+          </p>
+          <h1 className="mt-3 font-display text-3xl tracking-tight">Not authorized</h1>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            SHLM MOD access covers the SHLM Centre only. The applications console is limited to the
+            program owner.
+          </p>
+          <div className="mt-6 flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
+            <a
+              href="/centre"
+              className="flex min-h-12 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground"
+            >
+              Go to SHLM Centre
+            </a>
+            <HomeButton />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
 
   return (
     <div className="min-h-screen bg-background px-4 py-16 text-foreground sm:px-6 lg:px-8">

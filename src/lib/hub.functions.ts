@@ -22,8 +22,11 @@ export interface HubAccess {
   isAdmin: boolean;
   /** True when a paid membership grants access (independent of admin role). */
   memberAccess: boolean;
+  /** SHLM MOD: Centre access granted, but no program-management rights. */
+  readOnly?: boolean;
   reason?: string;
 }
+
 
 export interface HubPayload {
   access: HubAccess;
@@ -43,13 +46,14 @@ export interface HubPayload {
 }
 
 async function checkAccess(context: any): Promise<HubAccess> {
-  // Admin check via user_roles
-  const { data: roleRow } = await context.supabase
+  // Role check via user_roles: `admin` = full store, `shlm_mod` = Centre only.
+  const { data: roleRows } = await context.supabase
     .from("user_roles")
     .select("role")
-    .eq("user_id", context.userId)
-    .maybeSingle();
-  const isAdmin = roleRow?.role === "admin";
+    .eq("user_id", context.userId);
+  const held = ((roleRows ?? []) as { role: string }[]).map((r) => r.role);
+  const isAdmin = held.includes("admin");
+  const isMod = held.includes("shlm_mod");
 
   // Paid membership check
   const email = (context.claims.email as string | undefined) ?? null;
@@ -63,11 +67,13 @@ async function checkAccess(context: any): Promise<HubAccess> {
   const memberAccess = (data ?? []).length > 0;
 
   if (isAdmin) return { hasAccess: true, isAdmin: true, memberAccess };
+  if (isMod) return { hasAccess: true, isAdmin: false, memberAccess, readOnly: true };
   if (!memberAccess) {
     return { hasAccess: false, isAdmin: false, memberAccess: false, reason: "no-membership" };
   }
   return { hasAccess: true, isAdmin: false, memberAccess: true };
 }
+
 
 export const getHubData = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

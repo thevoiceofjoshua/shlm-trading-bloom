@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { verifyAdminPasscode } from "@/lib/admin-mode.functions";
+import { verifyAdminPasscode, type AdminScope } from "@/lib/admin-mode.functions";
 
 const MODE_KEY = "shlm.adminMode";
 const PASS_KEY = "shlm.adminPasscode";
 const VIEW_KEY = "shlm.adminViewAsMember";
 const DECIDED_KEY = "shlm.adminModeDecided";
+const SCOPE_KEY = "shlm.adminScope";
 const EVENT = "shlm:admin-mode";
 
 type AdminState = {
@@ -13,11 +14,12 @@ type AdminState = {
   viewAsMember: boolean;
   passcode: string;
   decided: boolean;
+  scope: AdminScope;
 };
 
 function read(): AdminState {
   if (typeof window === "undefined") {
-    return { adminMode: false, viewAsMember: false, passcode: "", decided: false };
+    return { adminMode: false, viewAsMember: false, passcode: "", decided: false, scope: "full" };
   }
   const ss = window.sessionStorage;
   return {
@@ -25,6 +27,7 @@ function read(): AdminState {
     viewAsMember: ss.getItem(VIEW_KEY) === "1",
     passcode: ss.getItem(PASS_KEY) ?? "",
     decided: ss.getItem(DECIDED_KEY) === "1",
+    scope: ss.getItem(SCOPE_KEY) === "shlm_mod" ? "shlm_mod" : "full",
   };
 }
 
@@ -38,16 +41,17 @@ function write(patch: Partial<AdminState>) {
     else ss.removeItem(PASS_KEY);
   }
   if (patch.decided !== undefined) ss.setItem(DECIDED_KEY, patch.decided ? "1" : "0");
+  if (patch.scope !== undefined) ss.setItem(SCOPE_KEY, patch.scope);
   window.dispatchEvent(new Event(EVENT));
 }
 
 /**
  * Admin mode is a convenience layer only. The browser flag never unlocks data
- * on its own — every gated server function re-checks `has_role` on the server.
+ * on its own — every gated server function re-checks roles on the server.
  */
 export function useAdminMode() {
   const [state, setState] = useState<AdminState>(() => read());
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [role, setRole] = useState<"admin" | "shlm_mod" | null>(null);
   const [checked, setChecked] = useState(false);
   const [email, setEmail] = useState<string | null>(null);
 
@@ -64,14 +68,15 @@ export function useAdminMode() {
     const check = async (userId: string | null, userEmail: string | null) => {
       if (!userId) {
         if (!active) return;
-        setIsAdmin(false);
+        setRole(null);
         setEmail(null);
         setChecked(true);
         return;
       }
-      const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
       if (!active) return;
-      setIsAdmin(data === true);
+      const held = (data ?? []).map((r) => r.role as string);
+      setRole(held.includes("admin") ? "admin" : held.includes("shlm_mod") ? "shlm_mod" : null);
       setEmail(userEmail);
       setChecked(true);
     };
@@ -82,7 +87,7 @@ export function useAdminMode() {
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT") {
-        write({ adminMode: false, viewAsMember: false, passcode: "", decided: false });
+        write({ adminMode: false, viewAsMember: false, passcode: "", decided: false, scope: "full" });
       }
       void check(session?.user.id ?? null, session?.user.email ?? null);
     });
@@ -96,7 +101,7 @@ export function useAdminMode() {
   const enter = useCallback(async (passcode: string) => {
     const res = await verifyAdminPasscode({ data: { passcode } });
     if (!res.ok) return res;
-    write({ adminMode: true, viewAsMember: false, passcode, decided: true });
+    write({ adminMode: true, viewAsMember: false, passcode, decided: true, scope: res.scope });
     return res;
   }, []);
 
@@ -117,17 +122,27 @@ export function useAdminMode() {
     write({ viewAsMember: !read().viewAsMember });
   }, []);
 
-  const active = isAdmin && state.adminMode;
+  const isStaff = role !== null;
+  const isAdmin = role === "admin";
+  const active = isStaff && state.adminMode;
+  /** SHLM MOD: Centre access only, no program changes. */
+  const modOnly = active && (role === "shlm_mod" || state.scope === "shlm_mod");
 
   return {
+    /** Full store admin. */
     isAdmin,
+    /** Any staff role (admin or SHLM MOD). */
+    isStaff,
+    role,
     checked,
     email,
     adminMode: state.adminMode,
     viewAsMember: state.viewAsMember,
     passcode: state.passcode,
     decided: state.decided,
-    /** Admin unlocks apply (admin, admin mode on, not viewing as member). */
+    scope: state.scope,
+    modOnly,
+    /** Admin unlocks apply (staff, admin mode on, not viewing as member). */
     adminUnlocked: active && !state.viewAsMember,
     /** Admin bar visible. */
     adminActive: active,
