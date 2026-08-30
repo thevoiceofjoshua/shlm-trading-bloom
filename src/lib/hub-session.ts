@@ -70,11 +70,15 @@ export const MARKET_CLOSE = { day: 5, h: 14, m: 0 } as const;
 /** True when the market week is open at `now` (LA reference). */
 export function marketWeekOpen(now: Date = new Date()): boolean {
   const { day, h, m } = laParts(now);
-  const cur = day * 24 * 60 + h * 60 + m;
-  const open = MARKET_OPEN.day * 24 * 60 + MARKET_OPEN.h * 60 + MARKET_OPEN.m;
-  const close = MARKET_CLOSE.day * 24 * 60 + MARKET_CLOSE.h * 60 + MARKET_CLOSE.m;
-  // Week runs Sun 15:00 → Fri 14:00, i.e. one contiguous span inside the week.
-  return cur >= open || cur < close;
+  const cur = h * 60 + m;
+  const open = MARKET_OPEN.h * 60 + MARKET_OPEN.m;
+  const close = MARKET_CLOSE.h * 60 + MARKET_CLOSE.m;
+  // Week runs Sun 15:00 → Fri 14:00 (LA).
+  if (day === 6) return false; // Saturday
+  if (day === 0) return cur >= open; // Sunday before 3:00pm is closed
+  if (day === 5) return cur < close; // Friday after 2:00pm is closed
+  return true;
+
 }
 
 export function sessionStatuses(now: Date = new Date()): { sessions: SessionStatus[]; marketsClosed: boolean; nextNote: string | null } {
