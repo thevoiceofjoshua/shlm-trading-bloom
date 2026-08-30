@@ -32,7 +32,7 @@ function monthMatrix(year: number, month: number): (Date | null)[] {
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 const SESSIONS = [
   { key: "ny-open", label: "NY Open" },
-  { key: "gold", label: "Gold Session" },
+  { key: "gold", label: "Asia Session" },
 ];
 
 function sessionLabel(key: string): string {
