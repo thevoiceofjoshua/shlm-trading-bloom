@@ -24,13 +24,16 @@ function AdminPage() {
 
   // Admin mode already verified the passcode this session — reuse it so the
   // console unlocks without retyping. Manual entry still works as a fallback.
-  const { adminMode, passcode: sessionPasscode } = useAdminMode();
+  const { adminMode, passcode: sessionPasscode, role, checked } = useAdminMode();
+  const modOnlyAccount = checked && role === "shlm_mod";
   const [passcodeInput, setPasscodeInput] = useState("");
   const [passcode, setPasscode] = useState("");
 
   useEffect(() => {
+    if (modOnlyAccount) return;
     if (adminMode && sessionPasscode && !passcode) setPasscode(sessionPasscode);
-  }, [adminMode, sessionPasscode, passcode]);
+  }, [adminMode, sessionPasscode, passcode, modOnlyAccount]);
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const [actingId, setActingId] = useState<string | null>(null);
