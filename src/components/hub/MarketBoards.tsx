@@ -88,7 +88,7 @@ export function MagSevenBoard({ payload }: { payload: HubPayload }) {
       <div className="mt-5 border-t border-border pt-4">
         <p className="text-xs uppercase tracking-widest text-muted-foreground">Macro drivers</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          {payload.nasdaqMacro.map((m) => (
+          {(payload.nasdaqMacro ?? []).map((m) => (
             <MacroTile key={m.label} macro={m} />
           ))}
         </div>
