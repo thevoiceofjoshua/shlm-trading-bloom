@@ -85,17 +85,19 @@ export function sessionStatuses(now: Date = new Date()): { sessions: SessionStat
       return { key: s.key, label: s.label, pairs: s.pairs, state: "open" as const, countdown: null };
     }
     const mins = minutesUntilOpen(now, s);
-    if (weekOpen && mins !== null && mins < 24 * 60) {
-      const h = Math.floor(mins / 60);
+    if (weekOpen && mins !== null) {
+      const d = Math.floor(mins / (24 * 60));
+      const h = Math.floor((mins % (24 * 60)) / 60);
       const m = mins % 60;
       return {
         key: s.key,
         label: s.label,
         pairs: s.pairs,
         state: "upcoming" as const,
-        countdown: `opens in ${h}h ${m}m`,
+        countdown: d > 0 ? `opens in ${d}d ${h}h ${m}m` : `opens in ${h}h ${m}m`,
       };
     }
+
     return { key: s.key, label: s.label, pairs: s.pairs, state: "closed" as const, countdown: null };
   });
 
