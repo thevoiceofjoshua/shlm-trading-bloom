@@ -4,11 +4,27 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import type { HubPayload } from "@/lib/hub.functions";
 import { getMemberNotes, saveMemberNote } from "@/lib/hub.functions";
 import { econTimeToLocal } from "@/lib/hub-session";
+import { SESSIONS } from "@/lib/market-data";
+
+/** Where a release lands relative to the SHLM trading windows (LA wall clock). */
+function sessionContext(laTime: string): string {
+  const [h, m] = laTime.split(":").map((v) => parseInt(v, 10));
+  const mins = h * 60 + m;
+  for (const s of SESSIONS) {
+    const start = s.startH * 60 + s.startM;
+    const end = s.endH * 60 + s.endM;
+    const name = s.label.split("—")[0].trim();
+    if (mins >= start && mins < end) return `Lands inside ${name}`;
+    if (mins < start && start - mins <= 180) return `Lands ${start - mins} min before ${name}`;
+  }
+  return "Outside the SHLM trading windows";
+}
 
 export function EconomicCalendar({ payload }: { payload: HubPayload }) {
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
   const events = [...payload.econEvents].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const [open, setOpen] = useState<number | null>(null);
 
   // Next upcoming release
   const next = events.find((e) => e.date + e.time >= todayStr);
@@ -35,31 +51,86 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
         {events.map((e, i) => {
           const localTime = econTimeToLocal(e.date, e.time);
           const dateLabel = new Date(e.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+          const isOpen = open === i;
           return (
-            <div key={i} className="flex items-center justify-between py-2.5 text-sm">
-              <div className="flex items-center gap-3">
-                <span className="font-medium tabular-nums">{localTime}</span>
-                <span className="text-muted-foreground">{dateLabel}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm">{e.title}</span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${
-                    e.impact === "high"
-                      ? "bg-foreground text-background"
-                      : "border border-border text-muted-foreground"
-                  }`}
-                >
-                  {e.impact}
-                </span>
-              </div>
+            <div key={i}>
+              <button
+                type="button"
+                aria-expanded={isOpen}
+                onClick={() => setOpen(isOpen ? null : i)}
+                className="flex min-h-11 w-full flex-wrap items-center justify-between gap-2 py-2.5 text-left text-sm transition-colors hover:text-foreground"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="font-medium tabular-nums">{localTime}</span>
+                  <span className="text-muted-foreground">{dateLabel}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">{e.title}</span>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${
+                      e.impact === "high"
+                        ? "bg-foreground text-background"
+                        : "border border-border text-muted-foreground"
+                    }`}
+                  >
+                    {e.impact}
+                  </span>
+                  <span className={`text-xs text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}>▾</span>
+                </div>
+              </button>
+
+              {isOpen && (
+                <div className="pb-4">
+                  <div className="rounded-xl border border-border bg-surface p-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {e.currency && (
+                        <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-widest text-muted-foreground">
+                          {e.currency}
+                        </span>
+                      )}
+                      <span className="text-xs text-muted-foreground">{sessionContext(e.time)}</span>
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                      {[
+                        { label: "Actual", value: e.actual },
+                        { label: "Forecast", value: e.forecast },
+                        { label: "Previous", value: e.previous },
+                      ].map((f) => (
+                        <div key={f.label} className="rounded-lg border border-border bg-card px-3 py-2">
+                          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{f.label}</p>
+                          <p className="mt-0.5 font-display text-base tabular-nums">{f.value ?? "—"}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {e.detail && <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{e.detail}</p>}
+
+                    {e.affects && e.affects.length > 0 && (
+                      <div className="mt-3">
+                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">What it moves</p>
+                        <div className="mt-1.5 flex flex-wrap gap-1.5">
+                          {e.affects.map((a) => (
+                            <span key={a} className="rounded-full border border-border px-2.5 py-1 text-xs text-foreground">
+                              {a}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
       </div>
+
+      <p className="mt-4 text-[11px] text-muted-foreground">Sample data — live feed coming soon.</p>
     </div>
   );
 }
+
 
 /* ----------------------- Bias journal ----------------------- */
 

@@ -245,17 +245,98 @@ export interface EconEvent {
   title: string;
   impact: "high" | "medium";
   detail?: string;
+  /** Region / currency the release belongs to. */
+  currency?: string;
+  /** Consensus expectation. */
+  forecast?: string;
+  /** Prior period's print. */
+  previous?: string;
+  /** Released figure — undefined until the release has printed. */
+  actual?: string;
+  /** Instruments this release typically moves. */
+  affects?: string[];
 }
 
 export const ECON_EVENTS: EconEvent[] = [
-  { time: "05:30", date: todayISO(0), title: "CPI (MoM)", impact: "high", detail: "Consumer Price Index month-over-month." },
-  { time: "05:30", date: todayISO(0), title: "Core CPI (YoY)", impact: "high", detail: "Core inflation excluding food & energy." },
-  { time: "08:30", date: todayISO(0), title: "Jobless Claims", impact: "medium", detail: "Weekly initial unemployment claims." },
-  { time: "10:00", date: todayISO(1), title: "FOMC Member Speech", impact: "medium", detail: "Scheduled remarks from a Fed governor." },
-  { time: "05:30", date: todayISO(2), title: "PPI (MoM)", impact: "high", detail: "Producer Price Index month-over-month." },
-  { time: "08:30", date: todayISO(3), title: "Retail Sales", impact: "medium", detail: "Monthly retail sales report." },
-  { time: "05:30", date: todayISO(4), title: "NFP", impact: "high", detail: "Nonfarm payrolls — the monthly jobs report." },
+  {
+    time: "05:30",
+    date: todayISO(0),
+    title: "CPI (MoM)",
+    impact: "high",
+    detail: "Consumer Price Index month-over-month.",
+    currency: "USD",
+    forecast: "0.3%",
+    previous: "0.2%",
+    affects: ["XAU/USD", "US100", "US30", "USD pairs"],
+  },
+  {
+    time: "05:30",
+    date: todayISO(0),
+    title: "Core CPI (YoY)",
+    impact: "high",
+    detail: "Core inflation excluding food & energy.",
+    currency: "USD",
+    forecast: "3.2%",
+    previous: "3.3%",
+    affects: ["XAU/USD", "US100", "USD pairs"],
+  },
+  {
+    time: "08:30",
+    date: todayISO(0),
+    title: "Jobless Claims",
+    impact: "medium",
+    detail: "Weekly initial unemployment claims.",
+    currency: "USD",
+    forecast: "225K",
+    previous: "219K",
+    affects: ["US30", "US100"],
+  },
+  {
+    time: "10:00",
+    date: todayISO(1),
+    title: "FOMC Member Speech",
+    impact: "medium",
+    detail: "Scheduled remarks from a Fed governor.",
+    currency: "USD",
+    forecast: "—",
+    previous: "—",
+    affects: ["XAU/USD", "US100", "USD pairs"],
+  },
+  {
+    time: "05:30",
+    date: todayISO(2),
+    title: "PPI (MoM)",
+    impact: "high",
+    detail: "Producer Price Index month-over-month.",
+    currency: "USD",
+    forecast: "0.2%",
+    previous: "0.4%",
+    affects: ["XAU/USD", "US100", "USD pairs"],
+  },
+  {
+    time: "08:30",
+    date: todayISO(3),
+    title: "Retail Sales",
+    impact: "medium",
+    detail: "Monthly retail sales report.",
+    currency: "USD",
+    forecast: "0.4%",
+    previous: "0.1%",
+    affects: ["US30", "US100"],
+  },
+  {
+    time: "05:30",
+    date: todayISO(4),
+    title: "NFP",
+    impact: "high",
+    detail: "Nonfarm payrolls — the monthly jobs report.",
+    currency: "USD",
+    forecast: "165K",
+    previous: "142K",
+    affects: ["XAU/USD", "US30", "US100", "USD pairs"],
+  },
 ];
+
 
 /* ----------------------------- Helpers ------------------------------------ */
 
