@@ -39,14 +39,17 @@ export function IndexCards({ payload }: { payload: HubPayload }) {
             <span>L {idx.dayLow.toLocaleString()}</span>
           </div>
 
-          <div className="mt-4 space-y-1.5 border-t border-border pt-3 text-xs">
+          <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
             <p className="uppercase tracking-widest text-muted-foreground">Key levels</p>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-              <Level label="PD High" val={idx.priorDayHigh} />
-              <Level label="PD Low" val={idx.priorDayLow} />
-              <Level label="Pre High" val={idx.premarketHigh} />
-              <Level label="Pre Low" val={idx.premarketLow} />
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+              <KeyLevel label="Yesterday High" val={idx.priorDayHigh} role="Resistance" tone="up" />
+              <KeyLevel label="Pre-Market High" val={idx.premarketHigh} role="Breakout" tone="up" />
+              <KeyLevel label="Yesterday Low" val={idx.priorDayLow} role="Support" tone="down" />
+              <KeyLevel label="Pre-Market Low" val={idx.premarketLow} role="Floor" tone="down" />
             </div>
+            <p className="pt-1 text-[10px] leading-relaxed text-muted-foreground/80">
+              Highs mark where price struggled to rise; lows mark where it struggled to fall.
+            </p>
           </div>
         </div>
       ))}
@@ -54,11 +57,13 @@ export function IndexCards({ payload }: { payload: HubPayload }) {
   );
 }
 
-function Level({ label, val }: { label: string; val: number }) {
+function KeyLevel({ label, val, role, tone }: { label: string; val: number; role: string; tone: "up" | "down" }) {
+  const roleColor = tone === "up" ? "text-emerald-500" : "text-red-500";
   return (
-    <div className="flex justify-between">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium tabular-nums">{val.toLocaleString()}</span>
+    <div>
+      <p className="text-muted-foreground">{label}</p>
+      <p className="font-display text-base font-medium tabular-nums text-foreground">{val.toLocaleString()}</p>
+      <p className={`mt-0.5 text-[10px] font-semibold uppercase tracking-widest ${roleColor}`}>{role}</p>
     </div>
   );
 }
