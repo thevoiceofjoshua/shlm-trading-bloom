@@ -110,6 +110,28 @@ export const getHubData = createServerFn({ method: "POST" })
 
 /* ----------------------- Bias journal (member notes) ----------------------- */
 
+export const getMemberNotesRange = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => {
+    const d = data as Record<string, unknown>;
+    const from = typeof d.from === "string" ? d.from : "";
+    const to = typeof d.to === "string" ? d.to : "";
+    if (!from || !to) throw new Error("from and to are required");
+    return { from, to };
+  })
+  .handler(async ({ context, data }) => {
+    const { data: rows, error } = await context.supabase
+      .from("member_notes")
+      .select("note_date, session, body, updated_at")
+      .eq("user_id", context.userId)
+      .gte("note_date", data.from)
+      .lte("note_date", data.to);
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+
+
 export const getMemberNotes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => {
