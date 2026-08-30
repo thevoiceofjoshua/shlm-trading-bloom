@@ -205,6 +205,34 @@ function AdminPage() {
 
   const selected = apps?.find((a) => a.id === selectedId) ?? null;
 
+  if (modOnlyAccount) {
+    return (
+      <div className="min-h-screen bg-background px-4 py-16 text-foreground sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-lg rounded-2xl border border-border bg-card p-8 text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+            SHLM MOD
+          </p>
+          <h1 className="mt-3 font-display text-3xl tracking-tight">Not authorized</h1>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            SHLM MOD access covers the SHLM Centre only. The applications console is limited to the
+            program owner.
+          </p>
+          <div className="mt-6 flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
+            <a
+              href="/centre"
+              className="flex min-h-12 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground"
+            >
+              Go to SHLM Centre
+            </a>
+            <HomeButton />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
+
   return (
     <div className="min-h-screen bg-background px-4 py-16 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
