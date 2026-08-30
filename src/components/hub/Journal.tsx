@@ -211,7 +211,7 @@ export function Journal({ userId }: { userId: string }) {
     mutationFn: async (target: StoredEntry) => {
       const desiredKey = `${target.entry.session}#${target.slot}`;
       await saveNote({ data: { noteDate: selected, session: desiredKey, body: JSON.stringify(target.entry) } });
-      if (target.storageKey !== desiredKey) {
+      if (target.storageKey && target.storageKey !== desiredKey) {
         try {
           await removeNote({ data: { noteDate: selected, session: target.storageKey } });
         } catch {
@@ -230,7 +230,11 @@ export function Journal({ userId }: { userId: string }) {
   });
 
   const del = useMutation({
-    mutationFn: (target: StoredEntry) => removeNote({ data: { noteDate: selected, session: target.storageKey } }),
+    mutationFn: async (target: StoredEntry) => {
+      if (!target.storageKey) return { deleted: true };
+      return removeNote({ data: { noteDate: selected, session: target.storageKey } });
+    },
+
     onSuccess: async () => {
       setEditing(null);
       setDirty(false);
