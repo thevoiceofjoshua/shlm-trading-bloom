@@ -6,12 +6,14 @@ import {
   MAG_SEVEN,
   DOW_DRIVERS,
   DOW_MACRO,
+  NASDAQ_MACRO,
   GOLD_QUOTE,
   GOLD_DRIVERS,
   ECON_EVENTS,
   SESSIONS,
   magSevenBreadth,
   dowMovers,
+  nasdaqMovers,
 } from "@/lib/market-data";
 import { sessionStatuses } from "@/lib/hub-session";
 
@@ -30,6 +32,8 @@ export interface HubPayload {
   indexes: typeof INDEX_QUOTES;
   magSeven: typeof MAG_SEVEN;
   magBreadth: ReturnType<typeof magSevenBreadth>;
+  nasdaqMacro: typeof NASDAQ_MACRO;
+  nasdaqMovers: ReturnType<typeof nasdaqMovers>;
   dowDrivers: typeof DOW_DRIVERS;
   dowMacro: typeof DOW_MACRO;
   dowMovers: ReturnType<typeof dowMovers>;
@@ -91,6 +95,8 @@ export const getHubData = createServerFn({ method: "POST" })
       indexes: INDEX_QUOTES,
       magSeven: MAG_SEVEN,
       magBreadth: magSevenBreadth(),
+      nasdaqMacro: NASDAQ_MACRO,
+      nasdaqMovers: nasdaqMovers(),
       dowDrivers: DOW_DRIVERS,
       dowMacro: DOW_MACRO,
       dowMovers: dowMovers(),
@@ -182,6 +188,8 @@ export const runSessionReview = createServerFn({ method: "POST" })
       indexes: INDEX_QUOTES,
       magSeven: MAG_SEVEN,
       magBreadth: magSevenBreadth(),
+      nasdaqMacro: NASDAQ_MACRO,
+      nasdaqMovers: nasdaqMovers(),
       dowDrivers: DOW_DRIVERS,
       dowMacro: DOW_MACRO,
       dowMovers: dowMovers(),

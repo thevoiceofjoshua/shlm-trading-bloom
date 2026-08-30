@@ -99,14 +99,46 @@ export const INDEX_QUOTES: LevelQuote[] = [
   },
 ];
 
-export const MAG_SEVEN: Quote[] = [
-  { symbol: "AAPL", name: "Apple", price: 228.4, change: 1.85, changePct: 0.82, dayHigh: 229.1, dayLow: 226.3 },
-  { symbol: "MSFT", name: "Microsoft", price: 425.1, change: 2.4, changePct: 0.57, dayHigh: 426.8, dayLow: 422.5 },
-  { symbol: "NVDA", name: "NVIDIA", price: 138.7, change: -0.92, changePct: -0.66, dayHigh: 140.2, dayLow: 137.8 },
-  { symbol: "AMZN", name: "Amazon", price: 201.3, change: 1.12, changePct: 0.56, dayHigh: 202.4, dayLow: 199.8 },
-  { symbol: "GOOGL", name: "Alphabet", price: 178.9, change: 0.78, changePct: 0.44, dayHigh: 180.1, dayLow: 177.6 },
-  { symbol: "META", name: "Meta", price: 595.2, change: 3.1, changePct: 0.52, dayHigh: 598.0, dayLow: 591.4 },
-  { symbol: "TSLA", name: "Tesla", price: 248.6, change: -1.35, changePct: -0.54, dayHigh: 251.2, dayLow: 246.8 },
+export interface MagDriver extends Quote {
+  /** Plain-English cause-and-effect line */
+  note: string;
+}
+
+export const MAG_SEVEN: MagDriver[] = [
+  { symbol: "AAPL", name: "Apple", price: 228.4, change: 1.85, changePct: 0.82, dayHigh: 229.1, dayLow: 226.3, note: "Lifting the index with steady demand." },
+  { symbol: "MSFT", name: "Microsoft", price: 425.1, change: 2.4, changePct: 0.57, dayHigh: 426.8, dayLow: 422.5, note: "Adding a steady lift to the index." },
+  { symbol: "NVDA", name: "NVIDIA", price: 138.7, change: -0.92, changePct: -0.66, dayHigh: 140.2, dayLow: 137.8, note: "The biggest weight on the index today." },
+  { symbol: "AMZN", name: "Amazon", price: 201.3, change: 1.12, changePct: 0.56, dayHigh: 202.4, dayLow: 199.8, note: "Helping push the index higher." },
+  { symbol: "GOOGL", name: "Alphabet", price: 178.9, change: 0.78, changePct: 0.44, dayHigh: 180.1, dayLow: 177.6, note: "Gently supporting the index." },
+  { symbol: "META", name: "Meta", price: 595.2, change: 3.1, changePct: 0.52, dayHigh: 598.0, dayLow: 591.4, note: "Among the strongest tails for the index." },
+  { symbol: "TSLA", name: "Tesla", price: 248.6, change: -1.35, changePct: -0.54, dayHigh: 251.2, dayLow: 246.8, note: "Dragging the index lower." },
+];
+
+export const NASDAQ_MACRO: MacroDriver[] = [
+  {
+    label: "10-Year Yield",
+    value: "4.28%",
+    direction: "up",
+    read: "Rising yields pressure high-multiple tech names.",
+    context:
+      "Growth stocks like the Mag 7 are valued on future earnings. When the 10-year treasury yield climbs, those future cash flows are discounted more heavily, which can pull richly-valued tech shares lower.",
+  },
+  {
+    label: "Semis / AI cycle",
+    value: "Strong",
+    direction: "up",
+    read: "Chip demand is lifting NVDA and the index.",
+    context:
+      "When AI accelerator demand stays strong, NVIDIA and the broader semiconductor complex tend to lead the Nasdaq higher. That lifts the index because NVDA carries a heavy weight.",
+  },
+  {
+    label: "USD (DXY)",
+    value: "104.3",
+    direction: "up",
+    read: "A stronger dollar can weigh on multinational tech.",
+    context:
+      "Apple, Microsoft, and Amazon all make a large share of revenue overseas. A rising dollar makes their products pricier abroad, which can soften demand and pull the Nasdaq lower.",
+  },
 ];
 
 export interface DowDriver {
@@ -250,5 +282,15 @@ export function dowMovers(): { top: string; label: string } {
   return {
     top: top.symbol,
     label: `${top.name} is driving the Dow ${direction}`,
+  };
+}
+
+export function nasdaqMovers(): { top: string; label: string } {
+  const sorted = [...MAG_SEVEN].sort((a, b) => Math.abs(b.changePct) - Math.abs(a.changePct));
+  const top = sorted[0];
+  const direction = top.changePct >= 0 ? "higher" : "lower";
+  return {
+    top: top.symbol,
+    label: `${top.name} is driving the index ${direction}`,
   };
 }
