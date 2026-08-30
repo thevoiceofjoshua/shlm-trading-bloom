@@ -200,7 +200,7 @@ export const saveMemberRules = createServerFn({ method: "POST" })
     const { error } = await context.supabase.from("member_rules").upsert(
       {
         user_id: context.userId,
-        rules: data.rules,
+        rules: data.rules as unknown as never,
         consequence: data.consequence,
         updated_at: new Date().toISOString(),
       },
