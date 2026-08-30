@@ -466,14 +466,55 @@ export function Journal({ userId }: { userId: string }) {
               <div className="mt-5 space-y-5">
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">💵 PnL for this entry ($)</p>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={editing.entry.pnl}
-                    onChange={(e) => setField("pnl", e.target.value)}
-                    placeholder="450 or -220"
-                    className="mt-2 w-full max-w-40 rounded-xl border border-input bg-background px-4 py-3 text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                  />
+                  {(() => {
+                    const isRed = editing.entry.pnl.trim().startsWith("-");
+                    const abs = editing.entry.pnl.replace(/^-+/, "").trim();
+                    const setDirection = (red: boolean) => {
+                      if (abs === "") {
+                        setField("pnl", red ? "-" : "");
+                        return;
+                      }
+                      setField("pnl", red ? `-${abs}` : abs);
+                    };
+                    const setAmount = (val: string) => {
+                      const clean = val.replace(/[^0-9.]/g, "");
+                      setField("pnl", isRed && clean !== "" ? `-${clean}` : clean);
+                    };
+                    return (
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setDirection(false)}
+                          className={`min-h-9 rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
+                            !isRed
+                              ? "border-emerald-500 bg-emerald-500/15 text-emerald-500"
+                              : "border-border bg-background text-muted-foreground hover:bg-accent"
+                          }`}
+                        >
+                          🟢 Green
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDirection(true)}
+                          className={`min-h-9 rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
+                            isRed
+                              ? "border-red-500 bg-red-500/15 text-red-500"
+                              : "border-border bg-background text-muted-foreground hover:bg-accent"
+                          }`}
+                        >
+                          🔴 Red
+                        </button>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          value={abs}
+                          onChange={(e) => setAmount(e.target.value)}
+                          placeholder="450"
+                          className="w-full max-w-40 rounded-xl border border-input bg-background px-4 py-3 text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                        />
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {rules.length > 0 && (
