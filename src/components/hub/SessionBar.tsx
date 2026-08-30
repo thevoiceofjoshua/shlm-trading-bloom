@@ -14,7 +14,6 @@ export function SessionBar({ payload }: { payload: HubPayload }) {
     minute: "2-digit",
     second: "2-digit",
   });
-  
 
   const { sessions, marketsClosed, nextNote } = payload.sessions;
 
