@@ -2,13 +2,16 @@ import { useState } from "react";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 
 export function AdminModePrompt() {
-  const { isAdmin, checked, decided, adminMode, enter, dismissPrompt, email } = useAdminMode();
+  const { isStaff, role, checked, decided, adminMode, enter, dismissPrompt, email } = useAdminMode();
   const [step, setStep] = useState<"ask" | "passcode">("ask");
   const [passcode, setPasscode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  if (!checked || !isAdmin || decided || adminMode) return null;
+  if (!checked || !isStaff || decided || adminMode) return null;
+
+  const isMod = role === "shlm_mod";
+
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
