@@ -20,7 +20,7 @@ export function AdminModePrompt() {
     try {
       const res = await enter(passcode.trim());
       if (!res.ok) {
-        setError(res.reason === "bad-passcode" ? "That passcode isn't right." : "This account isn't an admin.");
+        setError(res.reason === "bad-passcode" ? "That passcode isn't right." : "This account doesn't have admin access.");
       }
     } catch {
       setError("Couldn't verify the passcode. Try again.");
@@ -53,7 +53,7 @@ export function AdminModePrompt() {
               onClick={() => setStep("passcode")}
               className="flex min-h-12 flex-1 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
             >
-              Enter admin mode
+              {isMod ? "Enter SHLM MOD" : "Enter admin mode"}
             </button>
             <button
               type="button"
@@ -66,7 +66,7 @@ export function AdminModePrompt() {
         ) : (
           <form onSubmit={submit} className="mt-6 space-y-3">
             <label className="block text-xs font-medium text-muted-foreground" htmlFor="admin-passcode">
-              Admin passcode
+              {isMod ? "SHLM MOD passcode" : "Admin passcode"}
             </label>
             <input
               id="admin-passcode"
@@ -85,7 +85,7 @@ export function AdminModePrompt() {
                 disabled={busy || passcode.trim().length === 0}
                 className="flex min-h-12 flex-1 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
               >
-                {busy ? "Verifying…" : "Unlock admin mode"}
+                {busy ? "Verifying…" : isMod ? "Unlock SHLM MOD" : "Unlock admin mode"}
               </button>
               <button
                 type="button"
