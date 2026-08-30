@@ -136,6 +136,79 @@ export const getMemberNotesRange = createServerFn({ method: "POST" })
     return rows ?? [];
   });
 
+export const deleteMemberNote = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => {
+    const d = data as Record<string, unknown>;
+    const noteDate = typeof d.noteDate === "string" ? d.noteDate : "";
+    const session = typeof d.session === "string" ? d.session : "";
+    if (!noteDate || !session) throw new Error("noteDate and session are required");
+    return { noteDate, session };
+  })
+  .handler(async ({ context, data }) => {
+    const { error } = await context.supabase
+      .from("member_notes")
+      .delete()
+      .eq("user_id", context.userId)
+      .eq("note_date", data.noteDate)
+      .eq("session", data.session);
+    if (error) throw new Error(error.message);
+    return { deleted: true };
+  });
+
+/* --------------------------- Personal rulebook ----------------------------- */
+
+export interface MemberRule {
+  id: string;
+  text: string;
+}
+
+export const getMemberRules = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: row, error } = await context.supabase
+      .from("member_rules")
+      .select("rules, consequence")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) return { configured: false, rules: [] as MemberRule[], consequence: "" };
+    const rules = Array.isArray(row.rules) ? (row.rules as unknown as MemberRule[]) : [];
+    return { configured: rules.length > 0, rules, consequence: row.consequence ?? "" };
+  });
+
+export const saveMemberRules = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => {
+    const d = data as Record<string, unknown>;
+    const rawRules = Array.isArray(d.rules) ? d.rules : [];
+    const rules: MemberRule[] = rawRules
+      .map((r) => {
+        const o = (r ?? {}) as Record<string, unknown>;
+        return {
+          id: typeof o.id === "string" && o.id ? o.id : crypto.randomUUID(),
+          text: typeof o.text === "string" ? o.text.trim() : "",
+        };
+      })
+      .filter((r) => r.text !== "");
+    const consequence = typeof d.consequence === "string" ? d.consequence.trim() : "";
+    if (rules.length === 0) throw new Error("At least one rule is required");
+    if (!consequence) throw new Error("A consequence is required");
+    return { rules, consequence };
+  })
+  .handler(async ({ context, data }) => {
+    const { error } = await context.supabase.from("member_rules").upsert(
+      {
+        user_id: context.userId,
+        rules: data.rules as unknown as never,
+        consequence: data.consequence,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" },
+    );
+    if (error) throw new Error(error.message);
+    return { saved: true, rules: data.rules, consequence: data.consequence };
+  });
 
 
 export const getMemberNotes = createServerFn({ method: "POST" })
