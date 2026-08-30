@@ -1,7 +1,7 @@
 import { useRouterState } from "@tanstack/react-router";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 
-const links = [
+const fullLinks = [
   { label: "Applications", href: "/admin" },
   { label: "Dashboard", href: "/dashboard" },
   { label: "SHLM Centre", href: "/centre" },
@@ -9,11 +9,19 @@ const links = [
   { label: "Storefront", href: "/" },
 ];
 
+const modLinks = [
+  { label: "SHLM Centre", href: "/centre" },
+  { label: "Storefront", href: "/" },
+];
+
 export function AdminBar() {
-  const { adminActive, viewAsMember, email, exit, toggleViewAsMember } = useAdminMode();
+  const { adminActive, modOnly, viewAsMember, email, exit, toggleViewAsMember } = useAdminMode();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   if (!adminActive) return null;
+
+  const links = modOnly ? modLinks : fullLinks;
+  const badge = modOnly ? "SHLM MOD (read-only)" : viewAsMember ? "Member view" : "Admin mode";
 
   return (
     <>
@@ -22,10 +30,10 @@ export function AdminBar() {
           <span
             className={
               "rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] " +
-              (viewAsMember ? "bg-white/15 text-white/70" : "bg-white text-black")
+              (viewAsMember && !modOnly ? "bg-white/15 text-white/70" : "bg-white text-black")
             }
           >
-            {viewAsMember ? "Member view" : "Admin mode"}
+            {badge}
           </span>
 
           <span className="hidden text-[11px] text-white/60 sm:inline">{email}</span>
@@ -44,13 +52,15 @@ export function AdminBar() {
           </nav>
 
           <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={toggleViewAsMember}
-              className="rounded-full border border-white/20 px-2.5 py-1 text-[11px] font-medium text-white/85 transition-colors hover:bg-white/10"
-            >
-              {viewAsMember ? "Back to admin view" : "View as member"}
-            </button>
+            {!modOnly && (
+              <button
+                type="button"
+                onClick={toggleViewAsMember}
+                className="rounded-full border border-white/20 px-2.5 py-1 text-[11px] font-medium text-white/85 transition-colors hover:bg-white/10"
+              >
+                {viewAsMember ? "Back to admin view" : "View as member"}
+              </button>
+            )}
             <button
               type="button"
               onClick={exit}
@@ -60,6 +70,8 @@ export function AdminBar() {
             </button>
           </div>
         </div>
+      </div>
+
       </div>
       {/* Spacer so the bar never covers page chrome */}
       <div aria-hidden className="h-[46px] sm:h-[42px]" />
