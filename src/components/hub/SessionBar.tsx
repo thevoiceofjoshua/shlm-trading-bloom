@@ -14,17 +14,13 @@ export function SessionBar({ payload }: { payload: HubPayload }) {
     minute: "2-digit",
     second: "2-digit",
   });
-  const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const { sessions, marketsClosed, nextNote } = payload.sessions;
 
   return (
     <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-baseline gap-2">
-          <span className="font-display text-2xl font-medium tabular-nums tracking-tight">{localTime}</span>
-          <span className="text-xs uppercase tracking-widest text-muted-foreground">{localTz}</span>
-        </div>
+        <span className="font-display text-2xl font-medium tabular-nums tracking-tight">{localTime}</span>
         <span className="text-xs uppercase tracking-widest text-muted-foreground">
           {SITE_TIMEZONE_LABEL} market
         </span>
