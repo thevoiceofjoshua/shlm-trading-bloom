@@ -4,11 +4,17 @@ import { z } from "zod";
 const passcodeSchema = z.object({ passcode: z.string().min(1) });
 
 function verifyPasscode(passcode: string) {
-  const expected = process.env.ADMIN_PASSCODE;
+  const expected = process.env["ADMIN_PASSCODE"];
+  const modPasscode = process.env["SHLM_MOD_PASSCODE"];
+  // SHLM MOD is Centre-only: its passcode can never reach program mutations.
+  if (modPasscode && passcode === modPasscode) {
+    throw new Error("Invalid passcode");
+  }
   if (!expected || passcode !== expected) {
     throw new Error("Invalid passcode");
   }
 }
+
 
 const listSchema = passcodeSchema;
 
