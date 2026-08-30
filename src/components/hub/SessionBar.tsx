@@ -5,7 +5,7 @@ import type { HubPayload } from "@/lib/hub.functions";
 export function SessionBar({ payload }: { payload: HubPayload }) {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 30_000);
+    const id = setInterval(() => setNow(new Date()), 1_000);
     return () => clearInterval(id);
   }, []);
 
