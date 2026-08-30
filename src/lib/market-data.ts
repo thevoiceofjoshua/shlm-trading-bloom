@@ -41,12 +41,12 @@ export const SESSIONS: SessionWindow[] = [
   },
   {
     key: "gold",
-    label: "Gold Session — XAU/USD",
+    label: "Asia Session — XAU/USD",
     pairs: ["XAU/USD (Gold)"],
     startH: 17,
     startM: 0,
     endH: 19,
-    endM: 15,
+    endM: 30,
     days: [1, 2, 3, 4, 5],
   },
 ];
