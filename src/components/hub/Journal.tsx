@@ -225,7 +225,7 @@ export function Journal({ userId }: { userId: string }) {
       setEditing({ ...target, storageKey: desiredKey });
       await refetch();
       const broken = brokenRules(target.entry, rules);
-      if (broken.length > 0 && consequence) setAlertFor(broken);
+      if (broken.length > 0 && consequence && !target.entry.consequenceAcknowledged) setAlertFor(broken);
     },
   });
 
