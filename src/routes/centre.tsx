@@ -8,7 +8,8 @@ import { getHubData, type HubPayload } from "@/lib/hub.functions";
 import { DATA_LABEL } from "@/lib/market-data";
 import { SessionBar } from "@/components/hub/SessionBar";
 import { IndexCards, MagSevenBoard, DowBoard, GoldDesk } from "@/components/hub/MarketBoards";
-import { EconomicCalendar, BiasJournal } from "@/components/hub/EconomicCalendar";
+import { EconomicCalendar } from "@/components/hub/EconomicCalendar";
+import { Journal } from "@/components/hub/Journal";
 import { SessionAnalyst } from "@/components/hub/SessionAnalyst";
 import { AdminPreviewTag } from "@/components/AdminBar";
 import { useAdminMode } from "@/hooks/use-admin-mode";
@@ -109,7 +110,7 @@ function CentrePage() {
 
             <EconomicCalendar payload={payload} />
 
-            {user?.id && <BiasJournal userId={user.id} />}
+            {user?.id && <Journal userId={user.id} />}
           </div>
         )}
       </main>
