@@ -13,12 +13,12 @@ Give that account admin-style access to the SHLM Centre — unlocked with an adm
 ## Technical details
 
 Database migration:
-- Add `shlm_mod` (shown as "SHLM MOD") to the `app_role` enum.
+- Add `shlm_mod` to the `app_role` enum.
 - Insert a `user_roles` row for user `4acfe73b-af0d-4492-ac95-55a759b6c99e` with role `shlm_mod`.
 
 Server-side gating:
-- `src/lib/hub.functions.ts` — `checkAccess` treats `shlm_mod` (shown as "SHLM MOD") as Centre-granted (`hasAccess: true`) and returns a new `readOnly: true` flag; `isAdmin` stays false so no admin-only affordances light up.
-- `src/lib/admin-mode.functions.ts` — `verifyAdminPasscode` resolves the caller's role first: `admin` is checked against `ADMIN_PASSCODE`, `shlm_mod` (shown as "SHLM MOD") against a new `SHLM_MOD_PASSCODE` secret. Returns `{ ok, scope: "full" | "shlm_mod" }`. Anything else returns `not-admin`.
+- `src/lib/hub.functions.ts` — `checkAccess` treats `shlm_mod` as Centre-granted (`hasAccess: true`) and returns a new `readOnly: true` flag; `isAdmin` stays false so no admin-only affordances light up.
+- `src/lib/admin-mode.functions.ts` — `verifyAdminPasscode` resolves the caller's role first: `admin` is checked against `ADMIN_PASSCODE`, `shlm_mod` against a new `SHLM_MOD_PASSCODE` secret. Returns `{ ok, scope: "full" | "shlm_mod" }`. Anything else returns `not-admin`.
 - `src/lib/admin.functions.ts` (list/approve/deny/remove/resend) — keeps the passcode check and additionally requires the caller to hold the `admin` role, so a centre password can never reach these mutations.
 
 Client:
