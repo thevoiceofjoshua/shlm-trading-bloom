@@ -11,8 +11,8 @@ const fullLinks = [
 ];
 
 const modLinks = [
+  { label: "Dashboard", href: "/dashboard" },
   { label: "SHLM Centre", href: "/centre" },
-  { label: "Storefront", href: "/" },
 ];
 
 const MIN_KEY = "shlm.adminDockMinimized";
