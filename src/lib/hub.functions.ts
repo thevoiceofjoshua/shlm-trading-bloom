@@ -32,6 +32,8 @@ export interface HubPayload {
   indexes: typeof INDEX_QUOTES;
   magSeven: typeof MAG_SEVEN;
   magBreadth: ReturnType<typeof magSevenBreadth>;
+  nasdaqMacro: typeof NASDAQ_MACRO;
+  nasdaqMovers: ReturnType<typeof nasdaqMovers>;
   dowDrivers: typeof DOW_DRIVERS;
   dowMacro: typeof DOW_MACRO;
   dowMovers: ReturnType<typeof dowMovers>;
