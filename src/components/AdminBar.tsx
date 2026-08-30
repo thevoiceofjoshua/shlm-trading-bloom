@@ -37,7 +37,7 @@ export function AdminBar() {
   if (!adminActive) return null;
 
   const links = modOnly ? modLinks : fullLinks;
-  const label = modOnly ? "SHLM MOD" : viewAsMember ? "Member view" : "Admin mode";
+  const label = modOnly ? "SHLM MOD" : viewAsMember ? "Member view" : "SHLM Founder";
 
   if (minimized) {
     return (
@@ -145,7 +145,7 @@ export function AdminBar() {
               onClick={exit}
               className="w-full rounded-full px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             >
-              Exit {modOnly ? "SHLM MOD" : "admin mode"}
+              Exit {modOnly ? "SHLM MOD" : "SHLM Founder"}
             </button>
           </div>
         )}

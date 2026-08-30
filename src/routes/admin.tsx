@@ -10,7 +10,7 @@ import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
   head: () => ({
-    meta: [{ title: "SHLM Admin" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "SHLM Founder" }, { name: "robots", content: "noindex" }],
     links: [{ rel: "canonical", href: "https://shlm-trading-bloom.lovable.app/admin" }],
   }),
 });
@@ -237,7 +237,7 @@ function AdminPage() {
     <div className="min-h-screen bg-background px-4 py-16 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <div className="flex items-center justify-between">
-          <h1 className="font-display text-4xl font-medium tracking-tight">SHLM Admin</h1>
+          <h1 className="font-display text-4xl font-medium tracking-tight">SHLM Founder</h1>
           <HomeButton />
         </div>
         <p className="mt-2 text-sm text-muted-foreground">Review mentorship applications.</p>
@@ -250,7 +250,7 @@ function AdminPage() {
           }}
         >
           <label className="text-sm font-medium" htmlFor="admin-passcode">
-            Admin passcode
+            SHLM Founder passcode
           </label>
           <input
             id="admin-passcode"
