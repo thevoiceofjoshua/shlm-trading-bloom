@@ -41,19 +41,16 @@ function minutesUntilOpen(now: Date, s: SessionWindow): number | null {
   const { day, h, m } = laParts(now);
   const cur = h * 60 + m;
   const start = s.startH * 60 + s.startM;
-  if (!s.days.includes(day)) {
-    // find next market day
-    let d = day;
-    let add = 0;
-    while (!s.days.includes(d)) {
-      d = (d + 1) % 7;
-      add++;
-    }
-    return add * 24 * 60 - cur + start;
+  // Search today through the next 7 days for the next start that is still ahead.
+  for (let add = 0; add <= 7; add++) {
+    const d = (day + add) % 7;
+    if (!s.days.includes(d)) continue;
+    const mins = add * 24 * 60 - cur + start;
+    if (mins > 0) return mins;
   }
-  if (cur < start) return start - cur;
-  return null; // currently open or after close — next window is another day
+  return null;
 }
+
 
 export interface SessionStatus {
   key: SessionKey;
@@ -88,17 +85,19 @@ export function sessionStatuses(now: Date = new Date()): { sessions: SessionStat
       return { key: s.key, label: s.label, pairs: s.pairs, state: "open" as const, countdown: null };
     }
     const mins = minutesUntilOpen(now, s);
-    if (weekOpen && mins !== null && mins < 24 * 60) {
-      const h = Math.floor(mins / 60);
+    if (weekOpen && mins !== null) {
+      const d = Math.floor(mins / (24 * 60));
+      const h = Math.floor((mins % (24 * 60)) / 60);
       const m = mins % 60;
       return {
         key: s.key,
         label: s.label,
         pairs: s.pairs,
         state: "upcoming" as const,
-        countdown: `opens in ${h}h ${m}m`,
+        countdown: d > 0 ? `opens in ${d}d ${h}h ${m}m` : `opens in ${h}h ${m}m`,
       };
     }
+
     return { key: s.key, label: s.label, pairs: s.pairs, state: "closed" as const, countdown: null };
   });
 
