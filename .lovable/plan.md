@@ -40,4 +40,8 @@ Make each calendar date bigger and color-coded by the day's PnL, allow several e
 - Day aggregation: sum parsed `pnl` across a date's rows to pick the tint and the displayed figure; entries with no PnL contribute 0 and only trigger the dot.
 - `src/lib/hub.functions.ts`: `saveMemberNote` and `getMemberNotesRange` stay as-is; a `deleteMemberNote` server function is added (authenticated, scoped to `auth.uid()`) for removing an entry.
 - Colors use existing semantic tokens plus low-opacity success/destructive tints — no new palette entries; contrast checked in the dark theme.
-- Role parity: the journal is the member's own data. Member and full admin behave identically; SHLM MOD keeps read-only program access while still writing their own journal entries, as today.
+- Rulebook storage: new table `public.member_rules` (one row per member) holding the rules list and the consequence text, with owner-only access scoped to `auth.uid()` and the standard grants. Server functions `getMemberRules` / `saveMemberRules` are added to `src/lib/hub.functions.ts` behind `requireSupabaseAuth`.
+- Rule results are stored inside the entry JSON (`ruleChecks: Record<ruleId, "followed" | "broken">`, plus `consequenceAcknowledged`), so no extra table and older entries simply have no checks.
+- The alert is a new `RuleBreakAlert` component rendered from the journal, using a keyframed opacity/background pulse defined in `src/styles.css` and disabled under `prefers-reduced-motion`.
+- Role parity: the journal, rules, and consequence are the member's own data. Member and full admin behave identically; SHLM MOD keeps read-only program access while still setting rules and writing their own journal entries, as today.
+
