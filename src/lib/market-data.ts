@@ -32,7 +32,7 @@ export const SESSIONS: SessionWindow[] = [
   {
     key: "ny-open",
     label: "NY Open — NASDAQ / US30",
-    pairs: ["NASDAQ (US100)", "DOW (US30)"],
+    pairs: ["NASDAQ", "DOW (US30)"],
     startH: 6,
     startM: 30,
     endH: 9,
