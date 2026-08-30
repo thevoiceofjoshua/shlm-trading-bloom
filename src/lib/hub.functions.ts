@@ -95,6 +95,8 @@ export const getHubData = createServerFn({ method: "POST" })
       indexes: INDEX_QUOTES,
       magSeven: MAG_SEVEN,
       magBreadth: magSevenBreadth(),
+      nasdaqMacro: NASDAQ_MACRO,
+      nasdaqMovers: nasdaqMovers(),
       dowDrivers: DOW_DRIVERS,
       dowMacro: DOW_MACRO,
       dowMovers: dowMovers(),
