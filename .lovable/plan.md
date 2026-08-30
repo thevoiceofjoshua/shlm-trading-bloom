@@ -1,6 +1,6 @@
-# Journal: PnL on the calendar + multiple entries per day
+# Journal: PnL calendar, multiple entries, and personal trading rules
 
-Make each calendar date bigger and color-coded by the day's PnL, show the dollar PnL on the cell, and allow several entries per day.
+Make each calendar date bigger and color-coded by the day's PnL, allow several entries per day, and add a personal rulebook with a red rule-break alert.
 
 ## What you'll see
 
