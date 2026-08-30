@@ -267,7 +267,7 @@ export const ECON_EVENTS: EconEvent[] = [
     currency: "USD",
     forecast: "0.3%",
     previous: "0.2%",
-    affects: ["XAU/USD", "US100", "US30", "USD pairs"],
+    affects: ["XAU/USD", "NASDAQ", "US30", "USD pairs"],
   },
   {
     time: "05:30",
@@ -278,7 +278,7 @@ export const ECON_EVENTS: EconEvent[] = [
     currency: "USD",
     forecast: "3.2%",
     previous: "3.3%",
-    affects: ["XAU/USD", "US100", "USD pairs"],
+    affects: ["XAU/USD", "NASDAQ", "USD pairs"],
   },
   {
     time: "08:30",
@@ -289,7 +289,7 @@ export const ECON_EVENTS: EconEvent[] = [
     currency: "USD",
     forecast: "225K",
     previous: "219K",
-    affects: ["US30", "US100"],
+    affects: ["US30", "NASDAQ"],
   },
   {
     time: "10:00",
@@ -300,7 +300,7 @@ export const ECON_EVENTS: EconEvent[] = [
     currency: "USD",
     forecast: "—",
     previous: "—",
-    affects: ["XAU/USD", "US100", "USD pairs"],
+    affects: ["XAU/USD", "NASDAQ", "USD pairs"],
   },
   {
     time: "05:30",
@@ -311,7 +311,7 @@ export const ECON_EVENTS: EconEvent[] = [
     currency: "USD",
     forecast: "0.2%",
     previous: "0.4%",
-    affects: ["XAU/USD", "US100", "USD pairs"],
+    affects: ["XAU/USD", "NASDAQ", "USD pairs"],
   },
   {
     time: "08:30",
@@ -322,7 +322,7 @@ export const ECON_EVENTS: EconEvent[] = [
     currency: "USD",
     forecast: "0.4%",
     previous: "0.1%",
-    affects: ["US30", "US100"],
+    affects: ["US30", "NASDAQ"],
   },
   {
     time: "05:30",
@@ -333,7 +333,7 @@ export const ECON_EVENTS: EconEvent[] = [
     currency: "USD",
     forecast: "165K",
     previous: "142K",
-    affects: ["XAU/USD", "US30", "US100", "USD pairs"],
+    affects: ["XAU/USD", "US30", "NASDAQ", "USD pairs"],
   },
 ];
 
