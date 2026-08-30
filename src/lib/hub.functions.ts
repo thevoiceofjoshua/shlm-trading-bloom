@@ -22,8 +22,11 @@ export interface HubAccess {
   isAdmin: boolean;
   /** True when a paid membership grants access (independent of admin role). */
   memberAccess: boolean;
+  /** SHLM MOD: Centre access granted, but no program-management rights. */
+  readOnly?: boolean;
   reason?: string;
 }
+
 
 export interface HubPayload {
   access: HubAccess;
