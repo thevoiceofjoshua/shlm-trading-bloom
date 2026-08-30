@@ -66,9 +66,9 @@ function Level({ label, val }: { label: string; val: number }) {
 export function MagSevenBoard({ payload }: { payload: HubPayload }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
-      <div className="flex items-center justify-between">
-        <h3 className="font-display text-lg font-medium">Mag 7 — NASDAQ drivers</h3>
-        <span className="text-xs text-muted-foreground">{payload.magBreadth.label}</span>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="font-display text-lg font-medium">NASDAQ drivers — US100</h3>
+        <span className="text-xs text-muted-foreground">{payload.nasdaqMovers.label}</span>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
         {payload.magSeven.map((s) => (
@@ -80,8 +80,18 @@ export function MagSevenBoard({ payload }: { payload: HubPayload }) {
               {s.changePct}%
             </p>
             <div className="mt-2">{strengthBar(s.changePct)}</div>
+            <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{s.note}</p>
           </div>
         ))}
+      </div>
+
+      <div className="mt-5 border-t border-border pt-4">
+        <p className="text-xs uppercase tracking-widest text-muted-foreground">Macro drivers</p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          {payload.nasdaqMacro.map((m) => (
+            <MacroTile key={m.label} macro={m} />
+          ))}
+        </div>
       </div>
     </div>
   );
