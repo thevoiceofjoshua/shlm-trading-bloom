@@ -26,10 +26,15 @@ export function SessionBar({ payload }: { payload: HubPayload }) {
         </span>
       </div>
 
+      <p className="mt-1 text-xs text-muted-foreground">
+        Market week: Sunday 3:00pm PST → Friday 2:00pm PST · SHLM sessions: Mon–Fri from 6:30am PST
+      </p>
+
       {marketsClosed && nextNote ? (
         <div className="mt-4 rounded-lg border border-border bg-surface px-4 py-3 text-sm text-muted-foreground">
           {nextNote}
         </div>
+
       ) : (
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           {sessions.map((s) => (
