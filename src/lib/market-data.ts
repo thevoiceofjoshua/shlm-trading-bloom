@@ -284,3 +284,13 @@ export function dowMovers(): { top: string; label: string } {
     label: `${top.name} is driving the Dow ${direction}`,
   };
 }
+
+export function nasdaqMovers(): { top: string; label: string } {
+  const sorted = [...MAG_SEVEN].sort((a, b) => Math.abs(b.changePct) - Math.abs(a.changePct));
+  const top = sorted[0];
+  const direction = top.changePct >= 0 ? "higher" : "lower";
+  return {
+    top: top.symbol,
+    label: `${top.name} is driving the index ${direction}`,
+  };
+}
