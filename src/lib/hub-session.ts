@@ -95,16 +95,50 @@ export function sessionStatuses(now: Date = new Date()): { sessions: SessionStat
   return { sessions, marketsClosed, nextNote };
 }
 
-/** Convert a PST time-of-day to the viewer's local time zone for display. */
+/**
+ * Convert a wall-clock time in SITE_TIMEZONE (LA) into the exact UTC instant.
+ * Works by probing the LA offset for that approximate instant.
+ */
+function laWallClockToDate(year: number, month: number, day: number, h: number, m: number): Date {
+  // First guess: treat the wall clock as UTC, then correct by the LA offset.
+  const guess = Date.UTC(year, month - 1, day, h, m, 0, 0);
+  const offsetMs = laOffsetMs(new Date(guess));
+  // Refine once (handles DST boundaries).
+  const refined = guess - offsetMs;
+  const offset2 = laOffsetMs(new Date(refined));
+  return new Date(guess - offset2);
+}
+
+/** LA UTC offset in ms at a given instant (negative west of UTC). */
+function laOffsetMs(at: Date): number {
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: SITE_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  const parts = fmt.formatToParts(at);
+  const get = (t: string) => parseInt(parts.find((p) => p.type === t)?.value ?? "0", 10);
+  const asUTC = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour") % 24, get("minute"), get("second"));
+  return asUTC - at.getTime();
+}
+
+/** Convert a PST time-of-day (today in LA) to the viewer's local time zone for display. */
 export function pstToLocalTime(h: number, m: number): string {
-  // Build a Date for today in LA at the given h:m, then format in viewer TZ.
   const now = new Date();
-  const laStr = now.toLocaleString("en-US", { timeZone: SITE_TIMEZONE });
-  const laNow = new Date(laStr);
-  const d = new Date(laNow);
-  d.setHours(h, m, 0, 0);
-  // Format in viewer's local time
-  return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  const laDateParts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: SITE_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now); // YYYY-MM-DD
+  const [y, mo, d] = laDateParts.split("-").map((v) => parseInt(v, 10));
+  const instant = laWallClockToDate(y, mo, d, h, m);
+  return instant.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 }
 
 /** Convert an ISO date + LA-time "HH:MM" into a viewer-local time string. */
@@ -112,10 +146,8 @@ export function econTimeToLocal(dateISO: string, laTime: string): string {
   const [hStr, mStr] = laTime.split(":");
   const h = parseInt(hStr, 10);
   const m = parseInt(mStr, 10);
-  // Construct a Date in LA TZ for the given date+time
-  const date = new Date(`${dateISO}T00:00:00`);
-  const laStr = date.toLocaleString("en-US", { timeZone: SITE_TIMEZONE });
-  const laDate = new Date(laStr);
-  laDate.setHours(h, m, 0, 0);
-  return laDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  const [y, mo, d] = dateISO.split("-").map((v) => parseInt(v, 10));
+  const instant = laWallClockToDate(y, mo, d, h, m);
+  return instant.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 }
+
