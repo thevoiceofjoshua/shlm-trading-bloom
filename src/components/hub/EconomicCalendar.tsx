@@ -1,8 +1,5 @@
 import { useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { useQuery, useMutation } from "@tanstack/react-query";
 import type { HubPayload } from "@/lib/hub.functions";
-import { getMemberNotes, saveMemberNote } from "@/lib/hub.functions";
 import { econTimeToLocal } from "@/lib/hub-session";
 import { SESSIONS } from "@/lib/market-data";
 
@@ -133,76 +130,3 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
 
 
 /* ----------------------- Bias journal ----------------------- */
-
-export function BiasJournal({ userId }: { userId: string }) {
-  const today = new Date().toISOString().slice(0, 10);
-  const [body, setBody] = useState("");
-  const [session, setSession] = useState("ny-open");
-  const [loaded, setLoaded] = useState(false);
-
-  const fetchNotes = useServerFn(getMemberNotes);
-  const saveNote = useServerFn(saveMemberNote);
-
-  const { refetch } = useQuery({
-    queryKey: ["member-notes", userId, today],
-    queryFn: async () => {
-      const rows = await fetchNotes({ data: { noteDate: today } });
-      const existing = rows.find((r: any) => r.session === session);
-      if (existing) setBody(existing.body);
-      setLoaded(true);
-      return rows;
-    },
-    enabled: !!userId,
-  });
-
-  const save = useMutation({
-    mutationFn: () => saveNote({ data: { noteDate: today, session, body } }),
-    onSuccess: () => refetch(),
-  });
-
-  return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <h3 className="font-display text-lg font-medium">Trading notes / bias journal</h3>
-      <p className="mt-1 text-xs text-muted-foreground">{new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</p>
-
-      <div className="mt-4 flex gap-2">
-        {[
-          { key: "ny-open", label: "NY Open" },
-          { key: "gold", label: "Gold Session" },
-        ].map((s) => (
-          <button
-            key={s.key}
-            type="button"
-            onClick={() => {
-              setSession(s.key);
-              setBody("");
-              refetch();
-            }}
-            className={`rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
-              session === s.key ? "border-foreground bg-primary text-primary-foreground" : "border-border bg-background text-foreground hover:bg-accent"
-            }`}
-          >
-            {s.label}
-          </button>
-        ))}
-      </div>
-
-      <textarea
-        value={body}
-        onChange={(e) => setBody(e.target.value)}
-        placeholder="Log your bias, key levels, and plan for this session…"
-        className="mt-4 min-h-32 w-full resize-y rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-      />
-
-      <button
-        type="button"
-        disabled={save.isPending}
-        onClick={() => save.mutate()}
-        className="mt-4 inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
-      >
-        {save.isPending ? "Saving…" : "Save note"}
-      </button>
-      {save.isSuccess && <p className="mt-2 text-xs text-muted-foreground">Saved to your account.</p>}
-    </div>
-  );
-}
