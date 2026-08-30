@@ -71,8 +71,6 @@ export function AdminBar() {
           </div>
         </div>
       </div>
-
-      </div>
       {/* Spacer so the bar never covers page chrome */}
       <div aria-hidden className="h-[46px] sm:h-[42px]" />
     </>
