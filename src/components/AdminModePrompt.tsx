@@ -33,13 +33,17 @@ export function AdminModePrompt() {
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-foreground shadow-2xl">
         <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-          SHLM Admin
+          {isMod ? "SHLM MOD" : "SHLM Admin"}
         </p>
-        <h2 className="mt-3 font-display text-2xl tracking-tight">Enter admin mode?</h2>
+        <h2 className="mt-3 font-display text-2xl tracking-tight">
+          {isMod ? "Enter SHLM MOD access?" : "Enter admin mode?"}
+        </h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Admin mode unlocks every page and member function across the store so you can test it
-          end to end. Customer-facing actions still ask for confirmation.
+          {isMod
+            ? "SHLM MOD unlocks the full SHLM Centre — boards, analyst, calendar and journal. Program settings, applications and member data stay locked."
+            : "Admin mode unlocks every page and member function across the store so you can test it end to end. Customer-facing actions still ask for confirmation."}
         </p>
+
         {email && <p className="mt-2 text-xs text-muted-foreground">Signed in as {email}</p>}
 
         {step === "ask" ? (
