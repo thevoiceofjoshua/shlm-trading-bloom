@@ -63,16 +63,32 @@ export interface SessionStatus {
   countdown: string | null;
 }
 
+/**
+ * The market week itself: opens Sunday 3:00pm PST and closes Friday 2:00pm PST.
+ * This is separate from the SHLM session windows (6:30am / 5:00pm PST, Mon–Fri).
+ */
+export const MARKET_OPEN = { day: 0, h: 15, m: 0 } as const;
+export const MARKET_CLOSE = { day: 5, h: 14, m: 0 } as const;
+
+/** True when the market week is open at `now` (LA reference). */
+export function marketWeekOpen(now: Date = new Date()): boolean {
+  const { day, h, m } = laParts(now);
+  const cur = day * 24 * 60 + h * 60 + m;
+  const open = MARKET_OPEN.day * 24 * 60 + MARKET_OPEN.h * 60 + MARKET_OPEN.m;
+  const close = MARKET_CLOSE.day * 24 * 60 + MARKET_CLOSE.h * 60 + MARKET_CLOSE.m;
+  // Week runs Sun 15:00 → Fri 14:00, i.e. one contiguous span inside the week.
+  return cur >= open || cur < close;
+}
+
 export function sessionStatuses(now: Date = new Date()): { sessions: SessionStatus[]; marketsClosed: boolean; nextNote: string | null } {
-  const { day } = laParts(now);
-  const isWeekend = day === 0 || day === 6;
+  const weekOpen = marketWeekOpen(now);
   const sessions = SESSIONS.map((s) => {
-    const open = inWindow(now, s);
+    const open = weekOpen && inWindow(now, s);
     if (open) {
       return { key: s.key, label: s.label, pairs: s.pairs, state: "open" as const, countdown: null };
     }
     const mins = minutesUntilOpen(now, s);
-    if (mins !== null && mins < 24 * 60) {
+    if (weekOpen && mins !== null && mins < 24 * 60) {
       const h = Math.floor(mins / 60);
       const m = mins % 60;
       return {
@@ -86,14 +102,15 @@ export function sessionStatuses(now: Date = new Date()): { sessions: SessionStat
     return { key: s.key, label: s.label, pairs: s.pairs, state: "closed" as const, countdown: null };
   });
 
-  const marketsClosed = isWeekend;
+  const marketsClosed = !weekOpen;
   let nextNote: string | null = null;
-  if (isWeekend) {
-    nextNote = "Markets closed — next session Monday 6:30am PST.";
+  if (marketsClosed) {
+    nextNote = `Market closed — it reopens Sunday at ${pstToLocalTime(MARKET_OPEN.h, MARKET_OPEN.m)} your time (3:00pm PST). First SHLM session is Monday at ${pstToLocalTime(6, 30)} (6:30am PST).`;
   }
 
   return { sessions, marketsClosed, nextNote };
 }
+
 
 /**
  * Convert a wall-clock time in SITE_TIMEZONE (LA) into the exact UTC instant.
