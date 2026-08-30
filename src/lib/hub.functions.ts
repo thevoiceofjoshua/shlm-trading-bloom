@@ -6,12 +6,14 @@ import {
   MAG_SEVEN,
   DOW_DRIVERS,
   DOW_MACRO,
+  NASDAQ_MACRO,
   GOLD_QUOTE,
   GOLD_DRIVERS,
   ECON_EVENTS,
   SESSIONS,
   magSevenBreadth,
   dowMovers,
+  nasdaqMovers,
 } from "@/lib/market-data";
 import { sessionStatuses } from "@/lib/hub-session";
 
