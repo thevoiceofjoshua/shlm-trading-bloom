@@ -57,11 +57,13 @@ export function IndexCards({ payload }: { payload: HubPayload }) {
   );
 }
 
-function Level({ label, val }: { label: string; val: number }) {
+function KeyLevel({ label, val, role, tone }: { label: string; val: number; role: string; tone: "up" | "down" }) {
+  const roleColor = tone === "up" ? "text-emerald-500" : "text-red-500";
   return (
-    <div className="flex justify-between">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium tabular-nums">{val.toLocaleString()}</span>
+    <div>
+      <p className="text-muted-foreground">{label}</p>
+      <p className="font-display text-base font-medium tabular-nums text-foreground">{val.toLocaleString()}</p>
+      <p className={`mt-0.5 text-[10px] font-semibold uppercase tracking-widest ${roleColor}`}>{role}</p>
     </div>
   );
 }
