@@ -47,7 +47,8 @@ export const SESSIONS: SessionWindow[] = [
     startM: 0,
     endH: 19,
     endM: 30,
-    days: [1, 2, 3, 4, 5],
+    days: [0, 1, 2, 3, 4],
+
   },
 ];
 
