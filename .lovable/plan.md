@@ -20,7 +20,18 @@ Make each calendar date bigger and color-coded by the day's PnL, allow several e
 - The session tabs stop being containers. The selected date shows a list of that day's entries, each card labeled with its session and PnL (e.g. "NY Open · +$450").
 - "＋ Add entry" creates a new blank entry for the selected date; each entry picks its own session (NY Open / Gold Session) inside the form.
 - Tapping an entry in the list opens it for editing; each entry saves on its own and can be deleted.
-- Existing saved entries load into this list unchanged, so nothing is lost.
+
+**First-time rulebook setup**
+- The first time a member opens the journal, a one-time setup panel appears: "Set your daily trading rules."
+- They add their own rules as a list (e.g. "No trades in the first 5 minutes", "Max 2 trades per session", "Always set a stop"), plus one consequence they must carry out if any rule is broken (free text, e.g. "50 push-ups and no trading tomorrow").
+- Rules and the consequence can be edited later from an "Edit my rules" link in the journal header. Setup can't be skipped into an empty state — at least one rule and a consequence are required to continue.
+
+**Rule check on every entry**
+- Each entry form lists their rules with "Followed / Broken" toggles, so the journal knows exactly what happened.
+- On save, if any rule is marked broken, a full-screen alert appears: a flashing red panel reading "RULES BROKEN", the specific rules that were broken, and the consequence in large type.
+- The alert has a single acknowledgement button ("I'll do it") — dismissing it records the acknowledgement with the entry. Entries with a broken rule get a small red flag in the day's entry list.
+- Flashing respects `prefers-reduced-motion`: it becomes a solid red panel instead of a pulsing one.
+
 
 ## Technical notes
 
