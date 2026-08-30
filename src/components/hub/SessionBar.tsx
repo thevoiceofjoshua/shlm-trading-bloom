@@ -14,7 +14,7 @@ export function SessionBar({ payload }: { payload: HubPayload }) {
     minute: "2-digit",
     second: "2-digit",
   });
-  const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  
 
   const { sessions, marketsClosed, nextNote } = payload.sessions;
 
