@@ -95,6 +95,33 @@ export type Database = {
         }
         Relationships: []
       }
+      member_rules: {
+        Row: {
+          consequence: string
+          created_at: string
+          id: string
+          rules: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          consequence?: string
+          created_at?: string
+          id?: string
+          rules?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          consequence?: string
+          created_at?: string
+          id?: string
+          rules?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       purchases: {
         Row: {
           amount_total: number | null
