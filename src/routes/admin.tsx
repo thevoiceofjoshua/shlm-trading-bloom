@@ -250,7 +250,7 @@ function AdminPage() {
           }}
         >
           <label className="text-sm font-medium" htmlFor="admin-passcode">
-            Admin passcode
+            SHLM Founder passcode
           </label>
           <input
             id="admin-passcode"
