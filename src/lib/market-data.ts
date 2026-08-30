@@ -72,7 +72,7 @@ export interface LevelQuote extends Quote {
 
 export const INDEX_QUOTES: LevelQuote[] = [
   {
-    symbol: "US100",
+    symbol: "NASDAQ",
     name: "NASDAQ",
     price: 18_420.5,
     change: 142.8,
