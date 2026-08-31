@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { HomeButton } from "@/components/HomeButton";
+import { displayFirstName } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { getHubData, type HubPayload } from "@/lib/hub.functions";
 import { DATA_LABEL } from "@/lib/market-data";
@@ -86,11 +87,7 @@ function CentrePage() {
             )}
             <HomeButton />
             <span className="hidden text-sm text-muted-foreground sm:inline">
-              {displayFirstName(
-                (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.full_name ??
-                  (user?.user_metadata as { full_name?: string; name?: string } | undefined)?.name,
-                user?.email,
-              )}
+              {displayFirstName(user?.name, user?.email)}
             </span>
           </div>
 
