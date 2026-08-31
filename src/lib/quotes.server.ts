@@ -112,13 +112,16 @@ export async function fetchDelayedQuotes(): Promise<Record<string, DelayedQuote>
   if (cache && Date.now() - cache.at < TTL_MS) return cache.quotes;
 
   const pairs = Object.entries(YAHOO_SYMBOLS);
-  const symbols = pairs.map(([, sym]) => sym).join(",");
   const out: Record<string, DelayedQuote> = { ...(cache?.quotes ?? {}) };
 
-  // 1) One batched request covers every symbol.
-  const spark = await getJson(`/v8/finance/spark?symbols=${encodeURIComponent(symbols)}&interval=1d&range=1d`);
-  if (spark && typeof spark === "object") {
-    for (const [key, sym] of pairs) {
+  // 1) Batched requests (the feed caps each call at 20 symbols).
+  const chunks: [string, string][][] = [];
+  for (let i = 0; i < pairs.length; i += 10) chunks.push(pairs.slice(i, i + 10));
+  for (const chunk of chunks) {
+    const symbols = chunk.map(([, sym]) => sym).join(",");
+    const spark = await getJson(`/v8/finance/spark?symbols=${encodeURIComponent(symbols)}&interval=1d&range=1d`);
+    if (!spark || typeof spark !== "object") continue;
+    for (const [key, sym] of chunk) {
       const row = spark[sym];
       const price = Array.isArray(row?.close) ? Number(row.close[row.close.length - 1]) : NaN;
       const prev = Number(row?.chartPreviousClose ?? row?.previousClose ?? NaN);
