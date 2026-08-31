@@ -160,3 +160,46 @@ function LockedPreview() {
     </div>
   );
 }
+
+const REFETCH_MS = 60_000;
+
+function FeedBadges({ payload, dataUpdatedAt }: { payload: HubPayload; dataUpdatedAt: number }) {
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const last = payload.fetchedAt ? new Date(payload.fetchedAt).getTime() : dataUpdatedAt;
+  const remaining = Math.max(0, last + REFETCH_MS - now);
+  const nextText = remaining === 0 ? "Updating…" : `Next update in ${remaining < 60_000 ? `${Math.ceil(remaining / 1000)}s` : `${Math.floor(remaining / 60_000)}m ${Math.ceil((remaining % 60_000) / 1000)}s`}`;
+  const timeText = new Date(last).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
+  return (
+    <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+      {payload.dataState === "delayed" && (
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-emerald-500">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+          Delayed live
+        </span>
+      )}
+      {payload.dataState === "sample" && (
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-2 py-0.5">
+          Sample data
+        </span>
+      )}
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-2 py-0.5">
+        Updated {timeText}
+      </span>
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-2 py-0.5">
+        {nextText}
+      </span>
+      {payload.dataState === "delayed" && (
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-2 py-0.5">
+          ~15 min behind
+        </span>
+      )}
+    </div>
+  );
+}
