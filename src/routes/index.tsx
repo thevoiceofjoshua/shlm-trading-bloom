@@ -393,11 +393,11 @@ function HeroSection({ stats }: { stats: SiteStats }) {
         <div className="absolute left-3/4 top-[calc(50%+12px)] h-px w-3 bg-white/20" />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-36 pt-28 text-center sm:px-6 sm:pb-32 sm:pt-32 lg:px-8">
-        <h1 className="animate-hero-pulse inline-block text-balance font-display text-[clamp(4.5rem,17vw,12rem)] font-medium leading-[0.85] tracking-[0.05em] text-white [will-change:transform]">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-24 pt-24 text-center sm:px-6 sm:pb-32 sm:pt-32 lg:px-8">
+        <h1 className="animate-hero-pulse inline-block text-balance font-display text-[clamp(3.75rem,13vw,12rem)] font-medium leading-[0.85] tracking-[0.04em] text-white [will-change:transform] sm:tracking-[0.05em]">
           SHLM
         </h1>
-        <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+        <div className="mt-7 flex flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
           <a
             href="#pricing"
             className="flex min-h-12 items-center justify-center rounded-full bg-white px-7 text-sm font-semibold text-black transition-transform hover:scale-[1.02] hover:bg-white/90 sm:min-h-0 sm:py-3.5"
@@ -412,11 +412,12 @@ function HeroSection({ stats }: { stats: SiteStats }) {
             <span className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>
         </div>
-        <div className="mt-10 flex items-center justify-center sm:mt-12">
+        <div className="mt-7 flex items-center justify-center sm:mt-12">
           <LiveEnrollmentTicker />
         </div>
 
       </div>
+
 
       {/* Social links — bottom left */}
       <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3 sm:bottom-8 sm:left-6 sm:translate-x-0 lg:left-8">
