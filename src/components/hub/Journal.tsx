@@ -923,15 +923,45 @@ function TextField({
 
 function TradesEditor({ entry, onChange }: { entry: Entry; onChange: (patch: Partial<Entry>) => void }) {
   const trades = entry.trades ?? [];
+  const [sectionCollapsed, setSectionCollapsed] = useState(false);
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
 
   const setCount = (count: number) => {
     const next = [...trades];
     while (next.length < count) next.push(newTrade());
     onChange({ tradeCount: String(count), trades: next.slice(0, count) });
+    setSectionCollapsed(false);
+    setCollapsedIds((prev) => {
+      const nextSet = new Set(prev);
+      next.slice(0, count).forEach((t) => nextSet.delete(t.id));
+      return nextSet;
+    });
   };
 
   const patchTrade = (id: string, patch: Partial<Trade>) => {
     onChange({ trades: trades.map((t) => (t.id === id ? { ...t, ...patch } : t)) });
+  };
+
+  const toggleSection = (n: number) => {
+    if (entry.tradeCount === String(n)) {
+      setSectionCollapsed((c) => !c);
+    } else {
+      setCount(n);
+    }
+  };
+
+  const toggleTrade = (id: string) => {
+    setCollapsedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const removeTrade = (id: string) => {
+    const remaining = trades.filter((t) => t.id !== id);
+    onChange({ trades: remaining, tradeCount: String(remaining.length) });
   };
 
   return (
@@ -940,20 +970,23 @@ function TradesEditor({ entry, onChange }: { entry: Entry; onChange: (patch: Par
         📊 How many trades did you take this session?
       </p>
       <div className="mt-2 flex flex-wrap items-center gap-2">
-        {[0, 1, 2, 3, 4, 5, 6].map((n) => (
-          <button
-            key={n}
-            type="button"
-            onClick={() => setCount(n)}
-            className={`min-h-9 min-w-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-              entry.tradeCount === String(n)
-                ? "border-foreground bg-primary text-primary-foreground"
-                : "border-border bg-background text-foreground hover:bg-accent"
-            }`}
-          >
-            {n === 0 ? "None" : n}
-          </button>
-        ))}
+        {[0, 1, 2, 3, 4, 5, 6].map((n) => {
+          const active = entry.tradeCount === String(n);
+          return (
+            <button
+              key={n}
+              type="button"
+              onClick={() => toggleSection(n)}
+              className={`min-h-9 min-w-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                active
+                  ? "border-foreground bg-primary text-primary-foreground"
+                  : "border-border bg-background text-foreground hover:bg-accent"
+              }`}
+            >
+              {n === 0 ? "None" : n}
+            </button>
+          );
+        })}
         {trades.length > 0 && (
           <button
             type="button"
@@ -968,102 +1001,135 @@ function TradesEditor({ entry, onChange }: { entry: Entry; onChange: (patch: Par
       {trades.length > 0 && (
         <div className="mt-3 space-y-3">
           {trades.map((t, i) => {
+            const isCollapsed = sectionCollapsed || collapsedIds.has(t.id);
             const isRed = t.pnl.trim().startsWith("-");
             const abs = t.pnl.replace(/^-+/, "").trim();
+            const directionLabel = DIRECTIONS.find((d) => d.key === t.direction)?.label ?? "";
+            const resultLabel = RESULTS.find((r) => r.key === t.result)?.label ?? "";
+
             return (
               <div key={t.id} className="rounded-xl border border-border bg-background p-3">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Trade {i + 1}</p>
-                  <button
-                    type="button"
-                    onClick={() => onChange({ trades: trades.filter((x) => x.id !== t.id), tradeCount: String(trades.length - 1) })}
-                    className="text-xs text-muted-foreground underline underline-offset-4 hover:text-destructive"
-                  >
-                    Remove
-                  </button>
-                </div>
-
-                <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                  <input
-                    type="text"
-                    value={t.instrument}
-                    onChange={(e) => patchTrade(t.id, { instrument: e.target.value })}
-                    placeholder="Pair / instrument (e.g. XAUUSD)"
-                    className="min-h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                  />
-                  <div className="flex flex-wrap items-center gap-2">
-                    {DIRECTIONS.map((d) => (
-                      <button
-                        key={d.key}
-                        type="button"
-                        onClick={() => patchTrade(t.id, { direction: t.direction === d.key ? "" : d.key })}
-                        className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                          t.direction === d.key
-                            ? "border-foreground bg-primary text-primary-foreground"
-                            : "border-border bg-background text-foreground hover:bg-accent"
-                        }`}
-                      >
-                        {d.label}
-                      </button>
-                    ))}
+                <button
+                  type="button"
+                  onClick={() => toggleTrade(t.id)}
+                  className="flex w-full items-center justify-between gap-2 text-left"
+                  aria-expanded={!isCollapsed}
+                >
+                  <div className="flex min-w-0 items-center gap-2">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Trade {i + 1}</p>
+                    {isCollapsed && (
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {t.instrument
+                          ? `${t.instrument}${directionLabel ? ` · ${directionLabel}` : ""}${resultLabel ? ` · ${resultLabel}` : ""}${t.pnl ? ` · ${t.pnl}` : ""}`
+                          : "Tap to expand"}
+                      </span>
+                    )}
                   </div>
-                </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    {isCollapsed && hasPnl({ ...EMPTY, pnl: t.pnl }) && (
+                      <span className={`text-xs font-medium tabular-nums ${toNumber(t.pnl) > 0 ? "text-emerald-500" : toNumber(t.pnl) < 0 ? "text-red-500" : "text-muted-foreground"}`}>
+                        {formatMoney(toNumber(t.pnl))}
+                      </span>
+                    )}
+                    <span className="text-xs text-muted-foreground" aria-hidden>
+                      {isCollapsed ? "›" : "⌄"}
+                    </span>
+                  </div>
+                </button>
 
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  {RESULTS.map((r) => (
-                    <button
-                      key={r.key}
-                      type="button"
-                      onClick={() => patchTrade(t.id, { result: t.result === r.key ? "" : r.key })}
-                      className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                        t.result === r.key
-                          ? "border-foreground bg-primary text-primary-foreground"
-                          : "border-border bg-background text-foreground hover:bg-accent"
-                      }`}
-                    >
-                      {r.label}
-                    </button>
-                  ))}
-                  <span className="ml-auto flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => patchTrade(t.id, { pnl: abs === "" ? "" : abs })}
-                      className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                        !isRed ? "border-emerald-500 bg-emerald-500/15 text-emerald-500" : "border-border bg-background text-muted-foreground hover:bg-accent"
-                      }`}
-                    >
-                      🟢
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => patchTrade(t.id, { pnl: abs === "" ? "-" : `-${abs}` })}
-                      className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                        isRed ? "border-red-500 bg-red-500/15 text-red-500" : "border-border bg-background text-muted-foreground hover:bg-accent"
-                      }`}
-                    >
-                      🔴
-                    </button>
+                {!isCollapsed && (
+                  <div className="mt-3 space-y-3">
+                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                      <input
+                        type="text"
+                        value={t.instrument}
+                        onChange={(e) => patchTrade(t.id, { instrument: e.target.value })}
+                        placeholder="Pair / instrument (e.g. XAUUSD)"
+                        className="min-h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                      />
+                      <div className="flex flex-wrap items-center gap-2">
+                        {DIRECTIONS.map((d) => (
+                          <button
+                            key={d.key}
+                            type="button"
+                            onClick={() => patchTrade(t.id, { direction: t.direction === d.key ? "" : d.key })}
+                            className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                              t.direction === d.key
+                                ? "border-foreground bg-primary text-primary-foreground"
+                                : "border-border bg-background text-foreground hover:bg-accent"
+                            }`}
+                          >
+                            {d.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      {RESULTS.map((r) => (
+                        <button
+                          key={r.key}
+                          type="button"
+                          onClick={() => patchTrade(t.id, { result: t.result === r.key ? "" : r.key })}
+                          className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                            t.result === r.key
+                              ? "border-foreground bg-primary text-primary-foreground"
+                              : "border-border bg-background text-foreground hover:bg-accent"
+                          }`}
+                        >
+                          {r.label}
+                        </button>
+                      ))}
+                      <span className="ml-auto flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => patchTrade(t.id, { pnl: abs === "" ? "" : abs })}
+                          className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                            !isRed ? "border-emerald-500 bg-emerald-500/15 text-emerald-500" : "border-border bg-background text-muted-foreground hover:bg-accent"
+                          }`}
+                        >
+                          🟢
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => patchTrade(t.id, { pnl: abs === "" ? "-" : `-${abs}` })}
+                          className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                            isRed ? "border-red-500 bg-red-500/15 text-red-500" : "border-border bg-background text-muted-foreground hover:bg-accent"
+                          }`}
+                        >
+                          🔴
+                        </button>
+                        <input
+                          type="text"
+                          inputMode="decimal"
+                          value={abs}
+                          onChange={(e) => {
+                            const clean = e.target.value.replace(/[^0-9.]/g, "");
+                            patchTrade(t.id, { pnl: isRed && clean !== "" ? `-${clean}` : clean });
+                          }}
+                          placeholder="PnL $"
+                          className="w-24 rounded-xl border border-input bg-background px-3 py-2 text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                        />
+                      </span>
+                    </div>
+
                     <input
                       type="text"
-                      inputMode="decimal"
-                      value={abs}
-                      onChange={(e) => {
-                        const clean = e.target.value.replace(/[^0-9.]/g, "");
-                        patchTrade(t.id, { pnl: isRed && clean !== "" ? `-${clean}` : clean });
-                      }}
-                      placeholder="PnL $"
-                      className="w-24 rounded-xl border border-input bg-background px-3 py-2 text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                      value={t.note}
+                      onChange={(e) => patchTrade(t.id, { note: e.target.value })}
+                      placeholder="What was the setup / why did you take it?"
+                      className="min-h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                     />
-                  </span>
-                </div>
 
-                <input
-                  type="text"
-                  value={t.note}
-                  onChange={(e) => patchTrade(t.id, { note: e.target.value })}
-                  placeholder="What was the setup / why did you take it?"
-                  className="mt-2 min-h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                />
+                    <button
+                      type="button"
+                      onClick={() => removeTrade(t.id)}
+                      className="text-xs text-muted-foreground underline underline-offset-4 hover:text-destructive"
+                    >
+                      Remove trade
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}
