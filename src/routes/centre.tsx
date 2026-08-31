@@ -6,7 +6,6 @@ import { HomeButton } from "@/components/HomeButton";
 import { displayFirstName } from "@/lib/display-name";
 import { supabase } from "@/integrations/supabase/client";
 import { getHubData, type HubPayload } from "@/lib/hub.functions";
-import { DATA_LABEL } from "@/lib/market-data";
 import { SessionBar } from "@/components/hub/SessionBar";
 import { IndexCards, MagSevenBoard, DowBoard, GoldDesk } from "@/components/hub/MarketBoards";
 import { EconomicCalendar } from "@/components/hub/EconomicCalendar";
