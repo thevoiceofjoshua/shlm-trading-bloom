@@ -595,23 +595,24 @@ function StatsSection({ stats }: { stats: SiteStats }) {
   return (
     <section className="bg-foreground px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
       <div className="mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 items-center gap-10 sm:grid-cols-3 lg:grid-cols-4 lg:gap-0">
-          <div className="flex items-center justify-center sm:col-span-3 lg:col-span-1 lg:justify-start lg:pr-10">
+        <div className="grid grid-cols-3 items-center gap-x-3 gap-y-8 sm:gap-10 lg:grid-cols-4 lg:gap-0">
+          <div className="col-span-3 flex items-center justify-center lg:col-span-1 lg:justify-start lg:pr-10">
             <LiveEnrollmentTile />
           </div>
           {items.map((stat) => (
             <div
               key={typeof stat.label === "string" ? stat.label : "20-off"}
-              className="flex flex-col items-center justify-center text-center lg:border-l lg:border-background/10 lg:pl-10"
+              className="flex min-w-0 flex-col items-center justify-center text-center lg:border-l lg:border-background/10 lg:pl-10"
             >
-              <p className="font-display text-5xl font-medium leading-none tracking-tight text-background sm:text-6xl">
+              <p className="font-display text-2xl font-medium leading-none tracking-tight text-background sm:text-5xl lg:text-6xl">
                 {stat.value}
               </p>
-              <p className="mt-3 text-xs font-medium uppercase tracking-[0.2em] text-background/60">
+              <p className="mt-2 text-[10px] font-medium uppercase leading-snug tracking-[0.14em] text-background/60 sm:mt-3 sm:text-xs sm:tracking-[0.2em]">
                 {stat.label}
               </p>
             </div>
           ))}
+
         </div>
       </div>
     </section>
