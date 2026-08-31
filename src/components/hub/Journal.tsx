@@ -127,7 +127,7 @@ interface StoredEntry {
 
 function parseEntry(body: string, storageKey: string): Entry {
   const fallbackSession = storageKey.split("#")[0] || "ny-open";
-  const base: Entry = { ...EMPTY, session: fallbackSession, ruleChecks: {} };
+  const base: Entry = { ...EMPTY, session: fallbackSession, ruleChecks: {}, trades: [], screenshots: [] };
   if (!body) return base;
   try {
     const parsed = JSON.parse(body);
@@ -137,6 +137,9 @@ function parseEntry(body: string, storageKey: string): Entry {
         ...base,
         ...p,
         session: typeof p.session === "string" && p.session ? p.session : fallbackSession,
+        tradeCount: typeof p.tradeCount === "string" ? p.tradeCount : "",
+        trades: Array.isArray(p.trades) ? (p.trades as Trade[]) : [],
+        screenshots: Array.isArray(p.screenshots) ? (p.screenshots as Shot[]) : [],
         ruleChecks: (p.ruleChecks ?? {}) as Record<string, "followed" | "broken">,
         consequenceAcknowledged: !!p.consequenceAcknowledged,
       };
@@ -147,13 +150,29 @@ function parseEntry(body: string, storageKey: string): Entry {
   return { ...base, notes: body };
 }
 
-function pnlNumber(entry: Entry): number {
-  const n = Number.parseFloat(entry.pnl.replace(/[^0-9.-]/g, ""));
+function toNumber(value: string): number {
+  const n = Number.parseFloat((value ?? "").replace(/[^0-9.-]/g, ""));
   return Number.isFinite(n) ? n : 0;
 }
 
+function tradesWithPnl(entry: Entry): Trade[] {
+  return (entry.trades ?? []).filter((t) => t.pnl.replace(/[^0-9.]/g, "") !== "");
+}
+
+/** Effective PnL: sum of trade rows when any trade carries a number, otherwise the entry field. */
+function pnlNumber(entry: Entry): number {
+  const withPnl = tradesWithPnl(entry);
+  if (withPnl.length > 0) return withPnl.reduce((sum, t) => sum + toNumber(t.pnl), 0);
+  return toNumber(entry.pnl);
+}
+
 function hasPnl(entry: Entry): boolean {
+  if (tradesWithPnl(entry).length > 0) return true;
   return entry.pnl.trim() !== "" && Number.isFinite(Number.parseFloat(entry.pnl.replace(/[^0-9.-]/g, "")));
+}
+
+function newTrade(): Trade {
+  return { id: Math.random().toString(36).slice(2, 10), instrument: "", direction: "", result: "", pnl: "", note: "" };
 }
 
 function formatMoney(n: number): string {
