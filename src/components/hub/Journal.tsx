@@ -482,16 +482,30 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                   </button>
                 );
               })}
-              <button
-                type="button"
-                onClick={() => {
-                  setEditing({ storageKey: "", slot: newSlot(), entry: { ...EMPTY, ruleChecks: {} } });
-                  setDirty(true);
-                }}
-                className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                ＋ Add entry
-              </button>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {SESSIONS.filter((s) => !takenSessions.has(s.key)).map((s) => (
+                  <button
+                    key={s.key}
+                    type="button"
+                    onClick={() => {
+                      setEditing({
+                        storageKey: "",
+                        slot: newSlot(),
+                        entry: { ...EMPTY, session: s.key, ruleChecks: {}, trades: [], screenshots: [] },
+                      });
+                      setDirty(true);
+                    }}
+                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                  >
+                    ＋ {s.label} entry
+                  </button>
+                ))}
+                {SESSIONS.every((s) => takenSessions.has(s.key)) && (
+                  <p className="text-xs text-muted-foreground">
+                    Both sessions are logged for this day — open an entry above to add more trades to it.
+                  </p>
+                )}
+              </div>
             </div>
           ) : (
             <div className="mt-4">
