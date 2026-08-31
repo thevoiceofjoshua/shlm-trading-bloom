@@ -110,9 +110,7 @@ function CentrePage() {
                 <span className="sm:hidden">Journal</span>
               </button>
             )}
-            <span className="hidden text-sm text-muted-foreground sm:inline">
-              {displayFirstName(user?.name, user?.email)}
-            </span>
+            {user && <AccountMenu user={user} scrolled={true} variant="desktop" />}
           </div>
 
         </div>
