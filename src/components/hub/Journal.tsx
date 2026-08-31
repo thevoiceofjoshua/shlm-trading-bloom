@@ -335,8 +335,19 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
           >
             Edit my rules
           </button>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close journal"
+              className="flex size-8 items-center justify-center rounded-full border border-border text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              ✕
+            </button>
+          )}
         </div>
       </div>
+
 
       <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
         {/* Calendar */}
