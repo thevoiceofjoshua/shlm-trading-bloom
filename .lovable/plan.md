@@ -1,8 +1,10 @@
-# Plan: Journal Entry Trade Count + Header Reorder
+# Plan: Journal Trade Count, Header Reorder & Polished Feed Badges
 
 ## Goal
 1. Surface the number of trades taken inside each journal entry card.
-2. Reorder the SHLM Centre header controls so the right-side group reads: Home → Open journal → First name.
+2. Reorder the SHLM Centre header controls so the right-side group reads: Home → Open journal → First name, and remove the journal emoji.
+3. Turn the delayed-feed status line into polished badges showing last update, countdown to next refresh, and delay amount.
+
 
 ## Current State
 - `src/components/hub/Journal.tsx` renders day entries as clickable cards with session name, a "rule broken" flag, a note preview, and PnL. Each entry already stores `trades: Trade[]`.
@@ -30,7 +32,12 @@ In `src/routes/centre.tsx`:
 - Run the build/typecheck and confirm no errors.
 - In the preview, open the journal and confirm entries show the correct trade count and pluralization.
 - Confirm the SHLM Centre header shows Home, then Open journal, then the first name in that order.
+- Confirm the delayed-feed status in the SHLM Centre header is shown as three polished badges:
+  - "Updated 2:02 PM" (last refreshed timestamp)
+  - Countdown to next refresh
+  - "~15 min behind" (delay amount)
 
 ## Out of Scope
+
 - No data-model or backend changes.
 - No changes to the entry editor, rule flow, or modal behavior.
