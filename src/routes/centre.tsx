@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { HomeButton } from "@/components/HomeButton";
+import { displayFirstName } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { getHubData, type HubPayload } from "@/lib/hub.functions";
 import { DATA_LABEL } from "@/lib/market-data";
@@ -31,6 +32,7 @@ function CentrePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState<{ id?: string; email?: string | null; name?: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [journalOpen, setJournalOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -71,10 +73,24 @@ function CentrePage() {
           <Link to="/dashboard" search={{ demo: undefined }} className="font-display text-xl font-semibold tracking-tight">
             ← SHLM Centre
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {user?.id && (
+              <button
+                type="button"
+                onClick={() => setJournalOpen(true)}
+                className="inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                <span aria-hidden>📓</span>
+                <span className="hidden sm:inline">Open journal</span>
+                <span className="sm:hidden">Journal</span>
+              </button>
+            )}
             <HomeButton />
-            <span className="hidden text-sm text-muted-foreground sm:inline">{user?.email}</span>
+            <span className="hidden text-sm text-muted-foreground sm:inline">
+              {displayFirstName(user?.name, user?.email)}
+            </span>
           </div>
+
         </div>
       </header>
 
@@ -109,11 +125,17 @@ function CentrePage() {
             <GoldDesk payload={payload} />
 
             <EconomicCalendar payload={payload} />
-
-            {user?.id && <Journal userId={user.id} />}
           </div>
         )}
       </main>
+
+      {journalOpen && user?.id && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/80 p-3 backdrop-blur-sm sm:p-6">
+          <div className="w-full max-w-5xl">
+            <Journal userId={user.id} onClose={() => setJournalOpen(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

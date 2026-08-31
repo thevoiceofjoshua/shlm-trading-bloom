@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-r
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { displayFirstName } from "@/lib/utils";
 import { HomeButton } from "@/components/HomeButton";
 import { AdminPreviewTag } from "@/components/AdminBar";
 import { useAdminMode } from "@/hooks/use-admin-mode";
@@ -75,7 +76,7 @@ function DashboardPage() {
           <div className="flex items-center gap-3">
             <HomeButton />
             <span className="hidden text-sm text-muted-foreground sm:inline">
-              {user?.email}
+              {displayFirstName(user?.name, user?.email)}
             </span>
             <button
               type="button"

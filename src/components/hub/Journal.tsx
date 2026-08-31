@@ -9,6 +9,7 @@ import {
   saveMemberRules,
   type MemberRule,
 } from "@/lib/hub.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 /* ------------------------------ date helpers ------------------------------- */
 
@@ -41,9 +42,25 @@ function sessionLabel(key: string): string {
 
 /* ------------------------------ entry model ------------------------------- */
 
+interface Trade {
+  id: string;
+  instrument: string;
+  direction: string; // "long" | "short" | ""
+  result: string; // "win" | "loss" | "breakeven" | ""
+  pnl: string; // signed value, e.g. "-120"
+  note: string;
+}
+
+interface Shot {
+  path: string;
+}
+
 interface Entry {
   session: string;
   pnl: string;
+  tradeCount: string;
+  trades: Trade[];
+  screenshots: Shot[];
   bias: string;
   levels: string;
   wentWell: string;
@@ -59,6 +76,9 @@ interface Entry {
 const EMPTY: Entry = {
   session: "ny-open",
   pnl: "",
+  tradeCount: "",
+  trades: [],
+  screenshots: [],
   bias: "",
   levels: "",
   wentWell: "",
@@ -70,6 +90,16 @@ const EMPTY: Entry = {
   ruleChecks: {},
   consequenceAcknowledged: false,
 };
+
+const DIRECTIONS = [
+  { key: "long", label: "📈 Long" },
+  { key: "short", label: "📉 Short" },
+];
+const RESULTS = [
+  { key: "win", label: "🟢 Win" },
+  { key: "loss", label: "🔴 Loss" },
+  { key: "breakeven", label: "⚪ BE" },
+];
 
 const BIASES = [
   { key: "long", label: "📈 Long" },
@@ -98,7 +128,7 @@ interface StoredEntry {
 
 function parseEntry(body: string, storageKey: string): Entry {
   const fallbackSession = storageKey.split("#")[0] || "ny-open";
-  const base: Entry = { ...EMPTY, session: fallbackSession, ruleChecks: {} };
+  const base: Entry = { ...EMPTY, session: fallbackSession, ruleChecks: {}, trades: [], screenshots: [] };
   if (!body) return base;
   try {
     const parsed = JSON.parse(body);
@@ -108,6 +138,9 @@ function parseEntry(body: string, storageKey: string): Entry {
         ...base,
         ...p,
         session: typeof p.session === "string" && p.session ? p.session : fallbackSession,
+        tradeCount: typeof p.tradeCount === "string" ? p.tradeCount : "",
+        trades: Array.isArray(p.trades) ? (p.trades as Trade[]) : [],
+        screenshots: Array.isArray(p.screenshots) ? (p.screenshots as Shot[]) : [],
         ruleChecks: (p.ruleChecks ?? {}) as Record<string, "followed" | "broken">,
         consequenceAcknowledged: !!p.consequenceAcknowledged,
       };
@@ -118,13 +151,29 @@ function parseEntry(body: string, storageKey: string): Entry {
   return { ...base, notes: body };
 }
 
-function pnlNumber(entry: Entry): number {
-  const n = Number.parseFloat(entry.pnl.replace(/[^0-9.-]/g, ""));
+function toNumber(value: string): number {
+  const n = Number.parseFloat((value ?? "").replace(/[^0-9.-]/g, ""));
   return Number.isFinite(n) ? n : 0;
 }
 
+function tradesWithPnl(entry: Entry): Trade[] {
+  return (entry.trades ?? []).filter((t) => t.pnl.replace(/[^0-9.]/g, "") !== "");
+}
+
+/** Effective PnL: sum of trade rows when any trade carries a number, otherwise the entry field. */
+function pnlNumber(entry: Entry): number {
+  const withPnl = tradesWithPnl(entry);
+  if (withPnl.length > 0) return withPnl.reduce((sum, t) => sum + toNumber(t.pnl), 0);
+  return toNumber(entry.pnl);
+}
+
 function hasPnl(entry: Entry): boolean {
+  if (tradesWithPnl(entry).length > 0) return true;
   return entry.pnl.trim() !== "" && Number.isFinite(Number.parseFloat(entry.pnl.replace(/[^0-9.-]/g, "")));
+}
+
+function newTrade(): Trade {
+  return { id: Math.random().toString(36).slice(2, 10), instrument: "", direction: "", result: "", pnl: "", note: "" };
 }
 
 function formatMoney(n: number): string {
@@ -144,7 +193,7 @@ function newSlot(): string {
 
 /* -------------------------------- component ------------------------------- */
 
-export function Journal({ userId }: { userId: string }) {
+export function Journal({ userId, onClose }: { userId: string; onClose?: () => void }) {
   const todayKey = toKey(new Date());
   const [cursor, setCursor] = useState(() => {
     const n = new Date();
@@ -256,6 +305,7 @@ export function Journal({ userId }: { userId: string }) {
 
   const dayEntries = byDay.get(selected) ?? [];
   const dayTotal = dayEntries.reduce((sum, e) => sum + pnlNumber(e.entry), 0);
+  const takenSessions = new Set(dayEntries.map((e) => e.entry.session));
 
   const needsSetup = !rulesLoading && !(rulebook?.configured ?? false);
 
@@ -287,8 +337,19 @@ export function Journal({ userId }: { userId: string }) {
           >
             Edit my rules
           </button>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close journal"
+              className="flex size-8 items-center justify-center rounded-full border border-border text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              ✕
+            </button>
+          )}
         </div>
       </div>
+
 
       <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
         {/* Calendar */}
@@ -423,34 +484,53 @@ export function Journal({ userId }: { userId: string }) {
                   </button>
                 );
               })}
-              <button
-                type="button"
-                onClick={() => {
-                  setEditing({ storageKey: "", slot: newSlot(), entry: { ...EMPTY, ruleChecks: {} } });
-                  setDirty(true);
-                }}
-                className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                ＋ Add entry
-              </button>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {SESSIONS.filter((s) => !takenSessions.has(s.key)).map((s) => (
+                  <button
+                    key={s.key}
+                    type="button"
+                    onClick={() => {
+                      setEditing({
+                        storageKey: "",
+                        slot: newSlot(),
+                        entry: { ...EMPTY, session: s.key, ruleChecks: {}, trades: [], screenshots: [] },
+                      });
+                      setDirty(true);
+                    }}
+                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                  >
+                    ＋ {s.label} entry
+                  </button>
+                ))}
+                {SESSIONS.every((s) => takenSessions.has(s.key)) && (
+                  <p className="text-xs text-muted-foreground">
+                    Both sessions are logged for this day — open an entry above to add more trades to it.
+                  </p>
+                )}
+              </div>
             </div>
           ) : (
             <div className="mt-4">
               <div className="flex flex-wrap items-center gap-2">
-                {SESSIONS.map((s) => (
-                  <button
-                    key={s.key}
-                    type="button"
-                    onClick={() => setField("session", s.key)}
-                    className={`min-h-9 rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
-                      editing.entry.session === s.key
-                        ? "border-foreground bg-primary text-primary-foreground"
-                        : "border-border bg-background text-foreground hover:bg-accent"
-                    }`}
-                  >
-                    {s.label}
-                  </button>
-                ))}
+                {SESSIONS.map((s) => {
+                  const active = editing.entry.session === s.key;
+                  const takenByOther = !active && dayEntries.some((e) => e.entry.session === s.key && e.storageKey !== editing.storageKey);
+                  return (
+                    <button
+                      key={s.key}
+                      type="button"
+                      disabled={takenByOther}
+                      onClick={() => setField("session", s.key)}
+                      className={`min-h-9 rounded-full border px-4 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                        active
+                          ? "border-foreground bg-primary text-primary-foreground"
+                          : "border-border bg-background text-foreground hover:bg-accent"
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  );
+                })}
                 <button
                   type="button"
                   onClick={() => {
@@ -515,7 +595,21 @@ export function Journal({ userId }: { userId: string }) {
                       </div>
                     );
                   })()}
+                  {tradesWithPnl(editing.entry).length > 0 && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Session total is summed from your trades below: {formatMoney(pnlNumber(editing.entry))}
+                    </p>
+                  )}
                 </div>
+
+                <TradesEditor
+                  entry={editing.entry}
+                  onChange={(patch) => {
+                    setEditing((prev) => (prev ? { ...prev, entry: { ...prev.entry, ...patch } } : prev));
+                    setDirty(true);
+                  }}
+                />
+
 
                 {rules.length > 0 && (
                   <div>
@@ -569,6 +663,15 @@ export function Journal({ userId }: { userId: string }) {
                 <PillField label="📈 Session outcome" options={OUTCOMES} value={editing.entry.outcome} onChange={(v) => setField("outcome", v)} />
                 <TextField label="📝 One rule for tomorrow" placeholder="No entries in the first 5 minutes of the open." value={editing.entry.rule} onChange={(v) => setField("rule", v)} />
                 <TextField label="🗒️ Free notes" placeholder="Anything else worth remembering about this session…" value={editing.entry.notes} onChange={(v) => setField("notes", v)} rows={4} />
+
+                <Screenshots
+                  userId={userId}
+                  shots={editing.entry.screenshots ?? []}
+                  onChange={(shots) => {
+                    setEditing((prev) => (prev ? { ...prev, entry: { ...prev.entry, screenshots: shots } } : prev));
+                    setDirty(true);
+                  }}
+                />
               </div>
 
               <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -812,6 +915,281 @@ function TextField({
         placeholder={placeholder}
         className="mt-2 w-full resize-y rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
       />
+    </div>
+  );
+}
+
+/* -------------------------------- trades ---------------------------------- */
+
+function TradesEditor({ entry, onChange }: { entry: Entry; onChange: (patch: Partial<Entry>) => void }) {
+  const trades = entry.trades ?? [];
+
+  const setCount = (count: number) => {
+    const next = [...trades];
+    while (next.length < count) next.push(newTrade());
+    onChange({ tradeCount: String(count), trades: next.slice(0, count) });
+  };
+
+  const patchTrade = (id: string, patch: Partial<Trade>) => {
+    onChange({ trades: trades.map((t) => (t.id === id ? { ...t, ...patch } : t)) });
+  };
+
+  return (
+    <div>
+      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        📊 How many trades did you take this session?
+      </p>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        {[0, 1, 2, 3, 4, 5, 6].map((n) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => setCount(n)}
+            className={`min-h-9 min-w-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+              entry.tradeCount === String(n)
+                ? "border-foreground bg-primary text-primary-foreground"
+                : "border-border bg-background text-foreground hover:bg-accent"
+            }`}
+          >
+            {n === 0 ? "None" : n}
+          </button>
+        ))}
+        {trades.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setCount(trades.length + 1)}
+            className="min-h-9 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            ＋ one more
+          </button>
+        )}
+      </div>
+
+      {trades.length > 0 && (
+        <div className="mt-3 space-y-3">
+          {trades.map((t, i) => {
+            const isRed = t.pnl.trim().startsWith("-");
+            const abs = t.pnl.replace(/^-+/, "").trim();
+            return (
+              <div key={t.id} className="rounded-xl border border-border bg-background p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Trade {i + 1}</p>
+                  <button
+                    type="button"
+                    onClick={() => onChange({ trades: trades.filter((x) => x.id !== t.id), tradeCount: String(trades.length - 1) })}
+                    className="text-xs text-muted-foreground underline underline-offset-4 hover:text-destructive"
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  <input
+                    type="text"
+                    value={t.instrument}
+                    onChange={(e) => patchTrade(t.id, { instrument: e.target.value })}
+                    placeholder="Pair / instrument (e.g. XAUUSD)"
+                    className="min-h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  />
+                  <div className="flex flex-wrap items-center gap-2">
+                    {DIRECTIONS.map((d) => (
+                      <button
+                        key={d.key}
+                        type="button"
+                        onClick={() => patchTrade(t.id, { direction: t.direction === d.key ? "" : d.key })}
+                        className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                          t.direction === d.key
+                            ? "border-foreground bg-primary text-primary-foreground"
+                            : "border-border bg-background text-foreground hover:bg-accent"
+                        }`}
+                      >
+                        {d.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  {RESULTS.map((r) => (
+                    <button
+                      key={r.key}
+                      type="button"
+                      onClick={() => patchTrade(t.id, { result: t.result === r.key ? "" : r.key })}
+                      className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        t.result === r.key
+                          ? "border-foreground bg-primary text-primary-foreground"
+                          : "border-border bg-background text-foreground hover:bg-accent"
+                      }`}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                  <span className="ml-auto flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => patchTrade(t.id, { pnl: abs === "" ? "" : abs })}
+                      className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        !isRed ? "border-emerald-500 bg-emerald-500/15 text-emerald-500" : "border-border bg-background text-muted-foreground hover:bg-accent"
+                      }`}
+                    >
+                      🟢
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => patchTrade(t.id, { pnl: abs === "" ? "-" : `-${abs}` })}
+                      className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        isRed ? "border-red-500 bg-red-500/15 text-red-500" : "border-border bg-background text-muted-foreground hover:bg-accent"
+                      }`}
+                    >
+                      🔴
+                    </button>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={abs}
+                      onChange={(e) => {
+                        const clean = e.target.value.replace(/[^0-9.]/g, "");
+                        patchTrade(t.id, { pnl: isRed && clean !== "" ? `-${clean}` : clean });
+                      }}
+                      placeholder="PnL $"
+                      className="w-24 rounded-xl border border-input bg-background px-3 py-2 text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                    />
+                  </span>
+                </div>
+
+                <input
+                  type="text"
+                  value={t.note}
+                  onChange={(e) => patchTrade(t.id, { note: e.target.value })}
+                  placeholder="What was the setup / why did you take it?"
+                  className="mt-2 min-h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------ screenshots -------------------------------- */
+
+function Screenshots({
+  userId,
+  shots,
+  onChange,
+}: {
+  userId: string;
+  shots: Shot[];
+  onChange: (shots: Shot[]) => void;
+}) {
+  const [urls, setUrls] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    const missing = shots.map((s) => s.path).filter((p) => !urls[p]);
+    if (missing.length === 0) return;
+    (async () => {
+      const { data } = await supabase.storage.from("journal-shots").createSignedUrls(missing, 3600);
+      if (!active || !data) return;
+      setUrls((prev) => {
+        const next = { ...prev };
+        for (const item of data) {
+          if (item.path && item.signedUrl) next[item.path] = item.signedUrl;
+        }
+        return next;
+      });
+    })();
+    return () => {
+      active = false;
+    };
+  }, [shots, urls]);
+
+  const upload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    setError(null);
+    const added: Shot[] = [];
+    for (const file of Array.from(files)) {
+      const ext = (file.name.split(".").pop() || "png").toLowerCase();
+      const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("journal-shots").upload(path, file, {
+        contentType: file.type || "image/png",
+        upsert: false,
+      });
+      if (upErr) {
+        setError(upErr.message);
+        continue;
+      }
+      added.push({ path });
+    }
+    setUploading(false);
+    if (added.length > 0) onChange([...shots, ...added]);
+  };
+
+  const remove = async (path: string) => {
+    onChange(shots.filter((s) => s.path !== path));
+    await supabase.storage.from("journal-shots").remove([path]);
+  };
+
+  return (
+    <div>
+      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">🖼️ Screenshots</p>
+      <p className="mt-1 text-xs text-muted-foreground">Attach your charts or executions for this session.</p>
+
+      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {shots.map((s) => (
+          <div key={s.path} className="group relative overflow-hidden rounded-xl border border-border bg-background">
+            {urls[s.path] ? (
+              <button type="button" onClick={() => setLightbox(urls[s.path]!)} className="block h-28 w-full">
+                <img src={urls[s.path]} alt="Journal screenshot" className="h-28 w-full object-cover" loading="lazy" />
+              </button>
+            ) : (
+              <div className="flex h-28 w-full items-center justify-center text-xs text-muted-foreground">Loading…</div>
+            )}
+            <button
+              type="button"
+              onClick={() => remove(s.path)}
+              aria-label="Remove screenshot"
+              className="absolute right-1.5 top-1.5 flex size-7 items-center justify-center rounded-full border border-border bg-background/90 text-xs text-muted-foreground hover:text-destructive"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+
+        <label className="flex h-28 cursor-pointer items-center justify-center rounded-xl border border-dashed border-border bg-background text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+          {uploading ? "Uploading…" : "＋ Add screenshot"}
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            className="sr-only"
+            disabled={uploading}
+            onChange={(e) => {
+              void upload(e.target.files);
+              e.target.value = "";
+            }}
+          />
+        </label>
+      </div>
+
+      {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
+
+      {lightbox && (
+        <button
+          type="button"
+          onClick={() => setLightbox(null)}
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-background/95 p-6"
+          aria-label="Close screenshot"
+        >
+          <img src={lightbox} alt="Journal screenshot" className="max-h-full max-w-full rounded-2xl object-contain" />
+        </button>
+      )}
     </div>
   );
 }
