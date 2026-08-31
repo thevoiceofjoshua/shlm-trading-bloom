@@ -41,9 +41,25 @@ function sessionLabel(key: string): string {
 
 /* ------------------------------ entry model ------------------------------- */
 
+interface Trade {
+  id: string;
+  instrument: string;
+  direction: string; // "long" | "short" | ""
+  result: string; // "win" | "loss" | "breakeven" | ""
+  pnl: string; // signed value, e.g. "-120"
+  note: string;
+}
+
+interface Shot {
+  path: string;
+}
+
 interface Entry {
   session: string;
   pnl: string;
+  tradeCount: string;
+  trades: Trade[];
+  screenshots: Shot[];
   bias: string;
   levels: string;
   wentWell: string;
@@ -59,6 +75,9 @@ interface Entry {
 const EMPTY: Entry = {
   session: "ny-open",
   pnl: "",
+  tradeCount: "",
+  trades: [],
+  screenshots: [],
   bias: "",
   levels: "",
   wentWell: "",
@@ -70,6 +89,16 @@ const EMPTY: Entry = {
   ruleChecks: {},
   consequenceAcknowledged: false,
 };
+
+const DIRECTIONS = [
+  { key: "long", label: "📈 Long" },
+  { key: "short", label: "📉 Short" },
+];
+const RESULTS = [
+  { key: "win", label: "🟢 Win" },
+  { key: "loss", label: "🔴 Loss" },
+  { key: "breakeven", label: "⚪ BE" },
+];
 
 const BIASES = [
   { key: "long", label: "📈 Long" },
