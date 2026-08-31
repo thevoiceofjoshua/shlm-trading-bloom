@@ -9,6 +9,7 @@
 export const DATA_STATE = "sample" as const;
 export const DATA_LABEL: Record<string, string> = {
   sample: "Sample data — live feed coming soon",
+  delayed: "Delayed feed — prices refresh every 60s (~15 min behind)",
   live: "Live",
 };
 
