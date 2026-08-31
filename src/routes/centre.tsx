@@ -127,11 +127,17 @@ function CentrePage() {
             <GoldDesk payload={payload} />
 
             <EconomicCalendar payload={payload} />
-
-            {user?.id && <Journal userId={user.id} />}
           </div>
         )}
       </main>
+
+      {journalOpen && user?.id && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/80 p-3 backdrop-blur-sm sm:p-6">
+          <div className="w-full max-w-5xl">
+            <Journal userId={user.id} onClose={() => setJournalOpen(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
