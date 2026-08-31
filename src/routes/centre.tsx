@@ -50,7 +50,7 @@ export const Route = createFileRoute("/centre")({
 
 function CentrePage() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<{ id?: string; email?: string | null; name?: string | null } | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [journalOpen, setJournalOpen] = useState(false);
 
@@ -60,11 +60,13 @@ function CentrePage() {
         navigate({ to: "/auth", search: { mode: "signin", redirect: "/centre" }, replace: true });
         return;
       }
-      setUser({
-        id: data.session.user.id,
-        email: data.session.user.email,
-        name: data.session.user.user_metadata?.full_name ?? data.session.user.user_metadata?.name ?? null,
-      });
+      setUser(
+        deriveHeaderUser(
+          data.session.user.id,
+          data.session.user.email,
+          (data.session.user.user_metadata?.full_name ?? data.session.user.user_metadata?.name) as string | undefined,
+        ),
+      );
       setLoading(false);
     });
   }, [navigate]);
