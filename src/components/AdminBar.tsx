@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { displayFirstName } from "@/lib/utils";
+import { displayFirstName } from "@/lib/display-name";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 
 const fullLinks = [

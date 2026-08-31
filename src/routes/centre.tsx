@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { HomeButton } from "@/components/HomeButton";
-import { displayFirstName } from "@/lib/utils";
+import { displayFirstName } from "@/lib/display-name";
 import { supabase } from "@/integrations/supabase/client";
 import { getHubData, type HubPayload } from "@/lib/hub.functions";
 import { DATA_LABEL } from "@/lib/market-data";
