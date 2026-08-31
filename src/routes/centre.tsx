@@ -108,20 +108,7 @@ function CentrePage() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="font-display text-3xl font-medium tracking-tight">SHLM Centre</h1>
-                <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                  {payload.dataState === "delayed" && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium uppercase tracking-widest text-emerald-500">
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                      Delayed live
-                    </span>
-                  )}
-                  <span>{DATA_LABEL[payload.dataState]}</span>
-                  {payload.fetchedAt && (
-                    <span className="text-xs text-muted-foreground/70">
-                      Updated {new Date(payload.fetchedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
-                    </span>
-                  )}
-                </p>
+                <FeedBadges payload={payload} dataUpdatedAt={dataUpdatedAt || Date.now()} />
               </div>
               {payload.access.isAdmin && !payload.access.memberAccess && <AdminPreviewTag />}
             </div>
