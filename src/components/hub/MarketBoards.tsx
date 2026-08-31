@@ -168,19 +168,20 @@ function MacroTile({ macro }: { macro: HubPayload["dowMacro"][number] }) {
 export function GoldDesk({ payload }: { payload: HubPayload }) {
   const g = payload.gold;
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">XAU/USD</p>
-          <h3 className="font-display text-lg font-medium">Gold desk</h3>
+    <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-xs uppercase tracking-widest text-muted-foreground">XAU/USD</p>
+          <h3 className="truncate font-display text-lg font-medium">Gold desk</h3>
         </div>
-        <span className={`text-sm font-medium ${changeColor(g.changePct)}`}>
+        <span className={`shrink-0 whitespace-nowrap text-right text-xs font-medium sm:text-sm ${changeColor(g.changePct)}`}>
           {g.change >= 0 ? "+" : ""}
           {g.change.toFixed(1)} ({g.changePct >= 0 ? "+" : ""}
           {g.changePct}%)
         </span>
       </div>
-      <p className="mt-3 font-display text-3xl font-medium tabular-nums">{g.price.toFixed(1)}</p>
+      <p className="mt-3 font-display text-[1.75rem] font-medium tabular-nums sm:text-3xl">{g.price.toFixed(1)}</p>
+
       <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
         <span>H {g.dayHigh.toFixed(1)}</span>
         <span>L {g.dayLow.toFixed(1)}</span>
