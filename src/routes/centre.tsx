@@ -51,7 +51,7 @@ function CentrePage() {
 
   const { viewAsMember } = useAdminMode();
   const fetchHub = useServerFn(getHubData);
-  const { data: payload, isLoading } = useQuery({
+  const { data: payload, isLoading, dataUpdatedAt } = useQuery({
     queryKey: ["hub-data", viewAsMember],
     queryFn: () => fetchHub({ data: { asMember: viewAsMember } }),
     enabled: !loading,
