@@ -23,8 +23,10 @@ In `src/routes/centre.tsx`:
   2. "Open journal" button
   3. First-name greeting
 - Preserve existing responsive labels ("Journal" on small screens, "Open journal" on `sm`+).
+- Remove the notebook emoji from the "Open journal" button in the same header group.
 
 ## Verification
+
 - Run the build/typecheck and confirm no errors.
 - In the preview, open the journal and confirm entries show the correct trade count and pluralization.
 - Confirm the SHLM Centre header shows Home, then Open journal, then the first name in that order.
