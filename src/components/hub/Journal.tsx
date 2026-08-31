@@ -662,6 +662,15 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                 <PillField label="📈 Session outcome" options={OUTCOMES} value={editing.entry.outcome} onChange={(v) => setField("outcome", v)} />
                 <TextField label="📝 One rule for tomorrow" placeholder="No entries in the first 5 minutes of the open." value={editing.entry.rule} onChange={(v) => setField("rule", v)} />
                 <TextField label="🗒️ Free notes" placeholder="Anything else worth remembering about this session…" value={editing.entry.notes} onChange={(v) => setField("notes", v)} rows={4} />
+
+                <Screenshots
+                  userId={userId}
+                  shots={editing.entry.screenshots ?? []}
+                  onChange={(shots) => {
+                    setEditing((prev) => (prev ? { ...prev, entry: { ...prev.entry, screenshots: shots } } : prev));
+                    setDirty(true);
+                  }}
+                />
               </div>
 
               <div className="mt-5 flex flex-wrap items-center gap-3">
