@@ -33,30 +33,29 @@ export function SessionBar({ payload }: { payload: HubPayload }) {
 
 
 
-      {marketsClosed && nextNote ? (
+      {marketsClosed && nextNote && (
         <div className="mt-4 rounded-lg border border-border bg-surface px-4 py-3 text-sm text-muted-foreground">
           {nextNote}
         </div>
-
-      ) : (
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          {sessions.map((s) => (
-            <div
-              key={s.key}
-              className={`flex items-center justify-between rounded-lg border px-4 py-2.5 text-sm ${
-                s.state === "open"
-                  ? "border-foreground bg-primary text-primary-foreground"
-                  : "border-border bg-surface text-foreground"
-              }`}
-            >
-              <span className="font-medium">{s.label}</span>
-              <span className="ml-3 text-xs opacity-80">
-                {s.state === "open" ? "● Live now" : s.countdown ?? "Closed"}
-              </span>
-            </div>
-          ))}
-        </div>
       )}
+
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        {sessions.map((s) => (
+          <div
+            key={s.key}
+            className={`flex items-center justify-between rounded-lg border px-4 py-2.5 text-sm ${
+              s.state === "open"
+                ? "border-foreground bg-primary text-primary-foreground"
+                : "border-border bg-surface text-foreground"
+            }`}
+          >
+            <span className="font-medium">{s.label}</span>
+            <span className="ml-3 text-xs opacity-80">
+              {s.state === "open" ? "● Live now" : s.countdown ?? "Closed"}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
