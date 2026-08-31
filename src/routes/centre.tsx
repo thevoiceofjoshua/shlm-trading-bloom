@@ -77,18 +77,17 @@ function CentrePage() {
             ← SHLM Centre
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
+            <HomeButton />
             {user?.id && (
               <button
                 type="button"
                 onClick={() => setJournalOpen(true)}
                 className="inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
-                <span aria-hidden>📓</span>
                 <span className="hidden sm:inline">Open journal</span>
                 <span className="sm:hidden">Journal</span>
               </button>
             )}
-            <HomeButton />
             <span className="hidden text-sm text-muted-foreground sm:inline">
               {displayFirstName(user?.name, user?.email)}
             </span>
