@@ -482,9 +482,6 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                         <span aria-hidden className="h-1 w-1 rounded-full bg-muted-foreground" />
                         {tradeCountLabel(e.entry)}
                       </span>
-                      <span className="block truncate text-xs text-muted-foreground">
-                        {e.entry.notes || e.entry.levels || e.entry.wentWell || "Tap to open"}
-                      </span>
                     </span>
                     {hasPnl(e.entry) && (
                       <span className={`shrink-0 text-sm font-medium tabular-nums ${n > 0 ? "text-emerald-500" : n < 0 ? "text-red-500" : "text-muted-foreground"}`}>
