@@ -367,7 +367,7 @@ function Header({
 
 function HeroSection({ stats }: { stats: SiteStats }) {
   return (
-    <section className="dark relative flex min-h-screen items-center justify-center overflow-hidden bg-background">
+    <section className="dark relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-background">
       <div className="absolute inset-0">
         <img
           src={heroBg}
