@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { HomeButton } from "@/components/HomeButton";
-import { displayFirstName } from "@/lib/display-name";
+import { AccountMenu } from "@/components/AccountMenu";
+import type { AuthUser } from "@/hooks/use-auth-user";
 import { supabase } from "@/integrations/supabase/client";
 import { getHubData, type HubPayload } from "@/lib/hub.functions";
 import { SessionBar } from "@/components/hub/SessionBar";
@@ -13,6 +14,26 @@ import { Journal } from "@/components/hub/Journal";
 import { SessionAnalyst } from "@/components/hub/SessionAnalyst";
 import { AdminPreviewTag } from "@/components/AdminBar";
 import { useAdminMode } from "@/hooks/use-admin-mode";
+
+function deriveHeaderUser(
+  id: string,
+  email: string | null | undefined,
+  name: string | null | undefined,
+): AuthUser {
+  const display = (name ?? email?.split("@")[0] ?? "there").trim();
+  const parts = display.split(/[\s._\-+0-9]+/).filter(Boolean);
+  const firstName = parts[0] ?? display;
+  const initials =
+    (parts[0]?.[0]?.toUpperCase() ?? "") +
+    (parts.length > 1 ? (parts[parts.length - 1]?.[0]?.toUpperCase() ?? "") : "");
+  return {
+    id,
+    email: email ?? null,
+    name: name ?? null,
+    firstName: firstName.charAt(0).toUpperCase() + firstName.slice(1),
+    initials: initials || (email?.[0]?.toUpperCase() ?? "U"),
+  };
+}
 
 export const Route = createFileRoute("/centre")({
   component: CentrePage,
