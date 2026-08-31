@@ -511,20 +511,25 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
           ) : (
             <div className="mt-4">
               <div className="flex flex-wrap items-center gap-2">
-                {SESSIONS.map((s) => (
-                  <button
-                    key={s.key}
-                    type="button"
-                    onClick={() => setField("session", s.key)}
-                    className={`min-h-9 rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
-                      editing.entry.session === s.key
-                        ? "border-foreground bg-primary text-primary-foreground"
-                        : "border-border bg-background text-foreground hover:bg-accent"
-                    }`}
-                  >
-                    {s.label}
-                  </button>
-                ))}
+                {SESSIONS.map((s) => {
+                  const active = editing.entry.session === s.key;
+                  const takenByOther = !active && dayEntries.some((e) => e.entry.session === s.key && e.storageKey !== editing.storageKey);
+                  return (
+                    <button
+                      key={s.key}
+                      type="button"
+                      disabled={takenByOther}
+                      onClick={() => setField("session", s.key)}
+                      className={`min-h-9 rounded-full border px-4 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                        active
+                          ? "border-foreground bg-primary text-primary-foreground"
+                          : "border-border bg-background text-foreground hover:bg-accent"
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  );
+                })}
                 <button
                   type="button"
                   onClick={() => {
