@@ -31,6 +31,7 @@ function CentrePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState<{ id?: string; email?: string | null; name?: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [journalOpen, setJournalOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
