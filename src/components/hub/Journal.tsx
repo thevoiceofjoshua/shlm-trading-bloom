@@ -183,6 +183,12 @@ function formatMoney(n: number): string {
   return `${sign}$${body}`;
 }
 
+function tradeCountLabel(entry: Entry): string {
+  const count = entry.trades?.length ?? 0;
+  if (count === 0) return "No trades";
+  return `${count} trade${count === 1 ? "" : "s"}`;
+}
+
 function brokenRules(entry: Entry, rules: MemberRule[]): MemberRule[] {
   return rules.filter((r) => entry.ruleChecks[r.id] === "broken");
 }
