@@ -304,6 +304,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
 
   const dayEntries = byDay.get(selected) ?? [];
   const dayTotal = dayEntries.reduce((sum, e) => sum + pnlNumber(e.entry), 0);
+  const takenSessions = new Set(dayEntries.map((e) => e.entry.session));
 
   const needsSetup = !rulesLoading && !(rulebook?.configured ?? false);
 
