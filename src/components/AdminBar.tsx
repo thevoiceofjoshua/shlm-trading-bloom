@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
+import { displayFirstName } from "@/lib/utils";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 
 const fullLinks = [
@@ -105,7 +106,7 @@ export function AdminBar() {
         {details && (
           <div className="mt-2 space-y-3 rounded-[18px] border border-border bg-background/60 p-3">
             <div className="space-y-0.5">
-              {email && <p className="truncate text-xs text-foreground">{email}</p>}
+              {email && <p className="truncate text-xs text-foreground">{displayFirstName(null, email)}</p>}
               <p className="truncate text-[11px] text-muted-foreground">{pathname}</p>
             </div>
 
