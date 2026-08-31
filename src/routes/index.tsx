@@ -367,7 +367,7 @@ function Header({
 
 function HeroSection({ stats }: { stats: SiteStats }) {
   return (
-    <section className="dark relative flex min-h-screen items-center justify-center overflow-hidden bg-background">
+    <section className="dark relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-background">
       <div className="absolute inset-0">
         <img
           src={heroBg}
@@ -393,11 +393,11 @@ function HeroSection({ stats }: { stats: SiteStats }) {
         <div className="absolute left-3/4 top-[calc(50%+12px)] h-px w-3 bg-white/20" />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-36 pt-28 text-center sm:px-6 sm:pb-32 sm:pt-32 lg:px-8">
-        <h1 className="animate-hero-pulse inline-block text-balance font-display text-[clamp(4.5rem,17vw,12rem)] font-medium leading-[0.85] tracking-[0.05em] text-white [will-change:transform]">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-24 pt-24 text-center sm:px-6 sm:pb-32 sm:pt-32 lg:px-8">
+        <h1 className="animate-hero-pulse inline-block text-balance font-display text-[clamp(3.75rem,13vw,12rem)] font-medium leading-[0.85] tracking-[0.04em] text-white [will-change:transform] sm:tracking-[0.05em]">
           SHLM
         </h1>
-        <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+        <div className="mt-7 flex flex-col items-stretch justify-center gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
           <a
             href="#pricing"
             className="flex min-h-12 items-center justify-center rounded-full bg-white px-7 text-sm font-semibold text-black transition-transform hover:scale-[1.02] hover:bg-white/90 sm:min-h-0 sm:py-3.5"
@@ -412,11 +412,12 @@ function HeroSection({ stats }: { stats: SiteStats }) {
             <span className="transition-transform group-hover:translate-x-0.5">→</span>
           </a>
         </div>
-        <div className="mt-10 flex items-center justify-center sm:mt-12">
+        <div className="mt-7 flex items-center justify-center sm:mt-12">
           <LiveEnrollmentTicker />
         </div>
 
       </div>
+
 
       {/* Social links — bottom left */}
       <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3 sm:bottom-8 sm:left-6 sm:translate-x-0 lg:left-8">
@@ -594,23 +595,24 @@ function StatsSection({ stats }: { stats: SiteStats }) {
   return (
     <section className="bg-foreground px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
       <div className="mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 items-center gap-10 sm:grid-cols-3 lg:grid-cols-4 lg:gap-0">
-          <div className="flex items-center justify-center sm:col-span-3 lg:col-span-1 lg:justify-start lg:pr-10">
+        <div className="grid grid-cols-3 items-center gap-x-3 gap-y-8 sm:gap-10 lg:grid-cols-4 lg:gap-0">
+          <div className="col-span-3 flex items-center justify-center lg:col-span-1 lg:justify-start lg:pr-10">
             <LiveEnrollmentTile />
           </div>
           {items.map((stat) => (
             <div
               key={typeof stat.label === "string" ? stat.label : "20-off"}
-              className="flex flex-col items-center justify-center text-center lg:border-l lg:border-background/10 lg:pl-10"
+              className="flex min-w-0 flex-col items-center justify-center text-center lg:border-l lg:border-background/10 lg:pl-10"
             >
-              <p className="font-display text-5xl font-medium leading-none tracking-tight text-background sm:text-6xl">
+              <p className="font-display text-2xl font-medium leading-none tracking-tight text-background sm:text-5xl lg:text-6xl">
                 {stat.value}
               </p>
-              <p className="mt-3 text-xs font-medium uppercase tracking-[0.2em] text-background/60">
+              <p className="mt-2 text-[10px] font-medium uppercase leading-snug tracking-[0.14em] text-background/60 sm:mt-3 sm:text-xs sm:tracking-[0.2em]">
                 {stat.label}
               </p>
             </div>
           ))}
+
         </div>
       </div>
     </section>
