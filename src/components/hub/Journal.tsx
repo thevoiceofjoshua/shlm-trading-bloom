@@ -9,6 +9,7 @@ import {
   saveMemberRules,
   type MemberRule,
 } from "@/lib/hub.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 /* ------------------------------ date helpers ------------------------------- */
 
@@ -914,6 +915,281 @@ function TextField({
         placeholder={placeholder}
         className="mt-2 w-full resize-y rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
       />
+    </div>
+  );
+}
+
+/* -------------------------------- trades ---------------------------------- */
+
+function TradesEditor({ entry, onChange }: { entry: Entry; onChange: (patch: Partial<Entry>) => void }) {
+  const trades = entry.trades ?? [];
+
+  const setCount = (count: number) => {
+    const next = [...trades];
+    while (next.length < count) next.push(newTrade());
+    onChange({ tradeCount: String(count), trades: next.slice(0, count) });
+  };
+
+  const patchTrade = (id: string, patch: Partial<Trade>) => {
+    onChange({ trades: trades.map((t) => (t.id === id ? { ...t, ...patch } : t)) });
+  };
+
+  return (
+    <div>
+      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        📊 How many trades did you take this session?
+      </p>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        {[0, 1, 2, 3, 4, 5, 6].map((n) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => setCount(n)}
+            className={`min-h-9 min-w-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+              entry.tradeCount === String(n)
+                ? "border-foreground bg-primary text-primary-foreground"
+                : "border-border bg-background text-foreground hover:bg-accent"
+            }`}
+          >
+            {n === 0 ? "None" : n}
+          </button>
+        ))}
+        {trades.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setCount(trades.length + 1)}
+            className="min-h-9 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            ＋ one more
+          </button>
+        )}
+      </div>
+
+      {trades.length > 0 && (
+        <div className="mt-3 space-y-3">
+          {trades.map((t, i) => {
+            const isRed = t.pnl.trim().startsWith("-");
+            const abs = t.pnl.replace(/^-+/, "").trim();
+            return (
+              <div key={t.id} className="rounded-xl border border-border bg-background p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Trade {i + 1}</p>
+                  <button
+                    type="button"
+                    onClick={() => onChange({ trades: trades.filter((x) => x.id !== t.id), tradeCount: String(trades.length - 1) })}
+                    className="text-xs text-muted-foreground underline underline-offset-4 hover:text-destructive"
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  <input
+                    type="text"
+                    value={t.instrument}
+                    onChange={(e) => patchTrade(t.id, { instrument: e.target.value })}
+                    placeholder="Pair / instrument (e.g. XAUUSD)"
+                    className="min-h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  />
+                  <div className="flex flex-wrap items-center gap-2">
+                    {DIRECTIONS.map((d) => (
+                      <button
+                        key={d.key}
+                        type="button"
+                        onClick={() => patchTrade(t.id, { direction: t.direction === d.key ? "" : d.key })}
+                        className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                          t.direction === d.key
+                            ? "border-foreground bg-primary text-primary-foreground"
+                            : "border-border bg-background text-foreground hover:bg-accent"
+                        }`}
+                      >
+                        {d.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  {RESULTS.map((r) => (
+                    <button
+                      key={r.key}
+                      type="button"
+                      onClick={() => patchTrade(t.id, { result: t.result === r.key ? "" : r.key })}
+                      className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        t.result === r.key
+                          ? "border-foreground bg-primary text-primary-foreground"
+                          : "border-border bg-background text-foreground hover:bg-accent"
+                      }`}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                  <span className="ml-auto flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => patchTrade(t.id, { pnl: abs === "" ? "" : abs })}
+                      className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        !isRed ? "border-emerald-500 bg-emerald-500/15 text-emerald-500" : "border-border bg-background text-muted-foreground hover:bg-accent"
+                      }`}
+                    >
+                      🟢
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => patchTrade(t.id, { pnl: abs === "" ? "-" : `-${abs}` })}
+                      className={`min-h-9 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        isRed ? "border-red-500 bg-red-500/15 text-red-500" : "border-border bg-background text-muted-foreground hover:bg-accent"
+                      }`}
+                    >
+                      🔴
+                    </button>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={abs}
+                      onChange={(e) => {
+                        const clean = e.target.value.replace(/[^0-9.]/g, "");
+                        patchTrade(t.id, { pnl: isRed && clean !== "" ? `-${clean}` : clean });
+                      }}
+                      placeholder="PnL $"
+                      className="w-24 rounded-xl border border-input bg-background px-3 py-2 text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                    />
+                  </span>
+                </div>
+
+                <input
+                  type="text"
+                  value={t.note}
+                  onChange={(e) => patchTrade(t.id, { note: e.target.value })}
+                  placeholder="What was the setup / why did you take it?"
+                  className="mt-2 min-h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------ screenshots -------------------------------- */
+
+function Screenshots({
+  userId,
+  shots,
+  onChange,
+}: {
+  userId: string;
+  shots: Shot[];
+  onChange: (shots: Shot[]) => void;
+}) {
+  const [urls, setUrls] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    const missing = shots.map((s) => s.path).filter((p) => !urls[p]);
+    if (missing.length === 0) return;
+    (async () => {
+      const { data } = await supabase.storage.from("journal-shots").createSignedUrls(missing, 3600);
+      if (!active || !data) return;
+      setUrls((prev) => {
+        const next = { ...prev };
+        for (const item of data) {
+          if (item.path && item.signedUrl) next[item.path] = item.signedUrl;
+        }
+        return next;
+      });
+    })();
+    return () => {
+      active = false;
+    };
+  }, [shots, urls]);
+
+  const upload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    setError(null);
+    const added: Shot[] = [];
+    for (const file of Array.from(files)) {
+      const ext = (file.name.split(".").pop() || "png").toLowerCase();
+      const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("journal-shots").upload(path, file, {
+        contentType: file.type || "image/png",
+        upsert: false,
+      });
+      if (upErr) {
+        setError(upErr.message);
+        continue;
+      }
+      added.push({ path });
+    }
+    setUploading(false);
+    if (added.length > 0) onChange([...shots, ...added]);
+  };
+
+  const remove = async (path: string) => {
+    onChange(shots.filter((s) => s.path !== path));
+    await supabase.storage.from("journal-shots").remove([path]);
+  };
+
+  return (
+    <div>
+      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">🖼️ Screenshots</p>
+      <p className="mt-1 text-xs text-muted-foreground">Attach your charts or executions for this session.</p>
+
+      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {shots.map((s) => (
+          <div key={s.path} className="group relative overflow-hidden rounded-xl border border-border bg-background">
+            {urls[s.path] ? (
+              <button type="button" onClick={() => setLightbox(urls[s.path]!)} className="block h-28 w-full">
+                <img src={urls[s.path]} alt="Journal screenshot" className="h-28 w-full object-cover" loading="lazy" />
+              </button>
+            ) : (
+              <div className="flex h-28 w-full items-center justify-center text-xs text-muted-foreground">Loading…</div>
+            )}
+            <button
+              type="button"
+              onClick={() => remove(s.path)}
+              aria-label="Remove screenshot"
+              className="absolute right-1.5 top-1.5 flex size-7 items-center justify-center rounded-full border border-border bg-background/90 text-xs text-muted-foreground hover:text-destructive"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+
+        <label className="flex h-28 cursor-pointer items-center justify-center rounded-xl border border-dashed border-border bg-background text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+          {uploading ? "Uploading…" : "＋ Add screenshot"}
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            className="sr-only"
+            disabled={uploading}
+            onChange={(e) => {
+              void upload(e.target.files);
+              e.target.value = "";
+            }}
+          />
+        </label>
+      </div>
+
+      {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
+
+      {lightbox && (
+        <button
+          type="button"
+          onClick={() => setLightbox(null)}
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-background/95 p-6"
+          aria-label="Close screenshot"
+        >
+          <img src={lightbox} alt="Journal screenshot" className="max-h-full max-w-full rounded-2xl object-contain" />
+        </button>
+      )}
     </div>
   );
 }
