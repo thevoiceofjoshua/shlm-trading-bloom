@@ -192,7 +192,7 @@ function newSlot(): string {
 
 /* -------------------------------- component ------------------------------- */
 
-export function Journal({ userId }: { userId: string }) {
+export function Journal({ userId, onClose }: { userId: string; onClose?: () => void }) {
   const todayKey = toKey(new Date());
   const [cursor, setCursor] = useState(() => {
     const n = new Date();
