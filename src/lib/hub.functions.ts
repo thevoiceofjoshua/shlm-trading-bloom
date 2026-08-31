@@ -30,7 +30,9 @@ export interface HubAccess {
 
 export interface HubPayload {
   access: HubAccess;
-  dataState: typeof DATA_STATE;
+  dataState: typeof DATA_STATE | "delayed";
+  /** ISO timestamp of the last successful feed refresh (delayed feed only). */
+  fetchedAt?: string;
   sessions: ReturnType<typeof sessionStatuses>;
   indexes: typeof INDEX_QUOTES;
   magSeven: typeof MAG_SEVEN;
@@ -75,6 +77,96 @@ async function checkAccess(context: any): Promise<HubAccess> {
 }
 
 
+/** Overlay delayed feed prices onto the typed sample payload, in place. */
+function applyDelayedQuotes(
+  payload: HubPayload,
+  quotes: Record<string, { price: number; change: number; changePct: number; dayHigh: number; dayLow: number; previousClose: number }>,
+) {
+  payload.indexes = payload.indexes.map((idx) => {
+    const q = quotes[idx.symbol];
+    if (!q) return idx;
+    return {
+      ...idx,
+      price: q.price,
+      change: q.change,
+      changePct: q.changePct,
+      dayHigh: q.dayHigh,
+      dayLow: q.dayLow,
+      priorDayHigh: q.previousClose,
+      priorDayLow: q.previousClose,
+      premarketHigh: q.dayHigh,
+      premarketLow: q.dayLow,
+    };
+  });
+
+  payload.magSeven = payload.magSeven.map((s) => {
+    const q = quotes[s.symbol];
+    return q ? { ...s, price: q.price, change: q.change, changePct: q.changePct, dayHigh: q.dayHigh, dayLow: q.dayLow } : s;
+  });
+  payload.dowDrivers = payload.dowDrivers.map((d) => {
+    const q = quotes[d.symbol];
+    return q ? { ...d, price: q.price, changePct: q.changePct } : d;
+  });
+
+  const g = quotes["XAU/USD"];
+  if (g) {
+    payload.gold = {
+      ...payload.gold,
+      price: g.price,
+      change: g.change,
+      changePct: g.changePct,
+      dayHigh: g.dayHigh,
+      dayLow: g.dayLow,
+    };
+  }
+
+  // Macro tiles: 10-year yield, dollar index, crude.
+  const macroValue = (label: string): { value: string; direction: "up" | "down" | "flat" } | null => {
+    if (label.includes("10-Year")) {
+      const q = quotes["TNX"];
+      // ^TNX quotes the yield in index points (e.g. 42.8 = 4.28%).
+      return q ? { value: `${(q.price > 20 ? q.price / 10 : q.price).toFixed(2)}%`, direction: q.changePct >= 0 ? "up" : "down" } : null;
+    }
+    if (label.includes("USD") || label.includes("DXY") || label.includes("Dollar")) {
+      const q = quotes["DXY"];
+      return q ? { value: q.price.toFixed(1), direction: q.changePct >= 0 ? "up" : "down" } : null;
+    }
+    if (label.includes("Oil")) {
+      const q = quotes["WTI"];
+      return q ? { value: `$${q.price.toFixed(2)}`, direction: q.changePct >= 0 ? "up" : "down" } : null;
+    }
+    return null;
+  };
+  const patchMacro = <T extends { label: string; value: string; direction: "up" | "down" | "flat" }>(list: T[]): T[] =>
+    list.map((m) => {
+      const v = macroValue(m.label);
+      return v ? { ...m, value: v.value, direction: v.direction } : m;
+    });
+  payload.nasdaqMacro = patchMacro(payload.nasdaqMacro);
+  payload.dowMacro = patchMacro(payload.dowMacro);
+  payload.goldDrivers = patchMacro(payload.goldDrivers);
+
+  // Recompute breadth / top-mover copy from the refreshed numbers.
+  const green = payload.magSeven.filter((s) => s.changePct >= 0).length;
+  const total = payload.magSeven.length;
+  payload.magBreadth = {
+    green,
+    total,
+    label: green > total / 2 ? `${green} of ${total} green — index tailwind` : `${total - green} of ${total} red — index headwind`,
+  };
+  const topMag = [...payload.magSeven].sort((a, b) => Math.abs(b.changePct) - Math.abs(a.changePct))[0];
+  if (topMag) {
+    payload.nasdaqMovers = { top: topMag.symbol, label: `${topMag.name} is driving the index ${topMag.changePct >= 0 ? "higher" : "lower"}` };
+  }
+  const topDow = [...payload.dowDrivers].sort((a, b) => Math.abs(b.changePct) - Math.abs(a.changePct))[0];
+  if (topDow) {
+    payload.dowMovers = { top: topDow.symbol, label: `${topDow.name} is driving the Dow ${topDow.changePct >= 0 ? "higher" : "lower"}` };
+  }
+
+  payload.dataState = "delayed";
+  payload.fetchedAt = new Date().toISOString();
+}
+
 export const getHubData = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => {
@@ -110,6 +202,17 @@ export const getHubData = createServerFn({ method: "POST" })
       goldDrivers: GOLD_DRIVERS,
       econEvents: ECON_EVENTS,
     };
+
+    // Free delayed feed: overlay real prices when reachable, else keep samples.
+    if (access.hasAccess) {
+      try {
+        const { fetchDelayedQuotes } = await import("@/lib/quotes.server");
+        const quotes = await fetchDelayedQuotes();
+        if (Object.keys(quotes).length > 0) applyDelayedQuotes(payload, quotes);
+      } catch {
+        // Feed unavailable — sample dataset stays in place.
+      }
+    }
 
     return payload;
   });
