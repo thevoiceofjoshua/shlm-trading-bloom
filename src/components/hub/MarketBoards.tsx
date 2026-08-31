@@ -21,23 +21,24 @@ export function IndexCards({ payload }: { payload: HubPayload }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {payload.indexes.map((idx) => (
-        <div key={idx.symbol} className="rounded-2xl border border-border bg-card p-5">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-widest text-muted-foreground">{idx.symbol}</p>
-              <h3 className="font-display text-lg font-medium">{idx.name}</h3>
+        <div key={idx.symbol} className="rounded-2xl border border-border bg-card p-4 sm:p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="truncate text-xs uppercase tracking-widest text-muted-foreground">{idx.symbol}</p>
+              <h3 className="truncate font-display text-lg font-medium">{idx.name}</h3>
             </div>
-            <span className={`text-sm font-medium ${changeColor(idx.changePct)}`}>
+            <span className={`shrink-0 whitespace-nowrap text-right text-xs font-medium sm:text-sm ${changeColor(idx.changePct)}`}>
               {idx.change >= 0 ? "+" : ""}
               {idx.change.toFixed(1)} ({idx.changePct >= 0 ? "+" : ""}
               {idx.changePct}%)
             </span>
           </div>
-          <p className="mt-3 font-display text-3xl font-medium tabular-nums">{idx.price.toLocaleString()}</p>
+          <p className="mt-3 font-display text-[1.75rem] font-medium tabular-nums sm:text-3xl">{idx.price.toLocaleString()}</p>
           <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
             <span>H {idx.dayHigh.toLocaleString()}</span>
             <span>L {idx.dayLow.toLocaleString()}</span>
           </div>
+
 
           <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
             <p className="uppercase tracking-widest text-muted-foreground">Key levels</p>

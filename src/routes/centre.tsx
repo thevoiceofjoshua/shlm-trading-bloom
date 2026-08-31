@@ -94,17 +94,21 @@ function CentrePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-20 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <Link to="/dashboard" search={{ demo: undefined }} className="font-display text-xl font-semibold tracking-tight">
+        <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
+          <Link
+            to="/dashboard"
+            search={{ demo: undefined }}
+            className="min-w-0 truncate font-display text-base font-semibold tracking-tight sm:text-xl"
+          >
             ← SHLM Centre
           </Link>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
             <HomeButton />
             {user?.id && (
               <button
                 type="button"
                 onClick={() => setJournalOpen(true)}
-                className="inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full bg-primary px-3.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:px-4"
               >
                 <span className="hidden sm:inline">Open journal</span>
                 <span className="sm:hidden">Journal</span>
@@ -116,7 +120,7 @@ function CentrePage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 sm:pb-8 sm:pt-8 lg:px-8">
         {!payload ? (
           <div className="flex items-center justify-center py-20">
             <p className="text-sm text-muted-foreground">{isLoading ? "Loading market data…" : "Unable to load hub data."}</p>
@@ -125,13 +129,16 @@ function CentrePage() {
           <LockedPreview />
         ) : (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="font-display text-3xl font-medium tracking-tight">SHLM Centre</h1>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <h1 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">SHLM Centre</h1>
                 <FeedBadges payload={payload} dataUpdatedAt={dataUpdatedAt || Date.now()} />
               </div>
-              {payload.access.isAdmin && !payload.access.memberAccess && <AdminPreviewTag />}
+              {payload.access.isAdmin && !payload.access.memberAccess && (
+                <div className="shrink-0"><AdminPreviewTag /></div>
+              )}
             </div>
+
 
             <SessionBar payload={payload} />
 
