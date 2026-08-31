@@ -6,7 +6,6 @@ import { HomeButton } from "@/components/HomeButton";
 import { displayFirstName } from "@/lib/display-name";
 import { supabase } from "@/integrations/supabase/client";
 import { getHubData, type HubPayload } from "@/lib/hub.functions";
-import { DATA_LABEL } from "@/lib/market-data";
 import { SessionBar } from "@/components/hub/SessionBar";
 import { IndexCards, MagSevenBoard, DowBoard, GoldDesk } from "@/components/hub/MarketBoards";
 import { EconomicCalendar } from "@/components/hub/EconomicCalendar";
@@ -51,7 +50,7 @@ function CentrePage() {
 
   const { viewAsMember } = useAdminMode();
   const fetchHub = useServerFn(getHubData);
-  const { data: payload, isLoading } = useQuery({
+  const { data: payload, isLoading, dataUpdatedAt } = useQuery({
     queryKey: ["hub-data", viewAsMember],
     queryFn: () => fetchHub({ data: { asMember: viewAsMember } }),
     enabled: !loading,
@@ -77,18 +76,17 @@ function CentrePage() {
             ← SHLM Centre
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
+            <HomeButton />
             {user?.id && (
               <button
                 type="button"
                 onClick={() => setJournalOpen(true)}
                 className="inline-flex min-h-10 items-center gap-2 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
-                <span aria-hidden>📓</span>
                 <span className="hidden sm:inline">Open journal</span>
                 <span className="sm:hidden">Journal</span>
               </button>
             )}
-            <HomeButton />
             <span className="hidden text-sm text-muted-foreground sm:inline">
               {displayFirstName(user?.name, user?.email)}
             </span>
@@ -109,20 +107,7 @@ function CentrePage() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="font-display text-3xl font-medium tracking-tight">SHLM Centre</h1>
-                <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                  {payload.dataState === "delayed" && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium uppercase tracking-widest text-emerald-500">
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                      Delayed live
-                    </span>
-                  )}
-                  <span>{DATA_LABEL[payload.dataState]}</span>
-                  {payload.fetchedAt && (
-                    <span className="text-xs text-muted-foreground/70">
-                      Updated {new Date(payload.fetchedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
-                    </span>
-                  )}
-                </p>
+                <FeedBadges payload={payload} dataUpdatedAt={dataUpdatedAt || Date.now()} />
               </div>
               {payload.access.isAdmin && !payload.access.memberAccess && <AdminPreviewTag />}
             </div>
@@ -172,6 +157,49 @@ function LockedPreview() {
       <Link to="/dashboard" search={{ demo: undefined }} className="mt-4 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground">
         Back to dashboard
       </Link>
+    </div>
+  );
+}
+
+const REFETCH_MS = 60_000;
+
+function FeedBadges({ payload, dataUpdatedAt }: { payload: HubPayload; dataUpdatedAt: number }) {
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const last = payload.fetchedAt ? new Date(payload.fetchedAt).getTime() : dataUpdatedAt;
+  const remaining = Math.max(0, last + REFETCH_MS - now);
+  const nextText = remaining === 0 ? "Updating…" : `Next update in ${remaining < 60_000 ? `${Math.ceil(remaining / 1000)}s` : `${Math.floor(remaining / 60_000)}m ${Math.ceil((remaining % 60_000) / 1000)}s`}`;
+  const timeText = new Date(last).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
+  return (
+    <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+      {payload.dataState === "delayed" && (
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-emerald-500">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+          Delayed live
+        </span>
+      )}
+      {payload.dataState === "sample" && (
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-2 py-0.5">
+          Sample data
+        </span>
+      )}
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-2 py-0.5">
+        Updated {timeText}
+      </span>
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-2 py-0.5">
+        {nextText}
+      </span>
+      {payload.dataState === "delayed" && (
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-2 py-0.5">
+          ~15 min behind
+        </span>
+      )}
     </div>
   );
 }

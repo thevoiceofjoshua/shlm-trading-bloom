@@ -183,6 +183,12 @@ function formatMoney(n: number): string {
   return `${sign}$${body}`;
 }
 
+function tradeCountLabel(entry: Entry): string {
+  const count = entry.trades?.length ?? 0;
+  if (count === 0) return "No trades";
+  return `${count} trade${count === 1 ? "" : "s"}`;
+}
+
 function brokenRules(entry: Entry, rules: MemberRule[]): MemberRule[] {
   return rules.filter((r) => entry.ruleChecks[r.id] === "broken");
 }
@@ -471,6 +477,10 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                       <span className="block truncate text-sm font-medium">
                         {sessionLabel(e.entry.session)}
                         {broke && <span className="ml-2 text-xs font-medium text-destructive">⚑ rule broken</span>}
+                      </span>
+                      <span className="mt-1 inline-flex w-fit items-center gap-1.5 rounded-full border border-border bg-background px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                        <span aria-hidden className="h-1 w-1 rounded-full bg-muted-foreground" />
+                        {tradeCountLabel(e.entry)}
                       </span>
                       <span className="block truncate text-xs text-muted-foreground">
                         {e.entry.notes || e.entry.levels || e.entry.wentWell || "Tap to open"}
