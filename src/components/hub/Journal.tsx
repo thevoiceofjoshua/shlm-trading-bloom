@@ -594,7 +594,21 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                       </div>
                     );
                   })()}
+                  {tradesWithPnl(editing.entry).length > 0 && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Session total is summed from your trades below: {formatMoney(pnlNumber(editing.entry))}
+                    </p>
+                  )}
                 </div>
+
+                <TradesEditor
+                  entry={editing.entry}
+                  onChange={(patch) => {
+                    setEditing((prev) => (prev ? { ...prev, entry: { ...prev.entry, ...patch } } : prev));
+                    setDirty(true);
+                  }}
+                />
+
 
                 {rules.length > 0 && (
                   <div>
