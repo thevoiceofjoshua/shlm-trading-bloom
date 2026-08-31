@@ -146,10 +146,11 @@ function CentrePage() {
 
             <IndexCards payload={payload} />
 
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid items-stretch gap-6 lg:grid-cols-2">
               <MagSevenBoard payload={payload} />
               <DowBoard payload={payload} />
             </div>
+
 
             <GoldDesk payload={payload} />
 
