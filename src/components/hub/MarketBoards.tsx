@@ -71,14 +71,14 @@ function KeyLevel({ label, val, role, tone }: { label: string; val: number; role
 
 export function MagSevenBoard({ payload }: { payload: HubPayload }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="font-display text-lg font-medium">NASDAQ drivers</h3>
-        <span className="text-xs text-muted-foreground">{payload.nasdaqMovers?.label}</span>
+    <div className="flex h-full flex-col rounded-2xl border border-border bg-card p-4 sm:p-5">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
+        <h3 className="min-w-0 font-display text-lg font-medium">NASDAQ drivers</h3>
+        <span className="min-w-0 text-xs leading-snug text-muted-foreground sm:text-right">{payload.nasdaqMovers?.label}</span>
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {payload.magSeven.map((s) => (
-          <div key={s.symbol} className="rounded-lg border border-border bg-surface p-3">
+          <div key={s.symbol} className="min-w-0 rounded-lg border border-border bg-surface p-3">
             <p className="text-xs font-semibold">{s.symbol}</p>
             <p className="mt-1 font-display text-sm font-medium tabular-nums">{s.price.toFixed(1)}</p>
             <p className={`text-xs ${changeColor(s.changePct)}`}>
@@ -105,26 +105,24 @@ export function MagSevenBoard({ payload }: { payload: HubPayload }) {
 
 export function DowBoard({ payload }: { payload: HubPayload }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="font-display text-lg font-medium">Dow 30 drivers — US30</h3>
-        <span className="text-xs text-muted-foreground">{payload.dowMovers.label}</span>
+    <div className="flex h-full flex-col rounded-2xl border border-border bg-card p-4 sm:p-5">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
+        <h3 className="min-w-0 font-display text-lg font-medium">Dow 30 drivers — US30</h3>
+        <span className="min-w-0 text-xs leading-snug text-muted-foreground sm:text-right">{payload.dowMovers.label}</span>
       </div>
-      <div className="mt-4 overflow-x-auto">
-        <div className="grid min-w-[480px] grid-cols-2 gap-2 sm:grid-cols-5">
-          {payload.dowDrivers.map((d) => (
-            <div key={d.symbol} className="rounded-lg border border-border bg-surface p-3">
-              <p className="text-xs font-semibold">{d.symbol}</p>
-              <p className="mt-0.5 font-display text-sm font-medium tabular-nums">{d.price.toFixed(1)}</p>
-              <p className={`text-xs ${changeColor(d.changePct)}`}>
-                {d.changePct >= 0 ? "+" : ""}
-                {d.changePct}%
-              </p>
-              <div className="mt-1.5">{strengthBar(d.changePct)}</div>
-              <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{d.note}</p>
-            </div>
-          ))}
-        </div>
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {payload.dowDrivers.map((d) => (
+          <div key={d.symbol} className="min-w-0 rounded-lg border border-border bg-surface p-3">
+            <p className="text-xs font-semibold">{d.symbol}</p>
+            <p className="mt-0.5 font-display text-sm font-medium tabular-nums">{d.price.toFixed(1)}</p>
+            <p className={`text-xs ${changeColor(d.changePct)}`}>
+              {d.changePct >= 0 ? "+" : ""}
+              {d.changePct}%
+            </p>
+            <div className="mt-1.5">{strengthBar(d.changePct)}</div>
+            <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{d.note}</p>
+          </div>
+        ))}
       </div>
 
       <div className="mt-5 border-t border-border pt-4">
@@ -138,6 +136,7 @@ export function DowBoard({ payload }: { payload: HubPayload }) {
     </div>
   );
 }
+
 
 function MacroTile({ macro }: { macro: HubPayload["dowMacro"][number] }) {
   const [open, setOpen] = useState(false);
