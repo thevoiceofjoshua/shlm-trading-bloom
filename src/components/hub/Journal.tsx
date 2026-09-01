@@ -211,6 +211,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
   const [editing, setEditing] = useState<StoredEntry | null>(null);
   const [dirty, setDirty] = useState(false);
   const [alertFor, setAlertFor] = useState<MemberRule[] | null>(null);
+  const [successAlertFor, setSuccessAlertFor] = useState<MemberRule[] | null>(null);
   const [editingRules, setEditingRules] = useState(false);
 
   const fetchRange = useServerFn(getMemberNotesRange);
@@ -282,7 +283,14 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
       setEditing({ ...target, storageKey: desiredKey });
       await refetch();
       const broken = brokenRules(target.entry, rules);
-      if (broken.length > 0 && consequence && !target.entry.consequenceAcknowledged) setAlertFor(broken);
+      if (broken.length > 0 && consequence && !target.entry.consequenceAcknowledged) {
+        setAlertFor(broken);
+        return;
+      }
+      const followed = rules.filter((r) => target.entry.ruleChecks[r.id] === "followed");
+      if (rules.length > 0 && followed.length > 0 && broken.length === 0) {
+        setSuccessAlertFor(followed);
+      }
     },
   });
 
@@ -728,6 +736,13 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
           }}
         />
       )}
+
+      {successAlertFor && (
+        <RuleFollowAlert
+          followed={successAlertFor}
+          onAcknowledge={() => setSuccessAlertFor(null)}
+        />
+      )}
     </div>
   );
 }
@@ -771,6 +786,47 @@ function RuleBreakAlert({
           className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-white px-6 text-sm font-semibold text-black transition-opacity hover:opacity-90"
         >
           I’ll do it
+        </button>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+/* ------------------------------ rule follow alert -------------------------- */
+
+function RuleFollowAlert({
+  followed,
+  onAcknowledge,
+}: {
+  followed: MemberRule[];
+  onAcknowledge: () => void;
+}) {
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <div
+      role="alertdialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[300] flex items-center justify-center p-4"
+    >
+      <div className="absolute inset-0 bg-black/80" />
+
+      <div className="animate-rule-flash relative w-full max-w-lg rounded-2xl border-2 border-emerald-500 bg-card p-6 text-center shadow-2xl">
+        <p className="font-display text-3xl font-bold uppercase tracking-widest text-emerald-500 sm:text-4xl">Rules followed</p>
+        <p className="mt-2 text-sm text-muted-foreground">You stayed disciplined this session.</p>
+        <ul className="mt-5 space-y-2 text-left text-sm">
+          {followed.map((r) => (
+            <li key={r.id} className="rounded-lg bg-emerald-500/10 px-4 py-2 text-foreground">
+              ✓ {r.text}
+            </li>
+          ))}
+        </ul>
+        <button
+          type="button"
+          onClick={onAcknowledge}
+          className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-emerald-500 px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+        >
+          Keep it up
         </button>
       </div>
     </div>,
