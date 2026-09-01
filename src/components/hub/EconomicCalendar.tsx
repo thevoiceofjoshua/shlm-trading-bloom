@@ -58,13 +58,16 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
           const localTime = econTimeToLocal(e.date, e.time);
           const dateLabel = new Date(e.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
           const isOpen = open === i;
+          const isLow = e.impact === "low";
           return (
             <div key={i}>
               <button
                 type="button"
                 aria-expanded={isOpen}
                 onClick={() => setOpen(isOpen ? null : i)}
-                className="flex min-h-11 w-full flex-wrap items-center justify-between gap-2 py-2.5 text-left text-sm transition-colors hover:text-foreground"
+                className={`flex min-h-11 w-full flex-wrap items-center justify-between gap-2 py-2.5 text-left text-sm transition-colors hover:text-foreground ${
+                  isLow ? "text-muted-foreground/70" : ""
+                }`}
               >
                 <div className="flex items-center gap-3">
                   <span className="font-medium tabular-nums">{localTime}</span>
@@ -74,9 +77,7 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
                   <span className="text-sm">{e.title}</span>
                   <span
                     className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${
-                      e.impact === "high"
-                        ? "bg-foreground text-background"
-                        : "border border-border text-muted-foreground"
+                      IMPACT_BADGE[e.impact] ?? IMPACT_BADGE.medium
                     }`}
                   >
                     {e.impact}
