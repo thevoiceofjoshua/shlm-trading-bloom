@@ -736,6 +736,13 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
           }}
         />
       )}
+
+      {successAlertFor && (
+        <RuleFollowAlert
+          followed={successAlertFor}
+          onAcknowledge={() => setSuccessAlertFor(null)}
+        />
+      )}
     </div>
   );
 }
