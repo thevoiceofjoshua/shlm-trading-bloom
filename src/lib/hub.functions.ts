@@ -45,6 +45,8 @@ export interface HubPayload {
   gold: typeof GOLD_QUOTE;
   goldDrivers: typeof GOLD_DRIVERS;
   econEvents: typeof ECON_EVENTS;
+  /** True when the calendar rows come from the live economic feed. */
+  econLive?: boolean;
 }
 
 async function checkAccess(context: any): Promise<HubAccess> {
