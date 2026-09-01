@@ -82,11 +82,27 @@ async function checkAccess(context: any): Promise<HubAccess> {
 /** Overlay delayed feed prices onto the typed sample payload, in place. */
 function applyDelayedQuotes(
   payload: HubPayload,
-  quotes: Record<string, { price: number; change: number; changePct: number; dayHigh: number; dayLow: number; previousClose: number }>,
+  quotes: Record<
+    string,
+    {
+      price: number;
+      change: number;
+      changePct: number;
+      dayHigh: number;
+      dayLow: number;
+      previousClose: number;
+      priorDayHigh?: number;
+      priorDayLow?: number;
+      premarketHigh?: number;
+      premarketLow?: number;
+    }
+  >,
 ) {
   payload.indexes = payload.indexes.map((idx) => {
     const q = quotes[idx.symbol];
     if (!q) return idx;
+    // Key levels only carry real feed values — never a duplicated close or
+    // today's intraday range standing in for yesterday / pre-market.
     return {
       ...idx,
       price: q.price,
@@ -94,10 +110,10 @@ function applyDelayedQuotes(
       changePct: q.changePct,
       dayHigh: q.dayHigh,
       dayLow: q.dayLow,
-      priorDayHigh: q.previousClose,
-      priorDayLow: q.previousClose,
-      premarketHigh: q.dayHigh,
-      premarketLow: q.dayLow,
+      priorDayHigh: q.priorDayHigh,
+      priorDayLow: q.priorDayLow,
+      premarketHigh: q.premarketHigh,
+      premarketLow: q.premarketLow,
     };
   });
 
