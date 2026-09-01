@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import {
@@ -741,9 +743,17 @@ function RuleBreakAlert({
   consequence: string;
   onAcknowledge: () => void;
 }) {
-  return (
-    <div role="alertdialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  // Portal to <body>: the journal modal's backdrop-blur creates a containing
+  // block, which would otherwise pin this "fixed" alert to the scrolled panel.
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <div
+      role="alertdialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[300] flex items-center justify-center p-4"
+    >
       <div className="absolute inset-0 bg-black/80" />
+
       <div className="animate-rule-flash relative w-full max-w-lg rounded-2xl border-2 border-red-500 p-6 text-center text-white shadow-2xl">
         <p className="font-display text-3xl font-bold uppercase tracking-widest sm:text-4xl">Rules broken</p>
         <ul className="mt-5 space-y-2 text-left text-sm">
@@ -763,9 +773,11 @@ function RuleBreakAlert({
           I’ll do it
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
+
 
 /* -------------------------------- rules setup ------------------------------ */
 
