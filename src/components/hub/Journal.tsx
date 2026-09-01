@@ -793,6 +793,47 @@ function RuleBreakAlert({
   );
 }
 
+/* ------------------------------ rule follow alert -------------------------- */
+
+function RuleFollowAlert({
+  followed,
+  onAcknowledge,
+}: {
+  followed: MemberRule[];
+  onAcknowledge: () => void;
+}) {
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <div
+      role="alertdialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[300] flex items-center justify-center p-4"
+    >
+      <div className="absolute inset-0 bg-black/80" />
+
+      <div className="animate-rule-flash relative w-full max-w-lg rounded-2xl border-2 border-emerald-500 bg-card p-6 text-center shadow-2xl">
+        <p className="font-display text-3xl font-bold uppercase tracking-widest text-emerald-500 sm:text-4xl">Rules followed</p>
+        <p className="mt-2 text-sm text-muted-foreground">You stayed disciplined this session.</p>
+        <ul className="mt-5 space-y-2 text-left text-sm">
+          {followed.map((r) => (
+            <li key={r.id} className="rounded-lg bg-emerald-500/10 px-4 py-2 text-foreground">
+              ✓ {r.text}
+            </li>
+          ))}
+        </ul>
+        <button
+          type="button"
+          onClick={onAcknowledge}
+          className="mt-7 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-emerald-500 px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+        >
+          Keep it up
+        </button>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 
 /* -------------------------------- rules setup ------------------------------ */
 
