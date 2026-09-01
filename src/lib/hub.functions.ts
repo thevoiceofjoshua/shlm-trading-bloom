@@ -417,6 +417,15 @@ export const runSessionReview = createServerFn({ method: "POST" })
       dataState: DATA_STATE,
     };
 
+    // Prefer live releases for the analyst's macro context when reachable.
+    try {
+      const { fetchLiveEconEvents } = await import("@/lib/econ-calendar.server");
+      const econ = await fetchLiveEconEvents();
+      if (econ.length > 0) snapshot.econEvents = econ;
+    } catch {
+      // Calendar feed unavailable — sample events stay in place.
+    }
+
     // Try to return a cached review for today first
     const today = now.toISOString().slice(0, 10);
     const { data: cached } = await context.supabase
