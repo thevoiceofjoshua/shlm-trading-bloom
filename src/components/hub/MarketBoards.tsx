@@ -58,13 +58,18 @@ export function IndexCards({ payload }: { payload: HubPayload }) {
   );
 }
 
-function KeyLevel({ label, val, role, tone }: { label: string; val: number; role: string; tone: "up" | "down" }) {
+function KeyLevel({ label, val, role, tone }: { label: string; val?: number; role: string; tone: "up" | "down" }) {
   const roleColor = tone === "up" ? "text-emerald-500" : "text-red-500";
+  const has = typeof val === "number" && Number.isFinite(val);
   return (
     <div>
       <p className="text-muted-foreground">{label}</p>
-      <p className="font-display text-base font-medium tabular-nums text-foreground">{val.toLocaleString()}</p>
-      <p className={`mt-0.5 text-[10px] font-semibold uppercase tracking-widest ${roleColor}`}>{role}</p>
+      <p className="font-display text-base font-medium tabular-nums text-foreground">
+        {has ? val.toLocaleString() : <span className="text-muted-foreground">—</span>}
+      </p>
+      <p className={`mt-0.5 text-[10px] font-semibold uppercase tracking-widest ${has ? roleColor : "text-muted-foreground"}`}>
+        {has ? role : "No data"}
+      </p>
     </div>
   );
 }

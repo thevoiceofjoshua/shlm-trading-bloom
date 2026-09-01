@@ -66,10 +66,11 @@ export interface Quote {
 }
 
 export interface LevelQuote extends Quote {
-  priorDayHigh: number;
-  priorDayLow: number;
-  premarketHigh: number;
-  premarketLow: number;
+  /** Levels are optional: the delayed feed omits any it cannot source. */
+  priorDayHigh?: number;
+  priorDayLow?: number;
+  premarketHigh?: number;
+  premarketLow?: number;
 }
 
 export const INDEX_QUOTES: LevelQuote[] = [
