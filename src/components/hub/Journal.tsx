@@ -283,7 +283,14 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
       setEditing({ ...target, storageKey: desiredKey });
       await refetch();
       const broken = brokenRules(target.entry, rules);
-      if (broken.length > 0 && consequence && !target.entry.consequenceAcknowledged) setAlertFor(broken);
+      if (broken.length > 0 && consequence && !target.entry.consequenceAcknowledged) {
+        setAlertFor(broken);
+        return;
+      }
+      const followed = rules.filter((r) => target.entry.ruleChecks[r.id] === "followed");
+      if (rules.length > 0 && followed.length > 0 && broken.length === 0) {
+        setSuccessAlertFor(followed);
+      }
     },
   });
 
