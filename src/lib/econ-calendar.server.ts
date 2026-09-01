@@ -109,7 +109,7 @@ export async function fetchLiveEconEvents(): Promise<EconEvent[]> {
       time: when.time,
       date: when.date,
       title: row.title,
-      impact: impactRaw === "high" ? "high" : "medium",
+      impact: impactRaw === "high" ? "high" : impactRaw === "medium" ? "medium" : "low",
       detail: detailFor(row),
       currency: row.country,
       forecast: clean(row.forecast),
