@@ -11,7 +11,7 @@ import { SessionBar } from "@/components/hub/SessionBar";
 import { IndexCards, MagSevenBoard, DowBoard, GoldDesk } from "@/components/hub/MarketBoards";
 import { EconomicCalendar } from "@/components/hub/EconomicCalendar";
 import { Journal } from "@/components/hub/Journal";
-import { SessionAnalyst } from "@/components/hub/SessionAnalyst";
+
 import { AdminPreviewTag } from "@/components/AdminBar";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 
@@ -142,9 +142,8 @@ function CentrePage() {
 
             <SessionBar payload={payload} />
 
-            <SessionAnalyst payload={payload} />
-
             <IndexCards payload={payload} />
+
 
             <div className="grid items-stretch gap-6 lg:grid-cols-2">
               <MagSevenBoard payload={payload} />
