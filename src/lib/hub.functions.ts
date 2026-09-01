@@ -214,6 +214,18 @@ export const getHubData = createServerFn({ method: "POST" })
       } catch {
         // Feed unavailable — sample dataset stays in place.
       }
+
+      // Live economic calendar: real releases when reachable, else samples.
+      try {
+        const { fetchLiveEconEvents } = await import("@/lib/econ-calendar.server");
+        const econ = await fetchLiveEconEvents();
+        if (econ.length > 0) {
+          payload.econEvents = econ;
+          payload.econLive = true;
+        }
+      } catch {
+        // Calendar feed unavailable — sample events stay in place.
+      }
     }
 
     return payload;
