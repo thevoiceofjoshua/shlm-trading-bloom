@@ -135,17 +135,54 @@ export async function fetchDelayedQuotes(): Promise<Record<string, DelayedQuote>
     }
   }
 
-  // 2) Headline instruments also need the session high / low.
+  // 2) Headline instruments also need session high / low plus real key levels:
+  //    the prior session's own high / low and today's pre-market extremes.
   await Promise.all(
     DETAILED.map(async (key) => {
       const sym = YAHOO_SYMBOLS[key];
       if (!sym) return;
-      const json = await getJson(`/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=1d`);
-      const meta = json?.chart?.result?.[0]?.meta as Record<string, number> | undefined;
+      const json = await getJson(`/v8/finance/chart/${encodeURIComponent(sym)}?interval=1d&range=5d`);
+      const result = json?.chart?.result?.[0];
+      const meta = result?.meta as Record<string, number> | undefined;
       const price = meta?.['regularMarketPrice'];
       if (typeof price !== "number") return;
       const prev = typeof meta?.['chartPreviousClose'] === "number" ? meta['chartPreviousClose'] : price;
-      out[key] = build(key, price, prev, meta?.['regularMarketDayHigh'], meta?.['regularMarketDayLow']);
+      const quote = build(key, price, prev, meta?.['regularMarketDayHigh'], meta?.['regularMarketDayLow']);
+
+      // Prior daily bar = the most recent completed session before today's.
+      const bars = result?.indicators?.quote?.[0] as { high?: (number | null)[]; low?: (number | null)[] } | undefined;
+      const highs = (bars?.high ?? []).filter((n): n is number => typeof n === "number" && Number.isFinite(n));
+      const lows = (bars?.low ?? []).filter((n): n is number => typeof n === "number" && Number.isFinite(n));
+      if (highs.length >= 2 && lows.length >= 2) {
+        quote.priorDayHigh = round(highs[highs.length - 2]!, 2);
+        quote.priorDayLow = round(lows[lows.length - 2]!, 2);
+      }
+
+      // Pre-market window from the intraday feed (absent for cash indices).
+      const pre = await getJson(
+        `/v8/finance/chart/${encodeURIComponent(sym)}?interval=5m&range=1d&includePrePost=true`,
+      );
+      const preRes = pre?.chart?.result?.[0];
+      const period = preRes?.meta?.currentTradingPeriod?.pre as { start?: number; end?: number } | undefined;
+      const stamps: number[] = Array.isArray(preRes?.timestamp) ? preRes.timestamp : [];
+      const preBars = preRes?.indicators?.quote?.[0] as { high?: (number | null)[]; low?: (number | null)[] } | undefined;
+      if (period?.start && period?.end && stamps.length > 0 && preBars) {
+        const pHigh: number[] = [];
+        const pLow: number[] = [];
+        stamps.forEach((t, i) => {
+          if (t < period.start! || t >= period.end!) return;
+          const h = preBars.high?.[i];
+          const l = preBars.low?.[i];
+          if (typeof h === "number" && Number.isFinite(h)) pHigh.push(h);
+          if (typeof l === "number" && Number.isFinite(l)) pLow.push(l);
+        });
+        if (pHigh.length > 0 && pLow.length > 0) {
+          quote.premarketHigh = round(Math.max(...pHigh), 2);
+          quote.premarketLow = round(Math.min(...pLow), 2);
+        }
+      }
+
+      out[key] = quote;
     }),
   );
 
