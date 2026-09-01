@@ -180,6 +180,8 @@ async function eventsFromTradingView(): Promise<EconEvent[]> {
       const impact = importance >= 1 ? "high" : importance === 0 ? "medium" : "low";
       if (!currency || !row.title || !row.date) continue;
       if (currency !== "USD" && impact !== "high") continue;
+      // Trim auction/plumbing noise the Forex Factory board never lists.
+      if (impact !== "high" && /auction|redbook|logistics managers|api crude/i.test(row.title)) continue;
       const when = laDateTime(row.date);
       if (!when) continue;
       out.push({
