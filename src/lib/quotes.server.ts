@@ -17,6 +17,12 @@ export interface DelayedQuote {
   dayHigh: number;
   dayLow: number;
   previousClose: number;
+  /** Prior session's true high / low (only when the feed provides daily bars). */
+  priorDayHigh?: number;
+  priorDayLow?: number;
+  /** Pre-market extremes for today (only when pre-session bars exist). */
+  premarketHigh?: number;
+  premarketLow?: number;
 }
 
 /** Yahoo symbol for each instrument shown in the Centre. */
