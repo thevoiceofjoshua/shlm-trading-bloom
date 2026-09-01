@@ -211,6 +211,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
   const [editing, setEditing] = useState<StoredEntry | null>(null);
   const [dirty, setDirty] = useState(false);
   const [alertFor, setAlertFor] = useState<MemberRule[] | null>(null);
+  const [successAlertFor, setSuccessAlertFor] = useState<MemberRule[] | null>(null);
   const [editingRules, setEditingRules] = useState(false);
 
   const fetchRange = useServerFn(getMemberNotesRange);
