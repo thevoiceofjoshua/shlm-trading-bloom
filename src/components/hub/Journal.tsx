@@ -771,9 +771,11 @@ function RuleBreakAlert({
           I’ll do it
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
+
 
 /* -------------------------------- rules setup ------------------------------ */
 
