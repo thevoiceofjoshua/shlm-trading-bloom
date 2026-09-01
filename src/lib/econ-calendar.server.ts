@@ -63,7 +63,8 @@ function affectsFor(title: string): string[] {
 }
 
 function detailFor(row: FeedRow): string {
-  const impact = row.impact.toLowerCase() === "high" ? "High-impact" : "Medium-impact";
+  const i = row.impact.toLowerCase();
+  const impact = i === "high" ? "High-impact" : i === "medium" ? "Medium-impact" : "Low-impact";
   return `${impact} ${row.country} release.`;
 }
 
