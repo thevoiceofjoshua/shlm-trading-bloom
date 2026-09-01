@@ -20,7 +20,9 @@ function sessionContext(laTime: string): string {
 export function EconomicCalendar({ payload }: { payload: HubPayload }) {
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
-  const events = [...payload.econEvents].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const events = [...payload.econEvents]
+    .filter((e) => e.date >= todayStr)
+    .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   const [open, setOpen] = useState<number | null>(null);
 
   // Next upcoming release
