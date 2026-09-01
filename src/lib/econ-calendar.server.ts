@@ -93,6 +93,7 @@ interface TvRow {
   previous?: number | null;
   unit?: string | null;
   scale?: string | null;
+  importance?: number;
 }
 
 function fmtTv(value: number | null | undefined, unit?: string | null, scale?: string | null) {
