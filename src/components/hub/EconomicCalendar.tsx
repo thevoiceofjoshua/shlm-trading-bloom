@@ -17,6 +17,13 @@ function sessionContext(laTime: string): string {
   return "Outside the SHLM trading windows";
 }
 
+/** Forex Factory tier language: solid = high, outlined = medium, faint = low. */
+const IMPACT_BADGE: Record<string, string> = {
+  high: "bg-foreground text-background",
+  medium: "border border-border text-foreground",
+  low: "border border-border/50 text-muted-foreground/70",
+};
+
 export function EconomicCalendar({ payload }: { payload: HubPayload }) {
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
@@ -25,8 +32,8 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
     .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   const [open, setOpen] = useState<number | null>(null);
 
-  // Next upcoming release
-  const next = events.find((e) => e.date + e.time >= todayStr);
+  // Next upcoming high-impact release — low rows stay background context.
+  const next = events.find((e) => e.impact === "high" && e.date + e.time >= todayStr);
 
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
@@ -51,13 +58,16 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
           const localTime = econTimeToLocal(e.date, e.time);
           const dateLabel = new Date(e.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
           const isOpen = open === i;
+          const isLow = e.impact === "low";
           return (
             <div key={i}>
               <button
                 type="button"
                 aria-expanded={isOpen}
                 onClick={() => setOpen(isOpen ? null : i)}
-                className="flex min-h-11 w-full flex-wrap items-center justify-between gap-2 py-2.5 text-left text-sm transition-colors hover:text-foreground"
+                className={`flex min-h-11 w-full flex-wrap items-center justify-between gap-2 py-2.5 text-left text-sm transition-colors hover:text-foreground ${
+                  isLow ? "text-muted-foreground/70" : ""
+                }`}
               >
                 <div className="flex items-center gap-3">
                   <span className="font-medium tabular-nums">{localTime}</span>
@@ -67,9 +77,7 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
                   <span className="text-sm">{e.title}</span>
                   <span
                     className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${
-                      e.impact === "high"
-                        ? "bg-foreground text-background"
-                        : "border border-border text-muted-foreground"
+                      IMPACT_BADGE[e.impact] ?? IMPACT_BADGE.medium
                     }`}
                   >
                     {e.impact}
@@ -126,12 +134,12 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
       </div>
 
       {events.length === 0 && (
-        <p className="mt-4 text-sm text-muted-foreground">No high-impact releases left this week.</p>
+        <p className="mt-4 text-sm text-muted-foreground">No releases left this week.</p>
       )}
 
       <p className="mt-4 text-[11px] text-muted-foreground">
         {payload.econLive
-          ? "Live economic calendar — high and medium impact releases this week, in your local time."
+          ? "Live calendar — every USD release plus high-impact global prints, in your local time."
           : "Sample data — live feed unavailable right now."}
       </p>
     </div>

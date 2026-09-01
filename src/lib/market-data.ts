@@ -246,7 +246,7 @@ export interface EconEvent {
   time: string; // ISO-ish "HH:MM" in LA time
   date: string; // YYYY-MM-DD
   title: string;
-  impact: "high" | "medium";
+  impact: "high" | "medium" | "low";
   detail?: string;
   /** Region / currency the release belongs to. */
   currency?: string;
