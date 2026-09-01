@@ -96,8 +96,10 @@ export async function fetchLiveEconEvents(): Promise<EconEvent[]> {
   for (const row of rows) {
     if (!row?.title || !row?.date) continue;
     const impactRaw = String(row.impact ?? "").toLowerCase();
-    if (impactRaw !== "high" && impactRaw !== "medium") continue;
-    // Keep the desk relevant: USD prints plus any high-impact global release.
+    if (impactRaw !== "high" && impactRaw !== "medium" && impactRaw !== "low") continue;
+    // Non-economic rows (holidays, "All" country chatter) never make the board.
+    if (row.country === "All" || !row.country) continue;
+    // US desk focus: every USD print, plus high-impact releases elsewhere.
     if (row.country !== "USD" && impactRaw !== "high") continue;
 
     const when = laDateTime(row.date);
