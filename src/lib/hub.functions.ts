@@ -45,6 +45,8 @@ export interface HubPayload {
   gold: typeof GOLD_QUOTE;
   goldDrivers: typeof GOLD_DRIVERS;
   econEvents: typeof ECON_EVENTS;
+  /** True when the calendar rows come from the live economic feed. */
+  econLive?: boolean;
 }
 
 async function checkAccess(context: any): Promise<HubAccess> {
@@ -211,6 +213,18 @@ export const getHubData = createServerFn({ method: "POST" })
         if (Object.keys(quotes).length > 0) applyDelayedQuotes(payload, quotes);
       } catch {
         // Feed unavailable — sample dataset stays in place.
+      }
+
+      // Live economic calendar: real releases when reachable, else samples.
+      try {
+        const { fetchLiveEconEvents } = await import("@/lib/econ-calendar.server");
+        const econ = await fetchLiveEconEvents();
+        if (econ.length > 0) {
+          payload.econEvents = econ;
+          payload.econLive = true;
+        }
+      } catch {
+        // Calendar feed unavailable — sample events stay in place.
       }
     }
 
@@ -402,6 +416,15 @@ export const runSessionReview = createServerFn({ method: "POST" })
       econEvents: ECON_EVENTS,
       dataState: DATA_STATE,
     };
+
+    // Prefer live releases for the analyst's macro context when reachable.
+    try {
+      const { fetchLiveEconEvents } = await import("@/lib/econ-calendar.server");
+      const econ = await fetchLiveEconEvents();
+      if (econ.length > 0) snapshot.econEvents = econ;
+    } catch {
+      // Calendar feed unavailable — sample events stay in place.
+    }
 
     // Try to return a cached review for today first
     const today = now.toISOString().slice(0, 10);

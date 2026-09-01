@@ -20,7 +20,9 @@ function sessionContext(laTime: string): string {
 export function EconomicCalendar({ payload }: { payload: HubPayload }) {
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
-  const events = [...payload.econEvents].sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  const events = [...payload.econEvents]
+    .filter((e) => e.date >= todayStr)
+    .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   const [open, setOpen] = useState<number | null>(null);
 
   // Next upcoming release
@@ -123,7 +125,15 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
         })}
       </div>
 
-      <p className="mt-4 text-[11px] text-muted-foreground">Sample data — live feed coming soon.</p>
+      {events.length === 0 && (
+        <p className="mt-4 text-sm text-muted-foreground">No high-impact releases left this week.</p>
+      )}
+
+      <p className="mt-4 text-[11px] text-muted-foreground">
+        {payload.econLive
+          ? "Live economic calendar — high and medium impact releases this week, in your local time."
+          : "Sample data — live feed unavailable right now."}
+      </p>
     </div>
   );
 }
