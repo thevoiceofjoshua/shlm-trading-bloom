@@ -1,18 +1,19 @@
-# Full medium and high impact calendar from Forex Factory
+# Match the Forex Factory list row-for-row for USD
 
-The Centre calendar already pulls live from the Forex Factory weekly feed, so the source is correct. The gap is filtering: medium-impact releases are only kept when the currency is USD, so medium prints for EUR, GBP, CAD, NZD, CHF, AUD, and JPY are silently dropped. This week's feed carries 6 such medium releases that never reach the board.
+The Centre calendar already pulls live from the Forex Factory weekly feed, and today's ISM Manufacturing PMI (red), ISM Manufacturing Prices and JOLTS Job Openings (orange) are all on the board. The two rows that look missing — Final Manufacturing PMI and Construction Spending m/m — are tagged yellow (low impact) in the feed, and the current filter drops that tier entirely.
 
 ## What changes
 
-- Keep every medium and high impact release from the feed, regardless of currency. Low impact and non-economic rows (holidays, "All" country chatter) stay excluded.
-- Show the currency next to each row in the collapsed list, not only inside the expanded panel, so a trader can scan which economy a print belongs to.
-- Add a small filter row above the list: All / High only / USD only. Defaults to All.
-- Widen the "what it moves" mapping so non-USD releases map to sensible instruments (for example EUR prints to EUR/USD and DAX-adjacent risk, GBP prints to GBP/USD) instead of always falling back to NASDAQ and US30.
-- Update the footer caption and the empty-state copy to reflect medium plus high across all currencies.
-- Apply identically for member, SHLM MOD, and admin views — the calendar renders from the same payload for all three, so no role-specific work is needed beyond confirming each still renders.
+- Every USD release comes through, at all three impact tiers: high, medium and low. Non-USD stays as it is today (high impact only), so the board keeps its US-desk focus.
+- Low-impact rows render dimmed: muted text and a soft outlined LOW badge, so they read as background context and never compete with the red and orange prints.
+- Impact badges get the Forex Factory tier language: solid badge for high, outlined for medium, faint for low.
+- The "heads up" banner and the next-release line keep tracking high impact only, so extra low rows don't add noise.
+- Footer caption updates to say the board mirrors the full USD list plus high-impact global releases, in local time.
+- Identical for member, SHLM MOD and admin views — all three render from the same payload; each gets a visual pass after the change.
 
 ## Technical notes
 
-- `src/lib/econ-calendar.server.ts`: drop the `row.country !== "USD"` guard on medium rows; extend `affectsFor` with currency-aware mapping (pass the row's country in alongside the title); keep the 10-minute cache, the empty-array fallback, and the LA wall-clock conversion unchanged.
-- `src/components/hub/EconomicCalendar.tsx`: render the currency chip in the row header; add local `filter` state with the three options; adjust the caption and empty state.
+- `src/lib/market-data.ts`: widen the `EconEvent` impact union to include `"low"`.
+- `src/lib/econ-calendar.server.ts`: accept `low` alongside `high`/`medium`; keep the rule that non-USD only passes when high impact; skip the non-economic `All` country rows (for example G20 Meetings) so the list stays releases-only. Cache TTL, LA wall-clock conversion, and the sample-data fallback stay unchanged.
+- `src/components/hub/EconomicCalendar.tsx`: three-tier badge styling, dimmed row treatment for low, high-impact-only banner and next-release logic, updated caption.
 - No database or schema changes; no new dependencies.
