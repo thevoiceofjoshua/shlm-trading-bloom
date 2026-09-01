@@ -32,8 +32,8 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
     .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
   const [open, setOpen] = useState<number | null>(null);
 
-  // Next upcoming release
-  const next = events.find((e) => e.date + e.time >= todayStr);
+  // Next upcoming high-impact release — low rows stay background context.
+  const next = events.find((e) => e.impact === "high" && e.date + e.time >= todayStr);
 
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
