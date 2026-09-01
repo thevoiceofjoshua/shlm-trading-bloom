@@ -17,6 +17,13 @@ function sessionContext(laTime: string): string {
   return "Outside the SHLM trading windows";
 }
 
+/** Forex Factory tier language: solid = high, outlined = medium, faint = low. */
+const IMPACT_BADGE: Record<string, string> = {
+  high: "bg-foreground text-background",
+  medium: "border border-border text-foreground",
+  low: "border border-border/50 text-muted-foreground/70",
+};
+
 export function EconomicCalendar({ payload }: { payload: HubPayload }) {
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
