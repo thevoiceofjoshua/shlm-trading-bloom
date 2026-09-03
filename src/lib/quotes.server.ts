@@ -85,7 +85,7 @@ function toBars(raw: unknown): Bar[] {
 
 /** Yahoo symbol for each instrument shown in the Centre. */
 export const YAHOO_SYMBOLS: Record<string, string> = {
-  NASDAQ: "^IXIC",
+  NASDAQ: "^NDX",
   US30: "^DJI",
   "XAU/USD": "GC=F",
   AAPL: "AAPL",
@@ -288,7 +288,17 @@ export async function fetchDelayedQuotes(): Promise<Record<string, DelayedQuote>
       const meta = result?.meta as Record<string, number> | undefined;
       const price = meta?.['regularMarketPrice'];
       if (typeof price !== "number") return;
-      const prev = typeof meta?.['chartPreviousClose'] === "number" ? meta['chartPreviousClose'] : price;
+      // Prior close must come from the daily bars: with a multi-day range the
+      // feed's chartPreviousClose is the close before the whole window.
+      const dailyCloses = ((result?.indicators?.quote?.[0]?.close ?? []) as (number | null)[]).filter(
+        (n): n is number => typeof n === "number" && Number.isFinite(n),
+      );
+      const prev =
+        dailyCloses.length >= 2
+          ? dailyCloses[dailyCloses.length - 2]!
+          : typeof meta?.['chartPreviousClose'] === "number"
+            ? meta['chartPreviousClose']
+            : price;
       const quote = build(key, price, prev, meta?.['regularMarketDayHigh'], meta?.['regularMarketDayLow']);
 
       // Prior daily bar = the most recent completed session before today's.
