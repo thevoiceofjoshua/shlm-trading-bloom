@@ -168,6 +168,90 @@ function build(key: string, price: number, prev: number, high?: number, low?: nu
   };
 }
 
+function mkLevel(
+  label: string,
+  price: number,
+  side: "high" | "low",
+  dayHigh: number,
+  dayLow: number,
+): FeedLevel {
+  return {
+    label,
+    price: round(price, 2),
+    side,
+    swept: side === "high" ? dayHigh >= price : dayLow <= price,
+  };
+}
+
+/** 1H read: HH/HL = bullish, LH/LL = bearish, otherwise ranging. */
+function structureFrom(bars: Bar[], price: number, dayHigh: number, dayLow: number): FeedStructure | undefined {
+  if (bars.length < 12) return undefined;
+  const { highs, lows } = swings(bars, 2);
+  if (highs.length < 2 || lows.length < 2) return undefined;
+
+  const h1 = highs[highs.length - 1]!.price;
+  const h0 = highs[highs.length - 2]!.price;
+  const l1 = lows[lows.length - 1]!.price;
+  const l0 = lows[lows.length - 2]!.price;
+
+  let bias: FeedStructure["bias"] = "ranging";
+  if (h1 > h0 && l1 > l0) bias = "bullish";
+  else if (h1 < h0 && l1 < l0) bias = "bearish";
+
+  const above = highs.map((s) => s.price).filter((p) => p > price).sort((a, b) => a - b);
+  const below = lows.map((s) => s.price).filter((p) => p < price).sort((a, b) => b - a);
+
+  const targetPrice = bias === "bearish" ? below[0] : above[0];
+  const invalidPrice = bias === "bearish" ? above[0] : below[0];
+  const targetSide: "high" | "low" = bias === "bearish" ? "low" : "high";
+
+  return {
+    bias,
+    target:
+      typeof targetPrice === "number"
+        ? mkLevel(targetSide === "high" ? "1H swing high" : "1H swing low", targetPrice, targetSide, dayHigh, dayLow)
+        : undefined,
+    invalidation:
+      typeof invalidPrice === "number"
+        ? mkLevel(
+            targetSide === "high" ? "1H swing low" : "1H swing high",
+            invalidPrice,
+            targetSide === "high" ? "low" : "high",
+            dayHigh,
+            dayLow,
+          )
+        : undefined,
+  };
+}
+
+/** 5m swing points between price and the 1H target — the pullback shelf. */
+function pullbacksFrom(
+  bars: Bar[],
+  price: number,
+  target: FeedLevel | undefined,
+  dayHigh: number,
+  dayLow: number,
+): FeedLevel[] {
+  if (bars.length < 12 || !target) return [];
+  const { highs, lows } = swings(bars, 2);
+  const targetAbove = target.price > price;
+  const candidates = targetAbove
+    ? lows.map((s) => s.price).filter((p) => p < price)
+    : highs.map((s) => s.price).filter((p) => p > price && p < target.price + Math.abs(target.price - price) * 2);
+  const sorted = targetAbove ? candidates.sort((a, b) => b - a) : candidates.sort((a, b) => a - b);
+  const seen: number[] = [];
+  const out: FeedLevel[] = [];
+  for (const p of sorted) {
+    if (seen.some((s) => Math.abs(s - p) / price < 0.0004)) continue;
+    seen.push(p);
+    out.push(mkLevel(targetAbove ? "5m swing low" : "5m swing high", p, targetAbove ? "low" : "high", dayHigh, dayLow));
+    if (out.length === 2) break;
+  }
+  return out;
+}
+
+
+
 /**
  * Fetch every mapped instrument. Returns whatever succeeded (or the last cached
  * value); an empty object means the feed is unreachable.
