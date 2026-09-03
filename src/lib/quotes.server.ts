@@ -18,6 +18,10 @@ export interface FeedLevel {
 
 export interface FeedStructure {
   bias: "bullish" | "bearish" | "ranging";
+  /** Last confirmed structure shift on the 1H. */
+  event?: "BOS" | "CHoCH";
+  /** Latest swing sequence read, e.g. "HH / HL". */
+  sequence?: string;
   target?: FeedLevel;
   invalidation?: FeedLevel;
 }
@@ -198,6 +202,17 @@ function structureFrom(bars: Bar[], price: number, dayHigh: number, dayLow: numb
   if (h1 > h0 && l1 > l0) bias = "bullish";
   else if (h1 < h0 && l1 < l0) bias = "bearish";
 
+  const sequence = `${h1 > h0 ? "HH" : "LH"} / ${l1 > l0 ? "HL" : "LL"}`;
+
+  // Prior leg's bias: a flip means the last shift was a CHoCH, otherwise a BOS.
+  let event: FeedStructure["event"] | undefined;
+  if (highs.length >= 3 && lows.length >= 3) {
+    const hPrev = highs[highs.length - 3]!.price;
+    const lPrev = lows[lows.length - 3]!.price;
+    const prevBias = h0 > hPrev && l0 > lPrev ? "bullish" : h0 < hPrev && l0 < lPrev ? "bearish" : "ranging";
+    if (bias !== "ranging") event = prevBias !== "ranging" && prevBias !== bias ? "CHoCH" : "BOS";
+  }
+
   const above = highs.map((s) => s.price).filter((p) => p > price).sort((a, b) => a - b);
   const below = lows.map((s) => s.price).filter((p) => p < price).sort((a, b) => b - a);
 
@@ -207,6 +222,8 @@ function structureFrom(bars: Bar[], price: number, dayHigh: number, dayLow: numb
 
   return {
     bias,
+    event,
+    sequence,
     target:
       typeof targetPrice === "number"
         ? mkLevel(targetSide === "high" ? "1H swing high" : "1H swing low", targetPrice, targetSide, dayHigh, dayLow)

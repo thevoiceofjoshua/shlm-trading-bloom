@@ -77,6 +77,10 @@ export interface LiquidityLevel {
 /** 1H read: direction plus the draw on liquidity and the invalidation level. */
 export interface StructureRead {
   bias: "bullish" | "bearish" | "ranging";
+  /** Last confirmed 1H structure shift. */
+  event?: "BOS" | "CHoCH";
+  /** Latest swing sequence, e.g. "HH / HL". */
+  sequence?: string;
   target?: LiquidityLevel;
   invalidation?: LiquidityLevel;
 }
@@ -109,6 +113,8 @@ export const INDEX_QUOTES: LevelQuote[] = [
     premarketLow: 18_290.0,
     h1: {
       bias: "bullish",
+      event: "BOS",
+      sequence: "HH / HL",
       target: { label: "1H swing high", price: 18_560.0, side: "high", swept: false },
       invalidation: { label: "1H swing low", price: 18_262.0, side: "low", swept: false },
     },
@@ -131,6 +137,8 @@ export const INDEX_QUOTES: LevelQuote[] = [
     premarketLow: 41_700.0,
     h1: {
       bias: "bearish",
+      event: "CHoCH",
+      sequence: "LH / LL",
       target: { label: "1H swing low", price: 41_640.0, side: "low", swept: false },
       invalidation: { label: "1H swing high", price: 42_010.0, side: "high", swept: false },
     },
@@ -253,6 +261,8 @@ export const GOLD_QUOTE: LevelQuote = {
   dayLow: 2_508.5,
   h1: {
     bias: "bullish",
+    event: "BOS",
+    sequence: "HH / HL",
     target: { label: "1H swing high", price: 2_531.5, side: "high", swept: false },
     invalidation: { label: "1H swing low", price: 2_505.2, side: "low", swept: false },
   },
