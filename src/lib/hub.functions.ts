@@ -15,6 +15,7 @@ import {
   dowMovers,
   nasdaqMovers,
 } from "@/lib/market-data";
+import type { LevelQuote } from "@/lib/market-data";
 import { sessionStatuses } from "@/lib/hub-session";
 
 export interface HubAccess {
