@@ -32,3 +32,13 @@ Today the 1H structure and 5m entry zones are recomputed every time the feed cac
 - `src/components/hub/SessionBar.tsx` / `src/lib/market-data.ts`: shorten the two session labels.
 - `src/components/hub/MarketBoards.tsx`: swap the two entry-zone role labels and render the "levels set" note; the Gold desk reuses the same block.
 - No cron job needed — the first Centre view after 5:00 AM PST computes and stores that day's levels, and everyone else reads the same row.
+
+## 4. Gold desk and drivers polished to match the index cards
+
+The index cards carry the richer treatment (uppercase eyebrow, large tabular price, bias/BOS pills, badged levels), while the Gold desk and the two driver boards look plainer. Bring them up to the same finish, no new data:
+
+- Gold desk: same header rhythm as an index card (eyebrow, name, change chip), same price scale, and the day high/low shown as the same labelled pill pair the index cards use instead of loose "H / L" text.
+- Gold drivers: reuse the same macro tile component as the index boards, so gold gets the expandable "why" context and consistent arrows/spacing rather than a one-off tile.
+- Driver tiles (NASDAQ / Dow 30): unify padding and type scale, align the strength bar and change figure on one row, give each tile a subtle hover lift and a consistent muted note line so the grid reads as an even set at every breakpoint.
+- Section headers on both driver boards get the same eyebrow + divider treatment as the level blocks on the index cards.
+- All styling stays on existing semantic tokens (card, surface, border, muted-foreground) — no new colors, black-and-white luxury look preserved, mobile two-column grid unchanged.
