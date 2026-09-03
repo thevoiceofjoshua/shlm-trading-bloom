@@ -108,9 +108,21 @@ function ScalperLevels({ quote }: { quote: HubPayload["indexes"][number] }) {
   return (
     <>
       <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
-        <div className="flex items-center justify-between gap-2">
-          <p className="uppercase tracking-widest text-muted-foreground">1H structure</p>
-          {h1 ? biasPill(h1.bias) : null}
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="uppercase tracking-widest text-muted-foreground">1H structure — direction</p>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {h1?.event && (
+              <span className="rounded-full border border-border bg-surface px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-foreground">
+                {h1.event}
+              </span>
+            )}
+            {h1?.sequence && (
+              <span className="rounded-full border border-border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                {h1.sequence}
+              </span>
+            )}
+            {h1 ? biasPill(h1.bias) : null}
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-x-4 gap-y-3">
           <LevelRow level={h1?.target} role="Main target" price={quote.price} />
@@ -119,16 +131,18 @@ function ScalperLevels({ quote }: { quote: HubPayload["indexes"][number] }) {
       </div>
 
       <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
-        <p className="uppercase tracking-widest text-muted-foreground">5m pullback zones</p>
+        <p className="uppercase tracking-widest text-muted-foreground">5m execution — pullback entries</p>
         <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-          <LevelRow level={pullbacks[0]} role="Nearest pullback" price={quote.price} />
-          <LevelRow level={pullbacks[1]} role="Deeper pullback" price={quote.price} />
+          <LevelRow level={pullbacks[0]} role="First entry zone" price={quote.price} />
+          <LevelRow level={pullbacks[1]} role="Deeper entry zone" price={quote.price} />
         </div>
         <p className="pt-1 text-[10px] leading-relaxed text-muted-foreground/80">
-          Highs and lows are resting liquidity — price usually pulls back into these on the 5m before running the 1H target.
+          Direction and target come off the 1H (BOS continues it, CHoCH flips it). Execute on the 5m: wait for the pullback into these
+          untapped highs/lows, then run with the 1H draw.
         </p>
       </div>
     </>
+
   );
 }
 
