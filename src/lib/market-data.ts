@@ -261,6 +261,8 @@ export const GOLD_QUOTE: LevelQuote = {
   dayLow: 2_508.5,
   h1: {
     bias: "bullish",
+    event: "BOS",
+    sequence: "HH / HL",
     target: { label: "1H swing high", price: 2_531.5, side: "high", swept: false },
     invalidation: { label: "1H swing low", price: 2_505.2, side: "low", swept: false },
   },
