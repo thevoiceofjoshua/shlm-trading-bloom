@@ -65,13 +65,34 @@ export interface Quote {
   dayLow: number;
 }
 
+/** A high or low that scalpers treat as resting liquidity. */
+export interface LiquidityLevel {
+  label: string;
+  price: number;
+  side: "high" | "low";
+  /** True once today's range has traded through the level. */
+  swept: boolean;
+}
+
+/** 1H read: direction plus the draw on liquidity and the invalidation level. */
+export interface StructureRead {
+  bias: "bullish" | "bearish" | "ranging";
+  target?: LiquidityLevel;
+  invalidation?: LiquidityLevel;
+}
+
 export interface LevelQuote extends Quote {
   /** Levels are optional: the delayed feed omits any it cannot source. */
   priorDayHigh?: number;
   priorDayLow?: number;
   premarketHigh?: number;
   premarketLow?: number;
+  /** 1H structure — direction and main target. */
+  h1?: StructureRead;
+  /** 5m swing points between price and the 1H target. */
+  pullbacks?: LiquidityLevel[];
 }
+
 
 export const INDEX_QUOTES: LevelQuote[] = [
   {
@@ -86,6 +107,15 @@ export const INDEX_QUOTES: LevelQuote[] = [
     priorDayLow: 18_310.0,
     premarketHigh: 18_470.0,
     premarketLow: 18_290.0,
+    h1: {
+      bias: "bullish",
+      target: { label: "1H swing high", price: 18_560.0, side: "high", swept: false },
+      invalidation: { label: "1H swing low", price: 18_262.0, side: "low", swept: false },
+    },
+    pullbacks: [
+      { label: "5m swing low", price: 18_388.0, side: "low", swept: false },
+      { label: "5m swing low", price: 18_342.0, side: "low", swept: true },
+    ],
   },
   {
     symbol: "US30",
@@ -99,8 +129,18 @@ export const INDEX_QUOTES: LevelQuote[] = [
     priorDayLow: 41_680.0,
     premarketHigh: 41_940.0,
     premarketLow: 41_700.0,
+    h1: {
+      bias: "bearish",
+      target: { label: "1H swing low", price: 41_640.0, side: "low", swept: false },
+      invalidation: { label: "1H swing high", price: 42_010.0, side: "high", swept: false },
+    },
+    pullbacks: [
+      { label: "5m swing high", price: 41_868.0, side: "high", swept: false },
+      { label: "5m swing high", price: 41_912.0, side: "high", swept: false },
+    ],
   },
 ];
+
 
 export interface MagDriver extends Quote {
   /** Plain-English cause-and-effect line */
@@ -203,7 +243,7 @@ export const DOW_MACRO: MacroDriver[] = [
   },
 ];
 
-export const GOLD_QUOTE: Quote = {
+export const GOLD_QUOTE: LevelQuote = {
   symbol: "XAU/USD",
   name: "Gold",
   price: 2_518.4,
@@ -211,7 +251,17 @@ export const GOLD_QUOTE: Quote = {
   changePct: 0.27,
   dayHigh: 2_524.0,
   dayLow: 2_508.5,
+  h1: {
+    bias: "bullish",
+    target: { label: "1H swing high", price: 2_531.5, side: "high", swept: false },
+    invalidation: { label: "1H swing low", price: 2_505.2, side: "low", swept: false },
+  },
+  pullbacks: [
+    { label: "5m swing low", price: 2_515.6, side: "low", swept: false },
+    { label: "5m swing low", price: 2_511.8, side: "low", swept: true },
+  ],
 };
+
 
 export const GOLD_DRIVERS: MacroDriver[] = [
   {

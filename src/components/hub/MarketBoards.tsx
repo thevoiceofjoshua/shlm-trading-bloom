@@ -39,40 +39,99 @@ export function IndexCards({ payload }: { payload: HubPayload }) {
             <span>L {idx.dayLow.toLocaleString()}</span>
           </div>
 
-
-          <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
-            <p className="uppercase tracking-widest text-muted-foreground">Key levels</p>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-              <KeyLevel label="Yesterday High" val={idx.priorDayHigh} role="Resistance" tone="up" />
-              <KeyLevel label="Pre-Market High" val={idx.premarketHigh} role="Breakout" tone="up" />
-              <KeyLevel label="Yesterday Low" val={idx.priorDayLow} role="Support" tone="down" />
-              <KeyLevel label="Pre-Market Low" val={idx.premarketLow} role="Floor" tone="down" />
-            </div>
-            <p className="pt-1 text-[10px] leading-relaxed text-muted-foreground/80">
-              Highs mark where price struggled to rise; lows mark where it struggled to fall.
-            </p>
-          </div>
+          <ScalperLevels quote={idx} />
         </div>
       ))}
     </div>
   );
 }
 
-function KeyLevel({ label, val, role, tone }: { label: string; val?: number; role: string; tone: "up" | "down" }) {
-  const roleColor = tone === "up" ? "text-emerald-500" : "text-red-500";
-  const has = typeof val === "number" && Number.isFinite(val);
+type LiqLevel = NonNullable<HubPayload["indexes"][number]["pullbacks"]>[number];
+type Structure = NonNullable<HubPayload["indexes"][number]["h1"]>;
+
+function biasPill(bias: Structure["bias"]) {
+  const map = {
+    bullish: { text: "↑ Bullish", cls: "border-emerald-500/40 text-emerald-500" },
+    bearish: { text: "↓ Bearish", cls: "border-red-500/40 text-red-500" },
+    ranging: { text: "→ Ranging", cls: "border-border text-muted-foreground" },
+  } as const;
+  const b = map[bias];
+  return (
+    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${b.cls}`}>
+      {b.text}
+    </span>
+  );
+}
+
+function LevelRow({ level, role, price }: { level?: LiqLevel; role: string; price: number }) {
+  if (!level) {
+    return (
+      <div>
+        <p className="text-muted-foreground">{role}</p>
+        <p className="font-display text-base font-medium text-muted-foreground">—</p>
+        <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">No data</p>
+      </div>
+    );
+  }
+  const dist = level.price - price;
+  const pct = price ? (dist / price) * 100 : 0;
+  const toneCls = level.side === "high" ? "text-emerald-500" : "text-red-500";
   return (
     <div>
-      <p className="text-muted-foreground">{label}</p>
-      <p className="font-display text-base font-medium tabular-nums text-foreground">
-        {has ? val.toLocaleString() : <span className="text-muted-foreground">—</span>}
+      <p className="text-muted-foreground">
+        {role} <span className="text-muted-foreground/60">· {level.label}</span>
       </p>
-      <p className={`mt-0.5 text-[10px] font-semibold uppercase tracking-widest ${has ? roleColor : "text-muted-foreground"}`}>
-        {has ? role : "No data"}
+      <p className={`font-display text-base font-medium tabular-nums ${level.swept ? "text-muted-foreground" : "text-foreground"}`}>
+        {level.price.toLocaleString()}
       </p>
+      <div className="mt-0.5 flex items-center gap-2">
+        <span
+          className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${
+            level.swept ? "bg-border/60 text-muted-foreground" : `bg-transparent ring-1 ring-current ${toneCls}`
+          }`}
+        >
+          {level.swept ? "Swept" : "Untapped"}
+        </span>
+        <span className="text-[10px] tabular-nums text-muted-foreground">
+          {dist >= 0 ? "+" : ""}
+          {Math.abs(dist) >= 100 ? Math.round(dist).toLocaleString() : dist.toFixed(1)} ({pct >= 0 ? "+" : ""}
+          {pct.toFixed(2)}%)
+        </span>
+      </div>
     </div>
   );
 }
+
+function ScalperLevels({ quote }: { quote: HubPayload["indexes"][number] }) {
+  const h1 = quote.h1;
+  const pullbacks = quote.pullbacks ?? [];
+  return (
+    <>
+      <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
+        <div className="flex items-center justify-between gap-2">
+          <p className="uppercase tracking-widest text-muted-foreground">1H structure</p>
+          {h1 ? biasPill(h1.bias) : null}
+        </div>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+          <LevelRow level={h1?.target} role="Main target" price={quote.price} />
+          <LevelRow level={h1?.invalidation} role="Invalidation" price={quote.price} />
+        </div>
+      </div>
+
+      <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
+        <p className="uppercase tracking-widest text-muted-foreground">5m pullback zones</p>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+          <LevelRow level={pullbacks[0]} role="Nearest pullback" price={quote.price} />
+          <LevelRow level={pullbacks[1]} role="Deeper pullback" price={quote.price} />
+        </div>
+        <p className="pt-1 text-[10px] leading-relaxed text-muted-foreground/80">
+          Highs and lows are resting liquidity — price usually pulls back into these on the 5m before running the 1H target.
+        </p>
+      </div>
+    </>
+  );
+}
+
 
 export function MagSevenBoard({ payload }: { payload: HubPayload }) {
   return (
@@ -191,6 +250,9 @@ export function GoldDesk({ payload }: { payload: HubPayload }) {
         <span>H {g.dayHigh.toFixed(1)}</span>
         <span>L {g.dayLow.toFixed(1)}</span>
       </div>
+
+      <ScalperLevels quote={g} />
+
 
       <div className="mt-4 border-t border-border pt-4">
         <p className="text-xs uppercase tracking-widest text-muted-foreground">Gold drivers</p>

@@ -9,6 +9,19 @@
  * caller keeps the typed sample dataset instead of breaking the Centre.
  */
 
+export interface FeedLevel {
+  label: string;
+  price: number;
+  side: "high" | "low";
+  swept: boolean;
+}
+
+export interface FeedStructure {
+  bias: "bullish" | "bearish" | "ranging";
+  target?: FeedLevel;
+  invalidation?: FeedLevel;
+}
+
 export interface DelayedQuote {
   symbol: string;
   price: number;
@@ -23,7 +36,52 @@ export interface DelayedQuote {
   /** Pre-market extremes for today (only when pre-session bars exist). */
   premarketHigh?: number;
   premarketLow?: number;
+  /** 1H structure read: direction, main target, invalidation. */
+  h1?: FeedStructure;
+  /** 5m swing points sitting between price and the 1H target. */
+  pullbacks?: FeedLevel[];
 }
+
+interface Bar {
+  high: number;
+  low: number;
+}
+
+/** Fractal swing detection: bar i is a swing when it dominates ±k neighbours. */
+function swings(bars: Bar[], k = 2) {
+  const highs: { i: number; price: number }[] = [];
+  const lows: { i: number; price: number }[] = [];
+  for (let i = k; i < bars.length - k; i += 1) {
+    const b = bars[i]!;
+    let isHigh = true;
+    let isLow = true;
+    for (let j = i - k; j <= i + k; j += 1) {
+      if (j === i) continue;
+      const n = bars[j]!;
+      if (n.high >= b.high) isHigh = false;
+      if (n.low <= b.low) isLow = false;
+    }
+    if (isHigh) highs.push({ i, price: b.high });
+    if (isLow) lows.push({ i, price: b.low });
+  }
+  return { highs, lows };
+}
+
+function toBars(raw: unknown): Bar[] {
+  const q = raw as { high?: (number | null)[]; low?: (number | null)[] } | undefined;
+  const hs = q?.high ?? [];
+  const ls = q?.low ?? [];
+  const out: Bar[] = [];
+  for (let i = 0; i < hs.length; i += 1) {
+    const h = hs[i];
+    const l = ls[i];
+    if (typeof h === "number" && typeof l === "number" && Number.isFinite(h) && Number.isFinite(l)) {
+      out.push({ high: h, low: l });
+    }
+  }
+  return out;
+}
+
 
 /** Yahoo symbol for each instrument shown in the Centre. */
 export const YAHOO_SYMBOLS: Record<string, string> = {
@@ -110,6 +168,90 @@ function build(key: string, price: number, prev: number, high?: number, low?: nu
   };
 }
 
+function mkLevel(
+  label: string,
+  price: number,
+  side: "high" | "low",
+  dayHigh: number,
+  dayLow: number,
+): FeedLevel {
+  return {
+    label,
+    price: round(price, 2),
+    side,
+    swept: side === "high" ? dayHigh >= price : dayLow <= price,
+  };
+}
+
+/** 1H read: HH/HL = bullish, LH/LL = bearish, otherwise ranging. */
+function structureFrom(bars: Bar[], price: number, dayHigh: number, dayLow: number): FeedStructure | undefined {
+  if (bars.length < 12) return undefined;
+  const { highs, lows } = swings(bars, 2);
+  if (highs.length < 2 || lows.length < 2) return undefined;
+
+  const h1 = highs[highs.length - 1]!.price;
+  const h0 = highs[highs.length - 2]!.price;
+  const l1 = lows[lows.length - 1]!.price;
+  const l0 = lows[lows.length - 2]!.price;
+
+  let bias: FeedStructure["bias"] = "ranging";
+  if (h1 > h0 && l1 > l0) bias = "bullish";
+  else if (h1 < h0 && l1 < l0) bias = "bearish";
+
+  const above = highs.map((s) => s.price).filter((p) => p > price).sort((a, b) => a - b);
+  const below = lows.map((s) => s.price).filter((p) => p < price).sort((a, b) => b - a);
+
+  const targetPrice = bias === "bearish" ? below[0] : above[0];
+  const invalidPrice = bias === "bearish" ? above[0] : below[0];
+  const targetSide: "high" | "low" = bias === "bearish" ? "low" : "high";
+
+  return {
+    bias,
+    target:
+      typeof targetPrice === "number"
+        ? mkLevel(targetSide === "high" ? "1H swing high" : "1H swing low", targetPrice, targetSide, dayHigh, dayLow)
+        : undefined,
+    invalidation:
+      typeof invalidPrice === "number"
+        ? mkLevel(
+            targetSide === "high" ? "1H swing low" : "1H swing high",
+            invalidPrice,
+            targetSide === "high" ? "low" : "high",
+            dayHigh,
+            dayLow,
+          )
+        : undefined,
+  };
+}
+
+/** 5m swing points between price and the 1H target — the pullback shelf. */
+function pullbacksFrom(
+  bars: Bar[],
+  price: number,
+  target: FeedLevel | undefined,
+  dayHigh: number,
+  dayLow: number,
+): FeedLevel[] {
+  if (bars.length < 12 || !target) return [];
+  const { highs, lows } = swings(bars, 2);
+  const targetAbove = target.price > price;
+  const candidates = targetAbove
+    ? lows.map((s) => s.price).filter((p) => p < price)
+    : highs.map((s) => s.price).filter((p) => p > price && p < target.price + Math.abs(target.price - price) * 2);
+  const sorted = targetAbove ? candidates.sort((a, b) => b - a) : candidates.sort((a, b) => a - b);
+  const seen: number[] = [];
+  const out: FeedLevel[] = [];
+  for (const p of sorted) {
+    if (seen.some((s) => Math.abs(s - p) / price < 0.0004)) continue;
+    seen.push(p);
+    out.push(mkLevel(targetAbove ? "5m swing low" : "5m swing high", p, targetAbove ? "low" : "high", dayHigh, dayLow));
+    if (out.length === 2) break;
+  }
+  return out;
+}
+
+
+
 /**
  * Fetch every mapped instrument. Returns whatever succeeded (or the last cached
  * value); an empty object means the feed is unreachable.
@@ -182,7 +324,18 @@ export async function fetchDelayedQuotes(): Promise<Record<string, DelayedQuote>
         }
       }
 
+      // 1H structure (direction + main target) and the 5m pullback shelf.
+      const h1json = await getJson(`/v8/finance/chart/${encodeURIComponent(sym)}?interval=60m&range=1mo`);
+      const h1bars = toBars(h1json?.chart?.result?.[0]?.indicators?.quote?.[0]);
+      const structure = structureFrom(h1bars, quote.price, quote.dayHigh, quote.dayLow);
+      if (structure) {
+        quote.h1 = structure;
+        const m5bars = toBars(preBars);
+        quote.pullbacks = pullbacksFrom(m5bars, quote.price, structure.target, quote.dayHigh, quote.dayLow);
+      }
+
       out[key] = quote;
+
     }),
   );
 
