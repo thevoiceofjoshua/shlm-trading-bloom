@@ -137,6 +137,8 @@ export const INDEX_QUOTES: LevelQuote[] = [
     premarketLow: 41_700.0,
     h1: {
       bias: "bearish",
+      event: "CHoCH",
+      sequence: "LH / LL",
       target: { label: "1H swing low", price: 41_640.0, side: "low", swept: false },
       invalidation: { label: "1H swing high", price: 42_010.0, side: "high", swept: false },
     },
