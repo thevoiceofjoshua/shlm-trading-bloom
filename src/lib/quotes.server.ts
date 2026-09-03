@@ -44,7 +44,10 @@ export interface DelayedQuote {
   h1?: FeedStructure;
   /** 5m swing points sitting between price and the 1H target. */
   pullbacks?: FeedLevel[];
+  /** ISO timestamp of the daily 5:00am PST run that locked the levels in. */
+  levelsSetAt?: string;
 }
+
 
 interface Bar {
   high: number;
@@ -267,6 +270,97 @@ function pullbacksFrom(
   return out;
 }
 
+/* ------------------- Daily level lock (5:00am PST, Mon–Fri) ----------------- */
+
+const LA_TZ = "America/Los_Angeles";
+/** Levels for a trading day are set by the first run at/after this LA hour. */
+const LEVELS_HOUR = 5;
+
+interface StoredLevels {
+  h1?: FeedStructure;
+  pullbacks?: FeedLevel[];
+}
+
+/**
+ * The trading day whose 5:00am PST run owns the levels currently on screen.
+ * Before 5:00am we still show the previous day's, and weekends hold Friday's.
+ */
+export function levelsSessionDate(now: Date = new Date()): string {
+  const fmt = new Intl.DateTimeFormat("en-CA", {
+    timeZone: LA_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    hour12: false,
+  });
+  const parts = fmt.formatToParts(now);
+  const get = (t: string) => parseInt(parts.find((p) => p.type === t)?.value ?? "0", 10);
+  let anchor = Date.UTC(get("year"), get("month") - 1, get("day"));
+  if (get("hour") % 24 < LEVELS_HOUR) anchor -= 86_400_000;
+  // Weekends roll back to Friday.
+  while ([0, 6].includes(new Date(anchor).getUTCDay())) anchor -= 86_400_000;
+  return new Date(anchor).toISOString().slice(0, 10);
+}
+
+/** Re-stamp SWEPT against today's live range so tapped levels retire instantly. */
+function applySwept(levels: StoredLevels, dayHigh: number, dayLow: number): StoredLevels {
+  const mark = (l?: FeedLevel): FeedLevel | undefined =>
+    l ? { ...l, swept: l.side === "high" ? dayHigh >= l.price : dayLow <= l.price } : undefined;
+  return {
+    h1: levels.h1
+      ? { ...levels.h1, target: mark(levels.h1.target), invalidation: mark(levels.h1.invalidation) }
+      : undefined,
+    pullbacks: (levels.pullbacks ?? []).map((l) => mark(l)!).filter(Boolean),
+  };
+}
+
+async function readStoredLevels(
+  instrument: string,
+  day: string,
+): Promise<{ levels: StoredLevels; computedAt: string } | null> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await (supabaseAdmin as any)
+      .from("daily_levels")
+      .select("levels, computed_at")
+      .eq("instrument", instrument)
+      .eq("session_date", day)
+      .maybeSingle();
+    if (!data?.levels) return null;
+    return { levels: data.levels as StoredLevels, computedAt: String(data.computed_at) };
+  } catch {
+    return null;
+  }
+}
+
+async function writeStoredLevels(instrument: string, day: string, levels: StoredLevels): Promise<string | null> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const computedAt = new Date().toISOString();
+    await (supabaseAdmin as any)
+      .from("daily_levels")
+      .upsert(
+        { instrument, session_date: day, levels, computed_at: computedAt },
+        { onConflict: "instrument,session_date", ignoreDuplicates: true },
+      );
+    return computedAt;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Levels are computed once per trading day and then held: prices keep ticking,
+ * but the 1H structure and 5m entry zones stay put until the next 5:00am PST.
+ */
+async function dailyLevels(instrument: string, fresh: StoredLevels, dayHigh: number, dayLow: number) {
+  const day = levelsSessionDate();
+  const stored = await readStoredLevels(instrument, day);
+  if (stored) return { ...applySwept(stored.levels, dayHigh, dayLow), levelsSetAt: stored.computedAt };
+  const computedAt = await writeStoredLevels(instrument, day, fresh);
+  return { ...fresh, levelsSetAt: computedAt ?? undefined };
+}
 
 
 /**
@@ -352,14 +446,22 @@ export async function fetchDelayedQuotes(): Promise<Record<string, DelayedQuote>
       }
 
       // 1H structure (direction + main target) and the 5m pullback shelf.
+      // Computed fresh, then locked to the day's 5:00am PST snapshot.
       const h1json = await getJson(`/v8/finance/chart/${encodeURIComponent(sym)}?interval=60m&range=1mo`);
       const h1bars = toBars(h1json?.chart?.result?.[0]?.indicators?.quote?.[0]);
       const structure = structureFrom(h1bars, quote.price, quote.dayHigh, quote.dayLow);
       if (structure) {
-        quote.h1 = structure;
         const m5bars = toBars(preBars);
-        quote.pullbacks = pullbacksFrom(m5bars, quote.price, structure.target, quote.dayHigh, quote.dayLow);
+        const fresh = {
+          h1: structure,
+          pullbacks: pullbacksFrom(m5bars, quote.price, structure.target, quote.dayHigh, quote.dayLow),
+        };
+        const locked = await dailyLevels(key, fresh, quote.dayHigh, quote.dayLow);
+        quote.h1 = locked.h1;
+        quote.pullbacks = locked.pullbacks;
+        quote.levelsSetAt = locked.levelsSetAt;
       }
+
 
       out[key] = quote;
 
