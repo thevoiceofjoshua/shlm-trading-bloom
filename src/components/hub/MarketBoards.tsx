@@ -251,6 +251,9 @@ export function GoldDesk({ payload }: { payload: HubPayload }) {
         <span>L {g.dayLow.toFixed(1)}</span>
       </div>
 
+      <ScalperLevels quote={g} />
+
+
       <div className="mt-4 border-t border-border pt-4">
         <p className="text-xs uppercase tracking-widest text-muted-foreground">Gold drivers</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
