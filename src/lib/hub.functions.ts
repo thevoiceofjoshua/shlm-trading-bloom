@@ -95,6 +95,8 @@ function applyDelayedQuotes(
       priorDayLow?: number;
       premarketHigh?: number;
       premarketLow?: number;
+      h1?: LevelQuote["h1"];
+      pullbacks?: LevelQuote["pullbacks"];
     }
   >,
 ) {
@@ -114,6 +116,8 @@ function applyDelayedQuotes(
       priorDayLow: q.priorDayLow,
       premarketHigh: q.premarketHigh,
       premarketLow: q.premarketLow,
+      h1: q.h1,
+      pullbacks: q.pullbacks,
     };
   });
 
@@ -135,8 +139,11 @@ function applyDelayedQuotes(
       changePct: g.changePct,
       dayHigh: g.dayHigh,
       dayLow: g.dayLow,
+      h1: g.h1,
+      pullbacks: g.pullbacks,
     };
   }
+
 
   // Macro tiles: 10-year yield, dollar index, crude.
   const macroValue = (label: string): { value: string; direction: "up" | "down" | "flat" } | null => {
