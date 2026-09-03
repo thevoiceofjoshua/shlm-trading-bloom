@@ -98,6 +98,7 @@ function applyDelayedQuotes(
       premarketLow?: number;
       h1?: LevelQuote["h1"];
       pullbacks?: LevelQuote["pullbacks"];
+      levelsSetAt?: string;
     }
   >,
 ) {
@@ -119,6 +120,7 @@ function applyDelayedQuotes(
       premarketLow: q.premarketLow,
       h1: q.h1,
       pullbacks: q.pullbacks,
+      levelsSetAt: q.levelsSetAt,
     };
   });
 
@@ -142,6 +144,7 @@ function applyDelayedQuotes(
       dayLow: g.dayLow,
       h1: g.h1,
       pullbacks: g.pullbacks,
+      levelsSetAt: g.levelsSetAt,
     };
   }
 
