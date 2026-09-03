@@ -77,6 +77,10 @@ export interface LiquidityLevel {
 /** 1H read: direction plus the draw on liquidity and the invalidation level. */
 export interface StructureRead {
   bias: "bullish" | "bearish" | "ranging";
+  /** Last confirmed 1H structure shift. */
+  event?: "BOS" | "CHoCH";
+  /** Latest swing sequence, e.g. "HH / HL". */
+  sequence?: string;
   target?: LiquidityLevel;
   invalidation?: LiquidityLevel;
 }
