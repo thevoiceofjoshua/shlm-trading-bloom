@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { HubPayload } from "@/lib/hub.functions";
 
 function changeColor(pct: number) {
@@ -37,7 +37,7 @@ function RangePills({ high, low, dp = 0 }: { high: number; low: number; dp?: num
   );
 }
 
-function SectionHead({ title, right }: { title: string; right?: React.ReactNode }) {
+function SectionHead({ title, right }: { title: string; right?: ReactNode }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-2">
       <p className="text-xs uppercase tracking-widest text-muted-foreground">{title}</p>
