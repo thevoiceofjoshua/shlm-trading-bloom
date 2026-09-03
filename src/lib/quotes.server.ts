@@ -446,14 +446,22 @@ export async function fetchDelayedQuotes(): Promise<Record<string, DelayedQuote>
       }
 
       // 1H structure (direction + main target) and the 5m pullback shelf.
+      // Computed fresh, then locked to the day's 5:00am PST snapshot.
       const h1json = await getJson(`/v8/finance/chart/${encodeURIComponent(sym)}?interval=60m&range=1mo`);
       const h1bars = toBars(h1json?.chart?.result?.[0]?.indicators?.quote?.[0]);
       const structure = structureFrom(h1bars, quote.price, quote.dayHigh, quote.dayLow);
       if (structure) {
-        quote.h1 = structure;
         const m5bars = toBars(preBars);
-        quote.pullbacks = pullbacksFrom(m5bars, quote.price, structure.target, quote.dayHigh, quote.dayLow);
+        const fresh = {
+          h1: structure,
+          pullbacks: pullbacksFrom(m5bars, quote.price, structure.target, quote.dayHigh, quote.dayLow),
+        };
+        const locked = await dailyLevels(key, fresh, quote.dayHigh, quote.dayLow);
+        quote.h1 = locked.h1;
+        quote.pullbacks = locked.pullbacks;
+        quote.levelsSetAt = locked.levelsSetAt;
       }
+
 
       out[key] = quote;
 
