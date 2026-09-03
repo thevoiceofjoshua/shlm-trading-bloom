@@ -9,6 +9,19 @@
  * caller keeps the typed sample dataset instead of breaking the Centre.
  */
 
+export interface FeedLevel {
+  label: string;
+  price: number;
+  side: "high" | "low";
+  swept: boolean;
+}
+
+export interface FeedStructure {
+  bias: "bullish" | "bearish" | "ranging";
+  target?: FeedLevel;
+  invalidation?: FeedLevel;
+}
+
 export interface DelayedQuote {
   symbol: string;
   price: number;
@@ -23,7 +36,52 @@ export interface DelayedQuote {
   /** Pre-market extremes for today (only when pre-session bars exist). */
   premarketHigh?: number;
   premarketLow?: number;
+  /** 1H structure read: direction, main target, invalidation. */
+  h1?: FeedStructure;
+  /** 5m swing points sitting between price and the 1H target. */
+  pullbacks?: FeedLevel[];
 }
+
+interface Bar {
+  high: number;
+  low: number;
+}
+
+/** Fractal swing detection: bar i is a swing when it dominates ±k neighbours. */
+function swings(bars: Bar[], k = 2) {
+  const highs: { i: number; price: number }[] = [];
+  const lows: { i: number; price: number }[] = [];
+  for (let i = k; i < bars.length - k; i += 1) {
+    const b = bars[i]!;
+    let isHigh = true;
+    let isLow = true;
+    for (let j = i - k; j <= i + k; j += 1) {
+      if (j === i) continue;
+      const n = bars[j]!;
+      if (n.high >= b.high) isHigh = false;
+      if (n.low <= b.low) isLow = false;
+    }
+    if (isHigh) highs.push({ i, price: b.high });
+    if (isLow) lows.push({ i, price: b.low });
+  }
+  return { highs, lows };
+}
+
+function toBars(raw: unknown): Bar[] {
+  const q = raw as { high?: (number | null)[]; low?: (number | null)[] } | undefined;
+  const hs = q?.high ?? [];
+  const ls = q?.low ?? [];
+  const out: Bar[] = [];
+  for (let i = 0; i < hs.length; i += 1) {
+    const h = hs[i];
+    const l = ls[i];
+    if (typeof h === "number" && typeof l === "number" && Number.isFinite(h) && Number.isFinite(l)) {
+      out.push({ high: h, low: l });
+    }
+  }
+  return out;
+}
+
 
 /** Yahoo symbol for each instrument shown in the Centre. */
 export const YAHOO_SYMBOLS: Record<string, string> = {
