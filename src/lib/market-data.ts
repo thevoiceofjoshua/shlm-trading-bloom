@@ -32,7 +32,7 @@ export interface SessionWindow {
 export const SESSIONS: SessionWindow[] = [
   {
     key: "ny-open",
-    label: "NY Open — NASDAQ / US30",
+    label: "NY Open",
     pairs: ["NASDAQ", "DOW (US30)"],
     startH: 6,
     startM: 30,
@@ -42,7 +42,7 @@ export const SESSIONS: SessionWindow[] = [
   },
   {
     key: "gold",
-    label: "Asia Session — XAU/USD",
+    label: "Asia Session",
     pairs: ["XAU/USD (Gold)"],
     startH: 17,
     startM: 0,
@@ -95,6 +95,8 @@ export interface LevelQuote extends Quote {
   h1?: StructureRead;
   /** 5m swing points between price and the 1H target. */
   pullbacks?: LiquidityLevel[];
+  /** ISO timestamp of the 5:00am PST run that locked these levels in. */
+  levelsSetAt?: string;
 }
 
 
