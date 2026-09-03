@@ -65,13 +65,34 @@ export interface Quote {
   dayLow: number;
 }
 
+/** A high or low that scalpers treat as resting liquidity. */
+export interface LiquidityLevel {
+  label: string;
+  price: number;
+  side: "high" | "low";
+  /** True once today's range has traded through the level. */
+  swept: boolean;
+}
+
+/** 1H read: direction plus the draw on liquidity and the invalidation level. */
+export interface StructureRead {
+  bias: "bullish" | "bearish" | "ranging";
+  target?: LiquidityLevel;
+  invalidation?: LiquidityLevel;
+}
+
 export interface LevelQuote extends Quote {
   /** Levels are optional: the delayed feed omits any it cannot source. */
   priorDayHigh?: number;
   priorDayLow?: number;
   premarketHigh?: number;
   premarketLow?: number;
+  /** 1H structure — direction and main target. */
+  h1?: StructureRead;
+  /** 5m swing points between price and the 1H target. */
+  pullbacks?: LiquidityLevel[];
 }
+
 
 export const INDEX_QUOTES: LevelQuote[] = [
   {
