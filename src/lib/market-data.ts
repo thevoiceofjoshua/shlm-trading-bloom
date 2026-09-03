@@ -243,7 +243,7 @@ export const DOW_MACRO: MacroDriver[] = [
   },
 ];
 
-export const GOLD_QUOTE: Quote = {
+export const GOLD_QUOTE: LevelQuote = {
   symbol: "XAU/USD",
   name: "Gold",
   price: 2_518.4,
@@ -251,7 +251,17 @@ export const GOLD_QUOTE: Quote = {
   changePct: 0.27,
   dayHigh: 2_524.0,
   dayLow: 2_508.5,
+  h1: {
+    bias: "bullish",
+    target: { label: "1H swing high", price: 2_531.5, side: "high", swept: false },
+    invalidation: { label: "1H swing low", price: 2_505.2, side: "low", swept: false },
+  },
+  pullbacks: [
+    { label: "5m swing low", price: 2_515.6, side: "low", swept: false },
+    { label: "5m swing low", price: 2_511.8, side: "low", swept: true },
+  ],
 };
+
 
 export const GOLD_DRIVERS: MacroDriver[] = [
   {
