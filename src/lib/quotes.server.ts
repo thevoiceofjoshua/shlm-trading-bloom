@@ -44,7 +44,10 @@ export interface DelayedQuote {
   h1?: FeedStructure;
   /** 5m swing points sitting between price and the 1H target. */
   pullbacks?: FeedLevel[];
+  /** ISO timestamp of the daily 5:00am PST run that locked the levels in. */
+  levelsSetAt?: string;
 }
+
 
 interface Bar {
   high: number;
