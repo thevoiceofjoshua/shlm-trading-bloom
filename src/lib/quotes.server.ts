@@ -18,6 +18,10 @@ export interface FeedLevel {
 
 export interface FeedStructure {
   bias: "bullish" | "bearish" | "ranging";
+  /** Last confirmed structure shift on the 1H. */
+  event?: "BOS" | "CHoCH";
+  /** Latest swing sequence read, e.g. "HH / HL". */
+  sequence?: string;
   target?: FeedLevel;
   invalidation?: FeedLevel;
 }
