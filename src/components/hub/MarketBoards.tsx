@@ -17,6 +17,52 @@ function strengthBar(pct: number) {
   );
 }
 
+function RangePills({ high, low, dp = 0 }: { high: number; low: number; dp?: number }) {
+  const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: dp, maximumFractionDigits: dp });
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-2">
+      {[
+        { k: "High", v: high },
+        { k: "Low", v: low },
+      ].map(({ k, v }) => (
+        <span
+          key={k}
+          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-2.5 py-1 text-[11px]"
+        >
+          <span className="uppercase tracking-widest text-muted-foreground">{k}</span>
+          <span className="font-display font-medium tabular-nums">{fmt(v)}</span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function SectionHead({ title, right }: { title: string; right?: React.ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <p className="text-xs uppercase tracking-widest text-muted-foreground">{title}</p>
+      {right}
+    </div>
+  );
+}
+
+function DriverTile({ d }: { d: { symbol: string; price: number; changePct: number; note: string } }) {
+  return (
+    <div className="min-w-0 rounded-xl border border-border bg-surface p-3 transition-colors hover:border-foreground/40">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="truncate text-xs font-semibold uppercase tracking-wider">{d.symbol}</p>
+        <p className={`shrink-0 text-[11px] font-medium tabular-nums ${changeColor(d.changePct)}`}>
+          {d.changePct >= 0 ? "+" : ""}
+          {d.changePct}%
+        </p>
+      </div>
+      <p className="mt-1 font-display text-base font-medium tabular-nums">{d.price.toFixed(1)}</p>
+      <div className="mt-2">{strengthBar(d.changePct)}</div>
+      <p className="mt-2 text-[11px] leading-snug text-muted-foreground">{d.note}</p>
+    </div>
+  );
+}
+
 export function IndexCards({ payload }: { payload: HubPayload }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -34,10 +80,7 @@ export function IndexCards({ payload }: { payload: HubPayload }) {
             </span>
           </div>
           <p className="mt-3 font-display text-[1.75rem] font-medium tabular-nums sm:text-3xl">{idx.price.toLocaleString()}</p>
-          <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
-            <span>H {idx.dayHigh.toLocaleString()}</span>
-            <span>L {idx.dayLow.toLocaleString()}</span>
-          </div>
+          <RangePills high={idx.dayHigh} low={idx.dayLow} />
 
           <ScalperLevels quote={idx} />
         </div>
@@ -133,12 +176,17 @@ function ScalperLevels({ quote }: { quote: HubPayload["indexes"][number] }) {
       <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
         <p className="uppercase tracking-widest text-muted-foreground">5m execution — pullback entries</p>
         <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-          <LevelRow level={pullbacks[0]} role="First entry zone" price={quote.price} />
-          <LevelRow level={pullbacks[1]} role="Deeper entry zone" price={quote.price} />
+          <LevelRow level={pullbacks[0]} role="Deeper entry zone" price={quote.price} />
+          <LevelRow level={pullbacks[1]} role="First entry zone" price={quote.price} />
         </div>
         <p className="pt-1 text-[10px] leading-relaxed text-muted-foreground/80">
           Direction and target come off the 1H (BOS continues it, CHoCH flips it). Execute on the 5m: wait for the pullback into these
           untapped highs/lows, then run with the 1H draw.
+        </p>
+        <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70">
+          {quote.levelsSetAt
+            ? `Levels set ${new Date(quote.levelsSetAt).toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })} PST`
+            : "Levels set 5:00 AM PST"}
         </p>
       </div>
     </>
@@ -156,21 +204,12 @@ export function MagSevenBoard({ payload }: { payload: HubPayload }) {
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {payload.magSeven.map((s) => (
-          <div key={s.symbol} className="min-w-0 rounded-lg border border-border bg-surface p-3">
-            <p className="text-xs font-semibold">{s.symbol}</p>
-            <p className="mt-1 font-display text-sm font-medium tabular-nums">{s.price.toFixed(1)}</p>
-            <p className={`text-xs ${changeColor(s.changePct)}`}>
-              {s.changePct >= 0 ? "+" : ""}
-              {s.changePct}%
-            </p>
-            <div className="mt-2">{strengthBar(s.changePct)}</div>
-            <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{s.note}</p>
-          </div>
+          <DriverTile key={s.symbol} d={s} />
         ))}
       </div>
 
       <div className="mt-5 border-t border-border pt-4">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground">Macro drivers</p>
+        <SectionHead title="Macro drivers" />
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           {(payload.nasdaqMacro ?? []).map((m) => (
             <MacroTile key={m.label} macro={m} />
@@ -190,21 +229,12 @@ export function DowBoard({ payload }: { payload: HubPayload }) {
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {payload.dowDrivers.map((d) => (
-          <div key={d.symbol} className="min-w-0 rounded-lg border border-border bg-surface p-3">
-            <p className="text-xs font-semibold">{d.symbol}</p>
-            <p className="mt-0.5 font-display text-sm font-medium tabular-nums">{d.price.toFixed(1)}</p>
-            <p className={`text-xs ${changeColor(d.changePct)}`}>
-              {d.changePct >= 0 ? "+" : ""}
-              {d.changePct}%
-            </p>
-            <div className="mt-1.5">{strengthBar(d.changePct)}</div>
-            <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{d.note}</p>
-          </div>
+          <DriverTile key={d.symbol} d={d} />
         ))}
       </div>
 
       <div className="mt-5 border-t border-border pt-4">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground">Macro drivers</p>
+        <SectionHead title="Macro drivers" />
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           {payload.dowMacro.map((m) => (
             <MacroTile key={m.label} macro={m} />
@@ -260,34 +290,17 @@ export function GoldDesk({ payload }: { payload: HubPayload }) {
       </div>
       <p className="mt-3 font-display text-[1.75rem] font-medium tabular-nums sm:text-3xl">{g.price.toFixed(1)}</p>
 
-      <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
-        <span>H {g.dayHigh.toFixed(1)}</span>
-        <span>L {g.dayLow.toFixed(1)}</span>
-      </div>
+      <RangePills high={g.dayHigh} low={g.dayLow} dp={1} />
 
       <ScalperLevels quote={g} />
 
 
-      <div className="mt-4 border-t border-border pt-4">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground">Gold drivers</p>
+      <div className="mt-5 border-t border-border pt-4">
+        <SectionHead title="Gold drivers" />
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
-          {payload.goldDrivers.map((m) => {
-            const arrow = m.direction === "up" ? "↑" : m.direction === "down" ? "↓" : "→";
-            return (
-              <div key={m.label} className="rounded-lg border border-border bg-surface p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium">{m.label}</span>
-                  <span className="font-display text-sm font-medium tabular-nums">{m.value}</span>
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  <span className={changeColor(m.direction === "up" ? 1 : m.direction === "down" ? -1 : 0)}>
-                    {arrow}
-                  </span>{" "}
-                  {m.read}
-                </p>
-              </div>
-            );
-          })}
+          {payload.goldDrivers.map((m) => (
+            <MacroTile key={m.label} macro={m} />
+          ))}
         </div>
       </div>
     </div>
