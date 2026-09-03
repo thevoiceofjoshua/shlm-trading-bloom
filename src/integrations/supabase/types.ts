@@ -65,6 +65,30 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_levels: {
+        Row: {
+          computed_at: string
+          id: string
+          instrument: string
+          levels: Json
+          session_date: string
+        }
+        Insert: {
+          computed_at?: string
+          id?: string
+          instrument: string
+          levels: Json
+          session_date: string
+        }
+        Update: {
+          computed_at?: string
+          id?: string
+          instrument?: string
+          levels?: Json
+          session_date?: string
+        }
+        Relationships: []
+      }
       member_notes: {
         Row: {
           body: string
