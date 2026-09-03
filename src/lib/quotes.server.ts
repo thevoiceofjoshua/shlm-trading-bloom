@@ -140,7 +140,7 @@ async function getJson(path: string): Promise<any | null> {
 
 /** TradingView symbols used as a fallback for the headline instruments. */
 const TV_SYMBOLS: Record<string, string> = {
-  NASDAQ: "NASDAQ:IXIC",
+  NASDAQ: "NASDAQ:NDX",
   US30: "DJ:DJI",
   "XAU/USD": "OANDA:XAUUSD",
 };
