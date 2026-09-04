@@ -476,11 +476,26 @@ export async function fetchDelayedQuotes(): Promise<Record<string, DelayedQuote>
       const h1bars = toBars(h1json?.chart?.result?.[0]?.indicators?.quote?.[0]);
       const structure = structureFrom(h1bars, quote.price, quote.dayHigh, quote.dayLow);
       if (structure) {
-        const m5bars = toBars(preBars);
-        const fresh = {
-          h1: structure,
-          pullbacks: pullbacksFrom(m5bars, quote.price, structure.target, quote.dayHigh, quote.dayLow),
-        };
+        let m5bars = toBars(preBars);
+        // Right after the 5:00am lock today's 5m series is often too short
+        // (or missing for cash indices) — widen the window so the entry zones
+        // still have swings to work with.
+        if (m5bars.length < 12) {
+          const wide = await getJson(
+            `/v8/finance/chart/${encodeURIComponent(sym)}?interval=5m&range=5d&includePrePost=true`,
+          );
+          const wideBars = toBars(wide?.chart?.result?.[0]?.indicators?.quote?.[0]);
+          if (wideBars.length > m5bars.length) m5bars = wideBars;
+        }
+        // Last resort: fall back to 15m swings so the shelf is never empty.
+        let zones = pullbacksFrom(m5bars, quote.price, structure.target, quote.dayHigh, quote.dayLow);
+        if (zones.length === 0) {
+          const m15 = await getJson(`/v8/finance/chart/${encodeURIComponent(sym)}?interval=15m&range=5d`);
+          const m15bars = toBars(m15?.chart?.result?.[0]?.indicators?.quote?.[0]);
+          zones = pullbacksFrom(m15bars, quote.price, structure.target, quote.dayHigh, quote.dayLow);
+        }
+        const fresh = { h1: structure, pullbacks: zones };
+
         const locked = await dailyLevels(key, fresh, quote.dayHigh, quote.dayLow);
         quote.h1 = locked.h1;
         quote.pullbacks = locked.pullbacks;
