@@ -334,7 +334,12 @@ async function readStoredLevels(
   }
 }
 
-async function writeStoredLevels(instrument: string, day: string, levels: StoredLevels): Promise<string | null> {
+async function writeStoredLevels(
+  instrument: string,
+  day: string,
+  levels: StoredLevels,
+  overwrite = false,
+): Promise<string | null> {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const computedAt = new Date().toISOString();
@@ -342,7 +347,7 @@ async function writeStoredLevels(instrument: string, day: string, levels: Stored
       .from("daily_levels")
       .upsert(
         { instrument, session_date: day, levels, computed_at: computedAt },
-        { onConflict: "instrument,session_date", ignoreDuplicates: true },
+        { onConflict: "instrument,session_date", ignoreDuplicates: !overwrite },
       );
     return computedAt;
   } catch {
@@ -353,14 +358,34 @@ async function writeStoredLevels(instrument: string, day: string, levels: Stored
 /**
  * Levels are computed once per trading day and then held: prices keep ticking,
  * but the 1H structure and 5m entry zones stay put until the next 5:00am PST.
+ *
+ * One exception: a stored day whose 5m entry zones came out empty (the intraday
+ * series isn't there yet right after the 5:00am lock) is treated as incomplete
+ * and backfilled the first time real pullbacks exist, so the execution block
+ * never sits blank for the whole session.
  */
 async function dailyLevels(instrument: string, fresh: StoredLevels, dayHigh: number, dayLow: number) {
   const day = levelsSessionDate();
   const stored = await readStoredLevels(instrument, day);
-  if (stored) return { ...applySwept(stored.levels, dayHigh, dayLow), levelsSetAt: stored.computedAt };
+  const freshHasZones = (fresh.pullbacks ?? []).length > 0;
+
+  if (stored) {
+    const storedHasZones = (stored.levels.pullbacks ?? []).length > 0;
+    if (storedHasZones || !freshHasZones) {
+      return { ...applySwept(stored.levels, dayHigh, dayLow), levelsSetAt: stored.computedAt };
+    }
+    // Keep the locked 1H read, fill in the missing entry zones.
+    const merged: StoredLevels = { h1: stored.levels.h1 ?? fresh.h1, pullbacks: fresh.pullbacks };
+    await writeStoredLevels(instrument, day, merged, true);
+    return { ...applySwept(merged, dayHigh, dayLow), levelsSetAt: stored.computedAt };
+  }
+
+  // Don't lock a day in on an empty shelf — wait until zones exist.
+  if (!freshHasZones) return { ...fresh, levelsSetAt: undefined };
   const computedAt = await writeStoredLevels(instrument, day, fresh);
   return { ...fresh, levelsSetAt: computedAt ?? undefined };
 }
+
 
 
 /**
@@ -451,11 +476,26 @@ export async function fetchDelayedQuotes(): Promise<Record<string, DelayedQuote>
       const h1bars = toBars(h1json?.chart?.result?.[0]?.indicators?.quote?.[0]);
       const structure = structureFrom(h1bars, quote.price, quote.dayHigh, quote.dayLow);
       if (structure) {
-        const m5bars = toBars(preBars);
-        const fresh = {
-          h1: structure,
-          pullbacks: pullbacksFrom(m5bars, quote.price, structure.target, quote.dayHigh, quote.dayLow),
-        };
+        let m5bars = toBars(preBars);
+        // Right after the 5:00am lock today's 5m series is often too short
+        // (or missing for cash indices) — widen the window so the entry zones
+        // still have swings to work with.
+        if (m5bars.length < 12) {
+          const wide = await getJson(
+            `/v8/finance/chart/${encodeURIComponent(sym)}?interval=5m&range=5d&includePrePost=true`,
+          );
+          const wideBars = toBars(wide?.chart?.result?.[0]?.indicators?.quote?.[0]);
+          if (wideBars.length > m5bars.length) m5bars = wideBars;
+        }
+        // Last resort: fall back to 15m swings so the shelf is never empty.
+        let zones = pullbacksFrom(m5bars, quote.price, structure.target, quote.dayHigh, quote.dayLow);
+        if (zones.length === 0) {
+          const m15 = await getJson(`/v8/finance/chart/${encodeURIComponent(sym)}?interval=15m&range=5d`);
+          const m15bars = toBars(m15?.chart?.result?.[0]?.indicators?.quote?.[0]);
+          zones = pullbacksFrom(m15bars, quote.price, structure.target, quote.dayHigh, quote.dayLow);
+        }
+        const fresh = { h1: structure, pullbacks: zones };
+
         const locked = await dailyLevels(key, fresh, quote.dayHigh, quote.dayLow);
         quote.h1 = locked.h1;
         quote.pullbacks = locked.pullbacks;
