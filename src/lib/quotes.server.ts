@@ -334,7 +334,12 @@ async function readStoredLevels(
   }
 }
 
-async function writeStoredLevels(instrument: string, day: string, levels: StoredLevels): Promise<string | null> {
+async function writeStoredLevels(
+  instrument: string,
+  day: string,
+  levels: StoredLevels,
+  overwrite = false,
+): Promise<string | null> {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const computedAt = new Date().toISOString();
@@ -342,7 +347,7 @@ async function writeStoredLevels(instrument: string, day: string, levels: Stored
       .from("daily_levels")
       .upsert(
         { instrument, session_date: day, levels, computed_at: computedAt },
-        { onConflict: "instrument,session_date", ignoreDuplicates: true },
+        { onConflict: "instrument,session_date", ignoreDuplicates: !overwrite },
       );
     return computedAt;
   } catch {
@@ -353,14 +358,34 @@ async function writeStoredLevels(instrument: string, day: string, levels: Stored
 /**
  * Levels are computed once per trading day and then held: prices keep ticking,
  * but the 1H structure and 5m entry zones stay put until the next 5:00am PST.
+ *
+ * One exception: a stored day whose 5m entry zones came out empty (the intraday
+ * series isn't there yet right after the 5:00am lock) is treated as incomplete
+ * and backfilled the first time real pullbacks exist, so the execution block
+ * never sits blank for the whole session.
  */
 async function dailyLevels(instrument: string, fresh: StoredLevels, dayHigh: number, dayLow: number) {
   const day = levelsSessionDate();
   const stored = await readStoredLevels(instrument, day);
-  if (stored) return { ...applySwept(stored.levels, dayHigh, dayLow), levelsSetAt: stored.computedAt };
+  const freshHasZones = (fresh.pullbacks ?? []).length > 0;
+
+  if (stored) {
+    const storedHasZones = (stored.levels.pullbacks ?? []).length > 0;
+    if (storedHasZones || !freshHasZones) {
+      return { ...applySwept(stored.levels, dayHigh, dayLow), levelsSetAt: stored.computedAt };
+    }
+    // Keep the locked 1H read, fill in the missing entry zones.
+    const merged: StoredLevels = { h1: stored.levels.h1 ?? fresh.h1, pullbacks: fresh.pullbacks };
+    await writeStoredLevels(instrument, day, merged, true);
+    return { ...applySwept(merged, dayHigh, dayLow), levelsSetAt: stored.computedAt };
+  }
+
+  // Don't lock a day in on an empty shelf — wait until zones exist.
+  if (!freshHasZones) return { ...fresh, levelsSetAt: undefined };
   const computedAt = await writeStoredLevels(instrument, day, fresh);
   return { ...fresh, levelsSetAt: computedAt ?? undefined };
 }
+
 
 
 /**
