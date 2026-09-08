@@ -30,10 +30,9 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
   const captured = consumeLastCapturedError();
   console.error(captured ?? new Error(`h3 swallowed SSR error: ${body}`));
-  const debugBody = `DEBUG (h3-swallowed):\n${captured instanceof Error ? (captured.stack || captured.message) : String(captured ?? body)}`;
-  return new Response(debugBody, {
+  return new Response(renderErrorPage(), {
     status: 500,
-    headers: { "content-type": "text/plain; charset=utf-8" },
+    headers: { "content-type": "text/html; charset=utf-8" },
   });
 }
 
@@ -54,10 +53,9 @@ export default {
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
       console.error(error);
-      const debugBody = `DEBUG (top-level catch):\n${error instanceof Error ? (error.stack || error.message) : String(error)}`;
-      return new Response(debugBody, {
+      return new Response(renderErrorPage(), {
         status: 500,
-        headers: { "content-type": "text/plain; charset=utf-8" },
+        headers: { "content-type": "text/html; charset=utf-8" },
       });
     }
   },
