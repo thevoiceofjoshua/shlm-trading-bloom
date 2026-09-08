@@ -11,17 +11,19 @@ import { useAuthUser } from "@/hooks/use-auth-user";
 import { AccountMenu } from "@/components/AccountMenu";
 
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
-import chartNasdaq from "@/assets/chart-nasdaq.png.asset.json";
-import chartDow from "@/assets/chart-dow.png.asset.json";
-import chartEntry from "@/assets/chart-entry.png.asset.json";
-import pnl5145 from "@/assets/pnl-5145.jpg.asset.json";
-import liveTrade from "@/assets/live-trade-gold.mp4.asset.json";
-import liveTradePoster from "@/assets/live-trade-poster.jpg.asset.json";
 
-
-import pnlCard from "@/assets/pnl-card.png.asset.json";
-import accountsPnl from "@/assets/accounts-pnl.png.asset.json";
-import payouts from "@/assets/payouts.jpg.asset.json";
+// Trade-proof media — self-hosted in /public/trade-proof (previously served
+// through Lovable's asset proxy at /__l5e/assets-v1/*, which only worked on
+// Lovable's own hosting). Files in /public are served from the site root.
+const chartNasdaqUrl = "/trade-proof/chart-nasdaq.png";
+const chartDowUrl = "/trade-proof/chart-dow.png";
+const chartEntryUrl = "/trade-proof/chart-entry.png";
+const pnl5145Url = "/trade-proof/pnl-5145.jpg";
+const liveTradeUrl = "/trade-proof/live-trade-gold.mp4";
+const liveTradePosterUrl = "/trade-proof/live-trade-poster.jpg";
+const pnlCardUrl = "/trade-proof/pnl-card.png";
+const accountsPnlUrl = "/trade-proof/accounts-pnl.png";
+const payoutsUrl = "/trade-proof/payouts.jpg";
 
 import heroBg from "@/assets/hero-bg.jpg";
 
@@ -107,7 +109,7 @@ function Index() {
         <ProofSection />
         <CtaSection />
         <TestimonialsSection />
-        
+
         <PricingSection />
         <FaqSection />
       </main>
@@ -115,7 +117,6 @@ function Index() {
     </div>
   );
 }
-
 
 function LiveClock({ scrolled }: { scrolled: boolean }) {
   const [time, setTime] = useState("");
@@ -181,7 +182,6 @@ function PromoBanner() {
     </div>
   );
 }
-
 
 function Header({
   mobileMenuOpen,
@@ -418,7 +418,6 @@ function HeroSection({ stats }: { stats: SiteStats }) {
 
       </div>
 
-
       {/* Social links — bottom left */}
       <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3 sm:bottom-8 sm:left-6 sm:translate-x-0 lg:left-8">
         <a
@@ -619,7 +618,6 @@ function StatsSection({ stats }: { stats: SiteStats }) {
   );
 }
 
-
 function FeaturesSection() {
   const features = [
     {
@@ -681,7 +679,6 @@ function FeaturesSection() {
   );
 }
 
-
 function ProgramSection() {
   const modules = [
     { week: "WEEK 01", title: "Foundations & market structure", description: "Reading price action, liquidity, and the anatomy of a trend." },
@@ -695,7 +692,7 @@ function ProgramSection() {
   return (
     <section id="program" className="bg-surface px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-16 max-w-2xl">
+        <div className="mb-16 max-w2xl">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">The curriculum</p>
           <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
             Eight weeks. One clear path.
@@ -1010,7 +1007,7 @@ function PricingSection() {
               ))}
             </ul>
             <p className="text-xs text-muted-foreground">
-              Extensions are purchased from your member dashboard once you’re enrolled.
+              Extensions are purchased from your member dashboard once you're enrolled.
             </p>
           </div>
         </div>
@@ -1024,18 +1021,17 @@ function PricingSection() {
   );
 }
 
-
 function ProofSection() {
   const tiles = [
     {
-      src: chartNasdaq.url,
+      src: chartNasdaqUrl,
       alt: "Micro E-mini Nasdaq-100 five-minute chart with a breakout entry, stop loss and take profit zones marked",
       caption: "Nasdaq breakout — entry, stop and target mapped before the trade.",
       className: "md:col-span-4",
       aspect: "min-h-[280px] sm:min-h-[380px]",
     },
     {
-      src: payouts.url,
+      src: payoutsUrl,
       alt: "Three payout notifications from a proprietary trading firm",
       caption: "Payouts, not promises.",
       className: "md:col-span-2",
@@ -1043,21 +1039,21 @@ function ProofSection() {
       fit: "object-contain p-3",
     },
     {
-      src: chartDow.url,
+      src: chartDowUrl,
       alt: "Micro E-mini Dow futures chart showing a break of structure and a managed short position",
       caption: "Break of structure, then execution.",
       className: "md:col-span-3",
       aspect: "min-h-[220px]",
     },
     {
-      src: pnlCard.url,
+      src: pnlCardUrl,
       alt: "Group profit and loss card showing a daily group result",
       caption: "Group P&L, tracked daily.",
       className: "md:col-span-3",
       aspect: "min-h-[220px]",
     },
     {
-      src: accountsPnl.url,
+      src: accountsPnlUrl,
       alt: "Funded account table showing per-account totals and drawdown distance",
       caption: "Risk-managed across every funded account.",
       className: "md:col-span-6",
@@ -1065,7 +1061,7 @@ function ProofSection() {
       fit: "object-contain p-4",
     },
     {
-      src: liveTrade.url,
+      src: liveTradeUrl,
       kind: "video" as const,
       alt: "Screen recording of a live Micro Gold futures trade showing a position up 2,775 dollars",
       caption: "Live execution — Micro Gold, +$2,775 in open profit.",
@@ -1073,7 +1069,7 @@ function ProofSection() {
       aspect: "min-h-[420px] sm:min-h-[520px]",
     },
     {
-      src: pnl5145.url,
+      src: pnl5145Url,
       alt: "Daily profit and loss card showing plus 5,145 dollars",
       caption: "+$5,145 in a single session.",
       className: "md:col-span-4",
@@ -1081,14 +1077,13 @@ function ProofSection() {
       fit: "object-contain p-3",
     },
     {
-      src: chartEntry.url,
+      src: chartEntryUrl,
       alt: "Close-up chart of a reversal entry with risk and reward zones",
       caption: "One setup. Repeated with discipline.",
       className: "md:col-span-6",
       aspect: "min-h-[280px] sm:min-h-[420px]",
     },
   ];
-
 
   return (
     <section id="proof" className="bg-background px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
@@ -1122,7 +1117,7 @@ function ProofSection() {
                     loop
                     playsInline
                     preload="metadata"
-                    poster={liveTradePoster.url}
+                    poster={liveTradePosterUrl}
 
                     className="absolute inset-0 h-full w-full object-cover object-center"
                   />
@@ -1142,7 +1137,6 @@ function ProofSection() {
             </figure>
           ))}
         </div>
-
 
         <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
           Past performance is not indicative of future results. Trading futures involves substantial
@@ -1179,7 +1173,6 @@ function TestimonialsSection() {
     </section>
   );
 }
-
 
 function FaqSection() {
   const faqs = [
@@ -1254,8 +1247,6 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
   );
 }
 
-
-
 function CtaSection() {
   return (
     <section id="cta" className="bg-primary px-4 py-20 text-primary-foreground sm:px-6 sm:py-24 lg:px-8 lg:py-28">
@@ -1264,7 +1255,7 @@ function CtaSection() {
           Ready to stop guessing and start building your edge?
         </h2>
         <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed opacity-80 sm:text-lg">
-          Applications are reviewed weekly. If SHLM is the right fit, we’ll invite you to enroll and begin the onboarding process.
+          Applications are reviewed weekly. If SHLM is the right fit, we'll invite you to enroll and begin the onboarding process.
         </p>
         <div className="mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:gap-4">
           <a
