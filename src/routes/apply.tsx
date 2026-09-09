@@ -35,7 +35,7 @@ export const Route = createFileRoute("/apply")({
 
 function ApplyPage() {
   const { tier, promo } = useSearch({ from: "/apply" });
-  const submit = useServerFn(submitApplication);
+  const [submitting, setSubmitting] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<null | { timezone: string; scheduledAtLocal: string; scheduledAtLA: string }>(null);
   const [error, setError] = useState<string | null>(null);
