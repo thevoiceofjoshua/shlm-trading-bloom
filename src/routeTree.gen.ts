@@ -33,6 +33,7 @@ import { Route as ApiPublicSubmitApplicationRouteImport } from './routes/api/pub
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as ApiPublicEnrollApplicationIdRouteImport } from './routes/api/public/enroll.$applicationId'
+import { Route as ApiPublicCheckoutCreateRouteImport } from './routes/api/public/checkout.create'
 import { Route as ApiPublicAdminSendPaymentLinkRouteImport } from './routes/api/public/admin.send-payment-link'
 import { Route as ApiPublicAdminRemoveApplicationRouteImport } from './routes/api/public/admin.remove-application'
 import { Route as ApiPublicAdminDenyApplicationRouteImport } from './routes/api/public/admin.deny-application'
@@ -161,6 +162,11 @@ const ApiPublicEnrollApplicationIdRoute =
     path: '/api/public/enroll/$applicationId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCheckoutCreateRoute = ApiPublicCheckoutCreateRouteImport.update({
+  id: '/api/public/checkout/create',
+  path: '/api/public/checkout/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicAdminSendPaymentLinkRoute =
   ApiPublicAdminSendPaymentLinkRouteImport.update({
     id: '/api/public/admin/send-payment-link',
@@ -213,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/api/public/admin/deny-application': typeof ApiPublicAdminDenyApplicationRoute
   '/api/public/admin/remove-application': typeof ApiPublicAdminRemoveApplicationRoute
   '/api/public/admin/send-payment-link': typeof ApiPublicAdminSendPaymentLinkRoute
+  '/api/public/checkout/create': typeof ApiPublicCheckoutCreateRoute
   '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -243,6 +250,7 @@ export interface FileRoutesByTo {
   '/api/public/admin/deny-application': typeof ApiPublicAdminDenyApplicationRoute
   '/api/public/admin/remove-application': typeof ApiPublicAdminRemoveApplicationRoute
   '/api/public/admin/send-payment-link': typeof ApiPublicAdminSendPaymentLinkRoute
+  '/api/public/checkout/create': typeof ApiPublicCheckoutCreateRoute
   '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -274,6 +282,7 @@ export interface FileRoutesById {
   '/api/public/admin/deny-application': typeof ApiPublicAdminDenyApplicationRoute
   '/api/public/admin/remove-application': typeof ApiPublicAdminRemoveApplicationRoute
   '/api/public/admin/send-payment-link': typeof ApiPublicAdminSendPaymentLinkRoute
+  '/api/public/checkout/create': typeof ApiPublicCheckoutCreateRoute
   '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -306,6 +315,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/deny-application'
     | '/api/public/admin/remove-application'
     | '/api/public/admin/send-payment-link'
+    | '/api/public/checkout/create'
     | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/deny-application'
     | '/api/public/admin/remove-application'
     | '/api/public/admin/send-payment-link'
+    | '/api/public/checkout/create'
     | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   id:
@@ -366,6 +377,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/deny-application'
     | '/api/public/admin/remove-application'
     | '/api/public/admin/send-payment-link'
+    | '/api/public/checkout/create'
     | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
@@ -397,6 +409,7 @@ export interface RootRouteChildren {
   ApiPublicAdminDenyApplicationRoute: typeof ApiPublicAdminDenyApplicationRoute
   ApiPublicAdminRemoveApplicationRoute: typeof ApiPublicAdminRemoveApplicationRoute
   ApiPublicAdminSendPaymentLinkRoute: typeof ApiPublicAdminSendPaymentLinkRoute
+  ApiPublicCheckoutCreateRoute: typeof ApiPublicCheckoutCreateRoute
   ApiPublicEnrollApplicationIdRoute: typeof ApiPublicEnrollApplicationIdRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
@@ -571,6 +584,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicEnrollApplicationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/checkout/create': {
+      id: '/api/public/checkout/create'
+      path: '/api/public/checkout/create'
+      fullPath: '/api/public/checkout/create'
+      preLoaderRoute: typeof ApiPublicCheckoutCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/admin/send-payment-link': {
       id: '/api/public/admin/send-payment-link'
       path: '/api/public/admin/send-payment-link'
@@ -629,6 +649,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAdminDenyApplicationRoute: ApiPublicAdminDenyApplicationRoute,
   ApiPublicAdminRemoveApplicationRoute: ApiPublicAdminRemoveApplicationRoute,
   ApiPublicAdminSendPaymentLinkRoute: ApiPublicAdminSendPaymentLinkRoute,
+  ApiPublicCheckoutCreateRoute: ApiPublicCheckoutCreateRoute,
   ApiPublicEnrollApplicationIdRoute: ApiPublicEnrollApplicationIdRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
