@@ -339,10 +339,11 @@ async function writeStoredLevels(
   day: string,
   levels: StoredLevels,
   overwrite = false,
+  keepComputedAt?: string,
 ): Promise<string | null> {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const computedAt = new Date().toISOString();
+    const computedAt = keepComputedAt ?? new Date().toISOString();
     await (supabaseAdmin as any)
       .from("daily_levels")
       .upsert(
@@ -376,7 +377,7 @@ async function dailyLevels(instrument: string, fresh: StoredLevels, dayHigh: num
     }
     // Keep the locked 1H read, fill in the missing entry zones.
     const merged: StoredLevels = { h1: stored.levels.h1 ?? fresh.h1, pullbacks: fresh.pullbacks };
-    await writeStoredLevels(instrument, day, merged, true);
+    await writeStoredLevels(instrument, day, merged, true, stored.computedAt);
     return { ...applySwept(merged, dayHigh, dayLow), levelsSetAt: stored.computedAt };
   }
 
