@@ -1,11 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 import { HomeButton } from "@/components/HomeButton";
-import { listApplications, sendPaymentLink, denyApplication, removeApplication, type ApplicationList } from "@/lib/admin.functions";
+import {
+  fetchApplications,
+  sendPaymentLinkRequest,
+  denyApplicationRequest,
+  removeApplicationRequest,
+  type AdminApplication,
+} from "@/lib/admin-client";
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
+
+type ApplicationList = AdminApplication[];
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
@@ -16,11 +23,8 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
-  const listFn = useServerFn(listApplications);
-  const sendFn = useServerFn(sendPaymentLink);
-  const denyFn = useServerFn(denyApplication);
-  const removeFn = useServerFn(removeApplication);
   const queryClient = useQueryClient();
+
 
   // Admin mode already verified the passcode this session — reuse it so the
   // console unlocks without retyping. Manual entry still works as a fallback.
@@ -49,7 +53,7 @@ function AdminPage() {
     refetch: refetchApps,
   } = useQuery({
     queryKey: ["applications", passcode],
-    queryFn: () => listFn({ data: { passcode } }),
+    queryFn: () => fetchApplications(passcode),
     enabled: passcode.length > 0,
     retry: false,
   });
@@ -61,9 +65,7 @@ function AdminPage() {
     setSendMsg(null);
     setEmailState((s) => ({ ...s, [id]: "sending" }));
     try {
-      await sendFn({
-        data: { passcode, applicationId: id, origin: window.location.origin },
-      });
+      await sendPaymentLinkRequest(passcode, id);
       setSendMsg({ id, ok: true, text: "Approved — payment link sent." });
       setEmailState((s) => ({ ...s, [id]: "sent" }));
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
@@ -83,9 +85,7 @@ function AdminPage() {
     setSendMsg(null);
     setEmailState((s) => ({ ...s, [id]: "sending" }));
     try {
-      await sendFn({
-        data: { passcode, applicationId: id, origin: window.location.origin },
-      });
+      await sendPaymentLinkRequest(passcode, id);
       setSendMsg({ id, ok: true, text: "Payment link email resent." });
       setEmailState((s) => ({ ...s, [id]: "sent" }));
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
@@ -105,7 +105,7 @@ function AdminPage() {
     setSendMsg(null);
     setEmailState((s) => ({ ...s, [id]: "sending" }));
     try {
-      await denyFn({ data: { passcode, applicationId: id } });
+      await denyApplicationRequest(passcode, id);
       setSendMsg({ id, ok: true, text: "Denied — email sent." });
       setEmailState((s) => ({ ...s, [id]: "sent" }));
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
@@ -124,7 +124,7 @@ function AdminPage() {
     setAction("remove");
     setSendMsg(null);
     try {
-      await removeFn({ data: { passcode, applicationId: id } });
+      await removeApplicationRequest(passcode, id);
       setSelectedId((cur) => (cur === id ? null : cur));
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
     } catch (e) {
