@@ -339,10 +339,11 @@ async function writeStoredLevels(
   day: string,
   levels: StoredLevels,
   overwrite = false,
+  keepComputedAt?: string,
 ): Promise<string | null> {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const computedAt = new Date().toISOString();
+    const computedAt = keepComputedAt ?? new Date().toISOString();
     await (supabaseAdmin as any)
       .from("daily_levels")
       .upsert(
