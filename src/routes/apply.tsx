@@ -36,7 +36,6 @@ export const Route = createFileRoute("/apply")({
 function ApplyPage() {
   const { tier, promo } = useSearch({ from: "/apply" });
   const [submitting, setSubmitting] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<null | { timezone: string; scheduledAtLocal: string; scheduledAtLA: string }>(null);
   const [error, setError] = useState<string | null>(null);
   const guessTz = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "America/Los_Angeles";
@@ -49,8 +48,10 @@ function ApplyPage() {
     setSubmitting(true);
     const fd = new FormData(e.currentTarget);
     try {
-      const result = await submit({
-        data: {
+      const res = await fetch(SUBMIT_URL, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
           tier: (fd.get("tier") as any) || tier || "mentorship",
           fullName: String(fd.get("fullName") || ""),
           email: String(fd.get("email") || ""),
@@ -59,13 +60,16 @@ function ApplyPage() {
           goals: String(fd.get("goals") || ""),
           scheduledAt: String(fd.get("scheduledAt") || ""),
           timezone: String(fd.get("timezone") || guessTz),
-        },
+        }),
       });
+      const result = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(result?.error || "Something went wrong. Please try again.");
       setDone({
         timezone: result.timezone,
         scheduledAtLocal: result.scheduledAtLocal,
         scheduledAtLA: result.scheduledAtLA,
       });
+
     } catch (err: any) {
       setError(err?.message || "Something went wrong. Please try again.");
     } finally {
