@@ -3,7 +3,6 @@ import { useState } from "react";
 import { z } from "zod";
 import { HomeButton } from "@/components/HomeButton";
 
-
 const searchSchema = z.object({
   tier: z.enum(["foundation", "mentorship", "elite"]).optional(),
   promo: z.string().max(32).optional(),
@@ -11,11 +10,10 @@ const searchSchema = z.object({
 
 // Where the public application endpoint lives. Same-origin by default; set
 // VITE_APPLICATION_API_BASE (e.g. https://shlm-trading-bloom.lovable.app) when the
-// storefront is hosted elsewhere.
-const API_BASE = (import.meta.env["VITE_APPLICATION_API_BASE"] as string | undefined)?.replace(/\/$/, "") ?? "";
+// storefront is hosted elsewhere. Falls back to the known Lovable-hosted endpoint
+// since this project's custom VITE_* env injection doesn't pick up new var names.
+const API_BASE = (import.meta.env["VITE_APPLICATION_API_BASE"] as string | undefined)?.replace(/\/$/, "") ?? "https://shlm-trading-bloom.lovable.app";
 const SUBMIT_URL = `${API_BASE}/api/public/submit-application`;
-
-
 
 export const Route = createFileRoute("/apply")({
   validateSearch: (s) => searchSchema.parse(s),
@@ -40,7 +38,6 @@ function ApplyPage() {
   const [error, setError] = useState<string | null>(null);
   const guessTz = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "America/Los_Angeles";
   const promoApplied = promo?.toUpperCase() === "1MILL";
-
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -118,7 +115,6 @@ function ApplyPage() {
           <HomeButton />
         </div>
 
-
         <form onSubmit={onSubmit} className="space-y-5 rounded-3xl border border-border bg-card p-5 sm:p-8">
           <div>
             <label className="block text-sm font-medium text-foreground">Entry level</label>
@@ -139,7 +135,6 @@ function ApplyPage() {
               </p>
             )}
           </div>
-
 
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Full name" name="fullName" required />
