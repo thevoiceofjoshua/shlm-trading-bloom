@@ -8,7 +8,7 @@ import { AdminPreviewTag } from "@/components/AdminBar";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyMembership } from "@/lib/membership.functions";
-import { createExtensionCheckoutSession } from "@/lib/checkout.functions";
+import { createExtensionCheckoutRequest } from "@/lib/checkout-client";
 import { EXTENSION, PROGRAM, addMonths, accessWindow, extensionTotal, formatUsd } from "@/lib/tiers";
 
 export const Route = createFileRoute("/dashboard")({
@@ -119,7 +119,6 @@ function DashboardPage() {
 
 function MembershipPanel({ demo }: { demo?: "expired" }) {
   const fetchMembership = useServerFn(getMyMembership);
-  const startExtension = useServerFn(createExtensionCheckoutSession);
   const [months, setMonths] = useState(1);
   const { adminUnlocked } = useAdminMode();
 
@@ -133,7 +132,8 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
   });
 
   const extend = useMutation({
-    mutationFn: (m: number) => startExtension({ data: { months: m, origin: window.location.origin } }),
+    mutationFn: (m: number) =>
+      createExtensionCheckoutRequest({ months: m, origin: window.location.origin }),
     onSuccess: (res) => {
       if (res?.url) window.location.href = res.url;
     },

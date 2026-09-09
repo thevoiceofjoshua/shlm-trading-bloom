@@ -1,9 +1,8 @@
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { HomeButton } from "@/components/HomeButton";
-import { verifyCheckoutSession } from "@/lib/checkout.functions";
+import { verifyCheckoutRequest } from "@/lib/checkout-client";
 import { EXTENSION, PROGRAM, formatUsd } from "@/lib/tiers";
 
 
@@ -54,10 +53,9 @@ const purchaseDetails: Record<string, { title: string; description: string; perk
 
 function SuccessPage() {
   const { kind: urlKind, tier: legacyTier, session_id } = useSearch({ from: "/success" });
-  const verify = useServerFn(verifyCheckoutSession);
   const { data, isLoading, isError } = useQuery({
     queryKey: ["verify-checkout", session_id],
-    queryFn: () => verify({ data: { session_id: session_id! } }),
+    queryFn: () => verifyCheckoutRequest({ session_id: session_id! }),
     enabled: !!session_id,
     retry: false,
   });
