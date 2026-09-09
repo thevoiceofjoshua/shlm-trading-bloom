@@ -1,15 +1,20 @@
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
 import { HomeButton } from "@/components/HomeButton";
-import { submitApplication } from "@/lib/applications.functions";
 
 
 const searchSchema = z.object({
   tier: z.enum(["foundation", "mentorship", "elite"]).optional(),
   promo: z.string().max(32).optional(),
 });
+
+// Where the public application endpoint lives. Same-origin by default; set
+// VITE_APPLICATION_API_BASE (e.g. https://shlm-trading-bloom.lovable.app) when the
+// storefront is hosted elsewhere.
+const API_BASE = (import.meta.env["VITE_APPLICATION_API_BASE"] as string | undefined)?.replace(/\/$/, "") ?? "";
+const SUBMIT_URL = `${API_BASE}/api/public/submit-application`;
+
 
 
 export const Route = createFileRoute("/apply")({
