@@ -29,6 +29,7 @@ import { Route as FeaturesCurriculumRouteImport } from './routes/features.curric
 import { Route as FeaturesCommunityRouteImport } from './routes/features.community'
 import { Route as EnrollApplicationIdRouteImport } from './routes/enroll.$applicationId'
 import { Route as BlogBreakoutStrategyRouteImport } from './routes/blog.breakout-strategy'
+import { Route as ApiPublicSubmitApplicationRouteImport } from './routes/api/public/submit-application'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as ApiPublicEnrollApplicationIdRouteImport } from './routes/api/public/enroll.$applicationId'
@@ -133,6 +134,12 @@ const BlogBreakoutStrategyRoute = BlogBreakoutStrategyRouteImport.update({
   path: '/blog/breakout-strategy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSubmitApplicationRoute =
+  ApiPublicSubmitApplicationRouteImport.update({
+    id: '/api/public/submit-application',
+    path: '/api/public/submit-application',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   id: '/api/public/stripe-webhook',
   path: '/api/public/stripe-webhook',
@@ -173,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
   '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -198,6 +206,7 @@ export interface FileRoutesByTo {
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
   '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -224,6 +233,7 @@ export interface FileRoutesById {
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
+  '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
   '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/features/mentorship'
     | '/features/risk'
     | '/api/public/stripe-webhook'
+    | '/api/public/submit-application'
     | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/features/mentorship'
     | '/features/risk'
     | '/api/public/stripe-webhook'
+    | '/api/public/submit-application'
     | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   id:
@@ -301,6 +313,7 @@ export interface FileRouteTypes {
     | '/features/mentorship'
     | '/features/risk'
     | '/api/public/stripe-webhook'
+    | '/api/public/submit-application'
     | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
@@ -327,6 +340,7 @@ export interface RootRouteChildren {
   FeaturesMentorshipRoute: typeof FeaturesMentorshipRoute
   FeaturesRiskRoute: typeof FeaturesRiskRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
+  ApiPublicSubmitApplicationRoute: typeof ApiPublicSubmitApplicationRoute
   ApiPublicEnrollApplicationIdRoute: typeof ApiPublicEnrollApplicationIdRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
@@ -473,6 +487,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogBreakoutStrategyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/submit-application': {
+      id: '/api/public/submit-application'
+      path: '/api/public/submit-application'
+      fullPath: '/api/public/submit-application'
+      preLoaderRoute: typeof ApiPublicSubmitApplicationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/stripe-webhook': {
       id: '/api/public/stripe-webhook'
       path: '/api/public/stripe-webhook'
@@ -519,6 +540,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturesMentorshipRoute: FeaturesMentorshipRoute,
   FeaturesRiskRoute: FeaturesRiskRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
+  ApiPublicSubmitApplicationRoute: ApiPublicSubmitApplicationRoute,
   ApiPublicEnrollApplicationIdRoute: ApiPublicEnrollApplicationIdRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }

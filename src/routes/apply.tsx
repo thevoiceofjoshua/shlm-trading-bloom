@@ -1,15 +1,20 @@
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
 import { HomeButton } from "@/components/HomeButton";
-import { submitApplication } from "@/lib/applications.functions";
 
 
 const searchSchema = z.object({
   tier: z.enum(["foundation", "mentorship", "elite"]).optional(),
   promo: z.string().max(32).optional(),
 });
+
+// Where the public application endpoint lives. Same-origin by default; set
+// VITE_APPLICATION_API_BASE (e.g. https://shlm-trading-bloom.lovable.app) when the
+// storefront is hosted elsewhere.
+const API_BASE = (import.meta.env["VITE_APPLICATION_API_BASE"] as string | undefined)?.replace(/\/$/, "") ?? "";
+const SUBMIT_URL = `${API_BASE}/api/public/submit-application`;
+
 
 
 export const Route = createFileRoute("/apply")({
@@ -30,7 +35,6 @@ export const Route = createFileRoute("/apply")({
 
 function ApplyPage() {
   const { tier, promo } = useSearch({ from: "/apply" });
-  const submit = useServerFn(submitApplication);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<null | { timezone: string; scheduledAtLocal: string; scheduledAtLA: string }>(null);
   const [error, setError] = useState<string | null>(null);
@@ -44,8 +48,10 @@ function ApplyPage() {
     setSubmitting(true);
     const fd = new FormData(e.currentTarget);
     try {
-      const result = await submit({
-        data: {
+      const res = await fetch(SUBMIT_URL, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
           tier: (fd.get("tier") as any) || tier || "mentorship",
           fullName: String(fd.get("fullName") || ""),
           email: String(fd.get("email") || ""),
@@ -54,13 +60,16 @@ function ApplyPage() {
           goals: String(fd.get("goals") || ""),
           scheduledAt: String(fd.get("scheduledAt") || ""),
           timezone: String(fd.get("timezone") || guessTz),
-        },
+        }),
       });
+      const result = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(result?.error || "Something went wrong. Please try again.");
       setDone({
         timezone: result.timezone,
         scheduledAtLocal: result.scheduledAtLocal,
         scheduledAtLA: result.scheduledAtLA,
       });
+
     } catch (err: any) {
       setError(err?.message || "Something went wrong. Please try again.");
     } finally {
