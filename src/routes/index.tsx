@@ -692,7 +692,7 @@ function ProgramSection() {
   return (
     <section id="program" className="bg-surface px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-16 max-w2xl">
+        <div className="mb-16 max-w-2xl">
           <p className="font-display text-sm font-medium uppercase tracking-widest text-muted-foreground">The curriculum</p>
           <h2 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
             Eight weeks. One clear path.
