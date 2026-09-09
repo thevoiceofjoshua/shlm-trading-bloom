@@ -33,6 +33,10 @@ import { Route as ApiPublicSubmitApplicationRouteImport } from './routes/api/pub
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as ApiPublicEnrollApplicationIdRouteImport } from './routes/api/public/enroll.$applicationId'
+import { Route as ApiPublicAdminSendPaymentLinkRouteImport } from './routes/api/public/admin.send-payment-link'
+import { Route as ApiPublicAdminRemoveApplicationRouteImport } from './routes/api/public/admin.remove-application'
+import { Route as ApiPublicAdminDenyApplicationRouteImport } from './routes/api/public/admin.deny-application'
+import { Route as ApiPublicAdminApplicationsRouteImport } from './routes/api/public/admin.applications'
 
 const TestCheckoutRoute = TestCheckoutRouteImport.update({
   id: '/test-checkout',
@@ -157,6 +161,30 @@ const ApiPublicEnrollApplicationIdRoute =
     path: '/api/public/enroll/$applicationId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAdminSendPaymentLinkRoute =
+  ApiPublicAdminSendPaymentLinkRouteImport.update({
+    id: '/api/public/admin/send-payment-link',
+    path: '/api/public/admin/send-payment-link',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAdminRemoveApplicationRoute =
+  ApiPublicAdminRemoveApplicationRouteImport.update({
+    id: '/api/public/admin/remove-application',
+    path: '/api/public/admin/remove-application',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAdminDenyApplicationRoute =
+  ApiPublicAdminDenyApplicationRouteImport.update({
+    id: '/api/public/admin/deny-application',
+    path: '/api/public/admin/deny-application',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAdminApplicationsRoute =
+  ApiPublicAdminApplicationsRouteImport.update({
+    id: '/api/public/admin/applications',
+    path: '/api/public/admin/applications',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -181,6 +209,10 @@ export interface FileRoutesByFullPath {
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
+  '/api/public/admin/applications': typeof ApiPublicAdminApplicationsRoute
+  '/api/public/admin/deny-application': typeof ApiPublicAdminDenyApplicationRoute
+  '/api/public/admin/remove-application': typeof ApiPublicAdminRemoveApplicationRoute
+  '/api/public/admin/send-payment-link': typeof ApiPublicAdminSendPaymentLinkRoute
   '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -207,6 +239,10 @@ export interface FileRoutesByTo {
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
+  '/api/public/admin/applications': typeof ApiPublicAdminApplicationsRoute
+  '/api/public/admin/deny-application': typeof ApiPublicAdminDenyApplicationRoute
+  '/api/public/admin/remove-application': typeof ApiPublicAdminRemoveApplicationRoute
+  '/api/public/admin/send-payment-link': typeof ApiPublicAdminSendPaymentLinkRoute
   '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -234,6 +270,10 @@ export interface FileRoutesById {
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
+  '/api/public/admin/applications': typeof ApiPublicAdminApplicationsRoute
+  '/api/public/admin/deny-application': typeof ApiPublicAdminDenyApplicationRoute
+  '/api/public/admin/remove-application': typeof ApiPublicAdminRemoveApplicationRoute
+  '/api/public/admin/send-payment-link': typeof ApiPublicAdminSendPaymentLinkRoute
   '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -262,6 +302,10 @@ export interface FileRouteTypes {
     | '/features/risk'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
+    | '/api/public/admin/applications'
+    | '/api/public/admin/deny-application'
+    | '/api/public/admin/remove-application'
+    | '/api/public/admin/send-payment-link'
     | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -288,6 +332,10 @@ export interface FileRouteTypes {
     | '/features/risk'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
+    | '/api/public/admin/applications'
+    | '/api/public/admin/deny-application'
+    | '/api/public/admin/remove-application'
+    | '/api/public/admin/send-payment-link'
     | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   id:
@@ -314,6 +362,10 @@ export interface FileRouteTypes {
     | '/features/risk'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
+    | '/api/public/admin/applications'
+    | '/api/public/admin/deny-application'
+    | '/api/public/admin/remove-application'
+    | '/api/public/admin/send-payment-link'
     | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
@@ -341,6 +393,10 @@ export interface RootRouteChildren {
   FeaturesRiskRoute: typeof FeaturesRiskRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicSubmitApplicationRoute: typeof ApiPublicSubmitApplicationRoute
+  ApiPublicAdminApplicationsRoute: typeof ApiPublicAdminApplicationsRoute
+  ApiPublicAdminDenyApplicationRoute: typeof ApiPublicAdminDenyApplicationRoute
+  ApiPublicAdminRemoveApplicationRoute: typeof ApiPublicAdminRemoveApplicationRoute
+  ApiPublicAdminSendPaymentLinkRoute: typeof ApiPublicAdminSendPaymentLinkRoute
   ApiPublicEnrollApplicationIdRoute: typeof ApiPublicEnrollApplicationIdRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
@@ -515,6 +571,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicEnrollApplicationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin/send-payment-link': {
+      id: '/api/public/admin/send-payment-link'
+      path: '/api/public/admin/send-payment-link'
+      fullPath: '/api/public/admin/send-payment-link'
+      preLoaderRoute: typeof ApiPublicAdminSendPaymentLinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin/remove-application': {
+      id: '/api/public/admin/remove-application'
+      path: '/api/public/admin/remove-application'
+      fullPath: '/api/public/admin/remove-application'
+      preLoaderRoute: typeof ApiPublicAdminRemoveApplicationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin/deny-application': {
+      id: '/api/public/admin/deny-application'
+      path: '/api/public/admin/deny-application'
+      fullPath: '/api/public/admin/deny-application'
+      preLoaderRoute: typeof ApiPublicAdminDenyApplicationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin/applications': {
+      id: '/api/public/admin/applications'
+      path: '/api/public/admin/applications'
+      fullPath: '/api/public/admin/applications'
+      preLoaderRoute: typeof ApiPublicAdminApplicationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -541,6 +625,10 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturesRiskRoute: FeaturesRiskRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicSubmitApplicationRoute: ApiPublicSubmitApplicationRoute,
+  ApiPublicAdminApplicationsRoute: ApiPublicAdminApplicationsRoute,
+  ApiPublicAdminDenyApplicationRoute: ApiPublicAdminDenyApplicationRoute,
+  ApiPublicAdminRemoveApplicationRoute: ApiPublicAdminRemoveApplicationRoute,
+  ApiPublicAdminSendPaymentLinkRoute: ApiPublicAdminSendPaymentLinkRoute,
   ApiPublicEnrollApplicationIdRoute: ApiPublicEnrollApplicationIdRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
