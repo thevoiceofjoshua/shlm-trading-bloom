@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { createTestCheckoutSession } from "@/lib/checkout.functions";
+import { createTestCheckoutRequest } from "@/lib/checkout-client";
 import { HomeButton } from "@/components/HomeButton";
 import { Button } from "@/components/ui/button";
 
@@ -28,7 +27,6 @@ export const Route = createFileRoute("/test-checkout")({
 });
 
 function TestCheckoutPage() {
-  const startCheckout = useServerFn(createTestCheckoutSession);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +34,7 @@ function TestCheckoutPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await startCheckout({ data: { origin: window.location.origin } });
+      const res = await createTestCheckoutRequest({ origin: window.location.origin });
       if (res?.url) window.location.href = res.url;
       else setError("No checkout URL returned.");
     } catch (e) {
