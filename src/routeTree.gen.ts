@@ -33,6 +33,7 @@ import { Route as ApiPublicSubmitApplicationRouteImport } from './routes/api/pub
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as ApiPublicEnrollApplicationIdRouteImport } from './routes/api/public/enroll.$applicationId'
+import { Route as ApiPublicCheckoutVerifyRouteImport } from './routes/api/public/checkout.verify'
 import { Route as ApiPublicCheckoutTestRouteImport } from './routes/api/public/checkout.test'
 import { Route as ApiPublicCheckoutExtensionRouteImport } from './routes/api/public/checkout.extension'
 import { Route as ApiPublicCheckoutCreateRouteImport } from './routes/api/public/checkout.create'
@@ -164,6 +165,11 @@ const ApiPublicEnrollApplicationIdRoute =
     path: '/api/public/enroll/$applicationId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicCheckoutVerifyRoute = ApiPublicCheckoutVerifyRouteImport.update({
+  id: '/api/public/checkout/verify',
+  path: '/api/public/checkout/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCheckoutTestRoute = ApiPublicCheckoutTestRouteImport.update({
   id: '/api/public/checkout/test',
   path: '/api/public/checkout/test',
@@ -235,6 +241,7 @@ export interface FileRoutesByFullPath {
   '/api/public/checkout/create': typeof ApiPublicCheckoutCreateRoute
   '/api/public/checkout/extension': typeof ApiPublicCheckoutExtensionRoute
   '/api/public/checkout/test': typeof ApiPublicCheckoutTestRoute
+  '/api/public/checkout/verify': typeof ApiPublicCheckoutVerifyRoute
   '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -268,6 +275,7 @@ export interface FileRoutesByTo {
   '/api/public/checkout/create': typeof ApiPublicCheckoutCreateRoute
   '/api/public/checkout/extension': typeof ApiPublicCheckoutExtensionRoute
   '/api/public/checkout/test': typeof ApiPublicCheckoutTestRoute
+  '/api/public/checkout/verify': typeof ApiPublicCheckoutVerifyRoute
   '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -302,6 +310,7 @@ export interface FileRoutesById {
   '/api/public/checkout/create': typeof ApiPublicCheckoutCreateRoute
   '/api/public/checkout/extension': typeof ApiPublicCheckoutExtensionRoute
   '/api/public/checkout/test': typeof ApiPublicCheckoutTestRoute
+  '/api/public/checkout/verify': typeof ApiPublicCheckoutVerifyRoute
   '/api/public/enroll/$applicationId': typeof ApiPublicEnrollApplicationIdRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
@@ -337,6 +346,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout/create'
     | '/api/public/checkout/extension'
     | '/api/public/checkout/test'
+    | '/api/public/checkout/verify'
     | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
@@ -370,6 +380,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout/create'
     | '/api/public/checkout/extension'
     | '/api/public/checkout/test'
+    | '/api/public/checkout/verify'
     | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   id:
@@ -403,6 +414,7 @@ export interface FileRouteTypes {
     | '/api/public/checkout/create'
     | '/api/public/checkout/extension'
     | '/api/public/checkout/test'
+    | '/api/public/checkout/verify'
     | '/api/public/enroll/$applicationId'
     | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
@@ -437,6 +449,7 @@ export interface RootRouteChildren {
   ApiPublicCheckoutCreateRoute: typeof ApiPublicCheckoutCreateRoute
   ApiPublicCheckoutExtensionRoute: typeof ApiPublicCheckoutExtensionRoute
   ApiPublicCheckoutTestRoute: typeof ApiPublicCheckoutTestRoute
+  ApiPublicCheckoutVerifyRoute: typeof ApiPublicCheckoutVerifyRoute
   ApiPublicEnrollApplicationIdRoute: typeof ApiPublicEnrollApplicationIdRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
@@ -611,6 +624,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicEnrollApplicationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/checkout/verify': {
+      id: '/api/public/checkout/verify'
+      path: '/api/public/checkout/verify'
+      fullPath: '/api/public/checkout/verify'
+      preLoaderRoute: typeof ApiPublicCheckoutVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/checkout/test': {
       id: '/api/public/checkout/test'
       path: '/api/public/checkout/test'
@@ -693,6 +713,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCheckoutCreateRoute: ApiPublicCheckoutCreateRoute,
   ApiPublicCheckoutExtensionRoute: ApiPublicCheckoutExtensionRoute,
   ApiPublicCheckoutTestRoute: ApiPublicCheckoutTestRoute,
+  ApiPublicCheckoutVerifyRoute: ApiPublicCheckoutVerifyRoute,
   ApiPublicEnrollApplicationIdRoute: ApiPublicEnrollApplicationIdRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
