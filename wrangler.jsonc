@@ -8,6 +8,7 @@
     "VITE_SUPABASE_PROJECT_ID": "kepbnosffciyyrfnisda",
     "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_XJox_QJedYpRE0MoPKPv0Q_XH-9FBhn",
     "VITE_SUPABASE_URL": "https://kepbnosffciyyrfnisda.supabase.co",
-    "ADMIN_NOTIFICATION_EMAIL": "shalomtradinginc@gmail.com"
+    "ADMIN_NOTIFICATION_EMAIL": "shalomtradinginc@gmail.com",
+    "VITE_APPLICATION_API_BASE": "https://shlm-trading-bloom.lovable.app"
   }
 }
