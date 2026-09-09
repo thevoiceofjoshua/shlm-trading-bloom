@@ -40,7 +40,7 @@ export const Route = createFileRoute("/centre")({
   head: () => ({
     meta: [
       { title: "SHLM Centre — SHLM" },
-      { name: "description", content: "Your premium trading command center — NASDAQ, US30, Gold, economic calendar, and AI session analysis." },
+      { name: "description", content: "Your premium trading command center — NASDAQ, US30, Gold, and economic calendar." },
       { property: "og:title", content: "SHLM Centre — SHLM" },
       { property: "og:description", content: "Premium trading command center for SHLM members." },
       { name: "robots", content: "noindex" },
