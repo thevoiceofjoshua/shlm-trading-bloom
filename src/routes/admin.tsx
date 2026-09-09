@@ -53,7 +53,7 @@ function AdminPage() {
     refetch: refetchApps,
   } = useQuery({
     queryKey: ["applications", passcode],
-    queryFn: () => listFn({ data: { passcode } }),
+    queryFn: () => fetchApplications(passcode),
     enabled: passcode.length > 0,
     retry: false,
   });
@@ -65,9 +65,7 @@ function AdminPage() {
     setSendMsg(null);
     setEmailState((s) => ({ ...s, [id]: "sending" }));
     try {
-      await sendFn({
-        data: { passcode, applicationId: id, origin: window.location.origin },
-      });
+      await sendPaymentLinkRequest(passcode, id);
       setSendMsg({ id, ok: true, text: "Approved — payment link sent." });
       setEmailState((s) => ({ ...s, [id]: "sent" }));
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
@@ -87,9 +85,7 @@ function AdminPage() {
     setSendMsg(null);
     setEmailState((s) => ({ ...s, [id]: "sending" }));
     try {
-      await sendFn({
-        data: { passcode, applicationId: id, origin: window.location.origin },
-      });
+      await sendPaymentLinkRequest(passcode, id);
       setSendMsg({ id, ok: true, text: "Payment link email resent." });
       setEmailState((s) => ({ ...s, [id]: "sent" }));
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
@@ -109,7 +105,7 @@ function AdminPage() {
     setSendMsg(null);
     setEmailState((s) => ({ ...s, [id]: "sending" }));
     try {
-      await denyFn({ data: { passcode, applicationId: id } });
+      await denyApplicationRequest(passcode, id);
       setSendMsg({ id, ok: true, text: "Denied — email sent." });
       setEmailState((s) => ({ ...s, [id]: "sent" }));
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
@@ -128,7 +124,7 @@ function AdminPage() {
     setAction("remove");
     setSendMsg(null);
     try {
-      await removeFn({ data: { passcode, applicationId: id } });
+      await removeApplicationRequest(passcode, id);
       setSelectedId((cur) => (cur === id ? null : cur));
       queryClient.invalidateQueries({ queryKey: ["applications", passcode] });
     } catch (e) {
