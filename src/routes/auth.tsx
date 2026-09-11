@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { HomeButton } from "@/components/HomeButton";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
-
 
 const searchSchema = z.object({
   mode: z.enum(["signin", "signup"]).optional(),
@@ -76,16 +74,18 @@ function AuthPage() {
 
   const handleGoogle = async () => {
     setError(null);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    // Native Supabase OAuth (not the Lovable-hosting-only ~oauth/initiate wrapper),
+    // so this works regardless of which frontend deployment serves the request.
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: redirect ? `${window.location.origin}${redirect}` : window.location.origin,
+      },
     });
-    if (result.error) {
-      setError(result.error instanceof Error ? result.error.message : "Google sign-in failed");
-      return;
+    if (error) {
+      setError(error.message);
     }
-    if (!result.redirected) {
-      navigate({ to: redirect ?? "/", replace: true });
-    }
+    // On success, Supabase redirects the browser to Google automatically; nothing else to do here.
   };
 
   const isSignup = mode === "signup";
@@ -99,7 +99,6 @@ function AuthPage() {
           </Link>
           <HomeButton />
         </div>
-
 
         <div className="mt-10 rounded-2xl border border-border bg-card p-6 sm:p-8">
           <div className="flex gap-1 rounded-full border border-border bg-background p-1">
@@ -234,4 +233,3 @@ function GoogleIcon() {
     </svg>
   );
 }
-
