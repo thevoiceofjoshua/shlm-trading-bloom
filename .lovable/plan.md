@@ -19,7 +19,7 @@ Your current data is small and easy to move:
 | user_roles | 2 |
 | accounts (sign-ups) | 3 |
 
-There is also one private file area used for journal screenshots.
+There is also a private file area holding 9 journal screenshots (about 14.7 MB), which will be copied across as part of the move.
 
 ## Two things I cannot do from here (you must click them)
 
@@ -42,15 +42,17 @@ Passwords are stored as one-way hashes, so I can copy the accounts across with t
 **Step 4 — Re-point the app.**
 Once connected, the app's backend address and public key update, and I re-verify every place that talks to the backend: sign-in, the member dashboard, the SHLM Centre and journal, the application form endpoint, the four admin endpoints, and the four checkout endpoints.
 
-**Step 5 — Re-add the settings that don't travel with the data.**
-New project means these start empty and must be set again: email/password sign-in and Google sign-in, the journal screenshot storage area and its access rules, and the private keys (Stripe live key, Stripe webhook secret, admin passcodes, notification email, AI key). I'll list exactly which ones and set the ones I can.
+**Step 5 — Move the journal screenshots.**
+I'll recreate the private screenshot area with the same access rules, then download all 9 existing screenshots and re-upload them under the exact same file paths, so every journal entry still shows its images. I'll confirm the count matches before and after.
 
-**Step 6 — Test, then publish.**
-I'll run through sign-up, sign-in, an application submission, admin approval, journal save with a screenshot, and a test checkout before we call it done.
+**Step 6 — Re-add the settings that don't travel with the data.**
+New project means these start empty and must be set again: email/password sign-in and Google sign-in, and the private keys (Stripe live key, Stripe webhook secret, admin passcodes, notification email, AI key). I'll list exactly which ones and set the ones I can.
+
+**Step 7 — Test, then publish.**
+I'll run through sign-up, sign-in, an application submission, admin approval, an existing journal entry with its screenshots, a new screenshot upload, and a test checkout before we call it done.
 
 ## Things worth knowing
 
-- **Journal screenshots**: the files themselves live in the old project's storage. If there are any uploaded shots you want kept, I'll need to download and re-upload them; tell me if this matters or if losing old screenshots is fine.
 - **Stripe**: your Stripe account is unaffected, but the payment webhook points at your site, not at the backend, so no change needed there. Past payments stay in Stripe.
 - **Downtime**: expect a short window during the switch where sign-in fails. Best done outside market hours.
 - **Cost**: the new project bills to your own Supabase account instead of Lovable Cloud.
