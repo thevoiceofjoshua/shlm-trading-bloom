@@ -14,16 +14,312 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      applications: {
+        Row: {
+          created_at: string
+          email: string
+          experience: string | null
+          full_name: string
+          goals: string | null
+          id: string
+          payment_link_sent_at: string | null
+          payment_link_session_id: string | null
+          payment_link_status: string
+          phone: string | null
+          scheduled_at: string
+          status: string
+          tier: string
+          timezone: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          experience?: string | null
+          full_name: string
+          goals?: string | null
+          id?: string
+          payment_link_sent_at?: string | null
+          payment_link_session_id?: string | null
+          payment_link_status?: string
+          phone?: string | null
+          scheduled_at: string
+          status?: string
+          tier: string
+          timezone?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          experience?: string | null
+          full_name?: string
+          goals?: string | null
+          id?: string
+          payment_link_sent_at?: string | null
+          payment_link_session_id?: string | null
+          payment_link_status?: string
+          phone?: string | null
+          scheduled_at?: string
+          status?: string
+          tier?: string
+          timezone?: string | null
+        }
+        Relationships: []
+      }
+      daily_levels: {
+        Row: {
+          computed_at: string
+          id: string
+          instrument: string
+          levels: Json
+          session_date: string
+        }
+        Insert: {
+          computed_at?: string
+          id?: string
+          instrument: string
+          levels: Json
+          session_date: string
+        }
+        Update: {
+          computed_at?: string
+          id?: string
+          instrument?: string
+          levels?: Json
+          session_date?: string
+        }
+        Relationships: []
+      }
+      member_notes: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          note_date: string
+          session: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          note_date: string
+          session: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          note_date?: string
+          session?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      member_rules: {
+        Row: {
+          consequence: string
+          created_at: string
+          id: string
+          rules: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          consequence?: string
+          created_at?: string
+          id?: string
+          rules?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          consequence?: string
+          created_at?: string
+          id?: string
+          rules?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      purchases: {
+        Row: {
+          amount_total: number | null
+          created_at: string
+          currency: string | null
+          email: string
+          id: string
+          status: string
+          stripe_payment_intent: string | null
+          stripe_session_id: string
+          tier: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_total?: number | null
+          created_at?: string
+          currency?: string | null
+          email: string
+          id?: string
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id: string
+          tier: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_total?: number | null
+          created_at?: string
+          currency?: string | null
+          email?: string
+          id?: string
+          status?: string
+          stripe_payment_intent?: string | null
+          stripe_session_id?: string
+          tier?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          author: string
+          created_at: string
+          id: string
+          published: boolean
+          quote: string
+          rating: number
+          role: string
+          sort_order: number
+          verified: boolean
+        }
+        Insert: {
+          author: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          quote: string
+          rating?: number
+          role?: string
+          sort_order?: number
+          verified?: boolean
+        }
+        Update: {
+          author?: string
+          created_at?: string
+          id?: string
+          published?: boolean
+          quote?: string
+          rating?: number
+          role?: string
+          sort_order?: number
+          verified?: boolean
+        }
+        Relationships: []
+      }
+      session_reviews: {
+        Row: {
+          created_at: string
+          id: string
+          payload: Json
+          review_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payload: Json
+          review_date: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          review_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      site_stats: {
+        Row: {
+          cohort_label: string
+          cohort_value: string
+          hero_note: string
+          id: number
+          performance_note: string
+          performance_value: string
+          results_label: string
+          results_value: string
+          updated_at: string
+        }
+        Insert: {
+          cohort_label?: string
+          cohort_value?: string
+          hero_note?: string
+          id?: number
+          performance_note?: string
+          performance_value?: string
+          results_label?: string
+          results_value?: string
+          updated_at?: string
+        }
+        Update: {
+          cohort_label?: string
+          cohort_value?: string
+          hero_note?: string
+          id?: number
+          performance_note?: string
+          performance_value?: string
+          results_label?: string
+          results_value?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user" | "shlm_mod"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +446,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user", "shlm_mod"],
+    },
   },
 } as const
