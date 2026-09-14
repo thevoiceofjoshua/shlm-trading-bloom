@@ -3,12 +3,12 @@
   "name": "shlm-trading-bloom",
   "compatibility_date": "2026-09-08",
   "vars": {
-    "SUPABASE_PROJECT_ID": "kepbnosffciyyrfnisda",
-    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_XJox_QJedYpRE0MoPKPv0Q_XH-9FBhn",
-    "SUPABASE_URL": "https://kepbnosffciyyrfnisda.supabase.co",
-    "VITE_SUPABASE_PROJECT_ID": "kepbnosffciyyrfnisda",
-    "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_XJox_QJedYpRE0MoPKPv0Q_XH-9FBhn",
-    "VITE_SUPABASE_URL": "https://kepbnosffciyyrfnisda.supabase.co",
+    "SUPABASE_PROJECT_ID": "ugnyssxvtwvbbckycmru",
+    "SUPABASE_PUBLISHABLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnbnlzc3h2dHd2YmJja3ljbXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNDYyMDksImV4cCI6MjEwNDkyMjIwOX0.d5ZthlUj0Xmd1puZ3lM0cXjbk_CQDuZvO38cpxIVWpE",
+    "SUPABASE_URL": "https://ugnyssxvtwvbbckycmru.supabase.co",
+    "VITE_SUPABASE_PROJECT_ID": "ugnyssxvtwvbbckycmru",
+    "VITE_SUPABASE_PUBLISHABLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnbnlzc3h2dHd2YmJja3ljbXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNDYyMDksImV4cCI6MjEwNDkyMjIwOX0.d5ZthlUj0Xmd1puZ3lM0cXjbk_CQDuZvO38cpxIVWpE",
+    "VITE_SUPABASE_URL": "https://ugnyssxvtwvbbckycmru.supabase.co",
     "ADMIN_NOTIFICATION_EMAIL": "shalomtradinginc@gmail.com",
     "VITE_APPLICATION_API_BASE": "https://shlm-trading-bloom.lovable.app"
   }
