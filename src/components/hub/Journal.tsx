@@ -202,6 +202,8 @@ function newSlot(): string {
 /* -------------------------------- component ------------------------------- */
 
 export function Journal({ userId, onClose }: { userId: string; onClose?: () => void }) {
+  // Decorative vault gate: resets on every open since the modal unmounts.
+  const [unlocked, setUnlocked] = useState(false);
   const todayKey = toKey(new Date());
   const [cursor, setCursor] = useState(() => {
     const n = new Date();
