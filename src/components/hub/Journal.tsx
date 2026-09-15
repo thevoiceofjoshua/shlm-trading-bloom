@@ -12,6 +12,7 @@ import {
   type MemberRule,
 } from "@/lib/hub.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { JournalVaultGate } from "@/components/hub/JournalVaultGate";
 
 /* ------------------------------ date helpers ------------------------------- */
 
