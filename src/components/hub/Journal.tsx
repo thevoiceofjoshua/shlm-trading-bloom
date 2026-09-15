@@ -445,15 +445,6 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
               );
             })}
           </div>
-          <div className="mt-3 space-y-1 text-[11px] text-muted-foreground">
-            <p>
-              <span className="mr-1 inline-block h-2 w-2 translate-y-[1px] rounded-sm bg-emerald-500/40" /> profit day
-              <span className="ml-3 mr-1 inline-block h-2 w-2 translate-y-[1px] rounded-sm bg-red-500/40" /> loss day
-            </p>
-            <p>
-              <span className="mr-1 inline-block h-1 w-1 translate-y-[-2px] rounded-full bg-foreground" /> entry with no PnL logged
-            </p>
-          </div>
         </div>
 
         {/* Entries */}
