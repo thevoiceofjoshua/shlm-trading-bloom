@@ -327,6 +327,24 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
 
   const needsSetup = !rulesLoading && !(rulebook?.configured ?? false);
 
+  if (!unlocked) {
+    return (
+      <div className="relative">
+        <JournalVaultGate onUnlock={() => setUnlocked(true)} />
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close journal"
+            className="absolute right-3 top-3 z-20 flex size-8 items-center justify-center rounded-full border border-emerald-500/40 font-mono text-sm text-emerald-400 transition-colors hover:bg-emerald-500/15"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+    );
+  }
+
   if (needsSetup || editingRules) {
     return (
       <RulesSetup
