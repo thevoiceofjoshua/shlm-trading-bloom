@@ -1349,3 +1349,88 @@ function Screenshots({
     </div>
   );
 }
+
+/* --------------------------- week / month summary -------------------------- */
+
+function startOfWeek(d: Date): Date {
+  const day = d.getDay(); // 0 = Sunday
+  const diff = day === 0 ? 6 : day - 1; // week starts Monday
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() - diff);
+}
+
+function WeekMonthSummary({ userId }: { userId: string }) {
+  const fetchRange = useServerFn(getMemberNotesRange);
+
+  const { weekFrom, weekTo, monthFrom, monthTo } = useMemo(() => {
+    const now = new Date();
+    const ws = startOfWeek(now);
+    const we = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + 6);
+    return {
+      weekFrom: toKey(ws),
+      weekTo: toKey(we),
+      monthFrom: toKey(new Date(now.getFullYear(), now.getMonth(), 1)),
+      monthTo: toKey(new Date(now.getFullYear(), now.getMonth() + 1, 0)),
+    };
+  }, []);
+
+  const from = weekFrom < monthFrom ? weekFrom : monthFrom;
+  const to = weekTo > monthTo ? weekTo : monthTo;
+
+  const { data: rows } = useQuery({
+    queryKey: ["member-notes-summary", userId, from, to],
+    queryFn: () => fetchRange({ data: { from, to } }),
+    enabled: !!userId,
+  });
+
+  const totals = useMemo(() => {
+    const list = (rows ?? []) as { note_date: string; session: string; body: string }[];
+    const sum = (a: string, b: string) => {
+      let total = 0;
+      let entries = 0;
+      let trades = 0;
+      for (const r of list) {
+        if (r.note_date < a || r.note_date > b) continue;
+        const entry = parseEntry(r.body ?? "", r.session);
+        total += pnlNumber(entry);
+        entries++;
+        trades += (entry.trades ?? []).length;
+      }
+      return { total, entries, trades };
+    };
+    return { week: sum(weekFrom, weekTo), month: sum(monthFrom, monthTo) };
+  }, [rows, weekFrom, weekTo, monthFrom, monthTo]);
+
+  const monthLabel = new Date().toLocaleDateString("en-US", { month: "long" });
+
+  return (
+    <div className="mt-6 grid gap-3 border-t border-border pt-5 sm:grid-cols-2">
+      <SummaryTile label="This week" sub={`${weekFrom.slice(5)} – ${weekTo.slice(5)}`} {...totals.week} />
+      <SummaryTile label={`This month · ${monthLabel}`} sub="Calendar month to date" {...totals.month} />
+    </div>
+  );
+}
+
+function SummaryTile({
+  label,
+  sub,
+  total,
+  entries,
+  trades,
+}: {
+  label: string;
+  sub: string;
+  total: number;
+  entries: number;
+  trades: number;
+}) {
+  const color = total > 0 ? "text-emerald-500" : total < 0 ? "text-red-500" : "text-muted-foreground";
+  return (
+    <div className="rounded-xl border border-border bg-background px-4 py-3">
+      <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">{label}</p>
+      <p className={`mt-1 font-display text-2xl font-medium tabular-nums ${color}`}>{formatMoney(total)}</p>
+      <p className="mt-1 text-[11px] text-muted-foreground">
+        {entries} {entries === 1 ? "entry" : "entries"} · {trades} {trades === 1 ? "trade" : "trades"} · {sub}
+      </p>
+    </div>
+  );
+}
