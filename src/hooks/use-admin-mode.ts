@@ -7,6 +7,7 @@ const PASS_KEY = "shlm.adminPasscode";
 const VIEW_KEY = "shlm.adminViewAsMember";
 const DECIDED_KEY = "shlm.adminModeDecided";
 const SCOPE_KEY = "shlm.adminScope";
+const PROMPT_KEY = "shlm.adminPromptRequested";
 const EVENT = "shlm:admin-mode";
 
 type AdminState = {
@@ -15,11 +16,12 @@ type AdminState = {
   passcode: string;
   decided: boolean;
   scope: AdminScope;
+  promptRequested: boolean;
 };
 
 function read(): AdminState {
   if (typeof window === "undefined") {
-    return { adminMode: false, viewAsMember: false, passcode: "", decided: false, scope: "full" };
+    return { adminMode: false, viewAsMember: false, passcode: "", decided: false, scope: "full", promptRequested: false };
   }
   const ss = window.sessionStorage;
   return {
@@ -28,6 +30,7 @@ function read(): AdminState {
     passcode: ss.getItem(PASS_KEY) ?? "",
     decided: ss.getItem(DECIDED_KEY) === "1",
     scope: ss.getItem(SCOPE_KEY) === "shlm_mod" ? "shlm_mod" : "full",
+    promptRequested: ss.getItem(PROMPT_KEY) === "1",
   };
 }
 
@@ -42,6 +45,7 @@ function write(patch: Partial<AdminState>) {
   }
   if (patch.decided !== undefined) ss.setItem(DECIDED_KEY, patch.decided ? "1" : "0");
   if (patch.scope !== undefined) ss.setItem(SCOPE_KEY, patch.scope);
+  if (patch.promptRequested !== undefined) ss.setItem(PROMPT_KEY, patch.promptRequested ? "1" : "0");
   window.dispatchEvent(new Event(EVENT));
 }
 
@@ -88,7 +92,7 @@ export function useAdminMode() {
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT") {
-        write({ adminMode: false, viewAsMember: false, passcode: "", decided: false, scope: "full" });
+        write({ adminMode: false, viewAsMember: false, passcode: "", decided: false, scope: "full", promptRequested: false });
       }
       void check(session?.user.id ?? null, session?.user.email ?? null);
     });
@@ -102,7 +106,7 @@ export function useAdminMode() {
   const enter = useCallback(async (passcode: string) => {
     const res = await verifyAdminPasscode({ data: { passcode } });
     if (!res.ok) return res;
-    write({ adminMode: true, viewAsMember: false, passcode, decided: true, scope: res.scope });
+    write({ adminMode: true, viewAsMember: false, passcode, decided: true, scope: res.scope, promptRequested: false });
     return res;
   }, []);
 
@@ -111,12 +115,12 @@ export function useAdminMode() {
   }, []);
 
   const dismissPrompt = useCallback(() => {
-    write({ decided: true });
+    write({ decided: true, promptRequested: false });
   }, []);
 
   /** Re-opens the "Enter admin mode?" dialog (used from the account menu). */
   const reopenPrompt = useCallback(() => {
-    write({ decided: false });
+    write({ decided: false, promptRequested: true });
   }, []);
 
   const toggleViewAsMember = useCallback(() => {
@@ -141,6 +145,7 @@ export function useAdminMode() {
     viewAsMember: state.viewAsMember,
     passcode: state.passcode,
     decided: state.decided,
+    promptRequested: state.promptRequested,
     scope: state.scope,
     modOnly,
     /** Admin unlocks apply (staff, admin mode on, not viewing as member). */

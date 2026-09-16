@@ -1,14 +1,16 @@
 import { useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 
 export function AdminModePrompt() {
-  const { isStaff, role, checked, decided, adminMode, enter, dismissPrompt, email } = useAdminMode();
+  const { isStaff, role, checked, decided, promptRequested, adminMode, enter, dismissPrompt, email } = useAdminMode();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [step, setStep] = useState<"ask" | "passcode">("ask");
   const [passcode, setPasscode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  if (!checked || !isStaff || decided || adminMode) return null;
+  if (!checked || !isStaff || decided || adminMode || (pathname === "/" && !promptRequested)) return null;
 
   const isMod = role === "shlm_mod";
 
