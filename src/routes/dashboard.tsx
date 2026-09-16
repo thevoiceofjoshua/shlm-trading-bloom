@@ -184,7 +184,7 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
   }
 
   const { enrollment, access } = view;
-  const lifetime = "lifetime" in view ? Boolean((view as { lifetime?: boolean }).lifetime) : false;
+  const lifetime = Boolean((view as { lifetime?: boolean }).lifetime);
   const isAdminPreview = !data?.enrollment && adminUnlocked;
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -347,6 +347,7 @@ function makeActiveMembershipMock() {
       amount_total: PROGRAM.amount,
       created_at: enrolledAt.toISOString(),
     },
+    lifetime: false,
     access: accessWindow(enrolledAt.toISOString(), 0),
   };
 }
@@ -372,6 +373,7 @@ function makeExpiredMembershipMock() {
       amount_total: PROGRAM.amount,
       created_at: enrolledAt.toISOString(),
     },
+    lifetime: false,
     access,
   };
 }
