@@ -1,0 +1,1 @@
+ALTER TABLE public.journal_vault_passcodes ADD COLUMN IF NOT EXISTS passcode_length smallint;
