@@ -289,10 +289,16 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
     },
     onSuccess: async (desiredKey, target) => {
       setDirty(false);
-      setEditing({ ...target, storageKey: desiredKey });
-      await refetch();
       const broken = brokenRules(target.entry, rules);
-      if (broken.length > 0 && consequence && !target.entry.consequenceAcknowledged) {
+      const needsAck = broken.length > 0 && !!consequence && !target.entry.consequenceAcknowledged;
+      // Keep the editor mounted only while an acknowledgement is pending;
+      // otherwise collapse the entry back into the day list.
+      setEditing(needsAck ? { ...target, storageKey: desiredKey } : null);
+      await Promise.all([
+        refetch(),
+        queryClient.invalidateQueries({ queryKey: ["member-notes-summary", userId] }),
+      ]);
+      if (needsAck) {
         setAlertFor(broken);
         return;
       }
@@ -302,6 +308,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
       }
     },
   });
+
 
   const del = useMutation({
     mutationFn: async (target: StoredEntry) => {
