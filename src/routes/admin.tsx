@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 import { HomeButton } from "@/components/HomeButton";
+import { VaultCredentialFrame, VaultField } from "@/components/VaultCredentialFrame";
 import {
   fetchApplications,
   sendPaymentLinkRequest,
@@ -242,29 +243,28 @@ function AdminPage() {
         </div>
         <p className="mt-2 text-sm text-muted-foreground">Review mentorship applications.</p>
 
+        <VaultCredentialFrame className="mt-8" label="SHLM // founder console" status={passcode ? "unlocked" : "locked"}>
         <form
-          className="mt-8 rounded-2xl border border-border bg-card p-6"
+          className="mt-6"
           onSubmit={(e) => {
             e.preventDefault();
             setPasscode(passcodeInput.trim());
           }}
         >
-          <label className="text-sm font-medium" htmlFor="admin-passcode">
-            SHLM Founder passcode
-          </label>
-          <input
+          <VaultField
+            label="SHLM Founder passcode"
             id="admin-passcode"
             type="password"
             value={passcodeInput}
             onChange={(e) => setPasscodeInput(e.target.value)}
             placeholder="Type passcode and press Enter"
-            className="mt-1.5 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
           />
-          <p className="mt-2 text-xs text-muted-foreground">
+          <p className="mt-2 font-sans text-xs text-[var(--vault-green-soft)]">
             {passcode ? "Unlocked." : "Press Enter to unlock applications."}
           </p>
           <button type="submit" className="hidden" aria-hidden="true" tabIndex={-1} />
         </form>
+        </VaultCredentialFrame>
 
 
         {selected ? (

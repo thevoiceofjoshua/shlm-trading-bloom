@@ -271,6 +271,39 @@
   --vault-line: oklch(0.62 0.15 155 / 30%);
 }
 
+.credential-vault {
+  --vault-bg: oklch(0.075 0.012 155);
+  --vault-green: oklch(0.79 0.19 155);
+  --vault-green-soft: oklch(0.68 0.13 155);
+  --vault-amber: oklch(0.78 0.15 75);
+  --vault-panel: oklch(0.11 0.018 155 / 96%);
+  --vault-line: oklch(0.62 0.15 155 / 30%);
+  box-shadow: inset 0 0 48px oklch(0.18 0.05 155 / 20%), 0 24px 80px oklch(0 0 0 / 35%);
+}
+
+.credential-vault-grid {
+  opacity: 0.26;
+  background-image:
+    linear-gradient(var(--vault-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--vault-line) 1px, transparent 1px),
+    repeating-linear-gradient(180deg, color-mix(in oklch, var(--vault-green) 5%, transparent) 0 1px, transparent 1px 4px);
+  background-size: 32px 32px, 32px 32px, 100% 4px;
+  mask-image: linear-gradient(to bottom, transparent, black 18%, black 82%, transparent);
+}
+
+.credential-vault::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  height: 18%;
+  pointer-events: none;
+  opacity: 0.18;
+  background: linear-gradient(180deg, transparent, color-mix(in oklch, var(--vault-green) 22%, transparent), transparent);
+  animation: credential-vault-scan 5s linear infinite;
+}
+
+@keyframes credential-vault-scan { from { top: -18%; } to { top: 100%; } }
+
 .vault-boot::before {
   content: "";
   position: fixed;
@@ -315,6 +348,10 @@
   .home-vault-door-right {
     animation-duration: 0.01ms;
     animation-iteration-count: 1;
+  }
+
+  .credential-vault::after {
+    animation: none;
   }
 }
 
