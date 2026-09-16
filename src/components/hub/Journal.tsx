@@ -9,6 +9,9 @@ import {
   deleteMemberNote,
   getMemberRules,
   saveMemberRules,
+  getJournalVaultStatus,
+  setJournalVaultPasscode,
+  verifyJournalVaultPasscode,
   type MemberRule,
 } from "@/lib/hub.functions";
 import { supabase } from "@/integrations/supabase/client";
