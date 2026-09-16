@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { HomeButton } from "@/components/HomeButton";
+import { VaultCredentialFrame } from "@/components/VaultCredentialFrame";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { PROGRAM, formatUsd } from "@/lib/tiers";
 
@@ -73,38 +74,40 @@ function EnrollGate() {
           </p>
         </div>
 
+        <VaultCredentialFrame className="mt-8" label="SHLM // enrollment access" status={user ? "verified" : "account required"}>
         {!loaded ? (
           <div className="mt-8 h-12 animate-pulse rounded-full bg-muted" />
         ) : user ? (
-          <div className="mt-8 space-y-3">
+          <div className="mt-6 space-y-3 font-sans">
             <a
               href={checkoutHref}
-              className="flex h-12 w-full items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+              className="flex h-12 w-full items-center justify-center rounded-sm bg-[var(--vault-green)] px-6 text-sm font-medium text-[var(--vault-bg)] transition hover:bg-[var(--vault-green-soft)]"
             >
               {redirecting ? "Continuing to checkout…" : "Continue to secure checkout"}
             </a>
-            <p className="text-center text-xs text-muted-foreground">
+            <p className="text-center text-xs text-[var(--vault-green-soft)]">
               Signed in as {user.email ?? user.firstName}
             </p>
           </div>
         ) : (
-          <div className="mt-8 space-y-3">
+          <div className="mt-6 space-y-3 font-sans">
             <Link
               to="/auth"
               search={{ mode: "signup", redirect: returnTo }}
-              className="flex h-12 w-full items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+              className="flex h-12 w-full items-center justify-center rounded-sm bg-[var(--vault-green)] px-6 text-sm font-medium text-[var(--vault-bg)] transition hover:bg-[var(--vault-green-soft)]"
             >
               Create account &amp; continue
             </Link>
             <Link
               to="/auth"
               search={{ mode: "signin", redirect: returnTo }}
-              className="flex h-12 w-full items-center justify-center rounded-full border border-border px-6 text-sm font-medium transition hover:bg-muted"
+              className="flex h-12 w-full items-center justify-center rounded-sm border border-[var(--vault-line)] px-6 text-sm font-medium text-[var(--vault-green)] transition hover:bg-[var(--vault-line)]"
             >
               I already have an account
             </Link>
           </div>
         )}
+        </VaultCredentialFrame>
 
         <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
           Payments are processed securely by Stripe. Questions? Email{" "}

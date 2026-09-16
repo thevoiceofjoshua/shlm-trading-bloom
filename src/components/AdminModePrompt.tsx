@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { useAdminMode } from "@/hooks/use-admin-mode";
+import { Button } from "@/components/ui/button";
+import { VaultCredentialFrame, VaultField } from "@/components/VaultCredentialFrame";
 
 export function AdminModePrompt() {
   const { isStaff, role, checked, decided, promptRequested, adminMode, enter, dismissPrompt, email } = useAdminMode();
@@ -32,74 +34,73 @@ export function AdminModePrompt() {
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-foreground shadow-2xl">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+    <div className="vault-boot fixed inset-0 z-[200] flex items-center justify-center bg-[var(--vault-bg)]/90 px-4 backdrop-blur-sm">
+      <VaultCredentialFrame className="w-full max-w-md" label="SHLM // privileged terminal" status={step === "passcode" ? "clearance" : "standby"}>
+        <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--vault-amber)]">
           {isMod ? "SHLM MOD" : "SHLM Founder"}
         </p>
-        <h2 className="mt-3 font-display text-2xl tracking-tight">
+        <h2 className="mt-3 font-display text-2xl tracking-normal text-[var(--vault-green)]">
           {isMod ? "Enter SHLM MOD access?" : "Enter SHLM Founder mode?"}
         </h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-2 font-sans text-sm leading-relaxed text-[var(--vault-green-soft)]">
           {isMod
             ? "SHLM MOD unlocks the full SHLM Centre — boards, analyst, calendar and journal. Program settings, applications and member data stay locked."
             : "SHLM Founder mode unlocks every page and member function across the store so you can test it end to end. Customer-facing actions still ask for confirmation."}
         </p>
 
-        {email && <p className="mt-2 text-xs text-muted-foreground">Signed in as {email}</p>}
+        {email && <p className="mt-2 font-sans text-xs text-[var(--vault-green-soft)]">Signed in as {email}</p>}
 
         {step === "ask" ? (
           <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-            <button
+            <Button
               type="button"
               onClick={() => setStep("passcode")}
-              className="flex min-h-12 flex-1 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+              className="min-h-12 flex-1 rounded-sm bg-[var(--vault-amber)] text-[var(--vault-bg)] hover:opacity-90"
             >
               {isMod ? "Enter SHLM MOD" : "Enter SHLM Founder"}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="outline"
               onClick={dismissPrompt}
-              className="flex min-h-12 flex-1 items-center justify-center rounded-full border border-border px-5 text-sm font-medium transition-colors hover:bg-accent"
+              className="min-h-12 flex-1 rounded-sm border-[var(--vault-line)] bg-transparent text-[var(--vault-green)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]"
             >
               Continue as member
-            </button>
+            </Button>
           </div>
         ) : (
           <form onSubmit={submit} className="mt-6 space-y-3">
-            <label className="block text-xs font-medium text-muted-foreground" htmlFor="admin-passcode">
-              {isMod ? "SHLM MOD passcode" : "SHLM Founder passcode"}
-            </label>
-            <input
+            <VaultField
+              label={isMod ? "SHLM MOD passcode" : "SHLM Founder passcode"}
               id="admin-passcode"
               type="password"
               autoComplete="off"
               autoFocus
               value={passcode}
               onChange={(e) => setPasscode(e.target.value)}
-              className="h-12 w-full rounded-xl border border-border bg-background px-4 text-sm outline-none focus:border-foreground"
               placeholder="••••••••"
             />
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex flex-col gap-2 sm:flex-row">
-              <button
+              <Button
                 type="submit"
                 disabled={busy || passcode.trim().length === 0}
-                className="flex min-h-12 flex-1 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+                className="min-h-12 flex-1 rounded-sm bg-[var(--vault-amber)] text-[var(--vault-bg)] hover:opacity-90"
               >
                 {busy ? "Verifying…" : isMod ? "Unlock SHLM MOD" : "Unlock SHLM Founder"}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="outline"
                 onClick={dismissPrompt}
-                className="flex min-h-12 flex-1 items-center justify-center rounded-full border border-border px-5 text-sm font-medium transition-colors hover:bg-accent"
+                className="min-h-12 flex-1 rounded-sm border-[var(--vault-line)] bg-transparent text-[var(--vault-green)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]"
               >
                 Not now
-              </button>
+              </Button>
             </div>
           </form>
         )}
-      </div>
+      </VaultCredentialFrame>
     </div>
   );
 }
