@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getSiteStats, type SiteStats } from "@/lib/site-stats.functions";
 import { getReviews, type Review } from "@/lib/reviews.functions";
@@ -9,6 +9,7 @@ import { ReviewsCarousel } from "@/components/ReviewsCarousel";
 import { DISCORD_JOIN_URL } from "@/lib/external-links";
 import { useAuthUser } from "@/hooks/use-auth-user";
 import { AccountMenu } from "@/components/AccountMenu";
+import { HomepageVaultBoot } from "@/components/HomepageVaultBoot";
 
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
 
@@ -94,8 +95,14 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [introComplete, setIntroComplete] = useState(false);
   const getFn = useServerFn(getSiteStats);
   const { data: stats } = useSuspenseQuery(siteStatsQuery(() => getFn()));
+  const completeIntro = useCallback(() => setIntroComplete(true), []);
+
+  if (!introComplete) {
+    return <HomepageVaultBoot onComplete={completeIntro} />;
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
