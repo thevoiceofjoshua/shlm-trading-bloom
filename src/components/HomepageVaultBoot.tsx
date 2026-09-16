@@ -282,7 +282,7 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
               </div>
             )}
 
-            {returningUser && phase !== "opening" && !adminRequested ? (
+            {!adminRequested && (returningUser && phase !== "opening" ? (
               <div className="flex min-h-72 flex-col items-center justify-center text-center">
                 <p className="text-xs uppercase tracking-[0.3em] text-[var(--vault-amber)]">Session verified</p>
                 <p className="mt-4 text-sm text-[var(--vault-green-soft)]">Restoring secure access…</p>
@@ -338,7 +338,7 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
                   onContinueAsMember={continueAsMember}
                 />
               </>
-            )}
+            ))}
 
             {adminRequested && phase !== "opening" && (
               <AdminAccess
@@ -423,7 +423,7 @@ function AdminAccess({ stage, email, password, passcode, loading, error, role, s
               <form onSubmit={onEmailSubmit} className="space-y-3.5">
                 <TerminalField label="Admin email" type="email" value={email} onChange={onEmailChange} autoComplete="email" required />
                 <TerminalField label="Password" type="password" value={password} onChange={onPasswordChange} autoComplete="current-password" required />
-                <Button type="submit" disabled={loading || booting} className="h-11 w-full rounded-sm bg-[var(--vault-amber)] text-[var(--vault-bg)] hover:bg-[var(--vault-amber-soft)]">
+                <Button type="submit" disabled={loading || booting} className="h-11 w-full rounded-sm bg-[var(--vault-amber)] text-[var(--vault-bg)] hover:opacity-90">
                   {loading ? "Authenticating…" : "Authenticate admin"}
                 </Button>
               </form>
@@ -442,7 +442,7 @@ function AdminAccess({ stage, email, password, passcode, loading, error, role, s
           </div>
           <TerminalField label="Admin passcode" type="password" value={passcode} onChange={onPasscodeChange} autoComplete="off" required />
           {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
-          <Button type="submit" disabled={loading || passcode.trim().length === 0} className="h-11 w-full rounded-sm bg-[var(--vault-amber)] text-[var(--vault-bg)] hover:bg-[var(--vault-amber-soft)]">
+          <Button type="submit" disabled={loading || passcode.trim().length === 0} className="h-11 w-full rounded-sm bg-[var(--vault-amber)] text-[var(--vault-bg)] hover:opacity-90">
             {loading ? "Verifying…" : `Unlock ${roleLabel}`}
           </Button>
           <Button type="button" variant="ghost" onClick={onContinueAsMember} className="h-10 w-full rounded-sm text-[var(--vault-green-soft)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]">Continue as member</Button>
