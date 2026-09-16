@@ -47,7 +47,7 @@ export function MorningNewsSpotlight({ payload }: { payload: HubPayload }) {
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">Today · before 12 PM Pacific</p>
-          <h2 id="morning-news-title" className="mt-1 font-display text-2xl font-semibold sm:text-3xl">
+          <h2 id="morning-news-title" className="mt-1 font-display text-xl font-semibold sm:text-3xl">
             Morning high-impact news
           </h2>
         </div>
@@ -64,7 +64,7 @@ export function MorningNewsSpotlight({ payload }: { payload: HubPayload }) {
                 <time dateTime={`${event.date}T${event.time}`}>{econTimeToLocal(event.date, event.time)}</time>
                 {event.currency && <span className="rounded-full border border-border px-2 py-0.5">{event.currency}</span>}
               </div>
-              <h3 className="mt-3 font-display text-xl font-bold leading-tight sm:text-2xl">{event.title}</h3>
+              <h3 className="mt-3 break-words font-display text-lg font-bold leading-tight sm:text-2xl">{event.title}</h3>
               {(event.forecast || event.previous) && (
                 <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
                   {event.forecast && (
@@ -136,12 +136,12 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
                   isLow ? "text-muted-foreground/70" : ""
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex shrink-0 items-center gap-3">
                   <span className="font-medium tabular-nums">{localTime}</span>
                   <span className="text-muted-foreground">{dateLabel}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">{e.title}</span>
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="min-w-0 break-words text-sm">{e.title}</span>
                   <span
                     className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${
                       IMPACT_BADGE[e.impact] ?? IMPACT_BADGE.medium

@@ -237,8 +237,8 @@ function AdminPage() {
   return (
     <div className="min-h-screen bg-background px-4 py-16 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
-        <div className="flex items-center justify-between">
-          <h1 className="font-display text-4xl font-medium tracking-tight">SHLM Founder</h1>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+          <h1 className="min-w-0 font-display text-2xl font-medium tracking-tight sm:text-4xl">SHLM Founder</h1>
           <HomeButton />
         </div>
         <p className="mt-2 text-sm text-muted-foreground">Review mentorship applications.</p>
