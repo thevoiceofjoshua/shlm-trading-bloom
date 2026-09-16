@@ -442,7 +442,9 @@ export const setJournalVaultPasscode = createServerFn({ method: "POST" })
     const { error } = await context.supabase.from("journal_vault_passcodes").insert({
       user_id: context.userId,
       passcode_hash: passcodeHash,
+      passcode_length: data.passcode.length,
     });
+
     if (error) throw new Error(error.message);
     return { saved: true };
   });
