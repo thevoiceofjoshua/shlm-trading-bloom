@@ -54,12 +54,14 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
   useEffect(() => {
     let mounted = true;
     getStatus()
-      .then(({ configured }) => {
+      .then(({ configured, length }) => {
         if (!mounted) return;
         setConfigured(configured);
+        setSavedLength(typeof length === "number" ? length : null);
         setMode(configured ? "verify" : "setup");
         setLoading(false);
       })
+
       .catch(() => {
         if (!mounted) return;
         setConfigured(false);
