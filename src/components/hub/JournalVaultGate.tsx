@@ -363,12 +363,13 @@ function SetupPanel({ code, confirm, denied, error, onPush, onBackspace, onClear
   );
 }
 
-function VerifyPanel({ code, denied, error, onPush, onBackspace, onClear }: PanelProps) {
+function VerifyPanel({ code, boxes, denied, error, onPush, onBackspace, onClear }: PanelProps & { boxes: number }) {
   return (
     <div className={denied ? "vault-glitch mt-7" : "mt-7"}>
       <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-500/70">enter passcode</p>
       <div className="mt-3 flex items-center gap-2.5">
-        {Array.from({ length: MAX_LENGTH }).map((_, i) => (
+        {Array.from({ length: boxes }).map((_, i) => (
+
           <span
             key={i}
             className={`flex h-12 flex-1 items-center justify-center rounded-lg border text-lg ${
