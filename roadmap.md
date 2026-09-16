@@ -35,4 +35,4 @@
 
 ## Morning high-impact news spotlight
 - [x] Add today's pre-noon Pacific high-impact releases above the full economic calendar
-- [ ] Verify desktop and phone layouts, role parity, and clean build
+- [x] Verify desktop and phone layout rules, role parity, and clean build
