@@ -337,7 +337,12 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
   if (!unlocked) {
     return (
       <div className="relative">
-        <JournalVaultGate onUnlock={() => setUnlocked(true)} />
+        <JournalVaultGate
+          getStatus={() => getVaultStatus()}
+          setPasscode={(passcode) => setVaultPasscode({ data: { passcode } })}
+          verify={(passcode) => verifyVaultPasscode({ data: { passcode } })}
+          onUnlock={() => setUnlocked(true)}
+        />
         {onClose && (
           <button
             type="button"
