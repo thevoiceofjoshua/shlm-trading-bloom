@@ -395,3 +395,72 @@ export const saveMemberNote = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { saved: true };
   });
+
+/* ----------------------- Journal vault passcode ---------------------------- */
+
+function sha256(input: string): string {
+  const buffer = new TextEncoder().encode(input);
+  return crypto.subtle.digest("SHA-256", buffer).then((digest) => {
+    const bytes = new Uint8Array(digest);
+    return Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  }) as unknown as string;
+}
+
+export const getJournalVaultStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: row, error } = await context.supabase
+      .from("journal_vault_passcodes")
+      .select("id")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return { configured: !!row };
+  });
+
+export const setJournalVaultPasscode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => {
+    const d = data as Record<string, unknown>;
+    const passcode = typeof d.passcode === "string" ? d.passcode : "";
+    if (!/^\d{5,8}$/.test(passcode)) throw new Error("Passcode must be 5–8 digits");
+    return { passcode };
+  })
+  .handler(async ({ context, data }) => {
+    const existing = await context.supabase
+      .from("journal_vault_passcodes")
+      .select("id")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (existing.error) throw new Error(existing.error.message);
+    if (existing.data) throw new Error("Vault passcode already configured");
+
+    const passcodeHash = await sha256(data.passcode);
+    const { error } = await context.supabase.from("journal_vault_passcodes").insert({
+      user_id: context.userId,
+      passcode_hash: passcodeHash,
+    });
+    if (error) throw new Error(error.message);
+    return { saved: true };
+  });
+
+export const verifyJournalVaultPasscode = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => {
+    const d = data as Record<string, unknown>;
+    const passcode = typeof d.passcode === "string" ? d.passcode : "";
+    if (!/^\d{5,8}$/.test(passcode)) throw new Error("Passcode must be 5–8 digits");
+    return { passcode };
+  })
+  .handler(async ({ context, data }) => {
+    const { data: row, error } = await context.supabase
+      .from("journal_vault_passcodes")
+      .select("passcode_hash")
+      .eq("user_id", context.userId)
+      .single();
+    if (error || !row) throw new Error("Vault passcode not configured");
+    const passcodeHash = await sha256(data.passcode);
+    return { valid: passcodeHash === row.passcode_hash };
+  });
