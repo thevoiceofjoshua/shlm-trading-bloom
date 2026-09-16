@@ -220,7 +220,9 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
   const [successAlertFor, setSuccessAlertFor] = useState<MemberRule[] | null>(null);
   const [editingRules, setEditingRules] = useState(false);
 
+  const queryClient = useQueryClient();
   const fetchRange = useServerFn(getMemberNotesRange);
+
   const saveNote = useServerFn(saveMemberNote);
   const removeNote = useServerFn(deleteMemberNote);
   const fetchRules = useServerFn(getMemberRules);
