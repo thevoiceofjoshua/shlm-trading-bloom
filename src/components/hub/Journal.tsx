@@ -224,6 +224,9 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
   const saveNote = useServerFn(saveMemberNote);
   const removeNote = useServerFn(deleteMemberNote);
   const fetchRules = useServerFn(getMemberRules);
+  const getVaultStatus = useServerFn(getJournalVaultStatus);
+  const setVaultPasscode = useServerFn(setJournalVaultPasscode);
+  const verifyVaultPasscode = useServerFn(verifyJournalVaultPasscode);
 
   const from = toKey(new Date(cursor.year, cursor.month, 1));
   const to = toKey(new Date(cursor.year, cursor.month + 1, 0));
