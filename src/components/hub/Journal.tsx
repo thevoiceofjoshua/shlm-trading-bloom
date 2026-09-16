@@ -459,7 +459,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                   key={i}
                   type="button"
                   onClick={() => setSelected(key)}
-                  className={`relative flex h-16 min-w-11 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition-colors ${tint} ${
+                  className={`relative flex h-14 min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-xl border text-sm transition-colors sm:h-16 ${tint} ${
                     isSelected
                       ? "border-foreground ring-1 ring-foreground"
                       : isToday
