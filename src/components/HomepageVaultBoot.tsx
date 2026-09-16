@@ -282,7 +282,7 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
               </div>
             )}
 
-            {!adminRequested && (returningUser && phase !== "opening" ? (
+            {(!adminRequested || !sessionFound) && (returningUser && phase !== "opening" ? (
               <div className="flex min-h-72 flex-col items-center justify-center text-center">
                 <p className="text-xs uppercase tracking-[0.3em] text-[var(--vault-amber)]">Session verified</p>
                 <p className="mt-4 text-sm text-[var(--vault-green-soft)]">Restoring secure access…</p>
@@ -340,7 +340,7 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
               </>
             ))}
 
-            {adminRequested && phase !== "opening" && (
+            {adminRequested && sessionFound && phase !== "opening" && (
               <AdminAccess
                 stage={adminStage}
                 email={adminEmail}
