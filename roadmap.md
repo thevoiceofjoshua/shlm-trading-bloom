@@ -17,3 +17,10 @@
 - [x] Full end-to-end test passed: all pages, public reviews/stats reads, email sign-up + delete, Google OAuth handoff, application submit, admin list/approve/remove, MOD lockout, Stripe checkout (main/test/extension) and enrollment redirect
 - [x] Published
 - [ ] Leaked-password protection: skipped (Supabase Pro-plan feature; Free plan)
+
+## Per-user journal vault passcode
+- [x] Add `journal_vault_passcodes` table with SHA-256 hashes and per-user RLS
+- [x] Add authenticated server functions: status, setup, verify
+- [x] Rewrite `JournalVaultGate` with setup + verify modes
+- [x] Pre-set passcodes for mikestaten29@gmail.com (11711) and joschewagner56@gmail.com (09099)
+- [x] Build passes and rows verified
