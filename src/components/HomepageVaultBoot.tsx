@@ -116,7 +116,7 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
 
   return (
     <main className="vault-boot relative min-h-svh overflow-hidden bg-[var(--vault-bg)] font-mono text-[var(--vault-green)]">
-      <Button type="button" variant="ghost" onClick={openHomepage} disabled={phase === "booting"} className="fixed right-3 top-3 z-30 rounded-sm border border-[var(--vault-line)] bg-[var(--vault-bg)] text-[10px] uppercase tracking-[0.18em] text-[var(--vault-green-soft)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)] sm:right-5 sm:top-5">
+      <Button type="button" variant="ghost" onClick={openHomepage} className="fixed right-3 top-3 z-30 rounded-sm border border-[var(--vault-line)] bg-[var(--vault-bg)] text-[10px] uppercase tracking-[0.18em] text-[var(--vault-green-soft)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)] sm:right-5 sm:top-5">
         Skip / Explore
       </Button>
 
@@ -195,7 +195,7 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
                   </Button>
                 </form>
 
-                <Button type="button" variant="ghost" onClick={openHomepage} disabled={phase === "booting"} className="mt-3 h-11 w-full rounded-sm text-[var(--vault-green-soft)] underline underline-offset-4 hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]">Explore without signing in</Button>
+                <Button type="button" variant="ghost" onClick={openHomepage} className="mt-3 h-11 w-full rounded-sm text-[var(--vault-green-soft)] underline underline-offset-4 hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]">Explore without signing in</Button>
               </>
             )}
           </section>
