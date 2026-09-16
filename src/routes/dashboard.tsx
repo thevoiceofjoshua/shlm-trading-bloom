@@ -259,9 +259,9 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
           <h3 className="font-display text-lg font-medium">Purchase history</h3>
           <ul className="mt-4 divide-y divide-border">
             {view.purchases.map((p) => (
-              <li key={p.id} className="flex items-center justify-between py-3 text-sm">
-                <span>{p.name}</span>
-                <span className="text-muted-foreground">
+              <li key={p.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3 text-sm">
+                <span className="min-w-0 break-words">{p.name}</span>
+                <span className="shrink-0 text-right text-muted-foreground">
                   {new Date(p.created_at).toLocaleDateString("en-US")} ·{" "}
                   {formatUsd(p.amount_total ?? PROGRAM.amount)}
                 </span>
