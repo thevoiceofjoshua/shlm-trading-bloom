@@ -20,7 +20,7 @@ const BOOT_LINES = [
 ];
 
 interface Props {
-  getStatus: () => Promise<{ configured: boolean }>;
+  getStatus: () => Promise<{ configured: boolean; length?: number | null }>;
   setPasscode: (passcode: string) => Promise<{ saved: boolean }>;
   verify: (passcode: string) => Promise<{ valid: boolean }>;
   onUnlock: () => void;
@@ -29,6 +29,7 @@ interface Props {
 export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: Props) {
   const [loading, setLoading] = useState(true);
   const [configured, setConfigured] = useState<boolean | null>(null);
+  const [savedLength, setSavedLength] = useState<number | null>(null);
 
   const [mode, setMode] = useState<"setup" | "verify">("verify");
   const [code, setCode] = useState("");
@@ -41,15 +42,26 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
   const busyRef = useRef(busy);
   busyRef.current = busy;
 
+  // Number of boxes for the verify screen: the member's own code length when
+  // known, otherwise fall back to the flexible max.
+  const verifyLength =
+    savedLength && savedLength >= MIN_LENGTH && savedLength <= MAX_LENGTH ? savedLength : null;
+  const verifyBoxes = verifyLength ?? MAX_LENGTH;
+  const verifyLengthRef = useRef(verifyLength);
+  verifyLengthRef.current = verifyLength;
+
+
   useEffect(() => {
     let mounted = true;
     getStatus()
-      .then(({ configured }) => {
+      .then(({ configured, length }) => {
         if (!mounted) return;
         setConfigured(configured);
+        setSavedLength(typeof length === "number" ? length : null);
         setMode(configured ? "verify" : "setup");
         setLoading(false);
       })
+
       .catch(() => {
         if (!mounted) return;
         setConfigured(false);
@@ -133,13 +145,16 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
     }
 
     // verify mode
+    const expected = verifyLengthRef.current;
     setCode((prev) => {
-      if (prev.length >= MAX_LENGTH) return prev;
+      if (prev.length >= (expected ?? MAX_LENGTH)) return prev;
       const next = prev + digit;
-      if (next.length >= MIN_LENGTH) window.setTimeout(() => submitVerify(next), 120);
+      const ready = expected ? next.length === expected : next.length >= MIN_LENGTH;
+      if (ready) window.setTimeout(() => submitVerify(next), 120);
       return next;
     });
   };
+
 
   const backspace = () => {
     if (mode === "setup" && confirm.length > 0) {
@@ -280,12 +295,14 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
         ) : (
           <VerifyPanel
             code={code}
+            boxes={verifyBoxes}
             denied={denied}
             error={error}
             onPush={push}
             onBackspace={backspace}
             onClear={clear}
           />
+
         )}
       </div>
     </div>
@@ -346,12 +363,13 @@ function SetupPanel({ code, confirm, denied, error, onPush, onBackspace, onClear
   );
 }
 
-function VerifyPanel({ code, denied, error, onPush, onBackspace, onClear }: PanelProps) {
+function VerifyPanel({ code, boxes, denied, error, onPush, onBackspace, onClear }: PanelProps & { boxes: number }) {
   return (
     <div className={denied ? "vault-glitch mt-7" : "mt-7"}>
       <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-500/70">enter passcode</p>
       <div className="mt-3 flex items-center gap-2.5">
-        {Array.from({ length: MAX_LENGTH }).map((_, i) => (
+        {Array.from({ length: boxes }).map((_, i) => (
+
           <span
             key={i}
             className={`flex h-12 flex-1 items-center justify-center rounded-lg border text-lg ${
