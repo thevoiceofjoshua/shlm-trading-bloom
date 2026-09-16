@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getMemberNotesRange,
   saveMemberNote,
@@ -220,7 +220,9 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
   const [successAlertFor, setSuccessAlertFor] = useState<MemberRule[] | null>(null);
   const [editingRules, setEditingRules] = useState(false);
 
+  const queryClient = useQueryClient();
   const fetchRange = useServerFn(getMemberNotesRange);
+
   const saveNote = useServerFn(saveMemberNote);
   const removeNote = useServerFn(deleteMemberNote);
   const fetchRules = useServerFn(getMemberRules);
@@ -289,10 +291,16 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
     },
     onSuccess: async (desiredKey, target) => {
       setDirty(false);
-      setEditing({ ...target, storageKey: desiredKey });
-      await refetch();
       const broken = brokenRules(target.entry, rules);
-      if (broken.length > 0 && consequence && !target.entry.consequenceAcknowledged) {
+      const needsAck = broken.length > 0 && !!consequence && !target.entry.consequenceAcknowledged;
+      // Keep the editor mounted only while an acknowledgement is pending;
+      // otherwise collapse the entry back into the day list.
+      setEditing(needsAck ? { ...target, storageKey: desiredKey } : null);
+      await Promise.all([
+        refetch(),
+        queryClient.invalidateQueries({ queryKey: ["member-notes-summary", userId] }),
+      ]);
+      if (needsAck) {
         setAlertFor(broken);
         return;
       }
@@ -303,6 +311,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
     },
   });
 
+
   const del = useMutation({
     mutationFn: async (target: StoredEntry) => {
       if (!target.storageKey) return { deleted: true };
@@ -312,8 +321,12 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
     onSuccess: async () => {
       setEditing(null);
       setDirty(false);
-      await refetch();
+      await Promise.all([
+        refetch(),
+        queryClient.invalidateQueries({ queryKey: ["member-notes-summary", userId] }),
+      ]);
     },
+
   });
 
   const setField = <K extends keyof Entry>(key: K, value: Entry[K]) => {
@@ -442,7 +455,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
               </div>
             ))}
             {cells.map((d, i) => {
-              if (!d) return <div key={i} className="h-16" />;
+              if (!d) return <div key={i} className="h-14 sm:h-16" />;
               const key = toKey(d);
               const isSelected = key === selected;
               const isToday = key === todayKey;
@@ -459,7 +472,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                   key={i}
                   type="button"
                   onClick={() => setSelected(key)}
-                  className={`relative flex h-16 min-w-11 flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition-colors ${tint} ${
+                  className={`relative flex h-14 min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-xl border text-sm transition-colors sm:h-16 ${tint} ${
                     isSelected
                       ? "border-foreground ring-1 ring-foreground"
                       : isToday
@@ -469,7 +482,8 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                 >
                   <span className={isSelected ? "font-semibold" : ""}>{d.getDate()}</span>
                   {info?.hasPnl ? (
-                    <span className={`text-[10px] font-medium tabular-nums ${pnlColor}`}>{formatMoney(info.total)}</span>
+                    <span className={`max-w-full truncate px-0.5 text-[9px] font-medium tabular-nums sm:text-[10px] ${pnlColor}`}>{formatMoney(info.total)}</span>
+
                   ) : info?.hasAny ? (
                     <span className="h-1 w-1 rounded-full bg-foreground" />
                   ) : null}
