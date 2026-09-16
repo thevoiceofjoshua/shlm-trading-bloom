@@ -321,8 +321,12 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
     onSuccess: async () => {
       setEditing(null);
       setDirty(false);
-      await refetch();
+      await Promise.all([
+        refetch(),
+        queryClient.invalidateQueries({ queryKey: ["member-notes-summary", userId] }),
+      ]);
     },
+
   });
 
   const setField = <K extends keyof Entry>(key: K, value: Entry[K]) => {
