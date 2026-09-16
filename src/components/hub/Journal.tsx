@@ -9,6 +9,9 @@ import {
   deleteMemberNote,
   getMemberRules,
   saveMemberRules,
+  getJournalVaultStatus,
+  setJournalVaultPasscode,
+  verifyJournalVaultPasscode,
   type MemberRule,
 } from "@/lib/hub.functions";
 import { supabase } from "@/integrations/supabase/client";
@@ -221,6 +224,9 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
   const saveNote = useServerFn(saveMemberNote);
   const removeNote = useServerFn(deleteMemberNote);
   const fetchRules = useServerFn(getMemberRules);
+  const getVaultStatus = useServerFn(getJournalVaultStatus);
+  const setVaultPasscode = useServerFn(setJournalVaultPasscode);
+  const verifyVaultPasscode = useServerFn(verifyJournalVaultPasscode);
 
   const from = toKey(new Date(cursor.year, cursor.month, 1));
   const to = toKey(new Date(cursor.year, cursor.month + 1, 0));
@@ -331,7 +337,12 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
   if (!unlocked) {
     return (
       <div className="relative">
-        <JournalVaultGate onUnlock={() => setUnlocked(true)} />
+        <JournalVaultGate
+          getStatus={() => getVaultStatus()}
+          setPasscode={(passcode) => setVaultPasscode({ data: { passcode } })}
+          verify={(passcode) => verifyVaultPasscode({ data: { passcode } })}
+          onUnlock={() => setUnlocked(true)}
+        />
         {onClose && (
           <button
             type="button"
