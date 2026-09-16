@@ -295,12 +295,14 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
         ) : (
           <VerifyPanel
             code={code}
+            boxes={verifyBoxes}
             denied={denied}
             error={error}
             onPush={push}
             onBackspace={backspace}
             onClear={clear}
           />
+
         )}
       </div>
     </div>
