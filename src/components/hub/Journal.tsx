@@ -442,7 +442,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
               </div>
             ))}
             {cells.map((d, i) => {
-              if (!d) return <div key={i} className="h-16" />;
+              if (!d) return <div key={i} className="h-14 sm:h-16" />;
               const key = toKey(d);
               const isSelected = key === selected;
               const isToday = key === todayKey;
