@@ -58,6 +58,8 @@ async function checkAccess(context: any): Promise<HubAccess> {
   const held = ((roleRows ?? []) as { role: string }[]).map((r) => r.role);
   const isAdmin = held.includes("admin");
   const isMod = held.includes("shlm_mod");
+  // Complimentary lifetime member: same access as a paid member, no admin rights.
+  const isFreeMember = held.includes("free_member");
 
   // Paid membership check
   const email = (context.claims.email as string | undefined) ?? null;
@@ -68,7 +70,7 @@ async function checkAccess(context: any): Promise<HubAccess> {
     .order("created_at", { ascending: true });
   if (email) query = query.or(`user_id.eq.${context.userId},email.eq.${email}`);
   const { data } = await query;
-  const memberAccess = (data ?? []).length > 0;
+  const memberAccess = (data ?? []).length > 0 || isFreeMember;
 
   if (isAdmin) return { hasAccess: true, isAdmin: true, memberAccess };
   if (isMod) return { hasAccess: true, isAdmin: false, memberAccess, readOnly: true };

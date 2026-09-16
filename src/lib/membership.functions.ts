@@ -6,6 +6,14 @@ export const getMyMembership = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const email = (context.claims.email as string | undefined) ?? null;
+
+    // Complimentary lifetime members: granted by role, no Stripe purchase.
+    const { data: roleRows } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+    const lifetime = ((roleRows ?? []) as { role: string }[]).some((r) => r.role === "free_member");
+
     let query = context.supabase
       .from("purchases")
       .select("id, tier, status, amount_total, currency, created_at, stripe_session_id")
@@ -16,7 +24,21 @@ export const getMyMembership = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     const rows = data ?? [];
-    if (rows.length === 0) return { purchases: [], enrollment: null, access: null };
+    if (rows.length === 0) {
+      if (!lifetime) return { purchases: [], enrollment: null, access: null, lifetime: false };
+      const grantedAt = new Date().toISOString();
+      return {
+        purchases: [],
+        lifetime: true,
+        enrollment: {
+          id: "lifetime-access",
+          name: PROGRAM.name,
+          amount_total: PROGRAM.amount,
+          created_at: grantedAt,
+        },
+        access: { ...accessWindow(grantedAt, 0), active: true, daysRemaining: Infinity },
+      };
+    }
 
     // Anything that isn't an extension counts as the enrollment purchase
     // (covers legacy tier rows from the old three-tier model).
@@ -44,6 +66,9 @@ export const getMyMembership = createServerFn({ method: "POST" })
         amount_total: enrollment.amount_total ?? PROGRAM.amount,
         created_at: enrollment.created_at,
       },
-      access: accessWindow(enrollment.created_at, extensionMonths),
+      lifetime,
+      access: lifetime
+        ? { ...accessWindow(enrollment.created_at, extensionMonths), active: true, daysRemaining: Infinity }
+        : accessWindow(enrollment.created_at, extensionMonths),
     };
   });
