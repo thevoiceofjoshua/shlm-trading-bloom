@@ -3,9 +3,12 @@ import { useEffect, useRef, useState } from "react";
 /**
  * Decorative security-terminal gate shown before the journal content.
  * Purely visual: the real data access is protected by Supabase auth + RLS.
+ *
+ * This version is per-user: first open is a setup screen; later opens verify
+ * against the member's saved SHA-256 hash stored on the server.
  */
-const PASSCODE = "11711";
-const LENGTH = PASSCODE.length;
+const MIN_LENGTH = 5;
+const MAX_LENGTH = 8;
 const SCRAMBLE = "▚▞█▓▒░#@$%&*01";
 
 const BOOT_LINES = [
@@ -16,34 +19,140 @@ const BOOT_LINES = [
   "> authentication required",
 ];
 
-export function JournalVaultGate({ onUnlock }: { onUnlock: () => void }) {
+interface Props {
+  getStatus: () => Promise<{ configured: boolean }>;
+  setPasscode: (passcode: string) => Promise<{ saved: boolean }>;
+  verify: (passcode: string) => Promise<{ valid: boolean }>;
+  onUnlock: () => void;
+}
+
+export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: Props) {
+  const [loading, setLoading] = useState(true);
+  const [configured, setConfigured] = useState<boolean | null>(null);
+
+  const [mode, setMode] = useState<"setup" | "verify">("verify");
   const [code, setCode] = useState("");
-  const [denied, setDenied] = useState(false);
+  const [confirm, setConfirm] = useState("");
   const [phase, setPhase] = useState<"locked" | "opening">("locked");
+  const [denied, setDenied] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [scramble, setScramble] = useState("");
   const busy = phase !== "locked";
   const busyRef = useRef(busy);
   busyRef.current = busy;
 
-  const submit = (value: string) => {
-    if (value !== PASSCODE) {
+  useEffect(() => {
+    let mounted = true;
+    getStatus()
+      .then(({ configured }) => {
+        if (!mounted) return;
+        setConfigured(configured);
+        setMode(configured ? "verify" : "setup");
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setConfigured(false);
+        setMode("setup");
+        setLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [getStatus]);
+
+  const runUnlock = () => {
+    setPhase("opening");
+  };
+
+  const submitVerify = async (value: string) => {
+    try {
+      const { valid } = await verify(value);
+      if (!valid) {
+        setDenied(true);
+        setCode("");
+        window.setTimeout(() => setDenied(false), 900);
+        return;
+      }
+      runUnlock();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Verification failed");
       setDenied(true);
       setCode("");
       window.setTimeout(() => setDenied(false), 900);
+    }
+  };
+
+  const submitSetup = async (value: string, confirmation: string) => {
+    if (value.length < MIN_LENGTH) {
+      setError("Passcode too short");
       return;
     }
-    setPhase("opening");
+    if (value !== confirmation) {
+      setError("Passcodes do not match");
+      setDenied(true);
+      setConfirm("");
+      window.setTimeout(() => setDenied(false), 900);
+      return;
+    }
+    try {
+      await setPasscode(value);
+      setConfigured(true);
+      setMode("verify");
+      runUnlock();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not save passcode");
+    }
   };
 
   const push = (digit: string) => {
     if (busy) return;
+    setError(null);
     setDenied(false);
+
+    if (mode === "setup") {
+      if (confirm.length > 0 && confirm.length < MAX_LENGTH) {
+        setConfirm((prev) => {
+          const next = prev + digit;
+          if (next.length === MAX_LENGTH) window.setTimeout(() => submitSetup(code, next), 120);
+          return next;
+        });
+        return;
+      }
+      if (code.length < MAX_LENGTH) {
+        setCode((prev) => {
+          const next = prev + digit;
+          if (next.length === MAX_LENGTH) {
+            // move to confirmation automatically at max length
+            window.setTimeout(() => setConfirm(next), 80);
+          }
+          return next;
+        });
+      }
+      return;
+    }
+
+    // verify mode
     setCode((prev) => {
-      if (prev.length >= LENGTH) return prev;
+      if (prev.length >= MAX_LENGTH) return prev;
       const next = prev + digit;
-      if (next.length === LENGTH) window.setTimeout(() => submit(next), 120);
+      if (next.length >= MIN_LENGTH) window.setTimeout(() => submitVerify(next), 120);
       return next;
     });
+  };
+
+  const backspace = () => {
+    if (mode === "setup" && confirm.length > 0) {
+      setConfirm((p) => p.slice(0, -1));
+    } else {
+      setCode((p) => p.slice(0, -1));
+    }
+  };
+
+  const clear = () => {
+    setCode("");
+    setConfirm("");
+    setError(null);
   };
 
   // Keyboard entry mirrors the on-screen keypad.
@@ -51,7 +160,8 @@ export function JournalVaultGate({ onUnlock }: { onUnlock: () => void }) {
     const onKey = (e: KeyboardEvent) => {
       if (busyRef.current) return;
       if (/^[0-9]$/.test(e.key)) push(e.key);
-      else if (e.key === "Backspace") setCode((p) => p.slice(0, -1));
+      else if (e.key === "Backspace") backspace();
+      else if (e.key === "Escape") clear();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -85,6 +195,8 @@ export function JournalVaultGate({ onUnlock }: { onUnlock: () => void }) {
     };
   }, [phase, onUnlock]);
 
+  const activeValue = mode === "setup" && confirm.length > 0 ? confirm : code;
+
   return (
     <div className="vault-shell relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-[#04070a] p-5 font-mono text-emerald-400 sm:p-8">
       <style>{`
@@ -113,16 +225,19 @@ export function JournalVaultGate({ onUnlock }: { onUnlock: () => void }) {
         @keyframes vault-door-l { from { transform: translateX(0) } to { transform: translateX(-102%) } }
         @keyframes vault-door-r { from { transform: translateX(0) } to { transform: translateX(102%) } }
         .vault-door-l { animation: vault-door-l 1.1s cubic-bezier(.7,0,.2,1) .5s forwards }
-        .vault-door-r { animation: vault-door-r 1.1s cubic-bezier(.7,0,.2,1) .5s forwards }
+        .vault-door-r { animation: vault-door-l 1.1s cubic-bezier(.7,0,.2,1) .5s forwards }
         @keyframes vault-fade-up { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
         .vault-line { animation: vault-fade-up .35s ease-out both }
+        @media (prefers-reduced-motion: reduce) {
+          .vault-shell::after, .vault-caret, .vault-glitch, .vault-door-l, .vault-door-r, .vault-line { animation: none !important; }
+        }
       `}</style>
 
       <div className="relative z-10 mx-auto max-w-md">
         <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-emerald-500/70">
           <span>SHLM // vault</span>
-          <span className={phase === "opening" ? "text-emerald-300" : "text-amber-400"}>
-            {phase === "opening" ? "unsealing" : "locked"}
+          <span className={phase === "opening" ? "text-emerald-300" : denied ? "text-red-400" : "text-amber-400"}>
+            {phase === "opening" ? "unsealing" : denied ? "denied" : configured === false ? "setup" : "locked"}
           </span>
         </div>
 
@@ -134,7 +249,11 @@ export function JournalVaultGate({ onUnlock }: { onUnlock: () => void }) {
           ))}
         </div>
 
-        {phase === "opening" ? (
+        {loading ? (
+          <div className="mt-8 text-center text-xs tracking-widest text-emerald-500/70">
+            initializing vault…
+          </div>
+        ) : phase === "opening" ? (
           <div className="mt-7">
             <div className="relative h-28 overflow-hidden rounded-xl border border-emerald-500/40 bg-black/60">
               <div className="vault-door-l absolute inset-y-0 left-0 w-1/2 border-r border-emerald-500/50 bg-gradient-to-r from-[#0a1410] to-[#0f2a20]" />
@@ -147,44 +266,128 @@ export function JournalVaultGate({ onUnlock }: { onUnlock: () => void }) {
               decrypting journal…
             </p>
           </div>
+        ) : mode === "setup" ? (
+          <SetupPanel
+            code={code}
+            confirm={confirm}
+            denied={denied}
+            error={error}
+            onPush={push}
+            onBackspace={backspace}
+            onClear={clear}
+            onSubmit={() => submitSetup(code, confirm)}
+          />
         ) : (
-          <div className={denied ? "vault-glitch mt-7" : "mt-7"}>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-500/70">enter passcode</p>
-            <div className="mt-3 flex items-center gap-2.5">
-              {Array.from({ length: LENGTH }).map((_, i) => (
-                <span
-                  key={i}
-                  className={`flex h-12 flex-1 items-center justify-center rounded-lg border text-lg ${
-                    denied
-                      ? "border-red-500/70 text-red-400"
-                      : i < code.length
-                        ? "border-emerald-400 bg-emerald-500/10 text-emerald-300"
-                        : "border-emerald-500/30 text-emerald-500/40"
-                  }`}
-                  style={{ boxShadow: i < code.length && !denied ? "var(--vault-glow)" : undefined }}
-                >
-                  {i < code.length ? "●" : i === code.length && !denied ? <span className="vault-caret">_</span> : ""}
-                </span>
-              ))}
-            </div>
-
-            <p className={`mt-3 h-4 text-[11px] tracking-widest ${denied ? "text-red-400" : "text-emerald-500/60"}`}>
-              {denied ? "ACCESS DENIED — retry" : "keypad or keyboard"}
-            </p>
-
-            <div className="mt-4 grid grid-cols-3 gap-2">
-              {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
-                <KeypadKey key={d} onClick={() => push(d)}>
-                  {d}
-                </KeypadKey>
-              ))}
-              <KeypadKey onClick={() => setCode("")}>CLR</KeypadKey>
-              <KeypadKey onClick={() => push("0")}>0</KeypadKey>
-              <KeypadKey onClick={() => setCode((p) => p.slice(0, -1))}>⌫</KeypadKey>
-            </div>
-          </div>
+          <VerifyPanel
+            code={code}
+            denied={denied}
+            error={error}
+            onPush={push}
+            onBackspace={backspace}
+            onClear={clear}
+          />
         )}
       </div>
+    </div>
+  );
+}
+
+interface PanelProps {
+  code: string;
+  denied: boolean;
+  error: string | null;
+  onPush: (d: string) => void;
+  onBackspace: () => void;
+  onClear: () => void;
+}
+
+function SetupPanel({ code, confirm, denied, error, onPush, onBackspace, onClear, onSubmit }: PanelProps & { confirm: string; onSubmit: () => void }) {
+  const step = confirm.length > 0 || code.length === MAX_LENGTH ? "confirm" : "choose";
+  const value = step === "confirm" ? confirm : code;
+  return (
+    <div className={denied ? "vault-glitch mt-7" : "mt-7"}>
+      <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-500/70">
+        {step === "confirm" ? "confirm vault passcode" : "set your vault passcode"}
+      </p>
+      <div className="mt-3 flex items-center gap-2.5">
+        {Array.from({ length: MAX_LENGTH }).map((_, i) => (
+          <span
+            key={i}
+            className={`flex h-12 flex-1 items-center justify-center rounded-lg border text-lg ${
+              denied
+                ? "border-red-500/70 text-red-400"
+                : i < value.length
+                  ? "border-emerald-400 bg-emerald-500/10 text-emerald-300"
+                  : "border-emerald-500/30 text-emerald-500/40"
+            }`}
+            style={{ boxShadow: i < value.length && !denied ? "var(--vault-glow)" : undefined }}
+          >
+            {i < value.length ? "●" : i === value.length && !denied ? <span className="vault-caret">_</span> : ""}
+          </span>
+        ))}
+      </div>
+
+      <p className={`mt-3 h-4 text-[11px] tracking-widest ${denied ? "text-red-400" : error ? "text-amber-400" : "text-emerald-500/60"}`}>
+        {denied ? "ACCESS DENIED — retry" : error ?? "choose 5–8 digits, then confirm"}
+      </p>
+
+      <Keypad onPush={onPush} onBackspace={onBackspace} onClear={onClear} />
+
+      {step === "confirm" && (
+        <button
+          type="button"
+          onClick={onSubmit}
+          className="mt-4 w-full rounded-lg border border-emerald-500/50 bg-emerald-500/10 py-2.5 text-xs uppercase tracking-widest text-emerald-300 transition-colors hover:bg-emerald-500/20"
+        >
+          Seal vault
+        </button>
+      )}
+    </div>
+  );
+}
+
+function VerifyPanel({ code, denied, error, onPush, onBackspace, onClear }: PanelProps) {
+  return (
+    <div className={denied ? "vault-glitch mt-7" : "mt-7"}>
+      <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-500/70">enter passcode</p>
+      <div className="mt-3 flex items-center gap-2.5">
+        {Array.from({ length: MAX_LENGTH }).map((_, i) => (
+          <span
+            key={i}
+            className={`flex h-12 flex-1 items-center justify-center rounded-lg border text-lg ${
+              denied
+                ? "border-red-500/70 text-red-400"
+                : i < code.length
+                  ? "border-emerald-400 bg-emerald-500/10 text-emerald-300"
+                  : "border-emerald-500/30 text-emerald-500/40"
+            }`}
+            style={{ boxShadow: i < code.length && !denied ? "var(--vault-glow)" : undefined }}
+          >
+            {i < code.length ? "●" : i === code.length && !denied ? <span className="vault-caret">_</span> : ""}
+          </span>
+        ))}
+      </div>
+
+      <p className={`mt-3 h-4 text-[11px] tracking-widest ${denied ? "text-red-400" : error ? "text-amber-400" : "text-emerald-500/60"}`}>
+        {denied ? "ACCESS DENIED — retry" : error ?? "keypad or keyboard"}
+      </p>
+
+      <Keypad onPush={onPush} onBackspace={onBackspace} onClear={onClear} />
+    </div>
+  );
+}
+
+function Keypad({ onPush, onBackspace, onClear }: Omit<PanelProps, "code" | "denied" | "error">) {
+  return (
+    <div className="mt-4 grid grid-cols-3 gap-2">
+      {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
+        <KeypadKey key={d} onClick={() => onPush(d)}>
+          {d}
+        </KeypadKey>
+      ))}
+      <KeypadKey onClick={onClear}>CLR</KeypadKey>
+      <KeypadKey onClick={() => onPush("0")}>0</KeypadKey>
+      <KeypadKey onClick={onBackspace}>⌫</KeypadKey>
     </div>
   );
 }
