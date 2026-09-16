@@ -6,9 +6,9 @@
    - Add a `journal_vault_passcodes` table keyed by the member’s user ID.
    - Store only a salted, one-way passcode hash—not the readable passcode.
    - Enable row-level access so members can only reach their own vault record; privileged service access remains available for administration.
-   - Pre-set the two requested accounts directly in the database:
-     - `mikestaten29@gmail.com` → `11711`
-     - `joschewagner56@gmail.com` → `090994`
+  - Pre-set the two requested accounts directly in the database:
+    - `mikestaten29@gmail.com` → `11711`
+    - `joschewagner56@gmail.com` → `09099`
 
 2. **Add authenticated passcode operations**
    - Add signed-in server operations to check whether the current member has configured a passcode, save their first passcode, and verify later attempts.
