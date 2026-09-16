@@ -20,7 +20,7 @@ const BOOT_LINES = [
 ];
 
 interface Props {
-  getStatus: () => Promise<{ configured: boolean }>;
+  getStatus: () => Promise<{ configured: boolean; length?: number | null }>;
   setPasscode: (passcode: string) => Promise<{ saved: boolean }>;
   verify: (passcode: string) => Promise<{ valid: boolean }>;
   onUnlock: () => void;
@@ -29,6 +29,7 @@ interface Props {
 export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: Props) {
   const [loading, setLoading] = useState(true);
   const [configured, setConfigured] = useState<boolean | null>(null);
+  const [savedLength, setSavedLength] = useState<number | null>(null);
 
   const [mode, setMode] = useState<"setup" | "verify">("verify");
   const [code, setCode] = useState("");
@@ -40,6 +41,15 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
   const busy = phase !== "locked";
   const busyRef = useRef(busy);
   busyRef.current = busy;
+
+  // Number of boxes for the verify screen: the member's own code length when
+  // known, otherwise fall back to the flexible max.
+  const verifyLength =
+    savedLength && savedLength >= MIN_LENGTH && savedLength <= MAX_LENGTH ? savedLength : null;
+  const verifyBoxes = verifyLength ?? MAX_LENGTH;
+  const verifyLengthRef = useRef(verifyLength);
+  verifyLengthRef.current = verifyLength;
+
 
   useEffect(() => {
     let mounted = true;
