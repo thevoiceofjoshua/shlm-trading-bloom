@@ -24,6 +24,73 @@ const IMPACT_BADGE: Record<string, string> = {
   low: "border border-border/50 text-muted-foreground/70",
 };
 
+function pacificDateISO(now: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Los_Angeles",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+  return `${value("year")}-${value("month")}-${value("day")}`;
+}
+
+export function MorningNewsSpotlight({ payload }: { payload: HubPayload }) {
+  const todayPacific = pacificDateISO();
+  const morningEvents = [...payload.econEvents]
+    .filter((event) => event.date === todayPacific && event.impact === "high" && event.time < "12:00")
+    .sort((a, b) => a.time.localeCompare(b.time));
+
+  return (
+    <section aria-labelledby="morning-news-title" className="border-y border-border py-6 sm:py-8">
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">Today · before 12 PM Pacific</p>
+          <h2 id="morning-news-title" className="mt-1 font-display text-2xl font-semibold sm:text-3xl">
+            Morning high-impact news
+          </h2>
+        </div>
+        <span className="rounded-full bg-foreground px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-background">
+          High impact
+        </span>
+      </div>
+
+      {morningEvents.length > 0 ? (
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          {morningEvents.map((event) => (
+            <article key={`${event.date}-${event.time}-${event.title}`} className="rounded-lg border border-foreground/30 bg-card p-4 sm:p-5">
+              <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                <time dateTime={`${event.date}T${event.time}`}>{econTimeToLocal(event.date, event.time)}</time>
+                {event.currency && <span className="rounded-full border border-border px-2 py-0.5">{event.currency}</span>}
+              </div>
+              <h3 className="mt-3 font-display text-xl font-bold leading-tight sm:text-2xl">{event.title}</h3>
+              {(event.forecast || event.previous) && (
+                <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                  {event.forecast && (
+                    <div>
+                      <dt className="text-xs text-muted-foreground">Forecast</dt>
+                      <dd className="font-semibold tabular-nums">{event.forecast}</dd>
+                    </div>
+                  )}
+                  {event.previous && (
+                    <div>
+                      <dt className="text-xs text-muted-foreground">Previous</dt>
+                      <dd className="font-semibold tabular-nums">{event.previous}</dd>
+                    </div>
+                  )}
+                </dl>
+              )}
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-5 text-sm text-muted-foreground">No high-impact morning releases.</p>
+      )}
+    </section>
+  );
+}
+
 export function EconomicCalendar({ payload }: { payload: HubPayload }) {
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
