@@ -29,4 +29,5 @@
 - [x] Add a distinct inline ADMIN ACCESS section below member sign-in
 - [x] Reuse authenticated staff-role and server-verified passcode checks
 - [x] Preserve member sign-in/create-account and Google return intent
-- [ ] Verify Founder, SHLM MOD, regular member, desktop, and mobile flows
+- [x] Verify regular member controls, admin credential states, desktop/mobile layout, and clean build
+- [ ] Live Founder and SHLM MOD unlock checks require signing into the externally managed Supabase accounts
