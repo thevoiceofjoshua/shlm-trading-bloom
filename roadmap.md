@@ -22,5 +22,12 @@
 - [x] Add `journal_vault_passcodes` table with SHA-256 hashes and per-user RLS
 - [x] Add authenticated server functions: status, setup, verify
 - [x] Rewrite `JournalVaultGate` with setup + verify modes
-- [x] Pre-set passcodes for mikestaten29@gmail.com (11711) and joschewagner56@gmail.com (09099)
+- [x] Pre-set passcodes for mikestaten29@gmail.com (11711) and joschewagner56@gmail.com (090999)
 - [x] Build passes and rows verified
+
+## Embedded admin access on homepage vault
+- [x] Add a distinct inline ADMIN ACCESS section below member sign-in
+- [x] Reuse authenticated staff-role and server-verified passcode checks
+- [x] Preserve member sign-in/create-account and Google return intent
+- [x] Verify regular member controls, admin credential states, desktop/mobile layout, and clean build
+- [ ] Live Founder and SHLM MOD unlock checks require signing into the externally managed Supabase accounts

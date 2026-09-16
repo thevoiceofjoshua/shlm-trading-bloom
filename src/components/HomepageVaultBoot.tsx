@@ -1,9 +1,13 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useAdminMode } from "@/hooks/use-admin-mode";
 
 type Mode = "signin" | "signup";
 type Phase = "booting" | "ready" | "opening";
+type AdminStage = "closed" | "credentials" | "checking" | "passcode";
+
+const ACCESS_INTENT_KEY = "shlm.homeVaultAccessIntent";
 
 const BOOT_LINES = [
   "> SHLM SECURE TERMINAL v2.6",
@@ -13,6 +17,7 @@ const BOOT_LINES = [
 ];
 
 export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
+  const { checked: adminChecked, isStaff, role, enter, dismissPrompt } = useAdminMode();
   const [mode, setMode] = useState<Mode>("signin");
   const [phase, setPhase] = useState<Phase>("booting");
   const [email, setEmail] = useState("");
@@ -22,6 +27,14 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [returningUser, setReturningUser] = useState(false);
+  const [sessionFound, setSessionFound] = useState(false);
+  const [adminRequested, setAdminRequested] = useState(false);
+  const [adminStage, setAdminStage] = useState<AdminStage>("closed");
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminPasscode, setAdminPasscode] = useState("");
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [adminError, setAdminError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -32,16 +45,44 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
     supabase.auth.getSession().then(({ data }) => {
       if (!active || !data.session) return;
       setReturningUser(true);
-      window.setTimeout(() => {
-        if (active) setPhase("opening");
-      }, 700);
+      setSessionFound(true);
+      const intent = window.sessionStorage.getItem(ACCESS_INTENT_KEY);
+      dismissPrompt();
+      if (intent === "member") {
+        window.sessionStorage.removeItem(ACCESS_INTENT_KEY);
+        window.setTimeout(() => {
+          if (active) setPhase("opening");
+        }, 700);
+        return;
+      }
+      if (intent === "admin") {
+        setAdminRequested(true);
+        setAdminStage("checking");
+      }
     });
 
     return () => {
       active = false;
       window.clearTimeout(minimumBoot);
     };
-  }, []);
+  }, [dismissPrompt]);
+
+  useEffect(() => {
+    if (!sessionFound || !adminChecked || phase === "opening") return;
+    if (isStaff) {
+      setAdminRequested(true);
+      setAdminStage("passcode");
+      setAdminError(null);
+      return;
+    }
+    if (adminRequested) {
+      setAdminStage("credentials");
+      setAdminError("This account does not have SHLM admin access.");
+      return;
+    }
+    const timer = window.setTimeout(() => setPhase("opening"), 700);
+    return () => window.clearTimeout(timer);
+  }, [adminChecked, adminRequested, isStaff, phase, sessionFound]);
 
   useEffect(() => {
     if (phase !== "opening") return;
@@ -50,6 +91,8 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
   }, [onComplete, phase]);
 
   const openHomepage = () => {
+    window.sessionStorage.removeItem(ACCESS_INTENT_KEY);
+    dismissPrompt();
     setError(null);
     setNotice(null);
     setPhase("opening");
@@ -80,6 +123,7 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
         if (signUpError) throw signUpError;
         if (data.session) {
           setReturningUser(true);
+          dismissPrompt();
           openHomepage();
           return;
         }
@@ -89,6 +133,7 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
         if (signInError) throw signInError;
         setReturningUser(true);
+        dismissPrompt();
         openHomepage();
       }
     } catch (caught) {
@@ -101,21 +146,97 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
   const handleGoogle = async () => {
     setLoading(true);
     setError(null);
+    window.sessionStorage.setItem(ACCESS_INTENT_KEY, "member");
+    dismissPrompt();
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin },
     });
     if (oauthError) {
+      window.sessionStorage.removeItem(ACCESS_INTENT_KEY);
       setError(oauthError.message);
       setLoading(false);
     }
+  };
+
+  const openAdminAccess = () => {
+    dismissPrompt();
+    setAdminRequested(true);
+    setAdminError(null);
+    setAdminStage(sessionFound && isStaff ? "passcode" : "credentials");
+  };
+
+  const handleAdminEmail = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setAdminLoading(true);
+    setAdminError(null);
+    window.sessionStorage.setItem(ACCESS_INTENT_KEY, "admin");
+    dismissPrompt();
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: adminEmail,
+        password: adminPassword,
+      });
+      if (signInError) throw signInError;
+      setReturningUser(true);
+      setSessionFound(true);
+      setAdminStage("checking");
+    } catch (caught) {
+      window.sessionStorage.removeItem(ACCESS_INTENT_KEY);
+      setAdminError(caught instanceof Error ? caught.message : "Could not authenticate this account.");
+      setAdminStage("credentials");
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
+  const handleAdminGoogle = async () => {
+    setAdminLoading(true);
+    setAdminError(null);
+    window.sessionStorage.setItem(ACCESS_INTENT_KEY, "admin");
+    dismissPrompt();
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
+    });
+    if (oauthError) {
+      window.sessionStorage.removeItem(ACCESS_INTENT_KEY);
+      setAdminError(oauthError.message);
+      setAdminLoading(false);
+    }
+  };
+
+  const handleAdminPasscode = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setAdminLoading(true);
+    setAdminError(null);
+    try {
+      const result = await enter(adminPasscode.trim());
+      if (!result.ok) {
+        setAdminError(result.reason === "bad-passcode" ? "That admin passcode is incorrect." : "This account does not have SHLM admin access.");
+        return;
+      }
+      window.sessionStorage.removeItem(ACCESS_INTENT_KEY);
+      setReturningUser(true);
+      setPhase("opening");
+    } catch {
+      setAdminError("Could not verify the admin passcode. Try again.");
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
+  const continueAsMember = () => {
+    window.sessionStorage.removeItem(ACCESS_INTENT_KEY);
+    dismissPrompt();
+    setPhase("opening");
   };
 
   const isSignup = mode === "signup";
   const isOpening = phase === "opening";
 
   return (
-    <main className="vault-boot relative min-h-svh overflow-hidden bg-[var(--vault-bg)] font-mono text-[var(--vault-green)]">
+    <main className="vault-boot relative min-h-svh overflow-x-hidden bg-[var(--vault-bg)] font-mono text-[var(--vault-green)]">
       <Button type="button" variant="ghost" onClick={openHomepage} className="fixed right-3 top-3 z-30 rounded-sm border border-[var(--vault-line)] bg-[var(--vault-bg)] text-[10px] uppercase tracking-[0.18em] text-[var(--vault-green-soft)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)] sm:right-5 sm:top-5">
         Skip / Explore
       </Button>
@@ -161,7 +282,7 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
               </div>
             )}
 
-            {returningUser && phase !== "opening" ? (
+            {(!adminRequested || !sessionFound) && (returningUser && phase !== "opening" ? (
               <div className="flex min-h-72 flex-col items-center justify-center text-center">
                 <p className="text-xs uppercase tracking-[0.3em] text-[var(--vault-amber)]">Session verified</p>
                 <p className="mt-4 text-sm text-[var(--vault-green-soft)]">Restoring secure access…</p>
@@ -196,12 +317,138 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
                 </form>
 
                 <Button type="button" variant="ghost" onClick={openHomepage} className="mt-3 h-11 w-full rounded-sm text-[var(--vault-green-soft)] underline underline-offset-4 hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]">Explore without signing in</Button>
+
+                <AdminAccess
+                  stage={adminStage}
+                  email={adminEmail}
+                  password={adminPassword}
+                  passcode={adminPasscode}
+                  loading={adminLoading}
+                  error={adminError}
+                  role={role}
+                  signedIn={sessionFound}
+                  booting={phase === "booting"}
+                  onOpen={openAdminAccess}
+                  onEmailChange={setAdminEmail}
+                  onPasswordChange={setAdminPassword}
+                  onPasscodeChange={setAdminPasscode}
+                  onEmailSubmit={handleAdminEmail}
+                  onGoogle={handleAdminGoogle}
+                  onPasscodeSubmit={handleAdminPasscode}
+                  onContinueAsMember={continueAsMember}
+                />
               </>
+            ))}
+
+            {adminRequested && sessionFound && phase !== "opening" && (
+              <AdminAccess
+                stage={adminStage}
+                email={adminEmail}
+                password={adminPassword}
+                passcode={adminPasscode}
+                loading={adminLoading}
+                error={adminError}
+                role={role}
+                signedIn={sessionFound}
+                booting={phase === "booting"}
+                onOpen={openAdminAccess}
+                onEmailChange={setAdminEmail}
+                onPasswordChange={setAdminPassword}
+                onPasscodeChange={setAdminPasscode}
+                onEmailSubmit={handleAdminEmail}
+                onGoogle={handleAdminGoogle}
+                onPasscodeSubmit={handleAdminPasscode}
+                onContinueAsMember={continueAsMember}
+                standalone
+              />
             )}
           </section>
         </div>
       </div>
     </main>
+  );
+}
+
+function AdminAccess({ stage, email, password, passcode, loading, error, role, signedIn, booting, onOpen, onEmailChange, onPasswordChange, onPasscodeChange, onEmailSubmit, onGoogle, onPasscodeSubmit, onContinueAsMember, standalone = false }: {
+  stage: AdminStage;
+  email: string;
+  password: string;
+  passcode: string;
+  loading: boolean;
+  error: string | null;
+  role: "admin" | "shlm_mod" | null;
+  signedIn: boolean;
+  booting: boolean;
+  onOpen: () => void;
+  onEmailChange: (value: string) => void;
+  onPasswordChange: (value: string) => void;
+  onPasscodeChange: (value: string) => void;
+  onEmailSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onGoogle: () => void;
+  onPasscodeSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onContinueAsMember: () => void;
+  standalone?: boolean;
+}) {
+  const roleLabel = role === "shlm_mod" ? "SHLM MOD" : "SHLM FOUNDER";
+
+  return (
+    <div className={standalone ? "" : "mt-5 border-t border-[var(--vault-line)] pt-5"}>
+      <div className="flex items-center gap-3">
+        <span className="h-px flex-1 bg-[var(--vault-line)]" />
+        <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--vault-amber)]">Admin access</p>
+        <span className="h-px flex-1 bg-[var(--vault-line)]" />
+      </div>
+
+      {stage === "closed" && (
+        <Button type="button" variant="outline" onClick={onOpen} disabled={booting} className="mt-4 h-11 w-full rounded-sm border-[var(--vault-amber)]/60 bg-transparent text-[var(--vault-amber)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-amber)]">
+          Open admin terminal
+        </Button>
+      )}
+
+      {stage === "checking" && (
+        <div className="py-8 text-center">
+          <p className="text-[10px] uppercase tracking-[0.24em] text-[var(--vault-green-soft)]">Verifying staff clearance…</p>
+        </div>
+      )}
+
+      {stage === "credentials" && (
+        <div className="mt-4">
+          <p className="text-xs leading-relaxed text-[var(--vault-green-soft)]">Authenticate with your authorized staff account.</p>
+          {!signedIn && (
+            <>
+              <Button type="button" variant="outline" onClick={onGoogle} disabled={loading || booting} className="mt-4 h-11 w-full rounded-sm border-[var(--vault-line)] bg-transparent text-[var(--vault-green)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]">
+                <GoogleMark /> Continue with Google
+              </Button>
+              <div className="my-4 flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] text-[var(--vault-green-soft)]"><span className="h-px flex-1 bg-[var(--vault-line)]" />or<span className="h-px flex-1 bg-[var(--vault-line)]" /></div>
+              <form onSubmit={onEmailSubmit} className="space-y-3.5">
+                <TerminalField label="Admin email" type="email" value={email} onChange={onEmailChange} autoComplete="email" required />
+                <TerminalField label="Password" type="password" value={password} onChange={onPasswordChange} autoComplete="current-password" required />
+                <Button type="submit" disabled={loading || booting} className="h-11 w-full rounded-sm bg-[var(--vault-amber)] text-[var(--vault-bg)] hover:opacity-90">
+                  {loading ? "Authenticating…" : "Authenticate admin"}
+                </Button>
+              </form>
+            </>
+          )}
+          {error && <p role="alert" className="mt-3 text-xs text-destructive">{error}</p>}
+          {signedIn && <Button type="button" variant="ghost" onClick={onContinueAsMember} className="mt-3 h-10 w-full rounded-sm text-[var(--vault-green-soft)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]">Continue as member</Button>}
+        </div>
+      )}
+
+      {stage === "passcode" && (
+        <form onSubmit={onPasscodeSubmit} className="mt-4 space-y-3.5">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.24em] text-[var(--vault-green)]">{roleLabel} clearance confirmed</p>
+            <p className="mt-2 text-xs text-[var(--vault-green-soft)]">Enter your secure admin passcode to unlock controls.</p>
+          </div>
+          <TerminalField label="Admin passcode" type="password" value={passcode} onChange={onPasscodeChange} autoComplete="off" required />
+          {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
+          <Button type="submit" disabled={loading || passcode.trim().length === 0} className="h-11 w-full rounded-sm bg-[var(--vault-amber)] text-[var(--vault-bg)] hover:opacity-90">
+            {loading ? "Verifying…" : `Unlock ${roleLabel}`}
+          </Button>
+          <Button type="button" variant="ghost" onClick={onContinueAsMember} className="h-10 w-full rounded-sm text-[var(--vault-green-soft)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]">Continue as member</Button>
+        </form>
+      )}
+    </div>
   );
 }
 
