@@ -31,3 +31,4 @@
 - [x] Preserve member sign-in/create-account and Google return intent
 - [x] Verify regular member controls, admin credential states, desktop/mobile layout, and clean build
 - [ ] Live Founder and SHLM MOD unlock checks require signing into the externally managed Supabase accounts
+- [ ] Apply Emerald Vault styling only to all credential areas (sign-in, sign-up, admin access, journal passcode)
