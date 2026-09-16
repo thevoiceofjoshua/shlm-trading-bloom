@@ -116,26 +116,12 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
 
   return (
     <main className="vault-boot relative min-h-svh overflow-hidden bg-[var(--vault-bg)] font-mono text-[var(--vault-green)]">
-      <style>{`
-        .vault-boot { --vault-bg: oklch(0.075 0.012 155); --vault-green: oklch(0.79 0.19 155); --vault-green-soft: oklch(0.68 0.13 155); --vault-amber: oklch(0.78 0.15 75); --vault-panel: oklch(0.11 0.018 155 / .92); --vault-line: oklch(0.62 0.15 155 / .3); }
-        .vault-boot::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 20; background: repeating-linear-gradient(180deg, color-mix(in oklch, var(--vault-green) 6%, transparent) 0 1px, transparent 1px 4px); }
-        .vault-boot::after { content: ""; position: fixed; left: 0; right: 0; height: 24%; pointer-events: none; z-index: 20; opacity: .24; background: linear-gradient(180deg, transparent, color-mix(in oklch, var(--vault-green) 18%, transparent), transparent); animation: home-vault-scan 4.5s linear infinite; }
-        @keyframes home-vault-scan { from { top: -24%; } to { top: 100%; } }
-        @keyframes home-vault-spin { to { transform: rotate(360deg); } }
-        @keyframes home-vault-pulse { 0%, 100% { opacity: .45; transform: scale(.94); } 50% { opacity: 1; transform: scale(1); } }
-        @keyframes home-vault-line { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes home-vault-left { to { transform: translateX(-102%); } }
-        @keyframes home-vault-right { to { transform: translateX(102%); } }
-        .home-vault-logo { animation: home-vault-spin 5s linear infinite; }
-        .home-vault-pulse { animation: home-vault-pulse 1.25s ease-in-out infinite; }
-        .home-vault-line { animation: home-vault-line .35s ease-out both; }
-        .home-vault-door-left { animation: home-vault-left .9s cubic-bezier(.7,0,.2,1) .28s forwards; }
-        .home-vault-door-right { animation: home-vault-right .9s cubic-bezier(.7,0,.2,1) .28s forwards; }
-        @media (prefers-reduced-motion: reduce) { .vault-boot::after, .home-vault-logo, .home-vault-pulse, .home-vault-line, .home-vault-door-left, .home-vault-door-right { animation-duration: .01ms; animation-iteration-count: 1; } }
-      `}</style>
+      <Button type="button" variant="ghost" onClick={openHomepage} disabled={phase === "booting"} className="fixed right-3 top-3 z-30 rounded-sm border border-[var(--vault-line)] bg-[var(--vault-bg)] text-[10px] uppercase tracking-[0.18em] text-[var(--vault-green-soft)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)] sm:right-5 sm:top-5">
+        Skip / Explore
+      </Button>
 
       <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-6xl items-center px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid w-full items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,440px)] lg:gap-16">
+        <div className="grid w-full items-center gap-8 md:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] md:gap-10 lg:gap-16">
           <section aria-label="SHLM secure terminal" className="mx-auto w-full max-w-xl lg:mx-0">
             <div className="flex items-center justify-between border-b border-[var(--vault-line)] pb-3 text-[10px] uppercase tracking-[0.28em] text-[var(--vault-green-soft)]">
               <span>SHLM // secure access</span>
@@ -209,9 +195,7 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
                   </Button>
                 </form>
 
-                <Button type="button" variant="ghost" onClick={openHomepage} disabled={phase === "booting"} className="mt-3 h-11 w-full rounded-sm text-[var(--vault-green-soft)] underline underline-offset-4 hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]">
-                  Explore without signing in
-                </Button>
+                <Button type="button" variant="ghost" onClick={openHomepage} disabled={phase === "booting"} className="mt-3 h-11 w-full rounded-sm text-[var(--vault-green-soft)] underline underline-offset-4 hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]">Explore without signing in</Button>
               </>
             )}
           </section>

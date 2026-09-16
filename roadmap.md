@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Homepage vault boot and embedded sign-in
-- [ ] Add the homepage-only terminal boot screen with spinning SHLM logo
-- [ ] Reuse existing email/password, account creation, and Google sign-in behavior
-- [ ] Add skip and successful vault-opening paths into the public homepage
+- [x] Add the homepage-only terminal boot screen with spinning SHLM logo
+- [x] Reuse existing email/password, account creation, and Google sign-in behavior
+- [x] Add skip and successful vault-opening paths into the public homepage
 - [ ] Verify logged-out, signed-in, mobile, and unchanged `/auth` and journal flows
 
 ## Migrate backend to user-owned Supabase project ("SHLM Trading" org) — shlm-production (ugnyssxvtwvbbckycmru)
