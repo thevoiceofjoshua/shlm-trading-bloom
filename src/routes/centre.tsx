@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getHubData, type HubPayload } from "@/lib/hub.functions";
 import { SessionBar } from "@/components/hub/SessionBar";
 import { IndexCards, MagSevenBoard, DowBoard, GoldDesk } from "@/components/hub/MarketBoards";
-import { EconomicCalendar } from "@/components/hub/EconomicCalendar";
+import { EconomicCalendar, MorningNewsSpotlight } from "@/components/hub/EconomicCalendar";
 import { Journal } from "@/components/hub/Journal";
 
 import { AdminPreviewTag } from "@/components/AdminBar";
@@ -152,6 +152,8 @@ function CentrePage() {
 
 
             <GoldDesk payload={payload} />
+
+            <MorningNewsSpotlight payload={payload} />
 
             <EconomicCalendar payload={payload} />
           </div>

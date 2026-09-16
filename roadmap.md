@@ -32,3 +32,7 @@
 - [x] Verify regular member controls, admin credential states, desktop/mobile layout, and clean build
 - [ ] Live Founder and SHLM MOD unlock checks require signing into the externally managed Supabase accounts
 - [x] Apply Emerald Vault styling only to all credential areas (sign-in, sign-up, admin access, journal passcode)
+
+## Morning high-impact news spotlight
+- [x] Add today's pre-noon Pacific high-impact releases above the full economic calendar
+- [x] Verify desktop and phone layout rules, role parity, and clean build
