@@ -66,6 +66,7 @@ export function useAdminMode() {
     let active = true;
 
     const check = async (userId: string | null, userEmail: string | null) => {
+      if (active) setChecked(false);
       if (!userId) {
         if (!active) return;
         setRole(null);
