@@ -145,13 +145,16 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
     }
 
     // verify mode
+    const expected = verifyLengthRef.current;
     setCode((prev) => {
-      if (prev.length >= MAX_LENGTH) return prev;
+      if (prev.length >= (expected ?? MAX_LENGTH)) return prev;
       const next = prev + digit;
-      if (next.length >= MIN_LENGTH) window.setTimeout(() => submitVerify(next), 120);
+      const ready = expected ? next.length === expected : next.length >= MIN_LENGTH;
+      if (ready) window.setTimeout(() => submitVerify(next), 120);
       return next;
     });
   };
+
 
   const backspace = () => {
     if (mode === "setup" && confirm.length > 0) {
