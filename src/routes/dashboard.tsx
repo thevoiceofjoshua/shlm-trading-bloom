@@ -184,6 +184,7 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
   }
 
   const { enrollment, access } = view;
+  const lifetime = "lifetime" in view ? Boolean((view as { lifetime?: boolean }).lifetime) : false;
   const isAdminPreview = !data?.enrollment && adminUnlocked;
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -217,7 +218,7 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
             <p className="mt-2 max-w-xl text-sm text-muted-foreground">{PROGRAM.blurb}</p>
           </div>
           <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium uppercase tracking-widest">
-            {access.active ? "Active" : "Expired"}
+            {lifetime ? "Lifetime" : access.active ? "Active" : "Expired"}
           </span>
         </div>
 
@@ -228,18 +229,18 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
           </div>
           <div>
             <dt className="text-xs uppercase tracking-widest text-muted-foreground">Paid</dt>
-            <dd className="mt-1 text-sm font-medium">{formatUsd(enrollment.amount_total)}</dd>
+            <dd className="mt-1 text-sm font-medium">{lifetime ? "Paid in full" : formatUsd(enrollment.amount_total)}</dd>
           </div>
           <div>
             <dt className="text-xs uppercase tracking-widest text-muted-foreground">
               Access through
             </dt>
-            <dd className="mt-1 text-sm font-medium">{formatDate(access.endsAt)}</dd>
+            <dd className="mt-1 text-sm font-medium">{lifetime ? "No end date" : formatDate(access.endsAt)}</dd>
           </div>
           <div>
             <dt className="text-xs uppercase tracking-widest text-muted-foreground">Term</dt>
             <dd className="mt-1 text-sm font-medium">
-              {PROGRAM.weeks} weeks
+              {lifetime ? "Lifetime" : `${PROGRAM.weeks} weeks`}
               {access.extensionMonths > 0
                 ? ` + ${access.extensionMonths} month${access.extensionMonths === 1 ? "" : "s"}`
                 : ""}
@@ -248,9 +249,11 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
         </dl>
 
         <p className="mt-4 text-xs text-muted-foreground">
-          {access.active
-            ? `${access.daysRemaining} day${access.daysRemaining === 1 ? "" : "s"} of access remaining.`
-            : "Your access period has ended — extend below to continue."}
+          {lifetime
+            ? "Your membership is paid in full with lifetime access — nothing more to pay unless access is revoked."
+            : access.active
+              ? `${access.daysRemaining} day${access.daysRemaining === 1 ? "" : "s"} of access remaining.`
+              : "Your access period has ended — extend below to continue."}
         </p>
       </div>
 
@@ -271,6 +274,7 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
         </div>
       )}
 
+      {!lifetime && (
       <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
         <h3 className="font-display text-xl font-medium tracking-tight">Extend your access</h3>
         <p className="mt-2 max-w-xl text-sm text-muted-foreground">
@@ -317,6 +321,7 @@ function MembershipPanel({ demo }: { demo?: "expired" }) {
           </p>
         )}
       </div>
+      )}
     </section>
   );
 }
