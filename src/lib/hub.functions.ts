@@ -413,11 +413,12 @@ export const getJournalVaultStatus = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { data: row, error } = await context.supabase
       .from("journal_vault_passcodes")
-      .select("id")
+      .select("id, passcode_length")
       .eq("user_id", context.userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    return { configured: !!row };
+    return { configured: !!row, length: row?.passcode_length ?? null };
+
   });
 
 export const setJournalVaultPasscode = createServerFn({ method: "POST" })
