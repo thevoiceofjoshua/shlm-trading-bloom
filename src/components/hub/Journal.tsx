@@ -469,7 +469,8 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                 >
                   <span className={isSelected ? "font-semibold" : ""}>{d.getDate()}</span>
                   {info?.hasPnl ? (
-                    <span className={`text-[10px] font-medium tabular-nums ${pnlColor}`}>{formatMoney(info.total)}</span>
+                    <span className={`max-w-full truncate px-0.5 text-[9px] font-medium tabular-nums sm:text-[10px] ${pnlColor}`}>{formatMoney(info.total)}</span>
+
                   ) : info?.hasAny ? (
                     <span className="h-1 w-1 rounded-full bg-foreground" />
                   ) : null}
