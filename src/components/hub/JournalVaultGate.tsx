@@ -367,7 +367,7 @@ function VerifyPanel({ code, boxes, denied, error, onPush, onBackspace, onClear 
   return (
     <div className={denied ? "vault-glitch mt-7" : "mt-7"}>
       <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--vault-muted)]">enter passcode</p>
-      <div className="mt-3 grid gap-1.5 xs:gap-2.5" style={{ gridTemplateColumns: `repeat(${boxes}, minmax(0, 1fr))` }}>
+      <div className="mt-3 grid grid-flow-col auto-cols-fr gap-1.5 xs:gap-2.5">
         {Array.from({ length: boxes }).map((_, i) => (
 
           <span
