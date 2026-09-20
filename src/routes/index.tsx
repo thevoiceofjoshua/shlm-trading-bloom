@@ -105,7 +105,7 @@ function Index() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="homepage-terminal min-h-screen bg-background text-foreground">
       <Header mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
       <main>
         <HeroSection stats={stats} />

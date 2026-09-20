@@ -20,6 +20,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in to your SHLM account or create a new one to join the mentorship program." },
       { property: "og:title", content: "Sign in or create an account — SHLM" },
       { property: "og:description", content: "Sign in to your SHLM account or create a new one to join the mentorship program." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/auth" },
       { name: "robots", content: "noindex" },
     ],
@@ -93,10 +95,10 @@ function AuthPage() {
   const isSignup = mode === "signup";
 
   return (
-    <div className="vault-boot min-h-screen bg-[var(--vault-bg)] px-4 py-8 text-[var(--vault-green)] sm:px-6 sm:py-12 lg:px-8">
+    <div className="vault-boot min-h-screen bg-[var(--vault-bg)] px-4 py-8 text-[var(--vault-ink)] sm:px-6 sm:py-12 lg:px-8">
       <div className="mx-auto max-w-md">
         <div className="flex items-center justify-between">
-          <Link to="/" className="font-mono text-sm font-semibold uppercase tracking-[0.24em] text-[var(--vault-green)]">
+          <Link to="/" className="font-mono text-sm font-semibold uppercase tracking-[0.24em] text-[var(--vault-ink)]">
             SHLM
           </Link>
           <HomeButton />
@@ -109,7 +111,7 @@ function AuthPage() {
               variant="ghost"
               onClick={() => { setMode("signin"); setError(null); setNotice(null); }}
               className={`rounded-sm ${
-                !isSignup ? "bg-[var(--vault-green)] text-[var(--vault-bg)] hover:bg-[var(--vault-green)]" : "text-[var(--vault-green-soft)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]"
+                !isSignup ? "bg-[var(--vault-ink)] text-[var(--vault-bg)] hover:bg-[var(--vault-ink)]" : "text-[var(--vault-muted)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-ink)]"
               }`}
             >
               Sign in
@@ -119,18 +121,18 @@ function AuthPage() {
               variant="ghost"
               onClick={() => { setMode("signup"); setError(null); setNotice(null); }}
               className={`rounded-sm ${
-                isSignup ? "bg-[var(--vault-green)] text-[var(--vault-bg)] hover:bg-[var(--vault-green)]" : "text-[var(--vault-green-soft)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]"
+                isSignup ? "bg-[var(--vault-ink)] text-[var(--vault-bg)] hover:bg-[var(--vault-ink)]" : "text-[var(--vault-muted)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-ink)]"
               }`}
             >
               Create account
             </Button>
           </div>
 
-          <p className="mt-7 text-[10px] uppercase tracking-[0.28em] text-[var(--vault-amber)]">{isSignup ? "New operator registration" : "Operator authentication"}</p>
-          <h1 className="mt-3 font-display text-3xl font-medium tracking-normal text-[var(--vault-green)]">
+          <p className="mt-7 text-[10px] uppercase tracking-[0.28em] text-[var(--vault-accent)]">{isSignup ? "New operator registration" : "Operator authentication"}</p>
+          <h1 className="mt-3 font-display text-3xl font-medium tracking-normal text-[var(--vault-ink)]">
             {isSignup ? "Create your account" : "Welcome back"}
           </h1>
-          <p className="mt-2 font-sans text-sm text-[var(--vault-green-soft)]">
+          <p className="mt-2 font-sans text-sm text-[var(--vault-muted)]">
             {isSignup
               ? "Join SHLM and start building your trading edge."
               : "Sign in to continue your SHLM mentorship."}
@@ -140,7 +142,7 @@ function AuthPage() {
             type="button"
             variant="outline"
             onClick={handleGoogle}
-            className="mt-6 h-11 w-full rounded-sm border-[var(--vault-line)] bg-transparent text-[var(--vault-green)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]"
+            className="mt-6 h-11 w-full rounded-sm border-[var(--vault-line)] bg-transparent text-[var(--vault-ink)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-ink)]"
           >
             <GoogleIcon />
             Continue with Google
@@ -177,29 +179,29 @@ function AuthPage() {
                 autoComplete={isSignup ? "new-password" : "current-password"}
               />
               {isSignup && (
-                <p className="mt-1 font-sans text-xs text-[var(--vault-green-soft)]">At least 8 characters.</p>
+                <p className="mt-1 font-sans text-xs text-[var(--vault-muted)]">At least 8 characters.</p>
               )}
             </div>
 
             {error && <p className="text-sm text-destructive">{error}</p>}
-            {notice && <p className="text-sm text-[var(--vault-amber)]">{notice}</p>}
+            {notice && <p className="text-sm text-[var(--vault-accent)]">{notice}</p>}
 
             <Button
               type="submit"
               disabled={loading}
-              className="h-11 w-full rounded-sm bg-[var(--vault-green)] text-[var(--vault-bg)] hover:bg-[var(--vault-green-soft)]"
+              className="h-11 w-full rounded-sm bg-[var(--vault-ink)] text-[var(--vault-bg)] hover:bg-[var(--vault-muted)]"
             >
               {loading ? "Please wait…" : isSignup ? "Create account" : "Sign in"}
             </Button>
           </form>
 
-          <p className="mt-6 text-center font-sans text-sm text-[var(--vault-green-soft)]">
+          <p className="mt-6 text-center font-sans text-sm text-[var(--vault-muted)]">
             {isSignup ? "Already have an account?" : "New to SHLM?"}{" "}
             <Button
               type="button"
               variant="link"
               onClick={() => { setMode(isSignup ? "signin" : "signup"); setError(null); setNotice(null); }}
-              className="h-auto p-0 text-[var(--vault-green)]"
+              className="h-auto p-0 text-[var(--vault-ink)]"
             >
               {isSignup ? "Sign in" : "Create an account"}
             </Button>
@@ -212,7 +214,7 @@ function AuthPage() {
 
 function GoogleIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden className="grayscale">
       <path
         fill="#4285F4"
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

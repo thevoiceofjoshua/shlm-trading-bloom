@@ -259,7 +259,7 @@ function AdminPage() {
             onChange={(e) => setPasscodeInput(e.target.value)}
             placeholder="Type passcode and press Enter"
           />
-          <p className="mt-2 font-sans text-xs text-[var(--vault-green-soft)]">
+          <p className="mt-2 font-sans text-xs text-[var(--vault-muted)]">
             {passcode ? "Unlocked." : "Press Enter to unlock applications."}
           </p>
           <button type="submit" className="hidden" aria-hidden="true" tabIndex={-1} />

@@ -36,26 +36,26 @@ export function AdminModePrompt() {
   return (
     <div className="vault-boot fixed inset-0 z-[200] flex items-center justify-center bg-[var(--vault-bg)]/90 px-4 backdrop-blur-sm">
       <VaultCredentialFrame className="w-full max-w-md" label="SHLM // privileged terminal" status={step === "passcode" ? "clearance" : "standby"}>
-        <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--vault-amber)]">
+        <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--vault-accent)]">
           {isMod ? "SHLM MOD" : "SHLM Founder"}
         </p>
-        <h2 className="mt-3 font-display text-2xl tracking-normal text-[var(--vault-green)]">
+        <h2 className="mt-3 font-display text-2xl tracking-normal text-[var(--vault-ink)]">
           {isMod ? "Enter SHLM MOD access?" : "Enter SHLM Founder mode?"}
         </h2>
-        <p className="mt-2 font-sans text-sm leading-relaxed text-[var(--vault-green-soft)]">
+        <p className="mt-2 font-sans text-sm leading-relaxed text-[var(--vault-muted)]">
           {isMod
             ? "SHLM MOD unlocks the full SHLM Centre — boards, analyst, calendar and journal. Program settings, applications and member data stay locked."
             : "SHLM Founder mode unlocks every page and member function across the store so you can test it end to end. Customer-facing actions still ask for confirmation."}
         </p>
 
-        {email && <p className="mt-2 font-sans text-xs text-[var(--vault-green-soft)]">Signed in as {email}</p>}
+        {email && <p className="mt-2 font-sans text-xs text-[var(--vault-muted)]">Signed in as {email}</p>}
 
         {step === "ask" ? (
           <div className="mt-6 flex flex-col gap-2 sm:flex-row">
             <Button
               type="button"
               onClick={() => setStep("passcode")}
-              className="min-h-12 flex-1 rounded-sm bg-[var(--vault-amber)] text-[var(--vault-bg)] hover:opacity-90"
+              className="min-h-12 flex-1 rounded-sm bg-[var(--vault-accent)] text-[var(--vault-bg)] hover:opacity-90"
             >
               {isMod ? "Enter SHLM MOD" : "Enter SHLM Founder"}
             </Button>
@@ -63,7 +63,7 @@ export function AdminModePrompt() {
               type="button"
               variant="outline"
               onClick={dismissPrompt}
-              className="min-h-12 flex-1 rounded-sm border-[var(--vault-line)] bg-transparent text-[var(--vault-green)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]"
+              className="min-h-12 flex-1 rounded-sm border-[var(--vault-line)] bg-transparent text-[var(--vault-ink)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-ink)]"
             >
               Continue as member
             </Button>
@@ -85,7 +85,7 @@ export function AdminModePrompt() {
               <Button
                 type="submit"
                 disabled={busy || passcode.trim().length === 0}
-                className="min-h-12 flex-1 rounded-sm bg-[var(--vault-amber)] text-[var(--vault-bg)] hover:opacity-90"
+                className="min-h-12 flex-1 rounded-sm bg-[var(--vault-accent)] text-[var(--vault-bg)] hover:opacity-90"
               >
                 {busy ? "Verifying…" : isMod ? "Unlock SHLM MOD" : "Unlock SHLM Founder"}
               </Button>
@@ -93,7 +93,7 @@ export function AdminModePrompt() {
                 type="button"
                 variant="outline"
                 onClick={dismissPrompt}
-                className="min-h-12 flex-1 rounded-sm border-[var(--vault-line)] bg-transparent text-[var(--vault-green)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-green)]"
+                className="min-h-12 flex-1 rounded-sm border-[var(--vault-line)] bg-transparent text-[var(--vault-ink)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-ink)]"
               >
                 Not now
               </Button>
