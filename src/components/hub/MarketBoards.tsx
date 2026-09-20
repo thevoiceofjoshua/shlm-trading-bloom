@@ -180,8 +180,7 @@ function ScalperLevels({ quote }: { quote: HubPayload["indexes"][number] }) {
           <LevelRow level={pullbacks[1]} role="First entry zone" price={quote.price} />
         </div>
         <p className="pt-1 text-[10px] leading-relaxed text-muted-foreground/80">
-          Direction and target come off the 1H (BOS continues it, CHoCH flips it). Execute on the 5m: wait for the pullback into these
-          untapped highs/lows, then run with the 1H draw.
+          Trade with the 1H direction; enter on the 5m pullback into untapped levels.
         </p>
         <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70">
           {quote.levelsSetAt

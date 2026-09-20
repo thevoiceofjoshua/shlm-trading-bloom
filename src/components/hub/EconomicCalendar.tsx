@@ -11,10 +11,10 @@ function sessionContext(laTime: string): string {
     const start = s.startH * 60 + s.startM;
     const end = s.endH * 60 + s.endM;
     const name = s.label.split("—")[0].trim();
-    if (mins >= start && mins < end) return `Lands inside ${name}`;
-    if (mins < start && start - mins <= 180) return `Lands ${start - mins} min before ${name}`;
+    if (mins >= start && mins < end) return `Inside ${name}`;
+    if (mins < start && start - mins <= 180) return `${start - mins} min before ${name}`;
   }
-  return "Outside the SHLM trading windows";
+  return "Outside trading windows";
 }
 
 /** Forex Factory tier language: solid = high, outlined = medium, faint = low. */
@@ -116,7 +116,7 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
       {/* Heads up banner if a high-impact release lands in a trading window */}
       {events.some((e) => e.impact === "high" && e.date === todayStr) && (
         <div className="mt-3 rounded-lg border border-foreground/30 bg-surface px-4 py-2.5 text-xs text-foreground">
-          ⚠ Heads up: a high-impact release lands today — check if it falls inside your trading window.
+          ⚠ High-impact release today — watch your session timing.
         </div>
       )}
 
@@ -206,8 +206,8 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
 
       <p className="mt-4 text-[11px] text-muted-foreground">
         {payload.econLive
-          ? "Live calendar — every USD release plus high-impact global prints, in your local time."
-          : "Sample data — live feed unavailable right now."}
+          ? "Live calendar — USD + high-impact global releases, local time."
+          : "Sample data — live feed unavailable."}
       </p>
     </div>
   );

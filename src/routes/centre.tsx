@@ -176,7 +176,7 @@ function LockedPreview() {
     <div className="flex flex-col items-center justify-center py-24 text-center">
       <h1 className="font-display text-2xl font-medium tracking-tight">SHLM Centre is a members-only hub</h1>
       <p className="mt-3 max-w-md text-sm text-muted-foreground">
-        The SHLM Centre is available to active SHLM mentorship members. Once your enrollment payment clears, you'll get full access to the live trading command center.
+        Active SHLM members only. Enroll below to unlock the live trading command center.
       </p>
       <Link
         to="/apply"
