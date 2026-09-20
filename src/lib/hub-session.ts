@@ -109,7 +109,7 @@ export function sessionStatuses(now: Date = new Date()): { sessions: SessionStat
   const marketsClosed = !weekOpen;
   let nextNote: string | null = null;
   if (marketsClosed) {
-    nextNote = `Market closed — it reopens Sunday at ${pstToLocalTime(MARKET_OPEN.h, MARKET_OPEN.m)} your time (3:00pm PST). First SHLM session is Monday at ${pstToLocalTime(6, 30)} (6:30am PST).`;
+    nextNote = `Market closed — reopens Sunday ${pstToLocalTime(MARKET_OPEN.h, MARKET_OPEN.m)} (3:00pm PST). First session: Monday ${pstToLocalTime(6, 30)} (6:30am PST).`;
   }
 
   return { sessions, marketsClosed, nextNote };
