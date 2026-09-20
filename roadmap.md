@@ -40,4 +40,4 @@
 ## Grayscale terminal theme and homepage coded background
 - [x] Recolor every vault and credential surface to black, white, and gray
 - [x] Add the animated scanline and coded-grid treatment to the marketing homepage
-- [ ] Verify all terminal surfaces and homepage behavior on phone and desktop
+- [x] Verify all terminal surfaces and homepage behavior on phone and desktop
