@@ -95,16 +95,16 @@ function AuthPage() {
   const isSignup = mode === "signup";
 
   return (
-    <div className="vault-boot min-h-screen bg-[var(--vault-bg)] px-4 py-8 text-[var(--vault-ink)] sm:px-6 sm:py-12 lg:px-8">
-      <div className="mx-auto max-w-md">
-        <div className="flex items-center justify-between">
+    <div className="vault-boot min-h-dvh w-full max-w-full overflow-x-clip bg-[var(--vault-bg)] px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] text-[var(--vault-ink)] xs:px-4 sm:px-6 sm:py-12 lg:px-8">
+      <div className="mx-auto min-w-0 max-w-md">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
           <Link to="/" className="font-mono text-sm font-semibold uppercase tracking-[0.24em] text-[var(--vault-ink)]">
             SHLM
           </Link>
           <HomeButton />
         </div>
 
-        <VaultCredentialFrame className="mt-8" status={isSignup ? "register" : "locked"}>
+        <VaultCredentialFrame className="mt-5 sm:mt-8" status={isSignup ? "register" : "locked"}>
           <div className="grid grid-cols-2 border border-[var(--vault-line)] p-1">
             <Button
               type="button"

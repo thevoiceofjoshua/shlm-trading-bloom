@@ -213,7 +213,7 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
   const activeValue = mode === "setup" && confirm.length > 0 ? confirm : code;
 
   return (
-    <div className="vault-shell relative overflow-hidden rounded-2xl border border-[var(--vault-line)] bg-[var(--vault-bg)] p-5 font-mono text-[var(--vault-ink)] sm:p-8">
+    <div className="vault-shell relative min-w-0 max-w-full overflow-hidden rounded-lg border border-[var(--vault-line)] bg-[var(--vault-bg)] p-3 font-mono text-[var(--vault-ink)] xs:p-4 sm:rounded-2xl sm:p-8">
       <style>{`
         .vault-shell { --vault-glow: 0 0 18px color-mix(in oklch, var(--vault-ink) 28%, transparent); }
         .vault-shell::before {
@@ -248,15 +248,15 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
         }
       `}</style>
 
-      <div className="relative z-10 mx-auto max-w-md">
-        <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-[var(--vault-muted)]">
-          <span>SHLM // vault</span>
-          <span className={phase === "opening" ? "text-[var(--vault-ink)]" : denied ? "font-bold text-[var(--vault-ink)]" : "text-[var(--vault-accent)]"}>
+      <div className="relative z-10 mx-auto min-w-0 max-w-md">
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-[9px] uppercase tracking-[0.18em] text-[var(--vault-muted)] xs:text-[10px] xs:tracking-[0.3em]">
+          <span className="min-w-0 truncate">SHLM // vault</span>
+          <span className={phase === "opening" ? "shrink-0 text-[var(--vault-ink)]" : denied ? "shrink-0 font-bold text-[var(--vault-ink)]" : "shrink-0 text-[var(--vault-accent)]"}>
             {phase === "opening" ? "unsealing" : denied ? "denied" : configured === false ? "setup" : "locked"}
           </span>
         </div>
 
-        <div className="mt-5 space-y-1 text-[11px] leading-relaxed text-[var(--vault-muted)] sm:text-xs">
+        <div className="mt-4 space-y-0.5 text-[10px] leading-relaxed text-[var(--vault-muted)] xs:text-[11px] sm:mt-5 sm:space-y-1 sm:text-xs">
           {BOOT_LINES.map((line, i) => (
             <p key={line} className="vault-line" style={{ animationDelay: `${i * 110}ms` }}>
               {line}
@@ -326,11 +326,11 @@ function SetupPanel({ code, confirm, denied, error, onPush, onBackspace, onClear
       <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--vault-muted)]">
         {step === "confirm" ? "confirm vault passcode" : "set your vault passcode"}
       </p>
-      <div className="mt-3 flex items-center gap-2.5">
+      <div className="mt-3 grid grid-cols-8 gap-1 xs:gap-1.5 sm:gap-2.5">
         {Array.from({ length: MAX_LENGTH }).map((_, i) => (
           <span
             key={i}
-            className={`flex h-12 flex-1 items-center justify-center rounded-lg border text-lg ${
+            className={`flex h-10 min-w-0 items-center justify-center rounded-md border text-sm xs:h-11 sm:h-12 sm:rounded-lg sm:text-lg ${
               denied
                 ? "border-[var(--vault-ink)] text-[var(--vault-ink)]"
                 : i < value.length
@@ -367,12 +367,12 @@ function VerifyPanel({ code, boxes, denied, error, onPush, onBackspace, onClear 
   return (
     <div className={denied ? "vault-glitch mt-7" : "mt-7"}>
       <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--vault-muted)]">enter passcode</p>
-      <div className="mt-3 flex items-center gap-2.5">
+      <div className="mt-3 grid grid-flow-col auto-cols-fr gap-1.5 xs:gap-2.5">
         {Array.from({ length: boxes }).map((_, i) => (
 
           <span
             key={i}
-            className={`flex h-12 flex-1 items-center justify-center rounded-lg border text-lg ${
+            className={`flex h-10 min-w-0 items-center justify-center rounded-md border text-sm xs:h-11 sm:h-12 sm:rounded-lg sm:text-lg ${
               denied
                 ? "border-[var(--vault-ink)] text-[var(--vault-ink)]"
                 : i < code.length
@@ -397,7 +397,7 @@ function VerifyPanel({ code, boxes, denied, error, onPush, onBackspace, onClear 
 
 function Keypad({ onPush, onBackspace, onClear }: Omit<PanelProps, "code" | "denied" | "error">) {
   return (
-    <div className="mt-4 grid grid-cols-3 gap-2">
+    <div className="mt-3 grid grid-cols-3 gap-1.5 xs:mt-4 xs:gap-2">
       {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
         <KeypadKey key={d} onClick={() => onPush(d)}>
           {d}
@@ -415,7 +415,7 @@ function KeypadKey({ children, onClick }: { children: React.ReactNode; onClick: 
     <button
       type="button"
       onClick={onClick}
-      className="min-h-12 rounded-lg border border-[var(--vault-line)] bg-[var(--vault-panel)] text-sm tracking-widest text-[var(--vault-ink)] transition-colors hover:border-[var(--vault-ink)] hover:bg-[var(--vault-line)] active:bg-[var(--vault-ink)] active:text-[var(--vault-bg)]"
+      className="min-h-10 min-w-0 rounded-md border border-[var(--vault-line)] bg-[var(--vault-panel)] text-sm tracking-widest text-[var(--vault-ink)] transition-colors hover:border-[var(--vault-ink)] hover:bg-[var(--vault-line)] active:bg-[var(--vault-ink)] active:text-[var(--vault-bg)] xs:min-h-11 sm:min-h-12 sm:rounded-lg"
     >
       {children}
     </button>

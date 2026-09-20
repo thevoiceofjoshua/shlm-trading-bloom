@@ -236,41 +236,41 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
   const isOpening = phase === "opening";
 
   return (
-    <main className="vault-boot relative min-h-svh overflow-x-hidden bg-[var(--vault-bg)] font-mono text-[var(--vault-ink)]">
-      <Button type="button" variant="ghost" onClick={openHomepage} className="fixed right-3 top-3 z-30 rounded-sm border border-[var(--vault-line)] bg-[var(--vault-bg)] text-[10px] uppercase tracking-[0.18em] text-[var(--vault-muted)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-ink)] sm:right-5 sm:top-5">
+    <main className="vault-boot relative min-h-dvh w-full max-w-full overflow-x-clip bg-[var(--vault-bg)] font-mono text-[var(--vault-ink)]">
+      <Button type="button" variant="ghost" onClick={openHomepage} className="fixed right-[max(0.75rem,env(safe-area-inset-right))] top-[max(0.75rem,env(safe-area-inset-top))] z-30 h-9 max-w-[calc(100vw-1.5rem)] rounded-sm border border-[var(--vault-line)] bg-[var(--vault-bg)] px-2.5 text-[9px] uppercase tracking-[0.12em] text-[var(--vault-muted)] hover:bg-[var(--vault-line)] hover:text-[var(--vault-ink)] sm:right-5 sm:top-5 sm:h-10 sm:px-4 sm:text-[10px] sm:tracking-[0.18em]">
         Skip / Explore
       </Button>
 
-      <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-6xl items-center px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid w-full items-center gap-8 md:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] md:gap-10 lg:gap-16">
+      <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-6xl items-start px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(4rem,calc(env(safe-area-inset-top)+3.25rem))] xs:px-4 sm:px-6 sm:py-12 md:items-center lg:px-8">
+        <div className="grid min-w-0 w-full items-center gap-5 sm:gap-8 md:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] md:gap-10 lg:gap-16">
           <section aria-label="SHLM secure terminal" className="mx-auto w-full max-w-xl lg:mx-0">
             <div className="flex items-center justify-between border-b border-[var(--vault-line)] pb-3 text-[10px] uppercase tracking-[0.28em] text-[var(--vault-muted)]">
               <span>SHLM // secure access</span>
               <span className="text-[var(--vault-accent)]">{isOpening ? "unsealing" : phase}</span>
             </div>
 
-            <div className="mt-8 flex items-center gap-6 sm:gap-8">
-              <div className="relative grid h-24 w-24 shrink-0 place-items-center sm:h-32 sm:w-32">
+            <div className="mt-5 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4 sm:mt-8 sm:gap-8">
+              <div className="relative grid h-20 w-20 shrink-0 place-items-center xs:h-24 xs:w-24 sm:h-32 sm:w-32">
                 <div className="home-vault-pulse absolute inset-0 rounded-full border border-[var(--vault-ink)] opacity-40" />
-                <div className="home-vault-logo relative grid h-20 w-20 place-items-center rounded-full border border-[var(--vault-line)] bg-[var(--vault-panel)] p-3 sm:h-28 sm:w-28 sm:p-4">
+                <div className="home-vault-logo relative grid h-16 w-16 place-items-center rounded-full border border-[var(--vault-line)] bg-[var(--vault-panel)] p-2.5 xs:h-20 xs:w-20 xs:p-3 sm:h-28 sm:w-28 sm:p-4">
                   <img src="/favicon.png" alt="SHLM" className="h-full w-full rounded-full object-contain" width={512} height={512} />
                 </div>
               </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--vault-accent)]">Private trading network</p>
+              <div className="min-w-0">
+                <p className="text-[9px] uppercase tracking-[0.16em] text-[var(--vault-accent)] xs:text-[10px] xs:tracking-[0.3em]">Private trading network</p>
                 <h1 className="mt-2 font-mono text-3xl font-semibold tracking-normal text-[var(--vault-ink)] sm:text-5xl">SHLM</h1>
                 <p className="mt-2 text-xs leading-relaxed text-[var(--vault-muted)] sm:text-sm">Initializing disciplined execution.</p>
               </div>
             </div>
 
-            <div className="mt-8 space-y-1.5 text-[11px] leading-relaxed text-[var(--vault-muted)] sm:text-xs">
+            <div className="mt-5 space-y-1 text-[10px] leading-relaxed text-[var(--vault-muted)] xs:text-[11px] sm:mt-8 sm:space-y-1.5 sm:text-xs">
               {BOOT_LINES.map((line, index) => (
                 <p key={line} className="home-vault-line" style={{ animationDelay: `${index * 120}ms` }}>{line}</p>
               ))}
             </div>
           </section>
 
-          <section className="relative mx-auto w-full max-w-md overflow-hidden border border-[var(--vault-line)] bg-[var(--vault-panel)] p-5 sm:p-7" aria-label="SHLM account access">
+          <section className="relative mx-auto min-w-0 w-full max-w-md overflow-hidden border border-[var(--vault-line)] bg-[var(--vault-panel)] p-4 xs:p-5 sm:p-7" aria-label="SHLM account access">
             {isOpening && (
               <div className="absolute inset-0 z-20 flex items-center justify-center overflow-hidden bg-[var(--vault-bg)]">
                 <div className="home-vault-door-left absolute inset-y-0 left-0 w-1/2 border-r border-[var(--vault-line)] bg-[var(--vault-panel)]" />
@@ -393,9 +393,9 @@ function AdminAccess({ stage, email, password, passcode, loading, error, role, s
 
   return (
     <div className={standalone ? "" : "mt-5 border-t border-[var(--vault-line)] pt-5"}>
-      <div className="flex items-center gap-3">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 xs:gap-3">
         <span className="h-px flex-1 bg-[var(--vault-line)]" />
-        <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--vault-accent)]">Admin access</p>
+        <p className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--vault-accent)] xs:tracking-[0.3em]">Admin access</p>
         <span className="h-px flex-1 bg-[var(--vault-line)]" />
       </div>
 
@@ -456,7 +456,7 @@ function TerminalField({ label, type, value, onChange, autoComplete, required, m
   return (
     <label className="block text-[10px] uppercase tracking-[0.2em] text-[var(--vault-muted)]">
       {label}
-      <input type={type} value={value} onChange={(event) => onChange(event.target.value)} autoComplete={autoComplete} required={required} minLength={minLength} className="mt-1.5 h-11 w-full rounded-none border border-[var(--vault-line)] bg-[var(--vault-bg)] px-3 text-sm text-[var(--vault-ink)] outline-none transition-colors placeholder:text-[var(--vault-muted)] focus:border-[var(--vault-ink)] focus:ring-1 focus:ring-[var(--vault-ink)]" />
+      <input type={type} value={value} onChange={(event) => onChange(event.target.value)} autoComplete={autoComplete} required={required} minLength={minLength} className="mt-1.5 h-11 min-w-0 w-full rounded-none border border-[var(--vault-line)] bg-[var(--vault-bg)] px-3 text-base text-[var(--vault-ink)] outline-none transition-colors placeholder:text-[var(--vault-muted)] focus:border-[var(--vault-ink)] focus:ring-1 focus:ring-[var(--vault-ink)] sm:text-sm" />
     </label>
   );
 }

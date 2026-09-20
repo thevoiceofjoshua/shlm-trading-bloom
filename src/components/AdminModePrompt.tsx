@@ -34,8 +34,8 @@ export function AdminModePrompt() {
   };
 
   return (
-    <div className="vault-boot fixed inset-0 z-[200] flex items-center justify-center bg-[var(--vault-bg)]/90 px-4 backdrop-blur-sm">
-      <VaultCredentialFrame className="w-full max-w-md" label="SHLM // privileged terminal" status={step === "passcode" ? "clearance" : "standby"}>
+    <div className="vault-boot fixed inset-0 z-[200] flex min-h-dvh items-start justify-center overflow-x-hidden overflow-y-auto bg-[var(--vault-bg)]/90 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur-sm xs:px-4 sm:items-center sm:py-6">
+      <VaultCredentialFrame className="my-auto min-w-0 w-full max-w-md" label="SHLM // privileged terminal" status={step === "passcode" ? "clearance" : "standby"}>
         <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.3em] text-[var(--vault-accent)]">
           {isMod ? "SHLM MOD" : "SHLM Founder"}
         </p>

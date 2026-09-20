@@ -235,8 +235,8 @@ function AdminPage() {
 
 
   return (
-    <div className="min-h-screen bg-background px-4 py-16 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl">
+    <div className="min-h-dvh w-full max-w-full overflow-x-clip bg-background px-3 py-8 text-foreground xs:px-4 sm:px-6 sm:py-16 lg:px-8">
+      <div className="mx-auto min-w-0 max-w-3xl">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
           <h1 className="min-w-0 font-display text-2xl font-medium tracking-tight sm:text-4xl">SHLM Founder</h1>
           <HomeButton />

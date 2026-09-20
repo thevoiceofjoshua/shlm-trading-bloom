@@ -161,8 +161,8 @@ function CentrePage() {
       </main>
 
       {journalOpen && user?.id && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/80 p-3 backdrop-blur-sm sm:p-6">
-          <div className="w-full max-w-5xl">
+        <div className="fixed inset-0 z-50 flex min-h-dvh items-start justify-center overflow-x-hidden overflow-y-auto bg-background/80 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur-sm xs:p-3 sm:p-6">
+          <div className="min-w-0 w-full max-w-5xl">
             <Journal userId={user.id} onClose={() => setJournalOpen(false)} />
           </div>
         </div>
