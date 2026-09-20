@@ -349,7 +349,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
 
   if (!unlocked) {
     return (
-      <div className="relative">
+      <div className="relative min-w-0 max-w-full">
         <JournalVaultGate
           getStatus={() => getVaultStatus()}
           setPasscode={(passcode) => setVaultPasscode({ data: { passcode } })}
@@ -361,7 +361,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
             type="button"
             onClick={onClose}
             aria-label="Close journal"
-            className="absolute right-3 top-3 z-20 flex size-8 items-center justify-center rounded-full border border-emerald-500/40 font-mono text-sm text-emerald-400 transition-colors hover:bg-emerald-500/15"
+            className="absolute right-2 top-2 z-20 flex size-8 shrink-0 items-center justify-center rounded-full border border-emerald-500/40 font-mono text-sm text-emerald-400 transition-colors hover:bg-emerald-500/15 sm:right-3 sm:top-3"
           >
             ✕
           </button>

@@ -47,10 +47,10 @@ function EnrollGate() {
   }, [loaded, user, checkoutHref]);
 
   return (
-    <main className="min-h-screen bg-background px-5 py-10 sm:px-8">
+    <main className="min-h-dvh w-full max-w-full overflow-x-clip bg-background px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] xs:px-5 sm:px-8 sm:py-10">
       <HomeButton />
 
-      <div className="mx-auto mt-10 max-w-lg">
+      <div className="mx-auto mt-6 min-w-0 max-w-lg sm:mt-10">
         <p className="text-[11px] uppercase tracking-[0.35em] text-muted-foreground">
           Step 1 of 2
         </p>

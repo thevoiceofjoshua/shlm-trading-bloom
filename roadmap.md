@@ -43,6 +43,6 @@
 - [x] Verify all terminal surfaces and homepage behavior on phone and desktop
 
 ## Mobile-responsive vault and credential screens
-- [ ] Make every vault surface fit narrow and short phone viewports without pinch zoom
-- [ ] Prevent mobile input-focus zoom and keep all controls reachable
+- [x] Make every vault surface fit narrow and short phone viewports without pinch zoom
+- [x] Prevent mobile input-focus zoom and keep all controls reachable
 - [ ] Verify all credential surfaces at 320×568 and 390×844 across member, SHLM MOD, and Founder views
