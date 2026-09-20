@@ -213,17 +213,17 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
   const activeValue = mode === "setup" && confirm.length > 0 ? confirm : code;
 
   return (
-    <div className="vault-shell relative overflow-hidden rounded-2xl border border-[var(--vault-line)] bg-[var(--vault-bg)] p-5 font-mono text-[var(--vault-green)] sm:p-8">
+    <div className="vault-shell relative overflow-hidden rounded-2xl border border-[var(--vault-line)] bg-[var(--vault-bg)] p-5 font-mono text-[var(--vault-ink)] sm:p-8">
       <style>{`
-        .vault-shell { --vault-glow: 0 0 18px color-mix(in oklch, var(--vault-green) 28%, transparent); }
+        .vault-shell { --vault-glow: 0 0 18px color-mix(in oklch, var(--vault-ink) 28%, transparent); }
         .vault-shell::before {
           content: ""; position: absolute; inset: 0; pointer-events: none;
-          background: repeating-linear-gradient(180deg, color-mix(in oklch, var(--vault-green) 7%, transparent) 0 1px, transparent 1px 3px);
+          background: repeating-linear-gradient(180deg, color-mix(in oklch, var(--vault-ink) 7%, transparent) 0 1px, transparent 1px 3px);
         }
         .vault-shell::after {
           content: ""; position: absolute; left: 0; right: 0; height: 28%;
           pointer-events: none; opacity: .35;
-          background: linear-gradient(180deg, transparent, color-mix(in oklch, var(--vault-green) 18%, transparent), transparent);
+          background: linear-gradient(180deg, transparent, color-mix(in oklch, var(--vault-ink) 18%, transparent), transparent);
           animation: vault-scan 4.2s linear infinite;
         }
         @keyframes vault-scan { 0% { top: -30%; } 100% { top: 100%; } }
@@ -249,14 +249,14 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
       `}</style>
 
       <div className="relative z-10 mx-auto max-w-md">
-        <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-[var(--vault-green-soft)]">
+        <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-[var(--vault-muted)]">
           <span>SHLM // vault</span>
-          <span className={phase === "opening" ? "text-[var(--vault-green)]" : denied ? "font-bold text-[var(--vault-green)]" : "text-[var(--vault-amber)]"}>
+          <span className={phase === "opening" ? "text-[var(--vault-ink)]" : denied ? "font-bold text-[var(--vault-ink)]" : "text-[var(--vault-accent)]"}>
             {phase === "opening" ? "unsealing" : denied ? "denied" : configured === false ? "setup" : "locked"}
           </span>
         </div>
 
-        <div className="mt-5 space-y-1 text-[11px] leading-relaxed text-[var(--vault-green-soft)] sm:text-xs">
+        <div className="mt-5 space-y-1 text-[11px] leading-relaxed text-[var(--vault-muted)] sm:text-xs">
           {BOOT_LINES.map((line, i) => (
             <p key={line} className="vault-line" style={{ animationDelay: `${i * 110}ms` }}>
               {line}
@@ -265,7 +265,7 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
         </div>
 
         {loading ? (
-          <div className="mt-8 text-center text-xs tracking-widest text-[var(--vault-green-soft)]">
+          <div className="mt-8 text-center text-xs tracking-widest text-[var(--vault-muted)]">
             initializing vault…
           </div>
         ) : phase === "opening" ? (
@@ -274,10 +274,10 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
               <div className="vault-door-l absolute inset-y-0 left-0 w-1/2 border-r border-[var(--vault-line)] bg-[var(--vault-panel)]" />
               <div className="vault-door-r absolute inset-y-0 right-0 w-1/2 border-l border-[var(--vault-line)] bg-[var(--vault-panel)]" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-sm tracking-[0.35em] text-[var(--vault-green)] sm:text-base">{scramble}</p>
+                <p className="text-sm tracking-[0.35em] text-[var(--vault-ink)] sm:text-base">{scramble}</p>
               </div>
             </div>
-            <p className="mt-4 text-center text-[10px] uppercase tracking-[0.3em] text-[var(--vault-green-soft)]">
+            <p className="mt-4 text-center text-[10px] uppercase tracking-[0.3em] text-[var(--vault-muted)]">
               decrypting journal…
             </p>
           </div>
@@ -323,7 +323,7 @@ function SetupPanel({ code, confirm, denied, error, onPush, onBackspace, onClear
   const value = step === "confirm" ? confirm : code;
   return (
     <div className={denied ? "vault-glitch mt-7" : "mt-7"}>
-      <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--vault-green-soft)]">
+      <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--vault-muted)]">
         {step === "confirm" ? "confirm vault passcode" : "set your vault passcode"}
       </p>
       <div className="mt-3 flex items-center gap-2.5">
@@ -332,10 +332,10 @@ function SetupPanel({ code, confirm, denied, error, onPush, onBackspace, onClear
             key={i}
             className={`flex h-12 flex-1 items-center justify-center rounded-lg border text-lg ${
               denied
-                ? "border-[var(--vault-green)] text-[var(--vault-green)]"
+                ? "border-[var(--vault-ink)] text-[var(--vault-ink)]"
                 : i < value.length
-                  ? "border-[var(--vault-green)] bg-[var(--vault-line)] text-[var(--vault-green)]"
-                  : "border-[var(--vault-line)] text-[var(--vault-green-soft)]"
+                  ? "border-[var(--vault-ink)] bg-[var(--vault-line)] text-[var(--vault-ink)]"
+                  : "border-[var(--vault-line)] text-[var(--vault-muted)]"
             }`}
             style={{ boxShadow: i < value.length && !denied ? "var(--vault-glow)" : undefined }}
           >
@@ -344,7 +344,7 @@ function SetupPanel({ code, confirm, denied, error, onPush, onBackspace, onClear
         ))}
       </div>
 
-      <p className={`mt-3 h-4 text-[11px] tracking-widest ${denied ? "font-bold text-[var(--vault-green)]" : error ? "text-[var(--vault-amber)]" : "text-[var(--vault-green-soft)]"}`}>
+      <p className={`mt-3 h-4 text-[11px] tracking-widest ${denied ? "font-bold text-[var(--vault-ink)]" : error ? "text-[var(--vault-accent)]" : "text-[var(--vault-muted)]"}`}>
         {denied ? "ACCESS DENIED — retry" : error ?? "choose 5–8 digits, then confirm"}
       </p>
 
@@ -354,7 +354,7 @@ function SetupPanel({ code, confirm, denied, error, onPush, onBackspace, onClear
         <button
           type="button"
           onClick={onSubmit}
-          className="mt-4 w-full rounded-lg border border-[var(--vault-line)] bg-[var(--vault-line)] py-2.5 text-xs uppercase tracking-widest text-[var(--vault-green)] transition-colors hover:bg-[var(--vault-green)] hover:text-[var(--vault-bg)]"
+          className="mt-4 w-full rounded-lg border border-[var(--vault-line)] bg-[var(--vault-line)] py-2.5 text-xs uppercase tracking-widest text-[var(--vault-ink)] transition-colors hover:bg-[var(--vault-ink)] hover:text-[var(--vault-bg)]"
         >
           Seal vault
         </button>
@@ -366,7 +366,7 @@ function SetupPanel({ code, confirm, denied, error, onPush, onBackspace, onClear
 function VerifyPanel({ code, boxes, denied, error, onPush, onBackspace, onClear }: PanelProps & { boxes: number }) {
   return (
     <div className={denied ? "vault-glitch mt-7" : "mt-7"}>
-      <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--vault-green-soft)]">enter passcode</p>
+      <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--vault-muted)]">enter passcode</p>
       <div className="mt-3 flex items-center gap-2.5">
         {Array.from({ length: boxes }).map((_, i) => (
 
@@ -374,10 +374,10 @@ function VerifyPanel({ code, boxes, denied, error, onPush, onBackspace, onClear 
             key={i}
             className={`flex h-12 flex-1 items-center justify-center rounded-lg border text-lg ${
               denied
-                ? "border-[var(--vault-green)] text-[var(--vault-green)]"
+                ? "border-[var(--vault-ink)] text-[var(--vault-ink)]"
                 : i < code.length
-                  ? "border-[var(--vault-green)] bg-[var(--vault-line)] text-[var(--vault-green)]"
-                  : "border-[var(--vault-line)] text-[var(--vault-green-soft)]"
+                  ? "border-[var(--vault-ink)] bg-[var(--vault-line)] text-[var(--vault-ink)]"
+                  : "border-[var(--vault-line)] text-[var(--vault-muted)]"
             }`}
             style={{ boxShadow: i < code.length && !denied ? "var(--vault-glow)" : undefined }}
           >
@@ -386,7 +386,7 @@ function VerifyPanel({ code, boxes, denied, error, onPush, onBackspace, onClear 
         ))}
       </div>
 
-      <p className={`mt-3 h-4 text-[11px] tracking-widest ${denied ? "font-bold text-[var(--vault-green)]" : error ? "text-[var(--vault-amber)]" : "text-[var(--vault-green-soft)]"}`}>
+      <p className={`mt-3 h-4 text-[11px] tracking-widest ${denied ? "font-bold text-[var(--vault-ink)]" : error ? "text-[var(--vault-accent)]" : "text-[var(--vault-muted)]"}`}>
         {denied ? "ACCESS DENIED — retry" : error ?? "keypad or keyboard"}
       </p>
 
@@ -415,7 +415,7 @@ function KeypadKey({ children, onClick }: { children: React.ReactNode; onClick: 
     <button
       type="button"
       onClick={onClick}
-      className="min-h-12 rounded-lg border border-[var(--vault-line)] bg-[var(--vault-panel)] text-sm tracking-widest text-[var(--vault-green)] transition-colors hover:border-[var(--vault-green)] hover:bg-[var(--vault-line)] active:bg-[var(--vault-green)] active:text-[var(--vault-bg)]"
+      className="min-h-12 rounded-lg border border-[var(--vault-line)] bg-[var(--vault-panel)] text-sm tracking-widest text-[var(--vault-ink)] transition-colors hover:border-[var(--vault-ink)] hover:bg-[var(--vault-line)] active:bg-[var(--vault-ink)] active:text-[var(--vault-bg)]"
     >
       {children}
     </button>

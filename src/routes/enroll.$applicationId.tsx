@@ -81,11 +81,11 @@ function EnrollGate() {
           <div className="mt-6 space-y-3 font-sans">
             <a
               href={checkoutHref}
-              className="flex h-12 w-full items-center justify-center rounded-sm bg-[var(--vault-green)] px-6 text-sm font-medium text-[var(--vault-bg)] transition hover:bg-[var(--vault-green-soft)]"
+              className="flex h-12 w-full items-center justify-center rounded-sm bg-[var(--vault-ink)] px-6 text-sm font-medium text-[var(--vault-bg)] transition hover:bg-[var(--vault-muted)]"
             >
               {redirecting ? "Continuing to checkout…" : "Continue to secure checkout"}
             </a>
-            <p className="text-center text-xs text-[var(--vault-green-soft)]">
+            <p className="text-center text-xs text-[var(--vault-muted)]">
               Signed in as {user.email ?? user.firstName}
             </p>
           </div>
@@ -94,14 +94,14 @@ function EnrollGate() {
             <Link
               to="/auth"
               search={{ mode: "signup", redirect: returnTo }}
-              className="flex h-12 w-full items-center justify-center rounded-sm bg-[var(--vault-green)] px-6 text-sm font-medium text-[var(--vault-bg)] transition hover:bg-[var(--vault-green-soft)]"
+              className="flex h-12 w-full items-center justify-center rounded-sm bg-[var(--vault-ink)] px-6 text-sm font-medium text-[var(--vault-bg)] transition hover:bg-[var(--vault-muted)]"
             >
               Create account &amp; continue
             </Link>
             <Link
               to="/auth"
               search={{ mode: "signin", redirect: returnTo }}
-              className="flex h-12 w-full items-center justify-center rounded-sm border border-[var(--vault-line)] px-6 text-sm font-medium text-[var(--vault-green)] transition hover:bg-[var(--vault-line)]"
+              className="flex h-12 w-full items-center justify-center rounded-sm border border-[var(--vault-line)] px-6 text-sm font-medium text-[var(--vault-ink)] transition hover:bg-[var(--vault-line)]"
             >
               I already have an account
             </Link>

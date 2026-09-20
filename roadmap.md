@@ -38,6 +38,6 @@
 - [x] Verify desktop and phone layout rules, role parity, and clean build
 
 ## Grayscale terminal theme and homepage coded background
-- [ ] Recolor every vault and credential surface to black, white, and gray
-- [ ] Add the animated scanline and coded-grid treatment to the marketing homepage
+- [x] Recolor every vault and credential surface to black, white, and gray
+- [x] Add the animated scanline and coded-grid treatment to the marketing homepage
 - [ ] Verify all terminal surfaces and homepage behavior on phone and desktop
