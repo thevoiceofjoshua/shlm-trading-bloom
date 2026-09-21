@@ -613,15 +613,16 @@ function ManageRoles({ passcode }: { passcode: string }) {
                   )}
                 </div>
 
-                <div className="flex min-w-0 flex-wrap items-center gap-2 sm:shrink-0">
+                <div className="grid min-w-0 gap-2 sm:shrink-0 sm:grid-cols-[auto_auto] sm:items-center">
                   <select
                     value={draft}
                     disabled={isSelf}
-                    onChange={(e) =>
-                      setDrafts((d) => ({ ...d, [acc.id]: e.target.value as ManagedRole }))
-                    }
+                    onChange={(e) => {
+                      selectTouchedAt.current = Date.now();
+                      setDrafts((d) => ({ ...d, [acc.id]: e.target.value as ManagedRole }));
+                    }}
                     aria-label={`Role for ${acc.email ?? acc.id}`}
-                    className="min-h-11 min-w-0 rounded-full border border-input bg-background px-4 text-sm text-foreground disabled:opacity-50"
+                    className="min-h-11 w-full min-w-0 rounded-full border border-input bg-background px-4 text-sm text-foreground disabled:opacity-50 sm:w-auto"
                   >
                     {ROLE_OPTIONS.map((o) => (
                       <option key={o.value} value={o.value}>
@@ -630,9 +631,9 @@ function ManageRoles({ passcode }: { passcode: string }) {
                     ))}
                   </select>
                   <button
-                    onClick={() => setPending({ account: acc, next: draft })}
+                    onClick={() => openConfirm(acc, draft)}
                     disabled={!changed || isSelf}
-                    className="min-h-11 shrink-0 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-40"
+                    className="min-h-11 w-full shrink-0 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-40 sm:w-auto"
                   >
                     Apply
                   </button>
