@@ -17,7 +17,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { JournalVaultGate } from "@/components/hub/JournalVaultGate";
 import { importTradovateFills } from "@/lib/tradovate.functions";
-import { getTradovateStatus } from "@/lib/tradovate.functions";
+import { listTradovateConnections } from "@/lib/tradovate.functions";
 
 /* ------------------------------ date helpers ------------------------------- */
 
