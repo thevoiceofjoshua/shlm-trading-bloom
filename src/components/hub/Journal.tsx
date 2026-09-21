@@ -685,7 +685,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                                       { ...editing.entry.ruleChecks, [r.id]: v } as Record<string, "followed" | "broken">,
                                     )
                                   }
-                                   className={`min-h-9 min-w-0 rounded-full border px-3 text-xs font-medium transition-colors ${
+                                  className={`min-h-9 min-w-0 rounded-full border px-3 text-xs font-medium transition-colors ${
                                     state === v
                                       ? v === "broken"
                                         ? "border-destructive bg-destructive text-destructive-foreground"

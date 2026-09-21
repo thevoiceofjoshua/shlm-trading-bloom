@@ -48,6 +48,7 @@
 - [x] Verify all credential surfaces at 320×568 and 390×844 across member, SHLM MOD, and Founder views
 
 ## Mobile-responsive unlocked Trading Journal
-- [ ] Make the calendar, day view, entry forms, trades, screenshots, and totals fit narrow phones
-- [ ] Prevent iPhone input-focus zoom and make journal overlays safe-area-aware
-- [ ] Verify unlocked journal flows at 320×568 and 390×844 without changing desktop behavior
+- [x] Make the calendar, day view, entry forms, trades, screenshots, and totals fit narrow phones
+- [x] Prevent iPhone input-focus zoom and make journal overlays safe-area-aware
+- [x] Verify shared member, SHLM MOD, and Founder journal presentation and clean build
+- [ ] Live 320×568 and 390×844 authenticated checks require signing into the externally managed Supabase preview
