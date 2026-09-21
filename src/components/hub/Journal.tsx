@@ -386,15 +386,15 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="font-display text-lg font-medium">Trading journal</h3>
-        <div className="flex items-center gap-3">
+    <div className="min-w-0 w-full max-w-full overflow-hidden rounded-xl border border-border bg-card p-3 xs:p-4 sm:rounded-2xl sm:p-5">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+        <h3 className="min-w-0 truncate font-display text-lg font-medium">Trading journal</h3>
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
           <p className="hidden text-xs text-muted-foreground sm:block">Pick a date, log every session.</p>
           <button
             type="button"
             onClick={() => setEditingRules(true)}
-            className="rounded-full border border-border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
+            className="min-h-9 shrink-0 rounded-full border border-border px-2.5 py-1.5 text-[11px] font-medium transition-colors hover:bg-accent sm:px-3 sm:text-xs"
           >
             Edit my rules
           </button>
@@ -414,18 +414,18 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
 
       <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
         {/* Calendar */}
-        <div>
-          <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-1.5 xs:gap-2">
             <button
               type="button"
               aria-label="Previous month"
               onClick={() => setCursor((c) => (c.month === 0 ? { year: c.year - 1, month: 11 } : { ...c, month: c.month - 1 }))}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-sm text-foreground transition-colors hover:bg-accent"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-sm text-foreground transition-colors hover:bg-accent"
             >
               ‹
             </button>
-            <p className="font-display text-sm font-medium">{monthLabel}</p>
-            <div className="flex items-center gap-2">
+            <p className="min-w-0 truncate text-center font-display text-xs font-medium xs:text-sm">{monthLabel}</p>
+            <div className="flex shrink-0 items-center gap-1.5 xs:gap-2">
               <button
                 type="button"
                 onClick={() => {
@@ -433,7 +433,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                   setCursor({ year: n.getFullYear(), month: n.getMonth() });
                   setSelected(toKey(n));
                 }}
-                className="rounded-full border border-border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
+                className="min-h-9 rounded-full border border-border px-2.5 py-1.5 text-[11px] font-medium transition-colors hover:bg-accent xs:px-3 xs:text-xs"
               >
                 Today
               </button>
@@ -441,21 +441,21 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                 type="button"
                 aria-label="Next month"
                 onClick={() => setCursor((c) => (c.month === 11 ? { year: c.year + 1, month: 0 } : { ...c, month: c.month + 1 }))}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-sm text-foreground transition-colors hover:bg-accent"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-sm text-foreground transition-colors hover:bg-accent"
               >
                 ›
               </button>
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-7 gap-1">
+          <div className="mt-4 grid min-w-0 grid-cols-7 gap-0.5 xs:gap-1">
             {WEEKDAYS.map((w, i) => (
               <div key={i} className="pb-1 text-center text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 {w}
               </div>
             ))}
             {cells.map((d, i) => {
-              if (!d) return <div key={i} className="h-14 sm:h-16" />;
+              if (!d) return <div key={i} className="h-12 min-w-0 xs:h-14 sm:h-16" />;
               const key = toKey(d);
               const isSelected = key === selected;
               const isToday = key === todayKey;
@@ -472,7 +472,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                   key={i}
                   type="button"
                   onClick={() => setSelected(key)}
-                  className={`relative flex h-14 min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-xl border text-sm transition-colors sm:h-16 ${tint} ${
+                  className={`relative flex h-12 min-w-0 max-w-full flex-col items-center justify-center gap-0.5 overflow-hidden rounded-md border text-xs transition-colors xs:h-14 xs:rounded-lg xs:text-sm sm:h-16 sm:rounded-xl ${tint} ${
                     isSelected
                       ? "border-foreground ring-1 ring-foreground"
                       : isToday
@@ -495,8 +495,8 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
 
         {/* Entries */}
         <div className="min-w-0">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <p className="font-display text-sm font-medium">{selectedLabel}</p>
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2">
+            <p className="min-w-0 truncate font-display text-sm font-medium">{selectedLabel}</p>
             {dayEntries.length > 0 && (
               <p className={`text-xs font-medium tabular-nums ${dayTotal > 0 ? "text-emerald-500" : dayTotal < 0 ? "text-red-500" : "text-muted-foreground"}`}>
                 Day total {formatMoney(dayTotal)}
@@ -518,7 +518,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                       setEditing(e);
                       setDirty(false);
                     }}
-                    className="flex min-h-14 w-full items-center justify-between gap-3 rounded-xl border border-border bg-background px-4 py-3 text-left transition-colors hover:bg-accent"
+                    className="grid min-h-14 min-w-0 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-xl border border-border bg-background px-3 py-3 text-left transition-colors hover:bg-accent sm:gap-3 sm:px-4"
                   >
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-medium">
@@ -565,7 +565,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
             </div>
           ) : (
             <div className="mt-4">
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="grid min-w-0 grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap">
                 {SESSIONS.map((s) => {
                   const active = editing.entry.session === s.key;
                   const takenByOther = !active && dayEntries.some((e) => e.entry.session === s.key && e.storageKey !== editing.storageKey);
@@ -575,7 +575,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                       type="button"
                       disabled={takenByOther}
                       onClick={() => setField("session", s.key)}
-                      className={`min-h-9 rounded-full border px-4 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                      className={`min-h-9 min-w-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 sm:px-4 ${
                         active
                           ? "border-foreground bg-primary text-primary-foreground"
                           : "border-border bg-background text-foreground hover:bg-accent"
@@ -591,7 +591,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                     setEditing(null);
                     setDirty(false);
                   }}
-                  className="ml-auto text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
+                  className="col-span-2 justify-self-end text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground sm:ml-auto"
                 >
                   Back to entries
                 </button>
@@ -615,7 +615,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                       setField("pnl", isRed && clean !== "" ? `-${clean}` : clean);
                     };
                     return (
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <div className="mt-2 grid min-w-0 grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap">
                         <button
                           type="button"
                           onClick={() => setDirection(false)}
@@ -644,7 +644,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                           value={abs}
                           onChange={(e) => setAmount(e.target.value)}
                           placeholder="450"
-                          className="w-full max-w-40 rounded-xl border border-input bg-background px-4 py-3 text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                          className="col-span-2 min-w-0 w-full rounded-xl border border-input bg-background px-4 py-3 text-base tabular-nums text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring sm:col-auto sm:max-w-40 sm:text-sm"
                         />
                       </div>
                     );
@@ -672,9 +672,9 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                       {rules.map((r) => {
                         const state = editing.entry.ruleChecks[r.id];
                         return (
-                          <div key={r.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-background px-4 py-3">
+                          <div key={r.id} className="grid min-w-0 gap-3 rounded-xl border border-border bg-background px-3 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:px-4">
                             <p className="min-w-0 flex-1 text-sm">{r.text}</p>
-                            <div className="flex gap-2">
+                            <div className="grid grid-cols-2 gap-2 sm:flex">
                               {(["followed", "broken"] as const).map((v) => (
                                 <button
                                   key={v}
@@ -685,7 +685,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                                       { ...editing.entry.ruleChecks, [r.id]: v } as Record<string, "followed" | "broken">,
                                     )
                                   }
-                                  className={`min-h-9 rounded-full border px-3 text-xs font-medium transition-colors ${
+                                   className={`min-h-9 min-w-0 rounded-full border px-3 text-xs font-medium transition-colors ${
                                     state === v
                                       ? v === "broken"
                                         ? "border-destructive bg-destructive text-destructive-foreground"
@@ -728,12 +728,12 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                 />
               </div>
 
-              <div className="mt-5 flex flex-wrap items-center gap-3">
+              <div className="mt-5 grid min-w-0 grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap sm:gap-3">
                 <button
                   type="button"
                   disabled={save.isPending}
                   onClick={() => editing && save.mutate(editing)}
-                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+                  className="inline-flex min-h-11 min-w-0 items-center justify-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60 sm:px-6"
                 >
                   {save.isPending ? "Saving…" : "Save entry"}
                 </button>
@@ -742,17 +742,17 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                     type="button"
                     disabled={del.isPending}
                     onClick={() => editing && del.mutate(editing)}
-                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-border px-5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-60"
+                    className="inline-flex min-h-11 min-w-0 items-center justify-center rounded-full border border-border px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-60 sm:px-5"
                   >
                     Delete
                   </button>
                 )}
                 {dirty ? (
-                  <p className="text-xs text-muted-foreground">Unsaved changes</p>
+                  <p className="col-span-2 text-xs text-muted-foreground sm:col-auto">Unsaved changes</p>
                 ) : save.isSuccess ? (
-                  <p className="text-xs text-muted-foreground">Saved to your account.</p>
+                  <p className="col-span-2 text-xs text-muted-foreground sm:col-auto">Saved to your account.</p>
                 ) : null}
-                {save.isError && <p className="text-xs text-destructive">Couldn’t save. Try again.</p>}
+                {save.isError && <p className="col-span-2 text-xs text-destructive sm:col-auto">Couldn’t save. Try again.</p>}
               </div>
             </div>
           )}
