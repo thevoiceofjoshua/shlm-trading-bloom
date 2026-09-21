@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 import { HomeButton } from "@/components/HomeButton";
 import { VaultCredentialFrame, VaultField } from "@/components/VaultCredentialFrame";
