@@ -43,9 +43,9 @@ function b64(bytes: ArrayBuffer | Uint8Array): string {
   return btoa(out);
 }
 
-function unb64(value: string): Uint8Array {
+function unb64(value: string): Uint8Array<ArrayBuffer> {
   const raw = atob(value);
-  const bytes = new Uint8Array(raw.length);
+  const bytes = new Uint8Array(new ArrayBuffer(raw.length));
   for (let i = 0; i < raw.length; i += 1) bytes[i] = raw.charCodeAt(i);
   return bytes;
 }
