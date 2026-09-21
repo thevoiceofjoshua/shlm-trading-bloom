@@ -171,12 +171,13 @@ export async function listAccountsImpl(): Promise<AdminAccountRow[]> {
         (typeof meta["full_name"] === "string" && (meta["full_name"] as string)) ||
         (typeof meta["name"] === "string" && (meta["name"] as string)) ||
         null;
+      const banned = !!u.banned_until && new Date(u.banned_until).getTime() > Date.now();
       return {
         id: u.id,
         email: u.email ?? null,
         name,
         created_at: u.created_at,
-        role: roleByUser.get(u.id) ?? ("member" as ManagedRole),
+        role: banned ? ("revoked" as ManagedRole) : roleByUser.get(u.id) ?? ("member" as ManagedRole),
       };
     })
     .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
