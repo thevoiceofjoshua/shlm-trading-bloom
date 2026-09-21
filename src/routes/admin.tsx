@@ -656,15 +656,19 @@ function ManageRoles({ passcode }: { passcode: string }) {
               {roleLabel(pending.account.role)} to {roleLabel(pending.next)}?
             </p>
             <p className="mt-2 font-sans text-xs text-[var(--vault-muted)]">
-              This is a privileged change and takes effect immediately.
+              {pending.next === "revoked"
+                ? "This blocks the account from signing in and removes all member access. Their data is kept."
+                : pending.next === "member"
+                  ? "This removes any Founder, SHLM MOD or Free member status. Sign-in stays enabled."
+                  : "This is a privileged change and takes effect immediately."}
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               <button
                 onClick={apply}
-                disabled={saving}
+                disabled={saving || !confirmReady}
                 className="min-h-11 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground disabled:opacity-50"
               >
-                {saving ? "Applying…" : "Confirm change"}
+                {saving ? "Applying…" : confirmReady ? "Confirm change" : "Please wait…"}
               </button>
               <button
                 onClick={() => setPending(null)}
