@@ -764,6 +764,8 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
 
       <WeekMonthSummary userId={userId} />
 
+      <InstructionsPanel />
+
 
       {alertFor && (
         <RuleBreakAlert
@@ -1720,6 +1722,46 @@ function SummaryTile({
       <p className="mt-1 break-words text-[11px] text-muted-foreground">
         {entries} {entries === 1 ? "entry" : "entries"} · {trades} {trades === 1 ? "trade" : "trades"} · {sub}
       </p>
+    </div>
+  );
+}
+
+/* -------------------------- import instructions ----------------------------- */
+
+function InstructionsPanel() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-6 border-t border-border pt-5">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-2 text-left"
+        aria-expanded={open}
+      >
+        <span className="min-w-0 text-sm font-medium text-foreground">How to import from Tradovate</span>
+        <span className="shrink-0 text-xs text-muted-foreground">{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div className="mt-3 space-y-2">
+          <ol className="list-decimal space-y-1.5 pl-4 text-xs text-muted-foreground">
+            <li>Sign in to Tradovate.</li>
+            <li>
+              Go to the <strong className="text-foreground">Orders</strong> tab / order history.
+            </li>
+            <li>
+              Export as <strong className="text-foreground">CSV</strong> (usually a download icon).
+            </li>
+            <li>
+              In the journal entry, tap <strong className="text-foreground">Sync</strong>, pick the CSV file, or drag it onto the drop area.
+            </li>
+            <li>Optionally label the account, e.g. &quot;Apex 50K #2&quot;.</li>
+            <li>Review the imported trades before saving the journal entry.</li>
+          </ol>
+          <p className="text-[11px] text-muted-foreground">
+            Only filled orders become round-trip trades. Open positions are skipped.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
