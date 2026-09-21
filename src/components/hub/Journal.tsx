@@ -1152,6 +1152,7 @@ function CsvImport({
   const [label, setLabel] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (file: File | null | undefined) => {
