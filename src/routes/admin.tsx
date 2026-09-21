@@ -536,6 +536,7 @@ function ManageRoles({ passcode }: { passcode: string }) {
 
   const apply = async () => {
     if (!pending) return;
+    if (!confirmReady || Date.now() - pendingOpenedAt.current < TAP_GUARD_MS) return;
     setSaving(true);
     setMsg(null);
     try {
