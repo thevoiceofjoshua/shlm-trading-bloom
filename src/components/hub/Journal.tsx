@@ -764,6 +764,8 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
 
       <WeekMonthSummary userId={userId} />
 
+      <InstructionsPanel />
+
 
       {alertFor && (
         <RuleBreakAlert
