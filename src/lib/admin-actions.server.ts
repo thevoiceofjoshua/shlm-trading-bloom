@@ -120,7 +120,7 @@ export async function removeApplicationImpl(applicationId: string) {
 // Account role management (Founder only — verifyPasscode rejects SHLM MOD).
 // ---------------------------------------------------------------------------
 
-export type ManagedRole = "admin" | "shlm_mod" | "free_member" | "member";
+export type ManagedRole = "admin" | "shlm_mod" | "free_member" | "member" | "revoked";
 
 export type AdminAccountRow = {
   id: string;
