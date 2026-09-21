@@ -202,12 +202,18 @@ export async function setUserRoleImpl(userId: string, role: ManagedRole) {
   const { error: deleteError } = await supabaseAdmin.from("user_roles").delete().eq("user_id", userId);
   if (deleteError) throw new Error(deleteError.message);
 
-  if (role !== "member") {
+  if (role !== "member" && role !== "revoked") {
     const { error: insertError } = await supabaseAdmin
       .from("user_roles")
       .insert({ user_id: userId, role });
     if (insertError) throw new Error(insertError.message);
   }
+
+  // "revoked" blocks sign-in entirely; any other role restores access.
+  const { error: banError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+    ban_duration: role === "revoked" ? "876000h" : "none",
+  } as { ban_duration: string });
+  if (banError) throw new Error(banError.message);
 
   return { updated: true, role };
 }
