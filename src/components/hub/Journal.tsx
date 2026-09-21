@@ -386,15 +386,15 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="font-display text-lg font-medium">Trading journal</h3>
-        <div className="flex items-center gap-3">
+    <div className="min-w-0 w-full max-w-full overflow-hidden rounded-xl border border-border bg-card p-3 xs:p-4 sm:rounded-2xl sm:p-5">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+        <h3 className="min-w-0 truncate font-display text-lg font-medium">Trading journal</h3>
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
           <p className="hidden text-xs text-muted-foreground sm:block">Pick a date, log every session.</p>
           <button
             type="button"
             onClick={() => setEditingRules(true)}
-            className="rounded-full border border-border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
+            className="min-h-9 shrink-0 rounded-full border border-border px-2.5 py-1.5 text-[11px] font-medium transition-colors hover:bg-accent sm:px-3 sm:text-xs"
           >
             Edit my rules
           </button>
@@ -414,18 +414,18 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
 
       <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)]">
         {/* Calendar */}
-        <div>
-          <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-1.5 xs:gap-2">
             <button
               type="button"
               aria-label="Previous month"
               onClick={() => setCursor((c) => (c.month === 0 ? { year: c.year - 1, month: 11 } : { ...c, month: c.month - 1 }))}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-sm text-foreground transition-colors hover:bg-accent"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-sm text-foreground transition-colors hover:bg-accent"
             >
               ‹
             </button>
-            <p className="font-display text-sm font-medium">{monthLabel}</p>
-            <div className="flex items-center gap-2">
+            <p className="min-w-0 truncate text-center font-display text-xs font-medium xs:text-sm">{monthLabel}</p>
+            <div className="flex shrink-0 items-center gap-1.5 xs:gap-2">
               <button
                 type="button"
                 onClick={() => {
@@ -433,7 +433,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                   setCursor({ year: n.getFullYear(), month: n.getMonth() });
                   setSelected(toKey(n));
                 }}
-                className="rounded-full border border-border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
+                className="min-h-9 rounded-full border border-border px-2.5 py-1.5 text-[11px] font-medium transition-colors hover:bg-accent xs:px-3 xs:text-xs"
               >
                 Today
               </button>
@@ -441,21 +441,21 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                 type="button"
                 aria-label="Next month"
                 onClick={() => setCursor((c) => (c.month === 11 ? { year: c.year + 1, month: 0 } : { ...c, month: c.month + 1 }))}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-sm text-foreground transition-colors hover:bg-accent"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-sm text-foreground transition-colors hover:bg-accent"
               >
                 ›
               </button>
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-7 gap-1">
+          <div className="mt-4 grid min-w-0 grid-cols-7 gap-0.5 xs:gap-1">
             {WEEKDAYS.map((w, i) => (
               <div key={i} className="pb-1 text-center text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 {w}
               </div>
             ))}
             {cells.map((d, i) => {
-              if (!d) return <div key={i} className="h-14 sm:h-16" />;
+              if (!d) return <div key={i} className="h-12 min-w-0 xs:h-14 sm:h-16" />;
               const key = toKey(d);
               const isSelected = key === selected;
               const isToday = key === todayKey;
@@ -472,7 +472,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                   key={i}
                   type="button"
                   onClick={() => setSelected(key)}
-                  className={`relative flex h-14 min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-xl border text-sm transition-colors sm:h-16 ${tint} ${
+                  className={`relative flex h-12 min-w-0 max-w-full flex-col items-center justify-center gap-0.5 overflow-hidden rounded-md border text-xs transition-colors xs:h-14 xs:rounded-lg xs:text-sm sm:h-16 sm:rounded-xl ${tint} ${
                     isSelected
                       ? "border-foreground ring-1 ring-foreground"
                       : isToday
@@ -495,8 +495,8 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
 
         {/* Entries */}
         <div className="min-w-0">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <p className="font-display text-sm font-medium">{selectedLabel}</p>
+          <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2">
+            <p className="min-w-0 truncate font-display text-sm font-medium">{selectedLabel}</p>
             {dayEntries.length > 0 && (
               <p className={`text-xs font-medium tabular-nums ${dayTotal > 0 ? "text-emerald-500" : dayTotal < 0 ? "text-red-500" : "text-muted-foreground"}`}>
                 Day total {formatMoney(dayTotal)}
@@ -518,7 +518,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                       setEditing(e);
                       setDirty(false);
                     }}
-                    className="flex min-h-14 w-full items-center justify-between gap-3 rounded-xl border border-border bg-background px-4 py-3 text-left transition-colors hover:bg-accent"
+                    className="grid min-h-14 min-w-0 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-xl border border-border bg-background px-3 py-3 text-left transition-colors hover:bg-accent sm:gap-3 sm:px-4"
                   >
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-medium">
@@ -565,7 +565,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
             </div>
           ) : (
             <div className="mt-4">
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="grid min-w-0 grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap">
                 {SESSIONS.map((s) => {
                   const active = editing.entry.session === s.key;
                   const takenByOther = !active && dayEntries.some((e) => e.entry.session === s.key && e.storageKey !== editing.storageKey);
@@ -575,7 +575,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                       type="button"
                       disabled={takenByOther}
                       onClick={() => setField("session", s.key)}
-                      className={`min-h-9 rounded-full border px-4 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                      className={`min-h-9 min-w-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 sm:px-4 ${
                         active
                           ? "border-foreground bg-primary text-primary-foreground"
                           : "border-border bg-background text-foreground hover:bg-accent"
@@ -591,7 +591,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                     setEditing(null);
                     setDirty(false);
                   }}
-                  className="ml-auto text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
+                  className="col-span-2 justify-self-end text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground sm:ml-auto"
                 >
                   Back to entries
                 </button>
@@ -615,7 +615,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                       setField("pnl", isRed && clean !== "" ? `-${clean}` : clean);
                     };
                     return (
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <div className="mt-2 grid min-w-0 grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap">
                         <button
                           type="button"
                           onClick={() => setDirection(false)}
@@ -644,7 +644,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                           value={abs}
                           onChange={(e) => setAmount(e.target.value)}
                           placeholder="450"
-                          className="w-full max-w-40 rounded-xl border border-input bg-background px-4 py-3 text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                          className="col-span-2 min-w-0 w-full rounded-xl border border-input bg-background px-4 py-3 text-base tabular-nums text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring sm:col-auto sm:max-w-40 sm:text-sm"
                         />
                       </div>
                     );
@@ -672,9 +672,9 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                       {rules.map((r) => {
                         const state = editing.entry.ruleChecks[r.id];
                         return (
-                          <div key={r.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-background px-4 py-3">
+                          <div key={r.id} className="grid min-w-0 gap-3 rounded-xl border border-border bg-background px-3 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:px-4">
                             <p className="min-w-0 flex-1 text-sm">{r.text}</p>
-                            <div className="flex gap-2">
+                            <div className="grid grid-cols-2 gap-2 sm:flex">
                               {(["followed", "broken"] as const).map((v) => (
                                 <button
                                   key={v}
@@ -685,7 +685,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                                       { ...editing.entry.ruleChecks, [r.id]: v } as Record<string, "followed" | "broken">,
                                     )
                                   }
-                                  className={`min-h-9 rounded-full border px-3 text-xs font-medium transition-colors ${
+                                  className={`min-h-9 min-w-0 rounded-full border px-3 text-xs font-medium transition-colors ${
                                     state === v
                                       ? v === "broken"
                                         ? "border-destructive bg-destructive text-destructive-foreground"
@@ -728,12 +728,12 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                 />
               </div>
 
-              <div className="mt-5 flex flex-wrap items-center gap-3">
+              <div className="mt-5 grid min-w-0 grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap sm:gap-3">
                 <button
                   type="button"
                   disabled={save.isPending}
                   onClick={() => editing && save.mutate(editing)}
-                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+                  className="inline-flex min-h-11 min-w-0 items-center justify-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60 sm:px-6"
                 >
                   {save.isPending ? "Saving…" : "Save entry"}
                 </button>
@@ -742,17 +742,17 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                     type="button"
                     disabled={del.isPending}
                     onClick={() => editing && del.mutate(editing)}
-                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-border px-5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-60"
+                    className="inline-flex min-h-11 min-w-0 items-center justify-center rounded-full border border-border px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-60 sm:px-5"
                   >
                     Delete
                   </button>
                 )}
                 {dirty ? (
-                  <p className="text-xs text-muted-foreground">Unsaved changes</p>
+                  <p className="col-span-2 text-xs text-muted-foreground sm:col-auto">Unsaved changes</p>
                 ) : save.isSuccess ? (
-                  <p className="text-xs text-muted-foreground">Saved to your account.</p>
+                  <p className="col-span-2 text-xs text-muted-foreground sm:col-auto">Saved to your account.</p>
                 ) : null}
-                {save.isError && <p className="text-xs text-destructive">Couldn’t save. Try again.</p>}
+                {save.isError && <p className="col-span-2 text-xs text-destructive sm:col-auto">Couldn’t save. Try again.</p>}
               </div>
             </div>
           )}
@@ -805,12 +805,12 @@ function RuleBreakAlert({
     <div
       role="alertdialog"
       aria-modal="true"
-      className="fixed inset-0 z-[300] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[300] flex min-h-dvh items-start justify-center overflow-x-hidden overflow-y-auto px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] xs:px-4 sm:items-center sm:p-4"
     >
       <div className="absolute inset-0 bg-black/80" />
 
-      <div className="animate-rule-flash relative w-full max-w-lg rounded-2xl border-2 border-red-500 p-6 text-center text-white shadow-2xl">
-        <p className="font-display text-3xl font-bold uppercase tracking-widest sm:text-4xl">Rules broken</p>
+      <div className="animate-rule-flash relative my-auto min-w-0 w-full max-w-lg rounded-xl border-2 border-red-500 p-4 text-center text-white shadow-2xl sm:rounded-2xl sm:p-6">
+        <p className="font-display text-2xl font-bold uppercase tracking-widest sm:text-4xl">Rules broken</p>
         <ul className="mt-5 space-y-2 text-left text-sm">
           {broken.map((r) => (
             <li key={r.id} className="rounded-lg bg-black/40 px-4 py-2">
@@ -847,12 +847,12 @@ function RuleFollowAlert({
     <div
       role="alertdialog"
       aria-modal="true"
-      className="fixed inset-0 z-[300] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[300] flex min-h-dvh items-start justify-center overflow-x-hidden overflow-y-auto px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] xs:px-4 sm:items-center sm:p-4"
     >
       <div className="absolute inset-0 bg-black/80" />
 
-      <div className="animate-rule-flash relative w-full max-w-lg rounded-2xl border-2 border-emerald-500 bg-card p-6 text-center shadow-2xl">
-        <p className="font-display text-3xl font-bold uppercase tracking-widest text-emerald-500 sm:text-4xl">Rules followed</p>
+      <div className="animate-rule-flash relative my-auto min-w-0 w-full max-w-lg rounded-xl border-2 border-emerald-500 bg-card p-4 text-center shadow-2xl sm:rounded-2xl sm:p-6">
+        <p className="font-display text-2xl font-bold uppercase tracking-widest text-emerald-500 sm:text-4xl">Rules followed</p>
         <p className="mt-2 text-sm text-muted-foreground">You stayed disciplined this session.</p>
         <ul className="mt-5 space-y-2 text-left text-sm">
           {followed.map((r) => (
@@ -904,7 +904,7 @@ function RulesSetup({
   const valid = rules.some((r) => r.text.trim() !== "") && consequence.trim() !== "";
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-5">
+    <div className="min-w-0 w-full max-w-full overflow-hidden rounded-xl border border-border bg-card p-3 xs:p-4 sm:rounded-2xl sm:p-5">
       <h3 className="font-display text-lg font-medium">{firstTime ? "Set your daily trading rules" : "Edit my rules"}</h3>
       <p className="mt-1 max-w-xl text-sm text-muted-foreground">
         These are the rules you hold yourself to every session. If you mark any of them broken on an entry, the journal will remind you of the consequence you set here.
@@ -912,13 +912,13 @@ function RulesSetup({
 
       <div className="mt-5 space-y-2">
         {rules.map((r, i) => (
-          <div key={r.id} className="flex items-center gap-2">
+          <div key={r.id} className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
             <input
               type="text"
               value={r.text}
               onChange={(e) => setRules((prev) => prev.map((p) => (p.id === r.id ? { ...p, text: e.target.value } : p)))}
               placeholder={i === 0 ? "No trades in the first 5 minutes of the open" : "Add another rule…"}
-              className="min-h-11 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              className="min-h-11 min-w-0 w-full rounded-xl border border-input bg-background px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
             />
             <button
               type="button"
@@ -946,7 +946,7 @@ function RulesSetup({
           value={consequence}
           onChange={(e) => setConsequence(e.target.value)}
           placeholder="e.g. 50 push-ups and no trading tomorrow"
-          className="mt-2 w-full resize-y rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+          className="mt-2 min-w-0 w-full resize-y rounded-xl border border-input bg-background px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
         />
       </div>
 
@@ -1028,7 +1028,7 @@ function TextField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="mt-2 w-full resize-y rounded-xl border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+        className="mt-2 min-w-0 w-full resize-y rounded-xl border border-input bg-background px-4 py-3 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
       />
     </div>
   );
@@ -1123,11 +1123,11 @@ function TradesEditor({ entry, onChange }: { entry: Entry; onChange: (patch: Par
             const resultLabel = RESULTS.find((r) => r.key === t.result)?.label ?? "";
 
             return (
-              <div key={t.id} className="rounded-xl border border-border bg-background p-3">
+              <div key={t.id} className="min-w-0 max-w-full overflow-hidden rounded-xl border border-border bg-background p-3">
                 <button
                   type="button"
                   onClick={() => toggleTrade(t.id)}
-                  className="flex w-full items-center justify-between gap-2 text-left"
+                  className="grid min-w-0 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-left"
                   aria-expanded={!isCollapsed}
                 >
                   <div className="flex min-w-0 items-center gap-2">
@@ -1154,13 +1154,13 @@ function TradesEditor({ entry, onChange }: { entry: Entry; onChange: (patch: Par
 
                 {!isCollapsed && (
                   <div className="mt-3 space-y-3">
-                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                    <div className="mt-2 grid min-w-0 gap-2 sm:grid-cols-2">
                       <input
                         type="text"
                         value={t.instrument}
                         onChange={(e) => patchTrade(t.id, { instrument: e.target.value })}
                         placeholder="Pair / instrument (e.g. XAUUSD)"
-                        className="min-h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                        className="min-h-11 min-w-0 w-full rounded-xl border border-input bg-background px-4 py-2 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
                       />
                       <div className="flex flex-wrap items-center gap-2">
                         {DIRECTIONS.map((d) => (
@@ -1180,7 +1180,7 @@ function TradesEditor({ entry, onChange }: { entry: Entry; onChange: (patch: Par
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="grid min-w-0 grid-cols-3 items-center gap-2 sm:flex sm:flex-wrap">
                       {RESULTS.map((r) => (
                         <button
                           key={r.key}
@@ -1195,7 +1195,7 @@ function TradesEditor({ entry, onChange }: { entry: Entry; onChange: (patch: Par
                           {r.label}
                         </button>
                       ))}
-                      <span className="ml-auto flex items-center gap-2">
+                      <span className="col-span-3 grid min-w-0 grid-cols-[auto_auto_minmax(0,1fr)] items-center gap-2 sm:ml-auto sm:flex">
                         <button
                           type="button"
                           onClick={() => patchTrade(t.id, { pnl: abs === "" ? "" : abs })}
@@ -1223,7 +1223,7 @@ function TradesEditor({ entry, onChange }: { entry: Entry; onChange: (patch: Par
                             patchTrade(t.id, { pnl: isRed && clean !== "" ? `-${clean}` : clean });
                           }}
                           placeholder="PnL $"
-                          className="w-24 rounded-xl border border-input bg-background px-3 py-2 text-sm tabular-nums text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                          className="min-h-11 min-w-0 w-full rounded-xl border border-input bg-background px-3 py-2 text-base tabular-nums text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring sm:w-24 sm:text-sm"
                         />
                       </span>
                     </div>
@@ -1233,7 +1233,7 @@ function TradesEditor({ entry, onChange }: { entry: Entry; onChange: (patch: Par
                       value={t.note}
                       onChange={(e) => patchTrade(t.id, { note: e.target.value })}
                       placeholder="What was the setup / why did you take it?"
-                      className="min-h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                      className="min-h-11 min-w-0 w-full rounded-xl border border-input bg-background px-4 py-2 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
                     />
 
                     <button
@@ -1322,9 +1322,9 @@ function Screenshots({
       <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">🖼️ Screenshots</p>
       <p className="mt-1 text-xs text-muted-foreground">Attach your charts or executions for this session.</p>
 
-      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <div className="mt-2 grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-3">
         {shots.map((s) => (
-          <div key={s.path} className="group relative overflow-hidden rounded-xl border border-border bg-background">
+          <div key={s.path} className="group relative min-w-0 overflow-hidden rounded-xl border border-border bg-background">
             {urls[s.path] ? (
               <button type="button" onClick={() => setLightbox(urls[s.path]!)} className="block h-28 w-full">
                 <img src={urls[s.path]} alt="Journal screenshot" className="h-28 w-full object-cover" loading="lazy" />
@@ -1365,10 +1365,10 @@ function Screenshots({
         <button
           type="button"
           onClick={() => setLightbox(null)}
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-background/95 p-6"
+          className="fixed inset-0 z-[60] flex min-h-dvh items-center justify-center overflow-hidden bg-background/95 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:p-6"
           aria-label="Close screenshot"
         >
-          <img src={lightbox} alt="Journal screenshot" className="max-h-full max-w-full rounded-2xl object-contain" />
+          <img src={lightbox} alt="Journal screenshot" className="max-h-[calc(100dvh-1.5rem)] max-w-full rounded-xl object-contain sm:max-h-full sm:rounded-2xl" />
         </button>
       )}
     </div>
@@ -1428,7 +1428,7 @@ function WeekMonthSummary({ userId }: { userId: string }) {
   const monthLabel = new Date().toLocaleDateString("en-US", { month: "long" });
 
   return (
-    <div className="mt-6 grid gap-3 border-t border-border pt-5 sm:grid-cols-2">
+    <div className="mt-6 grid min-w-0 gap-3 border-t border-border pt-5 sm:grid-cols-2">
       <SummaryTile label="This week" sub={`${weekFrom.slice(5)} – ${weekTo.slice(5)}`} {...totals.week} />
       <SummaryTile label={`This month · ${monthLabel}`} sub="Calendar month to date" {...totals.month} />
     </div>
@@ -1450,10 +1450,10 @@ function SummaryTile({
 }) {
   const color = total > 0 ? "text-emerald-500" : total < 0 ? "text-red-500" : "text-muted-foreground";
   return (
-    <div className="rounded-xl border border-border bg-background px-4 py-3">
+    <div className="min-w-0 overflow-hidden rounded-xl border border-border bg-background px-3 py-3 sm:px-4">
       <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">{label}</p>
-      <p className={`mt-1 font-display text-2xl font-medium tabular-nums ${color}`}>{formatMoney(total)}</p>
-      <p className="mt-1 text-[11px] text-muted-foreground">
+      <p className={`mt-1 max-w-full truncate font-display text-2xl font-medium tabular-nums ${color}`}>{formatMoney(total)}</p>
+      <p className="mt-1 break-words text-[11px] text-muted-foreground">
         {entries} {entries === 1 ? "entry" : "entries"} · {trades} {trades === 1 ? "trade" : "trades"} · {sub}
       </p>
     </div>

@@ -46,3 +46,9 @@
 - [x] Make every vault surface fit narrow and short phone viewports without pinch zoom
 - [x] Prevent mobile input-focus zoom and keep all controls reachable
 - [x] Verify all credential surfaces at 320×568 and 390×844 across member, SHLM MOD, and Founder views
+
+## Mobile-responsive unlocked Trading Journal
+- [x] Make the calendar, day view, entry forms, trades, screenshots, and totals fit narrow phones
+- [x] Prevent iPhone input-focus zoom and make journal overlays safe-area-aware
+- [x] Verify shared member, SHLM MOD, and Founder journal presentation and clean build
+- [ ] Live 320×568 and 390×844 authenticated checks require signing into the externally managed Supabase preview
