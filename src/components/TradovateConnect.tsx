@@ -82,6 +82,9 @@ export function TradovateConnect() {
                 ? `${connections.length} account${connections.length === 1 ? "" : "s"} connected — journal pulls combine all of them.`
                 : "Connect your accounts to auto-fill journal trades from your real fills."}
           </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            For live cash Tradovate accounts. Prop firm accounts (Apex, etc.) can&apos;t connect live — use CSV import in the journal instead.
+          </p>
         </div>
         <Button className="shrink-0 rounded-full" onClick={() => setOpen((v) => !v)}>
           {open ? "Cancel" : connections.length > 0 ? "Add account" : "Connect"}
