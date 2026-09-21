@@ -44,8 +44,8 @@ export function PasskeySignIn({
     setError(null);
     try {
       const { startAuthentication } = await import("@simplewebauthn/browser");
-      const options = await start();
-      const response = await startAuthentication({ optionsJSON: options as never });
+      const { optionsJSON } = await start();
+      const response = await startAuthentication({ optionsJSON: JSON.parse(optionsJSON) });
       const { tokenHash, email } = await finish({ data: { response } });
       const { error: verifyError } = await supabase.auth.verifyOtp({
         email,

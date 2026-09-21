@@ -42,8 +42,8 @@ export function PasskeyDevices() {
     mutationFn: async () => {
       setError(null);
       const { startRegistration } = await import("@simplewebauthn/browser");
-      const options = await start();
-      const response = await startRegistration({ optionsJSON: options as never });
+      const { optionsJSON } = await start();
+      const response = await startRegistration({ optionsJSON: JSON.parse(optionsJSON) });
       const label = /iPhone|iPad|Mac/.test(navigator.userAgent)
         ? "Face ID / Touch ID"
         : /Android/.test(navigator.userAgent)

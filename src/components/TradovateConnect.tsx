@@ -110,10 +110,10 @@ export function TradovateConnect() {
               </button>
             ))}
           </div>
-          <Field label="Tradovate username" value={username} onChange={setUsername} autoComplete="off" />
-          <Field label="Password" value={password} onChange={setPassword} type="password" autoComplete="new-password" />
-          <Field label="CID" value={cid} onChange={setCid} inputMode="numeric" autoComplete="off" />
-          <Field label="API secret" value={sec} onChange={setSec} type="password" autoComplete="off" />
+          <Field label="Tradovate username" value={username} onValue={setUsername} autoComplete="off" />
+          <Field label="Password" value={password} onValue={setPassword} type="password" autoComplete="new-password" />
+          <Field label="CID" value={cid} onValue={setCid} inputMode="numeric" autoComplete="off" />
+          <Field label="API secret" value={sec} onValue={setSec} type="password" autoComplete="off" />
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="rounded-full" disabled={save.isPending}>
             {save.isPending ? "Connecting…" : "Save connection"}
@@ -127,13 +127,13 @@ export function TradovateConnect() {
 function Field({
   label,
   value,
-  onChange,
+  onValue,
   ...rest
 }: {
   label: string;
   value: string;
-  onChange: (v: string) => void;
-} & React.InputHTMLAttributes<HTMLInputElement>) {
+  onValue: (v: string) => void;
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value">) {
   return (
     <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground">
       {label}
@@ -141,7 +141,7 @@ function Field({
         {...rest}
         required
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onValue(e.target.value)}
         className="mt-1.5 h-11 min-w-0 w-full rounded-xl border border-input bg-background px-3 text-base text-foreground sm:text-sm"
       />
     </label>

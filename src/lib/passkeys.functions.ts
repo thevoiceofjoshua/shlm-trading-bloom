@@ -72,7 +72,7 @@ export const startPasskeyRegistration = createServerFn({ method: "POST" })
       excludeCredentials: (existing ?? []).map((c) => ({ id: c.credential_id })),
     });
     // Options travel to the browser as plain JSON.
-    const payload = JSON.parse(JSON.stringify(options)) as Record<string, unknown>;
+    const payload = JSON.stringify(options);
 
     await supabaseAdmin.from("webauthn_challenges").insert({
       challenge: options.challenge,
@@ -80,7 +80,7 @@ export const startPasskeyRegistration = createServerFn({ method: "POST" })
       kind: "register",
     });
 
-    return payload;
+    return { optionsJSON: payload };
   });
 
 export const finishPasskeyRegistration = createServerFn({ method: "POST" })
@@ -144,14 +144,14 @@ export const startPasskeyLogin = createServerFn({ method: "POST" }).handler(asyn
     rpID,
     userVerification: "required",
   });
-  const payload = JSON.parse(JSON.stringify(options)) as Record<string, unknown>;
+  const payload = JSON.stringify(options);
 
   await supabaseAdmin.from("webauthn_challenges").insert({
     challenge: options.challenge,
     kind: "login",
   });
 
-  return payload;
+  return { optionsJSON: payload };
 });
 
 export const finishPasskeyLogin = createServerFn({ method: "POST" })
