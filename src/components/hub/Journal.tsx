@@ -1305,6 +1305,15 @@ function TradesEditor({
           setCollapsedIds(new Set());
         }}
       />
+      <CsvImport
+        onImport={(imported) => {
+          const added = imported.map((t) => ({ ...newTrade(), ...t }));
+          const next = [...trades, ...added];
+          onChange({ trades: next, tradeCount: String(next.length) });
+          setSectionCollapsed(false);
+          setCollapsedIds(new Set());
+        }}
+      />
       <div className="mt-2 flex flex-wrap items-center gap-2">
         {[0, 1, 2, 3, 4, 5, 6].map((n) => {
           const active = entry.tradeCount === String(n);
