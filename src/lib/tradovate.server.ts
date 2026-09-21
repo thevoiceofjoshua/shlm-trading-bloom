@@ -175,6 +175,7 @@ interface Fill {
   contractId: number;
   timestamp: string;
   tradeDate?: { year: number; month: number; day: number };
+  accountId?: number;
   action: "Buy" | "Sell";
   qty: number;
   price: number;
@@ -219,6 +220,7 @@ export async function fetchRoundTrips(
     const buy = fillById.get(p.buyFillId);
     const sell = fillById.get(p.sellFillId);
     if (!buy || !sell) return false;
+    if (buy.accountId != null && buy.accountId !== accountId) return false;
     const stamps = [Date.parse(buy.timestamp), Date.parse(sell.timestamp)];
     const inWindow = stamps.some((t) => t >= from && t <= to);
     if (!inWindow) return false;
