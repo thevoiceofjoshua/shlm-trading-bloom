@@ -1149,7 +1149,6 @@ function CsvImport({
     trades: { instrument: string; direction: string; result: string; pnl: string; note: string }[],
   ) => void;
 }) {
-  const [open, setOpen] = useState(false);
   const [label, setLabel] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -1203,38 +1202,36 @@ function CsvImport({
 
   return (
     <div className="mt-2 min-w-0">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="min-h-9 rounded-full border border-border px-4 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
-      >
-        {open ? "Hide Sync" : "Sync"}
-      </button>
-      {open && (
-        <div className="mt-2 min-w-0 rounded-xl border border-border bg-background/60 p-3">
-          <p className="text-xs text-muted-foreground">
-            For prop firm accounts that can't connect live — export your Orders tab from Tradovate as CSV.
-          </p>
-          <label className="mt-2 block text-xs font-medium text-muted-foreground">
-            Account label (optional)
-            <input
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-              placeholder="Apex 50K #2"
-              className="mt-1 w-full min-w-0 rounded-lg border border-border bg-background px-3 py-2 text-base text-foreground sm:text-sm"
-            />
-          </label>
+      <div className="flex flex-wrap items-center gap-2">
+        <label className="flex min-w-0 flex-1 items-center gap-2 text-xs font-medium text-muted-foreground">
+          <span className="shrink-0">Label</span>
           <input
-            ref={fileRef}
-            type="file"
-            accept=".csv,text/csv,text/plain"
-            onChange={(e) => void handleFile(e.target.files?.[0])}
-            className="mt-2 block w-full min-w-0 text-xs text-muted-foreground file:mr-3 file:min-h-9 file:rounded-full file:border file:border-foreground file:bg-primary file:px-4 file:text-xs file:font-medium file:text-primary-foreground"
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            placeholder="Apex 50K #2"
+            className="min-w-0 flex-1 rounded-lg border border-border bg-background px-3 py-2 text-base text-foreground sm:text-sm"
           />
-          {error && <p className="mt-2 text-xs font-medium text-foreground">{error}</p>}
-          {message && !error && <p className="mt-2 text-xs text-muted-foreground">{message}</p>}
-        </div>
-      )}
+        </label>
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          className="min-h-9 shrink-0 rounded-full border border-border px-4 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+        >
+          Sync
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".csv,text/csv,text/plain"
+          onChange={(e) => void handleFile(e.target.files?.[0])}
+          className="hidden"
+        />
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground">
+        For prop firm accounts that can&apos;t connect live — export your Orders tab from Tradovate as CSV.
+      </p>
+      {error && <p className="mt-2 text-xs font-medium text-foreground">{error}</p>}
+      {message && !error && <p className="mt-2 text-xs text-muted-foreground">{message}</p>}
     </div>
   );
 }
