@@ -52,3 +52,8 @@
 - [x] Prevent iPhone input-focus zoom and make journal overlays safe-area-aware
 - [x] Verify shared member, SHLM MOD, and Founder journal presentation and clean build
 - [ ] Live 320×568 and 390×844 authenticated checks require signing into the externally managed Supabase preview
+
+## Manage roles in Founder admin panel
+- [x] Account list with email, name, current role, sign-up date
+- [x] Role selector + confirmation step, immediate effect
+- [x] Founder-only (SHLM MOD passcode rejected); own account locked; last Founder protected

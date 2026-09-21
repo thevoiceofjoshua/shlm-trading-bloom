@@ -44,3 +44,18 @@ export const denyApplicationRequest = (passcode: string, applicationId: string) 
 
 export const removeApplicationRequest = (passcode: string, applicationId: string) =>
   post<{ removed: boolean }>("remove-application", { passcode, applicationId });
+
+export type ManagedRole = "admin" | "shlm_mod" | "free_member" | "member";
+
+export type AdminAccount = {
+  id: string;
+  email: string | null;
+  name: string | null;
+  created_at: string;
+  role: ManagedRole;
+};
+
+export const fetchAccounts = (passcode: string) => post<AdminAccount[]>("accounts", { passcode });
+
+export const setUserRoleRequest = (passcode: string, userId: string, role: ManagedRole) =>
+  post<{ updated: boolean; role: ManagedRole }>("set-role", { passcode, userId, role });

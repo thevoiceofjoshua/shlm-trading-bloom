@@ -37,10 +37,12 @@ import { Route as ApiPublicCheckoutVerifyRouteImport } from './routes/api/public
 import { Route as ApiPublicCheckoutTestRouteImport } from './routes/api/public/checkout.test'
 import { Route as ApiPublicCheckoutExtensionRouteImport } from './routes/api/public/checkout.extension'
 import { Route as ApiPublicCheckoutCreateRouteImport } from './routes/api/public/checkout.create'
+import { Route as ApiPublicAdminSetRoleRouteImport } from './routes/api/public/admin.set-role'
 import { Route as ApiPublicAdminSendPaymentLinkRouteImport } from './routes/api/public/admin.send-payment-link'
 import { Route as ApiPublicAdminRemoveApplicationRouteImport } from './routes/api/public/admin.remove-application'
 import { Route as ApiPublicAdminDenyApplicationRouteImport } from './routes/api/public/admin.deny-application'
 import { Route as ApiPublicAdminApplicationsRouteImport } from './routes/api/public/admin.applications'
+import { Route as ApiPublicAdminAccountsRouteImport } from './routes/api/public/admin.accounts'
 
 const TestCheckoutRoute = TestCheckoutRouteImport.update({
   id: '/test-checkout',
@@ -186,6 +188,11 @@ const ApiPublicCheckoutCreateRoute = ApiPublicCheckoutCreateRouteImport.update({
   path: '/api/public/checkout/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAdminSetRoleRoute = ApiPublicAdminSetRoleRouteImport.update({
+  id: '/api/public/admin/set-role',
+  path: '/api/public/admin/set-role',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicAdminSendPaymentLinkRoute =
   ApiPublicAdminSendPaymentLinkRouteImport.update({
     id: '/api/public/admin/send-payment-link',
@@ -210,6 +217,11 @@ const ApiPublicAdminApplicationsRoute =
     path: '/api/public/admin/applications',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAdminAccountsRoute = ApiPublicAdminAccountsRouteImport.update({
+  id: '/api/public/admin/accounts',
+  path: '/api/public/admin/accounts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -234,10 +246,12 @@ export interface FileRoutesByFullPath {
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
+  '/api/public/admin/accounts': typeof ApiPublicAdminAccountsRoute
   '/api/public/admin/applications': typeof ApiPublicAdminApplicationsRoute
   '/api/public/admin/deny-application': typeof ApiPublicAdminDenyApplicationRoute
   '/api/public/admin/remove-application': typeof ApiPublicAdminRemoveApplicationRoute
   '/api/public/admin/send-payment-link': typeof ApiPublicAdminSendPaymentLinkRoute
+  '/api/public/admin/set-role': typeof ApiPublicAdminSetRoleRoute
   '/api/public/checkout/create': typeof ApiPublicCheckoutCreateRoute
   '/api/public/checkout/extension': typeof ApiPublicCheckoutExtensionRoute
   '/api/public/checkout/test': typeof ApiPublicCheckoutTestRoute
@@ -268,10 +282,12 @@ export interface FileRoutesByTo {
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
+  '/api/public/admin/accounts': typeof ApiPublicAdminAccountsRoute
   '/api/public/admin/applications': typeof ApiPublicAdminApplicationsRoute
   '/api/public/admin/deny-application': typeof ApiPublicAdminDenyApplicationRoute
   '/api/public/admin/remove-application': typeof ApiPublicAdminRemoveApplicationRoute
   '/api/public/admin/send-payment-link': typeof ApiPublicAdminSendPaymentLinkRoute
+  '/api/public/admin/set-role': typeof ApiPublicAdminSetRoleRoute
   '/api/public/checkout/create': typeof ApiPublicCheckoutCreateRoute
   '/api/public/checkout/extension': typeof ApiPublicCheckoutExtensionRoute
   '/api/public/checkout/test': typeof ApiPublicCheckoutTestRoute
@@ -303,10 +319,12 @@ export interface FileRoutesById {
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
+  '/api/public/admin/accounts': typeof ApiPublicAdminAccountsRoute
   '/api/public/admin/applications': typeof ApiPublicAdminApplicationsRoute
   '/api/public/admin/deny-application': typeof ApiPublicAdminDenyApplicationRoute
   '/api/public/admin/remove-application': typeof ApiPublicAdminRemoveApplicationRoute
   '/api/public/admin/send-payment-link': typeof ApiPublicAdminSendPaymentLinkRoute
+  '/api/public/admin/set-role': typeof ApiPublicAdminSetRoleRoute
   '/api/public/checkout/create': typeof ApiPublicCheckoutCreateRoute
   '/api/public/checkout/extension': typeof ApiPublicCheckoutExtensionRoute
   '/api/public/checkout/test': typeof ApiPublicCheckoutTestRoute
@@ -339,10 +357,12 @@ export interface FileRouteTypes {
     | '/features/risk'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
+    | '/api/public/admin/accounts'
     | '/api/public/admin/applications'
     | '/api/public/admin/deny-application'
     | '/api/public/admin/remove-application'
     | '/api/public/admin/send-payment-link'
+    | '/api/public/admin/set-role'
     | '/api/public/checkout/create'
     | '/api/public/checkout/extension'
     | '/api/public/checkout/test'
@@ -373,10 +393,12 @@ export interface FileRouteTypes {
     | '/features/risk'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
+    | '/api/public/admin/accounts'
     | '/api/public/admin/applications'
     | '/api/public/admin/deny-application'
     | '/api/public/admin/remove-application'
     | '/api/public/admin/send-payment-link'
+    | '/api/public/admin/set-role'
     | '/api/public/checkout/create'
     | '/api/public/checkout/extension'
     | '/api/public/checkout/test'
@@ -407,10 +429,12 @@ export interface FileRouteTypes {
     | '/features/risk'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
+    | '/api/public/admin/accounts'
     | '/api/public/admin/applications'
     | '/api/public/admin/deny-application'
     | '/api/public/admin/remove-application'
     | '/api/public/admin/send-payment-link'
+    | '/api/public/admin/set-role'
     | '/api/public/checkout/create'
     | '/api/public/checkout/extension'
     | '/api/public/checkout/test'
@@ -442,10 +466,12 @@ export interface RootRouteChildren {
   FeaturesRiskRoute: typeof FeaturesRiskRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicSubmitApplicationRoute: typeof ApiPublicSubmitApplicationRoute
+  ApiPublicAdminAccountsRoute: typeof ApiPublicAdminAccountsRoute
   ApiPublicAdminApplicationsRoute: typeof ApiPublicAdminApplicationsRoute
   ApiPublicAdminDenyApplicationRoute: typeof ApiPublicAdminDenyApplicationRoute
   ApiPublicAdminRemoveApplicationRoute: typeof ApiPublicAdminRemoveApplicationRoute
   ApiPublicAdminSendPaymentLinkRoute: typeof ApiPublicAdminSendPaymentLinkRoute
+  ApiPublicAdminSetRoleRoute: typeof ApiPublicAdminSetRoleRoute
   ApiPublicCheckoutCreateRoute: typeof ApiPublicCheckoutCreateRoute
   ApiPublicCheckoutExtensionRoute: typeof ApiPublicCheckoutExtensionRoute
   ApiPublicCheckoutTestRoute: typeof ApiPublicCheckoutTestRoute
@@ -652,6 +678,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCheckoutCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin/set-role': {
+      id: '/api/public/admin/set-role'
+      path: '/api/public/admin/set-role'
+      fullPath: '/api/public/admin/set-role'
+      preLoaderRoute: typeof ApiPublicAdminSetRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/admin/send-payment-link': {
       id: '/api/public/admin/send-payment-link'
       path: '/api/public/admin/send-payment-link'
@@ -680,6 +713,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAdminApplicationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin/accounts': {
+      id: '/api/public/admin/accounts'
+      path: '/api/public/admin/accounts'
+      fullPath: '/api/public/admin/accounts'
+      preLoaderRoute: typeof ApiPublicAdminAccountsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -706,10 +746,12 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturesRiskRoute: FeaturesRiskRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicSubmitApplicationRoute: ApiPublicSubmitApplicationRoute,
+  ApiPublicAdminAccountsRoute: ApiPublicAdminAccountsRoute,
   ApiPublicAdminApplicationsRoute: ApiPublicAdminApplicationsRoute,
   ApiPublicAdminDenyApplicationRoute: ApiPublicAdminDenyApplicationRoute,
   ApiPublicAdminRemoveApplicationRoute: ApiPublicAdminRemoveApplicationRoute,
   ApiPublicAdminSendPaymentLinkRoute: ApiPublicAdminSendPaymentLinkRoute,
+  ApiPublicAdminSetRoleRoute: ApiPublicAdminSetRoleRoute,
   ApiPublicCheckoutCreateRoute: ApiPublicCheckoutCreateRoute,
   ApiPublicCheckoutExtensionRoute: ApiPublicCheckoutExtensionRoute,
   ApiPublicCheckoutTestRoute: ApiPublicCheckoutTestRoute,

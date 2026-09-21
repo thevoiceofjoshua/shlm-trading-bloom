@@ -4,12 +4,17 @@ import { useEffect, useState } from "react";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 import { HomeButton } from "@/components/HomeButton";
 import { VaultCredentialFrame, VaultField } from "@/components/VaultCredentialFrame";
+import { useAuthUser } from "@/hooks/use-auth-user";
 import {
   fetchApplications,
   sendPaymentLinkRequest,
   denyApplicationRequest,
   removeApplicationRequest,
+  fetchAccounts,
+  setUserRoleRequest,
   type AdminApplication,
+  type AdminAccount,
+  type ManagedRole,
 } from "@/lib/admin-client";
 import { SITE_TIMEZONE, SITE_TIMEZONE_LABEL } from "@/lib/time";
 
@@ -482,7 +487,178 @@ function AdminPage() {
             )}
           </div>
         )}
+
+        {passcode && <ManageRoles passcode={passcode} />}
       </div>
     </div>
+  );
+}
+
+const ROLE_OPTIONS: { value: ManagedRole; label: string }[] = [
+  { value: "member", label: "Member" },
+  { value: "free_member", label: "Free member (lifetime)" },
+  { value: "shlm_mod", label: "SHLM MOD" },
+  { value: "admin", label: "Founder (admin)" },
+];
+
+const roleLabel = (role: ManagedRole) =>
+  ROLE_OPTIONS.find((o) => o.value === role)?.label ?? role;
+
+function ManageRoles({ passcode }: { passcode: string }) {
+  const queryClient = useQueryClient();
+  const { user } = useAuthUser();
+  const [drafts, setDrafts] = useState<Record<string, ManagedRole>>({});
+  const [pending, setPending] = useState<{ account: AdminAccount; next: ManagedRole } | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<{ id: string; ok: boolean; text: string } | null>(null);
+
+  const { data: accounts, isLoading, error, refetch } = useQuery({
+    queryKey: ["admin-accounts", passcode],
+    queryFn: () => fetchAccounts(passcode),
+    retry: false,
+  });
+
+  const apply = async () => {
+    if (!pending) return;
+    setSaving(true);
+    setMsg(null);
+    try {
+      await setUserRoleRequest(passcode, pending.account.id, pending.next);
+      setMsg({ id: pending.account.id, ok: true, text: `Updated to ${roleLabel(pending.next)}.` });
+      setDrafts((d) => {
+        const next = { ...d };
+        delete next[pending.account.id];
+        return next;
+      });
+      setPending(null);
+      await queryClient.invalidateQueries({ queryKey: ["admin-accounts", passcode] });
+    } catch (e) {
+      setMsg({
+        id: pending.account.id,
+        ok: false,
+        text: e instanceof Error ? e.message : "Could not update role.",
+      });
+      setPending(null);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <section className="mt-12">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+        <h2 className="min-w-0 font-display text-xl font-medium">Manage roles</h2>
+        <button
+          onClick={() => refetch()}
+          disabled={isLoading}
+          className="shrink-0 text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
+        >
+          {isLoading ? "Refreshing…" : "Refresh"}
+        </button>
+      </div>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Every signed-up account. Changes take effect immediately.
+      </p>
+
+      {isLoading && <p className="mt-4 text-sm text-muted-foreground">Loading accounts…</p>}
+      {error && (
+        <p className="mt-4 text-sm text-destructive">
+          {error instanceof Error ? error.message : "Failed to load accounts"}
+        </p>
+      )}
+
+      {accounts && accounts.length > 0 && (
+        <ul className="mt-4 divide-y divide-border overflow-hidden rounded-2xl border border-border bg-card">
+          {accounts.map((acc) => {
+            const isSelf = user?.id === acc.id;
+            const draft = drafts[acc.id] ?? acc.role;
+            const changed = draft !== acc.role;
+            return (
+              <li key={acc.id} className="grid min-w-0 gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                <div className="min-w-0">
+                  <p className="min-w-0 break-words text-sm font-medium text-foreground">
+                    {acc.email ?? "No email"}
+                  </p>
+                  <p className="mt-0.5 break-words text-xs text-muted-foreground">
+                    {acc.name ? `${acc.name} · ` : ""}
+                    {roleLabel(acc.role)} · Joined{" "}
+                    {new Date(acc.created_at).toLocaleDateString("en-US", { timeZone: SITE_TIMEZONE })}
+                  </p>
+                  {msg?.id === acc.id && (
+                    <p className={`mt-1 text-xs ${msg.ok ? "text-foreground" : "text-destructive"}`}>
+                      {msg.text}
+                    </p>
+                  )}
+                  {isSelf && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      This is your own account — its role is locked.
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex min-w-0 flex-wrap items-center gap-2 sm:shrink-0">
+                  <select
+                    value={draft}
+                    disabled={isSelf}
+                    onChange={(e) =>
+                      setDrafts((d) => ({ ...d, [acc.id]: e.target.value as ManagedRole }))
+                    }
+                    aria-label={`Role for ${acc.email ?? acc.id}`}
+                    className="min-h-11 min-w-0 rounded-full border border-input bg-background px-4 text-sm text-foreground disabled:opacity-50"
+                  >
+                    {ROLE_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => setPending({ account: acc, next: draft })}
+                    disabled={!changed || isSelf}
+                    className="min-h-11 shrink-0 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-40"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {accounts && accounts.length === 0 && (
+        <p className="mt-4 text-sm text-muted-foreground">No accounts yet.</p>
+      )}
+
+      {pending && (
+        <div className="fixed inset-0 z-[300] flex min-h-dvh items-start justify-center overflow-y-auto bg-background/90 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:items-center sm:p-4">
+          <VaultCredentialFrame className="my-auto w-full max-w-md" label="SHLM // role change" status="locked">
+            <p className="mt-4 font-sans text-sm text-[var(--vault-ink)]">
+              Change <span className="font-medium">{pending.account.email ?? pending.account.id}</span> from{" "}
+              {roleLabel(pending.account.role)} to {roleLabel(pending.next)}?
+            </p>
+            <p className="mt-2 font-sans text-xs text-[var(--vault-muted)]">
+              This is a privileged change and takes effect immediately.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <button
+                onClick={apply}
+                disabled={saving}
+                className="min-h-11 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground disabled:opacity-50"
+              >
+                {saving ? "Applying…" : "Confirm change"}
+              </button>
+              <button
+                onClick={() => setPending(null)}
+                disabled={saving}
+                className="min-h-11 rounded-full border border-border px-5 text-sm font-medium text-foreground disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </VaultCredentialFrame>
+        </div>
+      )}
+    </section>
   );
 }
