@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { useServerFn } from "@tanstack/react-start";
@@ -1109,13 +1109,7 @@ function TradovateImport({
     onError: (e) => setMessage(e instanceof Error ? e.message : "Could not reach Tradovate."),
   });
 
-  if (!conns || conns.length === 0) {
-    return (
-      <p className="mt-2 text-xs text-muted-foreground">
-        Connect Tradovate in your dashboard settings to auto-fill these trades from your real fills.
-      </p>
-    );
-  }
+  if (!conns || conns.length === 0) return null;
 
   return (
     <div className="mt-2 min-w-0">
@@ -1144,6 +1138,103 @@ function TradovateImport({
         </button>
       </div>
       {message && <p className="mt-2 text-xs text-muted-foreground">{message}</p>}
+    </div>
+  );
+}
+
+function CsvImport({
+  onImport,
+}: {
+  onImport: (
+    trades: { instrument: string; direction: string; result: string; pnl: string; note: string }[],
+  ) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [label, setLabel] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = async (file: File | null | undefined) => {
+    setMessage(null);
+    setError(null);
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const { parseTradovateOrdersCsv } = await import("@/lib/tradovate-csv");
+      const res = parseTradovateOrdersCsv(text);
+      if (res.error) {
+        setError(res.error);
+        return;
+      }
+      if (res.trades.length === 0) {
+        setError("No completed round-trip trades found in this file.");
+        return;
+      }
+      const account = label.trim() || "CSV import";
+      onImport(
+        res.trades.map((t) => ({
+          instrument: t.instrument,
+          direction: t.direction,
+          result: t.result,
+          pnl: t.pnl,
+          note: `${account} · ${t.qty} @ ${t.entryPrice} → ${t.exitPrice} · ${new Date(
+            t.entryTime,
+          ).toLocaleTimeString()}`,
+        })),
+      );
+      const notes: string[] = [];
+      if (res.skipped > 0) notes.push(`${res.skipped} row${res.skipped === 1 ? "" : "s"} skipped (not filled or unreadable)`);
+      if (res.openPositions > 0)
+        notes.push(`${res.openPositions} position${res.openPositions === 1 ? "" : "s"} still open (no closing order)`);
+      if (res.unknownSymbols.length > 0)
+        notes.push(`P&L for ${res.unknownSymbols.join(", ")} uses 1 point = $1 — check those amounts`);
+      setMessage(
+        `Added ${res.trades.length} trade${res.trades.length === 1 ? "" : "s"} — review before saving.${
+          notes.length > 0 ? ` ${notes.join(". ")}.` : ""
+        }`,
+      );
+    } catch {
+      setError("Could not read that file. Export the Orders tab as CSV and try again.");
+    } finally {
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="mt-2 min-w-0">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="min-h-9 rounded-full border border-border px-4 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+      >
+        {open ? "Hide CSV import" : "⇪ Import CSV"}
+      </button>
+      {open && (
+        <div className="mt-2 min-w-0 rounded-xl border border-border bg-background/60 p-3">
+          <p className="text-xs text-muted-foreground">
+            For prop firm accounts that can't connect live — export your Orders tab from Tradovate as CSV.
+          </p>
+          <label className="mt-2 block text-xs font-medium text-muted-foreground">
+            Account label (optional)
+            <input
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              placeholder="Apex 50K #2"
+              className="mt-1 w-full min-w-0 rounded-lg border border-border bg-background px-3 py-2 text-base text-foreground sm:text-sm"
+            />
+          </label>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".csv,text/csv,text/plain"
+            onChange={(e) => void handleFile(e.target.files?.[0])}
+            className="mt-2 block w-full min-w-0 text-xs text-muted-foreground file:mr-3 file:min-h-9 file:rounded-full file:border file:border-foreground file:bg-primary file:px-4 file:text-xs file:font-medium file:text-primary-foreground"
+          />
+          {error && <p className="mt-2 text-xs font-medium text-foreground">{error}</p>}
+          {message && !error && <p className="mt-2 text-xs text-muted-foreground">{message}</p>}
+        </div>
+      )}
     </div>
   );
 }
@@ -1209,6 +1300,15 @@ function TradesEditor({
         session={entry.session}
         onImport={(imported) => {
           const next = imported.map((t) => ({ ...newTrade(), ...t }));
+          onChange({ trades: next, tradeCount: String(next.length) });
+          setSectionCollapsed(false);
+          setCollapsedIds(new Set());
+        }}
+      />
+      <CsvImport
+        onImport={(imported) => {
+          const added = imported.map((t) => ({ ...newTrade(), ...t }));
+          const next = [...trades, ...added];
           onChange({ trades: next, tradeCount: String(next.length) });
           setSectionCollapsed(false);
           setCollapsedIds(new Set());
