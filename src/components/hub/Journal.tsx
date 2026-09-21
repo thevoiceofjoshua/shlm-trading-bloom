@@ -1070,12 +1070,15 @@ function TradovateImport({
   session: string;
   onImport: (trades: { instrument: string; direction: string; result: string; pnl: string; note: string }[]) => void;
 }) {
-  const status = useServerFn(getTradovateStatus);
+  const listConnections = useServerFn(listTradovateConnections);
   const pull = useServerFn(importTradovateFills);
   const [message, setMessage] = useState<string | null>(null);
   const [whole, setWhole] = useState(false);
 
-  const { data: conn } = useQuery({ queryKey: ["tradovate-status"], queryFn: () => status() });
+  const { data: conns } = useQuery({
+    queryKey: ["tradovate-connections"],
+    queryFn: () => listConnections(),
+  });
 
   const run = useMutation({
     mutationFn: async (wholeDay: boolean) => {
@@ -1088,21 +1091,25 @@ function TradovateImport({
         setMessage(res.message ?? "No fills found for this window.");
         return;
       }
-      setMessage(`Pulled ${res.trades.length} trade${res.trades.length === 1 ? "" : "s"} — review before saving.`);
+      setMessage(
+        `Pulled ${res.trades.length} trade${res.trades.length === 1 ? "" : "s"} across your accounts — review before saving.${
+          res.message ? ` ${res.message}` : ""
+        }`,
+      );
       onImport(
         res.trades.map((t) => ({
           instrument: t.instrument,
           direction: t.direction,
           result: t.result,
           pnl: t.pnl,
-          note: `${t.qty} @ ${t.entryPrice} → ${t.exitPrice} · ${new Date(t.entryTime).toLocaleTimeString()}`,
+          note: `${t.account} · ${t.qty} @ ${t.entryPrice} → ${t.exitPrice} · ${new Date(t.entryTime).toLocaleTimeString()}`,
         })),
       );
     },
     onError: (e) => setMessage(e instanceof Error ? e.message : "Could not reach Tradovate."),
   });
 
-  if (!conn?.connected) {
+  if (!conns || conns.length === 0) {
     return (
       <p className="mt-2 text-xs text-muted-foreground">
         Connect Tradovate in your dashboard settings to auto-fill these trades from your real fills.
