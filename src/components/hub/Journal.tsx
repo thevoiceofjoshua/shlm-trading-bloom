@@ -1152,6 +1152,7 @@ function CsvImport({
   const [label, setLabel] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (file: File | null | undefined) => {
@@ -1219,6 +1220,14 @@ function CsvImport({
         >
           Sync
         </button>
+        <a
+          href="https://trader.tradovate.com"
+          target="_blank"
+          rel="noreferrer noopener"
+          className="inline-flex min-h-9 shrink-0 items-center rounded-full border border-foreground px-4 text-xs font-medium text-foreground hover:bg-accent"
+        >
+          Open Tradovate ↗
+        </a>
         <input
           ref={fileRef}
           type="file"
@@ -1226,6 +1235,34 @@ function CsvImport({
           onChange={(e) => void handleFile(e.target.files?.[0])}
           className="hidden"
         />
+      </div>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => fileRef.current?.click()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            fileRef.current?.click();
+          }
+        }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragging(false);
+          void handleFile(e.dataTransfer.files?.[0]);
+        }}
+        className={`mt-2 min-w-0 cursor-pointer rounded-xl border border-dashed px-3 py-4 text-center text-xs transition-colors ${
+          dragging
+            ? "border-foreground bg-accent text-foreground"
+            : "border-border text-muted-foreground hover:bg-accent/50"
+        }`}
+      >
+        {dragging ? "Drop your CSV to import" : "Drag & drop your Tradovate Orders CSV here, or tap to browse"}
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
         For prop firm accounts that can&apos;t connect live — export your Orders tab from Tradovate as CSV.
