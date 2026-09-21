@@ -311,6 +311,93 @@ export type Database = {
         }
         Relationships: []
       }
+      tradovate_connections: {
+        Row: {
+          access_token_cipher: string | null
+          access_token_iv: string | null
+          account_id: number | null
+          account_name: string | null
+          created_at: string
+          credentials_cipher: string
+          credentials_iv: string
+          environment: string
+          id: string
+          last_used_at: string | null
+          token_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token_cipher?: string | null
+          access_token_iv?: string | null
+          account_id?: number | null
+          account_name?: string | null
+          created_at?: string
+          credentials_cipher: string
+          credentials_iv: string
+          environment?: string
+          id?: string
+          last_used_at?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token_cipher?: string | null
+          access_token_iv?: string | null
+          account_id?: number | null
+          account_name?: string | null
+          created_at?: string
+          credentials_cipher?: string
+          credentials_iv?: string
+          environment?: string
+          id?: string
+          last_used_at?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_passkeys: {
+        Row: {
+          counter: number
+          created_at: string
+          credential_id: string
+          device_label: string
+          id: string
+          last_used_at: string | null
+          public_key: string
+          transports: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          counter?: number
+          created_at?: string
+          credential_id: string
+          device_label?: string
+          id?: string
+          last_used_at?: string | null
+          public_key: string
+          transports?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          counter?: number
+          created_at?: string
+          credential_id?: string
+          device_label?: string
+          id?: string
+          last_used_at?: string | null
+          public_key?: string
+          transports?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -329,6 +416,33 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      webauthn_challenges: {
+        Row: {
+          challenge: string
+          created_at: string
+          expires_at: string
+          id: string
+          kind: string
+          user_id: string | null
+        }
+        Insert: {
+          challenge: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          kind: string
+          user_id?: string | null
+        }
+        Update: {
+          challenge?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          kind?: string
+          user_id?: string | null
         }
         Relationships: []
       }
