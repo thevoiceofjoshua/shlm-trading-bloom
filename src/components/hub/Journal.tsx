@@ -16,6 +16,8 @@ import {
 } from "@/lib/hub.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { JournalVaultGate } from "@/components/hub/JournalVaultGate";
+import { importTradovateFills } from "@/lib/tradovate.functions";
+import { getTradovateStatus } from "@/lib/tradovate.functions";
 
 /* ------------------------------ date helpers ------------------------------- */
 
@@ -657,6 +659,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                 </div>
 
                 <TradesEditor
+                  noteDate={selected}
                   entry={editing.entry}
                   onChange={(patch) => {
                     setEditing((prev) => (prev ? { ...prev, entry: { ...prev.entry, ...patch } } : prev));
@@ -1036,7 +1039,117 @@ function TextField({
 
 /* -------------------------------- trades ---------------------------------- */
 
-function TradesEditor({ entry, onChange }: { entry: Entry; onChange: (patch: Partial<Entry>) => void }) {
+/** Pacific-time UTC offset (e.g. "-07:00") for a given YYYY-MM-DD. */
+function pacificOffset(dateKey: string): string {
+  const probe = new Date(`${dateKey}T12:00:00Z`);
+  const name = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Los_Angeles",
+    timeZoneName: "longOffset",
+  })
+    .formatToParts(probe)
+    .find((p) => p.type === "timeZoneName")?.value;
+  const match = name?.match(/GMT([+-]\d{2}:\d{2})/);
+  return match?.[1] ?? "-08:00";
+}
+
+/** Session windows in Pacific time, used to narrow the Tradovate import. */
+function importWindow(dateKey: string, session: string, whole: boolean): { from: string; to: string } {
+  const off = pacificOffset(dateKey);
+  const at = (t: string) => new Date(`${dateKey}T${t}${off}`).toISOString();
+  if (whole) return { from: at("00:00:00"), to: at("23:59:59") };
+  if (session === "gold") return { from: at("16:00:00"), to: at("23:59:59") };
+  return { from: at("05:30:00"), to: at("10:00:00") };
+}
+
+function TradovateImport({
+  noteDate,
+  session,
+  onImport,
+}: {
+  noteDate: string;
+  session: string;
+  onImport: (trades: { instrument: string; direction: string; result: string; pnl: string; note: string }[]) => void;
+}) {
+  const status = useServerFn(getTradovateStatus);
+  const pull = useServerFn(importTradovateFills);
+  const [message, setMessage] = useState<string | null>(null);
+  const [whole, setWhole] = useState(false);
+
+  const { data: conn } = useQuery({ queryKey: ["tradovate-status"], queryFn: () => status() });
+
+  const run = useMutation({
+    mutationFn: async (wholeDay: boolean) => {
+      setMessage(null);
+      const win = importWindow(noteDate, session, wholeDay);
+      return pull({ data: win });
+    },
+    onSuccess: (res) => {
+      if (res.trades.length === 0) {
+        setMessage(res.message ?? "No fills found for this window.");
+        return;
+      }
+      setMessage(`Pulled ${res.trades.length} trade${res.trades.length === 1 ? "" : "s"} — review before saving.`);
+      onImport(
+        res.trades.map((t) => ({
+          instrument: t.instrument,
+          direction: t.direction,
+          result: t.result,
+          pnl: t.pnl,
+          note: `${t.qty} @ ${t.entryPrice} → ${t.exitPrice} · ${new Date(t.entryTime).toLocaleTimeString()}`,
+        })),
+      );
+    },
+    onError: (e) => setMessage(e instanceof Error ? e.message : "Could not reach Tradovate."),
+  });
+
+  if (!conn?.connected) {
+    return (
+      <p className="mt-2 text-xs text-muted-foreground">
+        Connect Tradovate in your dashboard settings to auto-fill these trades from your real fills.
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-2 min-w-0">
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          disabled={run.isPending}
+          onClick={() => {
+            setWhole(false);
+            run.mutate(false);
+          }}
+          className="min-h-9 rounded-full border border-foreground bg-primary px-4 text-xs font-medium text-primary-foreground disabled:opacity-60"
+        >
+          {run.isPending && !whole ? "Pulling…" : "⤓ Pull from Tradovate"}
+        </button>
+        <button
+          type="button"
+          disabled={run.isPending}
+          onClick={() => {
+            setWhole(true);
+            run.mutate(true);
+          }}
+          className="min-h-9 rounded-full border border-border px-4 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-60"
+        >
+          {run.isPending && whole ? "Pulling…" : "Whole day"}
+        </button>
+      </div>
+      {message && <p className="mt-2 text-xs text-muted-foreground">{message}</p>}
+    </div>
+  );
+}
+
+function TradesEditor({
+  entry,
+  onChange,
+  noteDate,
+}: {
+  entry: Entry;
+  onChange: (patch: Partial<Entry>) => void;
+  noteDate: string;
+}) {
   const trades = entry.trades ?? [];
   const [sectionCollapsed, setSectionCollapsed] = useState(false);
   const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
@@ -1084,6 +1197,16 @@ function TradesEditor({ entry, onChange }: { entry: Entry; onChange: (patch: Par
       <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
         📊 How many trades did you take this session?
       </p>
+      <TradovateImport
+        noteDate={noteDate}
+        session={entry.session}
+        onImport={(imported) => {
+          const next = imported.map((t) => ({ ...newTrade(), ...t }));
+          onChange({ trades: next, tradeCount: String(next.length) });
+          setSectionCollapsed(false);
+          setCollapsedIds(new Set());
+        }}
+      />
       <div className="mt-2 flex flex-wrap items-center gap-2">
         {[0, 1, 2, 3, 4, 5, 6].map((n) => {
           const active = entry.tradeCount === String(n);
