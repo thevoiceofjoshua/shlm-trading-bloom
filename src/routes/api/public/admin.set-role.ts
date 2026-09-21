@@ -5,7 +5,7 @@ import { adminPreflight, runAdminAction } from "@/lib/admin-api";
 const schema = z.object({
   passcode: z.string().min(1),
   userId: z.string().uuid(),
-  role: z.enum(["admin", "shlm_mod", "free_member", "member"]),
+  role: z.enum(["admin", "shlm_mod", "free_member", "member", "revoked"]),
 });
 
 export const Route = createFileRoute("/api/public/admin/set-role")({

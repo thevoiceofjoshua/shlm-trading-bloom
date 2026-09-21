@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 import { HomeButton } from "@/components/HomeButton";
 import { VaultCredentialFrame, VaultField } from "@/components/VaultCredentialFrame";
@@ -495,11 +495,16 @@ function AdminPage() {
 }
 
 const ROLE_OPTIONS: { value: ManagedRole; label: string }[] = [
-  { value: "member", label: "Member" },
+  { value: "member", label: "Member (no special role)" },
   { value: "free_member", label: "Free member (lifetime)" },
   { value: "shlm_mod", label: "SHLM MOD" },
   { value: "admin", label: "Founder (admin)" },
+  { value: "revoked", label: "No access (revoked)" },
 ];
+
+// Guard against a tap that "passes through" from a just-closed native select
+// or a just-opened dialog and lands on the next button.
+const TAP_GUARD_MS = 700;
 
 const roleLabel = (role: ManagedRole) =>
   ROLE_OPTIONS.find((o) => o.value === role)?.label ?? role;
@@ -511,6 +516,17 @@ function ManageRoles({ passcode }: { passcode: string }) {
   const [pending, setPending] = useState<{ account: AdminAccount; next: ManagedRole } | null>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ id: string; ok: boolean; text: string } | null>(null);
+  const selectTouchedAt = useRef(0);
+  const pendingOpenedAt = useRef(0);
+  const [confirmReady, setConfirmReady] = useState(false);
+
+  const openConfirm = (account: AdminAccount, next: ManagedRole) => {
+    if (Date.now() - selectTouchedAt.current < TAP_GUARD_MS) return;
+    pendingOpenedAt.current = Date.now();
+    setConfirmReady(false);
+    setPending({ account, next });
+    window.setTimeout(() => setConfirmReady(true), TAP_GUARD_MS);
+  };
 
   const { data: accounts, isLoading, error, refetch } = useQuery({
     queryKey: ["admin-accounts", passcode],
@@ -520,6 +536,7 @@ function ManageRoles({ passcode }: { passcode: string }) {
 
   const apply = async () => {
     if (!pending) return;
+    if (!confirmReady || Date.now() - pendingOpenedAt.current < TAP_GUARD_MS) return;
     setSaving(true);
     setMsg(null);
     try {
@@ -596,15 +613,16 @@ function ManageRoles({ passcode }: { passcode: string }) {
                   )}
                 </div>
 
-                <div className="flex min-w-0 flex-wrap items-center gap-2 sm:shrink-0">
+                <div className="grid min-w-0 gap-2 sm:shrink-0 sm:grid-cols-[auto_auto] sm:items-center">
                   <select
                     value={draft}
                     disabled={isSelf}
-                    onChange={(e) =>
-                      setDrafts((d) => ({ ...d, [acc.id]: e.target.value as ManagedRole }))
-                    }
+                    onChange={(e) => {
+                      selectTouchedAt.current = Date.now();
+                      setDrafts((d) => ({ ...d, [acc.id]: e.target.value as ManagedRole }));
+                    }}
                     aria-label={`Role for ${acc.email ?? acc.id}`}
-                    className="min-h-11 min-w-0 rounded-full border border-input bg-background px-4 text-sm text-foreground disabled:opacity-50"
+                    className="min-h-11 w-full min-w-0 rounded-full border border-input bg-background px-4 text-sm text-foreground disabled:opacity-50 sm:w-auto"
                   >
                     {ROLE_OPTIONS.map((o) => (
                       <option key={o.value} value={o.value}>
@@ -613,9 +631,9 @@ function ManageRoles({ passcode }: { passcode: string }) {
                     ))}
                   </select>
                   <button
-                    onClick={() => setPending({ account: acc, next: draft })}
+                    onClick={() => openConfirm(acc, draft)}
                     disabled={!changed || isSelf}
-                    className="min-h-11 shrink-0 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-40"
+                    className="min-h-11 w-full shrink-0 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-40 sm:w-auto"
                   >
                     Apply
                   </button>
@@ -638,15 +656,19 @@ function ManageRoles({ passcode }: { passcode: string }) {
               {roleLabel(pending.account.role)} to {roleLabel(pending.next)}?
             </p>
             <p className="mt-2 font-sans text-xs text-[var(--vault-muted)]">
-              This is a privileged change and takes effect immediately.
+              {pending.next === "revoked"
+                ? "This blocks the account from signing in and removes all member access. Their data is kept."
+                : pending.next === "member"
+                  ? "This removes any Founder, SHLM MOD or Free member status. Sign-in stays enabled."
+                  : "This is a privileged change and takes effect immediately."}
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               <button
                 onClick={apply}
-                disabled={saving}
+                disabled={saving || !confirmReady}
                 className="min-h-11 rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground disabled:opacity-50"
               >
-                {saving ? "Applying…" : "Confirm change"}
+                {saving ? "Applying…" : confirmReady ? "Confirm change" : "Please wait…"}
               </button>
               <button
                 onClick={() => setPending(null)}

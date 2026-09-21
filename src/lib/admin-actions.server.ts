@@ -120,7 +120,7 @@ export async function removeApplicationImpl(applicationId: string) {
 // Account role management (Founder only — verifyPasscode rejects SHLM MOD).
 // ---------------------------------------------------------------------------
 
-export type ManagedRole = "admin" | "shlm_mod" | "free_member" | "member";
+export type ManagedRole = "admin" | "shlm_mod" | "free_member" | "member" | "revoked";
 
 export type AdminAccountRow = {
   id: string;
@@ -133,7 +133,13 @@ export type AdminAccountRow = {
 export async function listAccountsImpl(): Promise<AdminAccountRow[]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  const users: { id: string; email?: string | null; created_at: string; user_metadata?: Record<string, unknown> | null }[] = [];
+  const users: {
+    id: string;
+    email?: string | null;
+    created_at: string;
+    banned_until?: string | null;
+    user_metadata?: Record<string, unknown> | null;
+  }[] = [];
   for (let page = 1; page <= 20; page++) {
     const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 200 });
     if (error) throw new Error(error.message);
@@ -165,12 +171,13 @@ export async function listAccountsImpl(): Promise<AdminAccountRow[]> {
         (typeof meta["full_name"] === "string" && (meta["full_name"] as string)) ||
         (typeof meta["name"] === "string" && (meta["name"] as string)) ||
         null;
+      const banned = !!u.banned_until && new Date(u.banned_until).getTime() > Date.now();
       return {
         id: u.id,
         email: u.email ?? null,
         name,
         created_at: u.created_at,
-        role: roleByUser.get(u.id) ?? ("member" as ManagedRole),
+        role: banned ? ("revoked" as ManagedRole) : roleByUser.get(u.id) ?? ("member" as ManagedRole),
       };
     })
     .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
@@ -195,12 +202,18 @@ export async function setUserRoleImpl(userId: string, role: ManagedRole) {
   const { error: deleteError } = await supabaseAdmin.from("user_roles").delete().eq("user_id", userId);
   if (deleteError) throw new Error(deleteError.message);
 
-  if (role !== "member") {
+  if (role !== "member" && role !== "revoked") {
     const { error: insertError } = await supabaseAdmin
       .from("user_roles")
       .insert({ user_id: userId, role });
     if (insertError) throw new Error(insertError.message);
   }
+
+  // "revoked" blocks sign-in entirely; any other role restores access.
+  const { error: banError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+    ban_duration: role === "revoked" ? "876000h" : "none",
+  } as { ban_duration: string });
+  if (banError) throw new Error(banError.message);
 
   return { updated: true, role };
 }
