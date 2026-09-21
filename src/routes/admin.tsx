@@ -516,6 +516,17 @@ function ManageRoles({ passcode }: { passcode: string }) {
   const [pending, setPending] = useState<{ account: AdminAccount; next: ManagedRole } | null>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ id: string; ok: boolean; text: string } | null>(null);
+  const selectTouchedAt = useRef(0);
+  const pendingOpenedAt = useRef(0);
+  const [confirmReady, setConfirmReady] = useState(false);
+
+  const openConfirm = (account: AdminAccount, next: ManagedRole) => {
+    if (Date.now() - selectTouchedAt.current < TAP_GUARD_MS) return;
+    pendingOpenedAt.current = Date.now();
+    setConfirmReady(false);
+    setPending({ account, next });
+    window.setTimeout(() => setConfirmReady(true), TAP_GUARD_MS);
+  };
 
   const { data: accounts, isLoading, error, refetch } = useQuery({
     queryKey: ["admin-accounts", passcode],
