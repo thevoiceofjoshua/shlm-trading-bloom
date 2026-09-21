@@ -5,6 +5,7 @@ import { HomeButton } from "@/components/HomeButton";
 import { Button } from "@/components/ui/button";
 import { VaultCredentialFrame, VaultDivider, VaultField } from "@/components/VaultCredentialFrame";
 import { supabase } from "@/integrations/supabase/client";
+import { PasskeySignIn } from "@/components/PasskeySignIn";
 
 const searchSchema = z.object({
   mode: z.enum(["signin", "signup"]).optional(),
@@ -147,6 +148,13 @@ function AuthPage() {
             <GoogleIcon />
             Continue with Google
           </Button>
+
+          {!isSignup && (
+            <PasskeySignIn
+              className="mt-3"
+              onSignedIn={() => navigate({ to: redirect ?? "/", replace: true })}
+            />
+          )}
 
           <div className="my-6"><VaultDivider /></div>
 
