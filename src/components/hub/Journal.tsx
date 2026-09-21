@@ -1208,7 +1208,7 @@ function CsvImport({
         onClick={() => setOpen((o) => !o)}
         className="min-h-9 rounded-full border border-border px-4 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
       >
-        {open ? "Hide CSV import" : "⇪ Import CSV"}
+        {open ? "Hide Sync" : "Sync"}
       </button>
       {open && (
         <div className="mt-2 min-w-0 rounded-xl border border-border bg-background/60 p-3">
