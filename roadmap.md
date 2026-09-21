@@ -62,5 +62,5 @@
 - [x] Encrypted server-only Tradovate credential storage with automatic token renewal
 - [x] Connect/disconnect panel on the dashboard (status only, credentials never returned)
 - [x] "Pull from Tradovate" in the journal entry form (session window or whole day, editable before save)
-- [x] Face ID / fingerprint sign-in on /auth plus device registration and removal in settings
+- [ ] Face ID / fingerprint sign-in — removed: the WebAuthn library crashed the live server on every page; needs a Cloudflare-compatible rebuild
 - [ ] Live end-to-end check with real Tradovate credentials and a signed-in device (needs your account)
