@@ -408,9 +408,7 @@ function MarketHubTeaser() {
             SHLM Centre
           </h2>
           <p className="mt-3 text-sm text-muted-foreground">
-            Your live trading command center — NASDAQ & US30 watchlists, Mag 7 and Dow 30
-            drivers, a Gold desk, the US economic calendar, and an AI session analyst that flags
-            the zero-volume and highest-volume opens each day.
+            Your live trading command center — watchlists, drivers, calendar, and AI session analyst.
           </p>
         </div>
         <Link
