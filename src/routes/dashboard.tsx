@@ -5,7 +5,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { displayFirstName } from "@/lib/display-name";
 import { HomeButton } from "@/components/HomeButton";
 import { TradovateConnect } from "@/components/TradovateConnect";
-import { PasskeyDevices } from "@/components/PasskeyDevices";
 import { AdminPreviewTag } from "@/components/AdminBar";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 import { supabase } from "@/integrations/supabase/client";
@@ -110,7 +109,6 @@ function DashboardPage() {
             </h2>
             <div className="mt-6 grid gap-6">
               <TradovateConnect />
-              <PasskeyDevices />
             </div>
           </>
         )}
