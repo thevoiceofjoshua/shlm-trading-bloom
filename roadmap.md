@@ -64,4 +64,5 @@
 - [x] "Pull from Tradovate" in the journal entry form (session window or whole day, editable before save)
 - [ ] Face ID / fingerprint sign-in — removed: the WebAuthn library crashed the live server on every page; needs a Cloudflare-compatible rebuild
 - [x] Multiple Tradovate accounts per member (add/remove each, combined fills and totals)
+- [x] CSV import of Tradovate orders exports (prop firm accounts, optional account label, no live connection needed)
 - [ ] Live end-to-end check with real Tradovate credentials and a signed-in device (needs your account)
