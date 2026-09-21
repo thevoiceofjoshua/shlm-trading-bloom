@@ -101,9 +101,22 @@ function DashboardPage() {
 
         <MembershipPanel demo={demo === "expired" ? "expired" : undefined} />
 
+        {!demo && (
+          <>
+            <h2 className="mt-12 font-display text-xl font-medium tracking-tight text-foreground">
+              Account settings
+            </h2>
+            <div className="mt-6 grid gap-6">
+              <TradovateConnect />
+              <PasskeyDevices />
+            </div>
+          </>
+        )}
+
         <h2 className="mt-12 font-display text-xl font-medium tracking-tight text-foreground">
           Your member modules
         </h2>
+
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <DashboardCard title="Curriculum" description="Access your breakout strategy lessons and weekly modules." />
           <DashboardCard title="Mentorship Calls" description="Book and review your live sessions with mentors." />
