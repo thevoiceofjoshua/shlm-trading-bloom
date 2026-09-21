@@ -495,11 +495,16 @@ function AdminPage() {
 }
 
 const ROLE_OPTIONS: { value: ManagedRole; label: string }[] = [
-  { value: "member", label: "Member" },
+  { value: "member", label: "Member (no special role)" },
   { value: "free_member", label: "Free member (lifetime)" },
   { value: "shlm_mod", label: "SHLM MOD" },
   { value: "admin", label: "Founder (admin)" },
+  { value: "revoked", label: "No access (revoked)" },
 ];
+
+// Guard against a tap that "passes through" from a just-closed native select
+// or a just-opened dialog and lands on the next button.
+const TAP_GUARD_MS = 700;
 
 const roleLabel = (role: ManagedRole) =>
   ROLE_OPTIONS.find((o) => o.value === role)?.label ?? role;
