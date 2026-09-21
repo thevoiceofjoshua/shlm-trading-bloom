@@ -133,7 +133,13 @@ export type AdminAccountRow = {
 export async function listAccountsImpl(): Promise<AdminAccountRow[]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  const users: { id: string; email?: string | null; created_at: string; user_metadata?: Record<string, unknown> | null }[] = [];
+  const users: {
+    id: string;
+    email?: string | null;
+    created_at: string;
+    banned_until?: string | null;
+    user_metadata?: Record<string, unknown> | null;
+  }[] = [];
   for (let page = 1; page <= 20; page++) {
     const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 200 });
     if (error) throw new Error(error.message);
