@@ -2,9 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export interface TradovateStatus {
-  connected: boolean;
-  environment: "demo" | "live" | null;
+export interface TradovateConnection {
+  id: string;
+  label: string;
+  environment: "demo" | "live";
   accountName: string | null;
   lastUsedAt: string | null;
 }
@@ -20,12 +21,14 @@ export interface ImportResult {
     exitPrice: number;
     entryTime: string;
     exitTime: string;
+    account: string;
   }[];
   message?: string;
 }
 
 const connectSchema = z.object({
   environment: z.enum(["demo", "live"]),
+  label: z.string().trim().max(60).optional(),
   username: z.string().trim().min(1),
   password: z.string().min(1),
   appId: z.string().trim().default("SHLM Journal"),
@@ -35,29 +38,41 @@ const connectSchema = z.object({
   deviceId: z.string().trim().optional(),
 });
 
-export const getTradovateStatus = createServerFn({ method: "POST" })
+function connectionLabel(row: {
+  label?: string | null;
+  account_name?: string | null;
+  environment?: string | null;
+}): string {
+  return (
+    row.label?.trim() ||
+    row.account_name?.trim() ||
+    `Tradovate ${row.environment === "demo" ? "demo" : "live"}`
+  );
+}
+
+export const listTradovateConnections = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<TradovateStatus> => {
+  .handler(async ({ context }): Promise<TradovateConnection[]> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin
       .from("tradovate_connections")
-      .select("environment, account_name, last_used_at")
+      .select("id, label, environment, account_name, last_used_at")
       .eq("user_id", context.userId)
-      .maybeSingle();
+      .order("created_at", { ascending: true });
 
-    if (!data) return { connected: false, environment: null, accountName: null, lastUsedAt: null };
-    return {
-      connected: true,
-      environment: (data.environment as "demo" | "live") ?? "live",
-      accountName: data.account_name ?? null,
-      lastUsedAt: data.last_used_at ?? null,
-    };
+    return (data ?? []).map((row) => ({
+      id: row.id,
+      label: connectionLabel(row),
+      environment: (row.environment as "demo" | "live") ?? "live",
+      accountName: row.account_name ?? null,
+      lastUsedAt: row.last_used_at ?? null,
+    }));
   });
 
 export const connectTradovate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => connectSchema.parse(input))
-  .handler(async ({ data, context }): Promise<TradovateStatus & { error?: string }> => {
+  .handler(async ({ data, context }): Promise<{ connected: boolean; error?: string }> => {
     const { encryptSecret, requestAccessToken, listAccounts, TradovateError } = await import(
       "@/lib/tradovate.server"
     );
@@ -84,7 +99,7 @@ export const connectTradovate = createServerFn({ method: "POST" })
         err instanceof TradovateError
           ? err.message
           : "Could not reach Tradovate. Try again in a moment.";
-      return { connected: false, environment: null, accountName: null, lastUsedAt: null, error: message };
+      return { connected: false, error: message };
     }
 
     let accountId: number | null = null;
@@ -101,36 +116,36 @@ export const connectTradovate = createServerFn({ method: "POST" })
     const encCreds = await encryptSecret(JSON.stringify(creds));
     const encToken = await encryptSecret(token);
 
-    const { error } = await supabaseAdmin.from("tradovate_connections").upsert(
-      {
-        user_id: context.userId,
-        environment: data.environment,
-        account_id: accountId,
-        account_name: accountName,
-        credentials_cipher: encCreds.cipher,
-        credentials_iv: encCreds.iv,
-        access_token_cipher: encToken.cipher,
-        access_token_iv: encToken.iv,
-        token_expires_at: expiresAt,
-        last_used_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id" },
-    );
+    const { error } = await supabaseAdmin.from("tradovate_connections").insert({
+      user_id: context.userId,
+      environment: data.environment,
+      label: data.label?.trim() || null,
+      account_id: accountId,
+      account_name: accountName,
+      credentials_cipher: encCreds.cipher,
+      credentials_iv: encCreds.iv,
+      access_token_cipher: encToken.cipher,
+      access_token_iv: encToken.iv,
+      token_expires_at: expiresAt,
+      last_used_at: new Date().toISOString(),
+    });
     if (error) throw new Error(error.message);
 
-    return { connected: true, environment: data.environment, accountName, lastUsedAt: new Date().toISOString() };
+    return { connected: true };
   });
 
 export const disconnectTradovate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("tradovate_connections")
       .delete()
+      .eq("id", data.id)
       .eq("user_id", context.userId);
     if (error) throw new Error(error.message);
-    return { connected: false };
+    return { removed: true };
   });
 
 const importSchema = z.object({
@@ -152,78 +167,92 @@ export const importTradovateFills = createServerFn({ method: "POST" })
       TradovateError,
     } = await import("@/lib/tradovate.server");
 
-    const { data: row } = await supabaseAdmin
+    const { data: rows } = await supabaseAdmin
       .from("tradovate_connections")
       .select("*")
       .eq("user_id", context.userId)
-      .maybeSingle();
+      .order("created_at", { ascending: true });
 
-    if (!row) {
-      return { trades: [], message: "No Tradovate account connected yet. Connect one in your settings first." };
+    if (!rows || rows.length === 0) {
+      return {
+        trades: [],
+        message: "No Tradovate account connected yet. Connect one in your settings first.",
+      };
     }
 
-    const environment = (row.environment as "demo" | "live") ?? "live";
-    const creds = JSON.parse(await decryptSecret(row.credentials_cipher, row.credentials_iv));
+    const trades: ImportResult["trades"] = [];
+    const warnings: string[] = [];
 
-    // Reuse the cached token while it is comfortably valid; otherwise renew silently.
-    const expiry = row.token_expires_at ? Date.parse(row.token_expires_at) : 0;
-    let token: string | null = null;
-    if (row.access_token_cipher && row.access_token_iv && expiry - Date.now() > 2 * 60 * 1000) {
-      token = await decryptSecret(row.access_token_cipher, row.access_token_iv);
-    }
+    for (const row of rows) {
+      const label = connectionLabel(row);
+      const environment = (row.environment as "demo" | "live") ?? "live";
 
-    try {
-      if (!token) {
-        const fresh = await requestAccessToken(environment, creds);
-        token = fresh.token;
-        const encToken = await encryptSecret(fresh.token);
-        await supabaseAdmin
-          .from("tradovate_connections")
-          .update({
-            access_token_cipher: encToken.cipher,
-            access_token_iv: encToken.iv,
-            token_expires_at: fresh.expiresAt,
-          })
-          .eq("user_id", context.userId);
-      }
+      try {
+        const creds = JSON.parse(await decryptSecret(row.credentials_cipher, row.credentials_iv));
 
-      let accountId = row.account_id ?? null;
-      if (!accountId) {
-        const accounts = await listAccounts(environment, token);
-        accountId = (accounts.find((a) => a.active) ?? accounts[0])?.id ?? null;
-        if (accountId) {
+        // Reuse the cached token while it is comfortably valid; otherwise renew silently.
+        const expiry = row.token_expires_at ? Date.parse(row.token_expires_at) : 0;
+        let token: string | null = null;
+        if (row.access_token_cipher && row.access_token_iv && expiry - Date.now() > 2 * 60 * 1000) {
+          token = await decryptSecret(row.access_token_cipher, row.access_token_iv);
+        }
+
+        if (!token) {
+          const fresh = await requestAccessToken(environment, creds);
+          token = fresh.token;
+          const encToken = await encryptSecret(fresh.token);
           await supabaseAdmin
             .from("tradovate_connections")
-            .update({ account_id: accountId })
-            .eq("user_id", context.userId);
+            .update({
+              access_token_cipher: encToken.cipher,
+              access_token_iv: encToken.iv,
+              token_expires_at: fresh.expiresAt,
+            })
+            .eq("id", row.id);
         }
-      }
 
-      if (!accountId) {
-        return {
-          trades: [],
-          message:
-            "Tradovate returned no trading accounts for these credentials. Check that the API Access add-on is active.",
-        };
-      }
+        let accountId = row.account_id ?? null;
+        if (!accountId) {
+          const accounts = await listAccounts(environment, token);
+          accountId = (accounts.find((a) => a.active) ?? accounts[0])?.id ?? null;
+          if (accountId) {
+            await supabaseAdmin
+              .from("tradovate_connections")
+              .update({ account_id: accountId })
+              .eq("id", row.id);
+          }
+        }
 
-      const trades = await fetchRoundTrips(environment, token, accountId, data.from, data.to);
-      await supabaseAdmin
-        .from("tradovate_connections")
-        .update({ last_used_at: new Date().toISOString() })
-        .eq("user_id", context.userId);
+        if (!accountId) {
+          warnings.push(`${label}: Tradovate returned no trading accounts — check the API Access add-on.`);
+          continue;
+        }
 
-      if (trades.length === 0) {
-        return {
-          trades: [],
-          message:
-            "No fills found for this window. Tradovate sometimes reports nothing for demo accounts or outside market hours — try widening to the whole day.",
-        };
+        const found = await fetchRoundTrips(environment, token, accountId, data.from, data.to);
+        for (const t of found) trades.push({ ...t, account: label });
+
+        await supabaseAdmin
+          .from("tradovate_connections")
+          .update({ last_used_at: new Date().toISOString() })
+          .eq("id", row.id);
+      } catch (err) {
+        warnings.push(
+          `${label}: ${
+            err instanceof TradovateError ? err.message : "Could not reach Tradovate for this account."
+          }`,
+        );
       }
-      return { trades };
-    } catch (err) {
-      const message =
-        err instanceof TradovateError ? err.message : "Could not reach Tradovate. Try again in a moment.";
-      return { trades: [], message };
     }
+
+    trades.sort((a, b) => Date.parse(a.entryTime) - Date.parse(b.entryTime));
+
+    if (trades.length === 0) {
+      const base =
+        warnings.length > 0
+          ? warnings.join(" ")
+          : "No fills found for this window. Tradovate sometimes reports nothing for demo accounts or outside market hours — try widening to the whole day.";
+      return { trades: [], message: base };
+    }
+
+    return { trades, message: warnings.length > 0 ? warnings.join(" ") : undefined };
   });
