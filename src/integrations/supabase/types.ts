@@ -322,6 +322,7 @@ export type Database = {
           credentials_iv: string
           environment: string
           id: string
+          label: string | null
           last_used_at: string | null
           token_expires_at: string | null
           updated_at: string
@@ -337,6 +338,7 @@ export type Database = {
           credentials_iv: string
           environment?: string
           id?: string
+          label?: string | null
           last_used_at?: string | null
           token_expires_at?: string | null
           updated_at?: string
@@ -352,6 +354,7 @@ export type Database = {
           credentials_iv?: string
           environment?: string
           id?: string
+          label?: string | null
           last_used_at?: string | null
           token_expires_at?: string | null
           updated_at?: string
