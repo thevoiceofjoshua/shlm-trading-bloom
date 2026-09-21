@@ -1109,13 +1109,7 @@ function TradovateImport({
     onError: (e) => setMessage(e instanceof Error ? e.message : "Could not reach Tradovate."),
   });
 
-  if (!conns || conns.length === 0) {
-    return (
-      <p className="mt-2 text-xs text-muted-foreground">
-        Connect Tradovate in your dashboard settings to auto-fill these trades from your real fills.
-      </p>
-    );
-  }
+  if (!conns || conns.length === 0) return null;
 
   return (
     <div className="mt-2 min-w-0">
