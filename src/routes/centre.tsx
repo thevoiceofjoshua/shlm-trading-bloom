@@ -105,17 +105,15 @@ function CentrePage() {
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
             <HomeButton />
             {user?.id && (
-              <button
-                type="button"
-                onClick={() => setJournalOpen(true)}
-                className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full bg-primary px-3.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:px-4"
-              >
-                <span className="hidden sm:inline">Open journal</span>
-                <span className="sm:hidden">Journal</span>
-              </button>
+              <CentreMenu
+                onOpenJournal={() => setJournalOpen(true)}
+                onOpenBeta={() => setBetaOpen(true)}
+                showBeta={isStaff}
+              />
             )}
             {user && <AccountMenu user={user} scrolled={true} variant="desktop" />}
           </div>
+
 
         </div>
       </header>
