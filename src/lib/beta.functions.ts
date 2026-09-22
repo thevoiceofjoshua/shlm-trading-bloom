@@ -51,14 +51,15 @@ export const submitBetaUsername = createServerFn({ method: "POST" })
       .parse(data),
   )
   .handler(async ({ data, context }) => {
-    const memberEmail =
-      typeof context.claims["email"] === "string" ? (context.claims["email"] as string) : "";
+    const claims = (context.claims ?? {}) as Record<string, unknown>;
+    const memberEmail = typeof claims["email"] === "string" ? (claims["email"] as string) : "";
     const adminEmail = process.env["ADMIN_NOTIFICATION_EMAIL"] || "joschewagner56@gmail.com";
 
     try {
       const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
-      await sendTemplateEmail("beta-username", adminEmail, {
-        idempotencyKey: `beta-username-${context.userId}-${data.username.toLowerCase()}`,
+      const result = await sendTemplateEmail("beta-username", adminEmail, {
+        // Unique per submission so a retry is never silently deduped away.
+        idempotencyKey: `beta-username-${context.userId}-${Date.now()}`,
         replyTo: memberEmail || undefined,
         templateData: {
           username: data.username,
@@ -66,9 +67,13 @@ export const submitBetaUsername = createServerFn({ method: "POST" })
           note: data.note || "",
         },
       });
+      if (!result.sent) {
+        return { ok: false as const, error: "The desk inbox is not accepting mail right now." };
+      }
       return { ok: true as const };
     } catch (err) {
       console.error("Failed to send beta username notification", err);
-      return { ok: false as const };
+      const message = err instanceof Error ? err.message : String(err);
+      return { ok: false as const, error: message };
     }
   });
