@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { submitBetaUsername, verifyBetaPassword } from "@/lib/beta.functions";
 import indicatorVideo from "@/assets/indicator-preview.mp4.asset.json";
+import indicatorVideoWebm from "@/assets/indicator-preview.webm.asset.json";
 import indicatorPoster from "@/assets/indicator-poster.jpg.asset.json";
 
 const STEPS = [
