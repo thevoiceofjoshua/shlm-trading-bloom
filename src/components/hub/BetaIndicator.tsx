@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { verifyBetaPassword } from "@/lib/beta.functions";
+import { submitBetaUsername, verifyBetaPassword } from "@/lib/beta.functions";
 import indicatorVideo from "@/assets/indicator-preview.mp4.asset.json";
 import indicatorPoster from "@/assets/indicator-poster.jpg.asset.json";
 
@@ -161,6 +161,8 @@ function Instructions() {
         ))}
       </ol>
 
+      <UsernameSubmit />
+
       <a
         href="https://www.tradingview.com/chart/"
         target="_blank"
@@ -175,5 +177,68 @@ function Instructions() {
         source outside the desk.
       </p>
     </>
+  );
+}
+
+function UsernameSubmit() {
+  const send = useServerFn(submitBetaUsername);
+  const [username, setUsername] = useState("");
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (busy || username.trim().length < 2) {
+      setStatus("Enter your TradingView username first.");
+      return;
+    }
+    setBusy(true);
+    setStatus(null);
+    try {
+      const res = await send({ data: { username: username.trim(), note: note.trim() } });
+      if (res.ok) {
+        setSent(true);
+        setStatus("Sent to the SHLM desk. You'll get access on TradingView shortly.");
+      } else {
+        setStatus("Couldn't send that right now. Try again in a moment.");
+      }
+    } catch {
+      setStatus("Couldn't send that right now. Try again in a moment.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <form onSubmit={submit} className="mt-6 grid gap-3 rounded-2xl border border-border bg-accent/20 p-4">
+      <h3 className="text-sm font-semibold">Send your TradingView username</h3>
+      <p className="text-xs text-muted-foreground">
+        Goes straight to the SHLM desk so SHLM SYSTEM can be added to your invite-only scripts.
+      </p>
+      <input
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="TradingView username"
+        autoComplete="off"
+        className="min-h-11 w-full min-w-0 rounded-2xl border border-border bg-background px-4 text-base outline-none focus:border-foreground sm:text-sm"
+      />
+      <textarea
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        rows={2}
+        placeholder="Optional note (broker, timeframe, anything the desk should know)"
+        className="w-full min-w-0 rounded-2xl border border-border bg-background px-4 py-3 text-base outline-none focus:border-foreground sm:text-sm"
+      />
+      <button
+        type="submit"
+        disabled={busy || sent}
+        className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+      >
+        {sent ? "Username sent" : busy ? "Sending…" : "Send username to SHLM desk"}
+      </button>
+      {status && <p className="text-sm font-medium">{status}</p>}
+    </form>
   );
 }
