@@ -17,8 +17,8 @@ export const verifyBetaPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ password: z.string().min(1).max(200) }).parse(data))
   .handler(async ({ data }) => {
-    const expected = process.env["BETA_ACCESS_PASSWORD"];
+    const expected = process.env["BETA_ACCESS_PASSWORD"]?.trim();
     if (!expected) return { ok: false as const, reason: "unset" as const };
-    if (!matches(data.password, expected)) return { ok: false as const, reason: "wrong" as const };
+    if (!matches(data.password.trim(), expected)) return { ok: false as const, reason: "wrong" as const };
     return { ok: true as const };
   });
