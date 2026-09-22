@@ -117,19 +117,31 @@ function Instructions() {
     <>
       <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-background">
         <video
+          key={indicatorVideo.url}
+          src={indicatorVideo.url}
           controls
           playsInline
+          muted
           preload="metadata"
           poster={indicatorPoster.url}
-          className="aspect-video w-full bg-black"
+          className="block h-auto w-full bg-black"
           aria-label="SHLM SYSTEM indicator preview on Micro Gold Futures"
         >
-          <source src={indicatorVideo.url} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
-        <p className="px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-          Preview · Micro Gold Futures (MGC) on a 5-minute chart
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            Preview · Micro Gold Futures (MGC) on a 5-minute chart
+          </p>
+          <a
+            href={indicatorVideo.url}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="text-[11px] font-medium underline underline-offset-4 hover:text-foreground"
+          >
+            Open video ↗
+          </a>
+        </div>
       </div>
 
       <div className="mt-5 space-y-2 rounded-2xl border border-border bg-accent/30 p-4">
