@@ -15,6 +15,10 @@ const STEPS = [
 ];
 
 const UNLOCK_KEY = "shlm.betaUnlocked";
+const ASSET_ORIGIN = "https://shlm-trading-bloom.lovable.app";
+const indicatorVideoUrl = new URL(indicatorVideo.url, ASSET_ORIGIN).toString();
+const indicatorVideoWebmUrl = new URL(indicatorVideoWebm.url, ASSET_ORIGIN).toString();
+const indicatorPosterUrl = new URL(indicatorPoster.url, ASSET_ORIGIN).toString();
 
 export function BetaIndicator({ onClose }: { onClose: () => void }) {
   const [unlocked, setUnlocked] = useState(
@@ -118,17 +122,17 @@ function Instructions() {
     <>
       <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-background">
         <video
-          key={indicatorVideo.url}
+          key={indicatorVideoUrl}
           controls
           playsInline
           muted
           preload="metadata"
-          poster={indicatorPoster.url}
+          poster={indicatorPosterUrl}
           className="block h-auto w-full bg-black"
           aria-label="SHLM SYSTEM indicator preview on Micro Gold Futures"
         >
-          <source src={indicatorVideoWebm.url} type="video/webm" />
-          <source src={indicatorVideo.url} type="video/mp4" />
+          <source src={indicatorVideoUrl} type="video/mp4" />
+          <source src={indicatorVideoWebmUrl} type="video/webm" />
           Your browser does not support the video tag.
         </video>
         <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
@@ -136,7 +140,7 @@ function Instructions() {
             Preview · Micro Gold Futures (MGC) on a 5-minute chart
           </p>
           <a
-            href={indicatorVideo.url}
+            href={indicatorVideoUrl}
             target="_blank"
             rel="noreferrer noopener"
             className="text-[11px] font-medium underline underline-offset-4 hover:text-foreground"
