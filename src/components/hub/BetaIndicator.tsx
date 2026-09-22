@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { submitBetaUsername, verifyBetaPassword } from "@/lib/beta.functions";
 import indicatorVideo from "@/assets/indicator-preview.mp4.asset.json";
+import indicatorVideoWebm from "@/assets/indicator-preview.webm.asset.json";
 import indicatorPoster from "@/assets/indicator-poster.jpg.asset.json";
 
 const STEPS = [
@@ -118,7 +119,6 @@ function Instructions() {
       <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-background">
         <video
           key={indicatorVideo.url}
-          src={indicatorVideo.url}
           controls
           playsInline
           muted
@@ -127,6 +127,8 @@ function Instructions() {
           className="block h-auto w-full bg-black"
           aria-label="SHLM SYSTEM indicator preview on Micro Gold Futures"
         >
+          <source src={indicatorVideoWebm.url} type="video/webm" />
+          <source src={indicatorVideo.url} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
