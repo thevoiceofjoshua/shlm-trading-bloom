@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { verifyBetaPassword } from "@/lib/beta.functions";
+import indicatorVideo from "@/assets/indicator-preview.mp4.asset.json";
+import indicatorPoster from "@/assets/indicator-poster.jpg.asset.json";
 
 const STEPS = [
   "Send your TradingView username to the SHLM desk so the script can be added to your invite-only list.",
