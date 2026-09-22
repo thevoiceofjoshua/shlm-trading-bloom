@@ -74,11 +74,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
         onUnlock();
         return;
       }
-      setError(
-        res.reason === "unset"
-          ? "No beta password has been set yet. Set one first."
-          : "That password isn't right.",
-      );
+      setError("That password isn't right.");
       setPassword("");
     } catch {
       setError("Couldn't check that right now. Try again.");
