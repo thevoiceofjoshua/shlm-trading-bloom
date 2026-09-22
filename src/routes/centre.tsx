@@ -53,6 +53,8 @@ function CentrePage() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [journalOpen, setJournalOpen] = useState(false);
+  const [betaOpen, setBetaOpen] = useState(false);
+
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
