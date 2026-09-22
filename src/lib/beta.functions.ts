@@ -35,3 +35,40 @@ export const verifyBetaPassword = createServerFn({ method: "POST" })
     if (!valid) return { ok: false as const, reason: "wrong" as const };
     return { ok: true as const };
   });
+
+/**
+ * A beta tester submits their TradingView username; it is emailed to the SHLM
+ * desk. Identity comes from the authenticated session, never the browser.
+ */
+export const submitBetaUsername = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        username: z.string().trim().min(2).max(60),
+        note: z.string().trim().max(500).optional().or(z.literal("")),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const memberEmail =
+      typeof context.claims["email"] === "string" ? (context.claims["email"] as string) : "";
+    const adminEmail = process.env["ADMIN_NOTIFICATION_EMAIL"] || "joschewagner56@gmail.com";
+
+    try {
+      const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+      await sendTemplateEmail("beta-username", adminEmail, {
+        idempotencyKey: `beta-username-${context.userId}-${data.username.toLowerCase()}`,
+        replyTo: memberEmail || undefined,
+        templateData: {
+          username: data.username,
+          memberEmail,
+          note: data.note || "",
+        },
+      });
+      return { ok: true as const };
+    } catch (err) {
+      console.error("Failed to send beta username notification", err);
+      return { ok: false as const };
+    }
+  });
