@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { verifyBetaPassword } from "@/lib/beta.functions";
+import indicatorVideo from "@/assets/indicator-preview.mp4.asset.json";
+import indicatorPoster from "@/assets/indicator-poster.jpg.asset.json";
 
 const STEPS = [
   "Send your TradingView username to the SHLM desk so the script can be added to your invite-only list.",
@@ -117,6 +119,41 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
 function Instructions() {
   return (
     <>
+      <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-background">
+        <video
+          controls
+          playsInline
+          preload="metadata"
+          poster={indicatorPoster.url}
+          className="aspect-video w-full bg-black"
+          aria-label="SHLM SYSTEM indicator preview on Micro Gold Futures"
+        >
+          <source src={indicatorVideo.url} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <p className="px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          Preview · Micro Gold Futures (MGC) on a 5-minute chart
+        </p>
+      </div>
+
+      <div className="mt-5 space-y-2 rounded-2xl border border-border bg-accent/30 p-4">
+        <h3 className="text-sm font-semibold">What the indicator is doing</h3>
+        <ul className="space-y-1.5 text-sm text-muted-foreground">
+          <li className="min-w-0 break-words">
+            <span className="font-medium text-foreground">London / kill-zones</span> — shaded time windows where the indicator expects institutional moves.
+          </li>
+          <li className="min-w-0 break-words">
+            <span className="font-medium text-foreground">BISL / BISI levels</span> — buy-side / sell-side liquidity and breaker blocks drawn straight off the 1H structure.
+          </li>
+          <li className="min-w-0 break-words">
+            <span className="font-medium text-foreground">Order labels</span> — visual Buy Stop / Buy Limit / Sell Stop markers mapped to the active setup.
+          </li>
+          <li className="min-w-0 break-words">
+            <span className="font-medium text-foreground">Trend panel</span> — trend direction, 1H trend, aggressive stop, plus ATR, VIX and momentum readouts.
+          </li>
+        </ul>
+      </div>
+
       <ol className="mt-6 space-y-3">
         {STEPS.map((step, i) => (
           <li key={step} className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">

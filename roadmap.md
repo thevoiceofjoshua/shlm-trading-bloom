@@ -67,3 +67,11 @@
 - [x] CSV import of Tradovate orders exports (prop firm accounts, optional account label, no live connection needed)
 - [x] Add instructions dropdown at the bottom of the journal explaining how to export/import Tradovate CSV
 - [ ] Live end-to-end check with real Tradovate credentials and a signed-in device (needs your account)
+
+## Beta indicator preview in SHLM Centre
+- [x] Compress the uploaded indicator screen recording to a web-friendly MP4 (~1.3 MB)
+- [x] Upload preview video + poster frame to Lovable Assets
+- [x] Add the preview video and poster to the password-protected BetaIndicator panel
+- [x] Add a short plain-language description of what the indicator marks (zones, BISL/BISI levels, order labels, trend panel)
+- [x] Verify assets load (200), build passes, and public pages render cleanly at mobile + desktop
+- [ ] Staff-only beta modal playback check requires signing into a Founder or SHLM MOD account in the preview
