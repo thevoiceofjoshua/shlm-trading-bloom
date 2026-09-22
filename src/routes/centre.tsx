@@ -73,7 +73,7 @@ function CentrePage() {
     });
   }, [navigate]);
 
-  const { viewAsMember } = useAdminMode();
+  const { viewAsMember, isStaff } = useAdminMode();
   const fetchHub = useServerFn(getHubData);
   const { data: payload, isLoading, dataUpdatedAt } = useQuery({
     queryKey: ["hub-data", viewAsMember],
