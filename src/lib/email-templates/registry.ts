@@ -3,6 +3,7 @@ import { template as applicationNotification } from './application-notification'
 import { template as paymentLink } from './payment-link'
 import { template as applicationDenial } from './application-denial'
 import { template as paymentReceipt } from './payment-receipt'
+import { template as betaUsername } from './beta-username'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -18,5 +19,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'payment-link': paymentLink,
   'application-denial': applicationDenial,
   'payment-receipt': paymentReceipt,
+  'beta-username': betaUsername,
 }
 
