@@ -220,10 +220,11 @@ function UsernameSubmit() {
         setSent(true);
         setStatus("Sent to the SHLM desk. You'll get access on TradingView shortly.");
       } else {
-        setStatus("Couldn't send that right now. Try again in a moment.");
+        setStatus(res.error ? `Couldn't send that: ${res.error}` : "Couldn't send that right now. Try again in a moment.");
       }
-    } catch {
-      setStatus("Couldn't send that right now. Try again in a moment.");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      setStatus(message ? `Couldn't send that: ${message}` : "Couldn't send that right now. Try again in a moment.");
     } finally {
       setBusy(false);
     }
