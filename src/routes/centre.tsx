@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { HomeButton } from "@/components/HomeButton";
@@ -11,6 +11,8 @@ import { SessionBar } from "@/components/hub/SessionBar";
 import { IndexCards, MagSevenBoard, DowBoard, GoldDesk } from "@/components/hub/MarketBoards";
 import { EconomicCalendar, MorningNewsSpotlight } from "@/components/hub/EconomicCalendar";
 import { Journal } from "@/components/hub/Journal";
+import { BetaIndicator } from "@/components/hub/BetaIndicator";
+
 
 import { AdminPreviewTag } from "@/components/AdminBar";
 import { useAdminMode } from "@/hooks/use-admin-mode";
