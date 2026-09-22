@@ -167,9 +167,93 @@ function CentrePage() {
           </div>
         </div>
       )}
+
+      {betaOpen && isStaff && (
+        <div className="fixed inset-0 z-50 flex min-h-dvh items-start justify-center overflow-x-hidden overflow-y-auto bg-background/80 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur-sm xs:p-3 sm:p-6">
+          <div className="min-w-0 w-full max-w-2xl">
+            <BetaIndicator onClose={() => setBetaOpen(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+function CentreMenu({
+  onOpenJournal,
+  onOpenBeta,
+  showBeta,
+}: {
+  onOpenJournal: () => void;
+  onOpenBeta: () => void;
+  showBeta: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full bg-primary px-3.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:px-4"
+      >
+        <span className="hidden sm:inline">Member tools</span>
+        <span className="sm:hidden">Tools</span>
+        <span aria-hidden className="text-[10px]">▾</span>
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-border bg-background text-foreground shadow-xl"
+        >
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              setOpen(false);
+              onOpenJournal();
+            }}
+            className="block w-full px-4 py-3 text-left text-sm hover:bg-accent"
+          >
+            <span className="font-medium">Trading journal</span>
+            <span className="mt-0.5 block text-xs text-muted-foreground">
+              Calendar, entries and PnL totals
+            </span>
+          </button>
+          {showBeta && (
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                onOpenBeta();
+              }}
+              className="block w-full border-t border-border px-4 py-3 text-left text-sm hover:bg-accent"
+            >
+              <span className="font-medium">Beta testing · VIP</span>
+              <span className="mt-0.5 block text-xs text-muted-foreground">
+                SHLM SYSTEM TradingView indicator
+              </span>
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 function LockedPreview() {
   return (
