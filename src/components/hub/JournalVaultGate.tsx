@@ -380,7 +380,17 @@ function SetupPanel({ code, confirm, denied, error, onPush, onBackspace, onClear
   );
 }
 
-function VerifyPanel({ code, boxes, denied, error, onPush, onBackspace, onClear }: PanelProps & { boxes: number }) {
+function VerifyPanel({
+  code,
+  boxes,
+  denied,
+  error,
+  onPush,
+  onBackspace,
+  onClear,
+  onSubmit,
+}: PanelProps & { boxes: number; onSubmit?: () => void }) {
+
   return (
     <div className={denied ? "vault-glitch mt-7" : "mt-7"}>
       <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--vault-muted)]">enter passcode</p>
