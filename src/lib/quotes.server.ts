@@ -367,18 +367,19 @@ function structureFrom(bars: Bar[], price: number, dayHigh: number, dayLow: numb
     sequence,
     target:
       typeof targetPrice === "number"
-        ? mkLevel(targetSide === "high" ? "1H swing high" : "1H swing low", targetPrice, targetSide, dayHigh, dayLow)
+        ? mkLevel(targetSide === "high" ? "15m swing high" : "15m swing low", targetPrice, targetSide, dayHigh, dayLow)
         : undefined,
     invalidation:
       typeof invalidPrice === "number"
         ? mkLevel(
-            targetSide === "high" ? "1H swing low" : "1H swing high",
+            targetSide === "high" ? "15m swing low" : "15m swing high",
             invalidPrice,
             targetSide === "high" ? "low" : "high",
             dayHigh,
             dayLow,
           )
         : undefined,
+
   };
 }
 
