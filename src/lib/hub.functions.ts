@@ -98,7 +98,9 @@ function applyDelayedQuotes(
       premarketLow?: number;
       h1?: LevelQuote["h1"];
       pullbacks?: LevelQuote["pullbacks"];
+      mtf?: LevelQuote["mtf"];
       levelsSetAt?: string;
+
     }
   >,
 ) {
