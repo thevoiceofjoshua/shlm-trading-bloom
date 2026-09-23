@@ -49,6 +49,11 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
   const verifyBoxes = verifyLength ?? MAX_LENGTH;
   const verifyLengthRef = useRef(verifyLength);
   verifyLengthRef.current = verifyLength;
+  const codeRef = useRef(code);
+  codeRef.current = code;
+  const modeRef = useRef(mode);
+  modeRef.current = mode;
+
 
 
   useEffect(() => {
