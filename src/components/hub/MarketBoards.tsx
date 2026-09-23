@@ -314,6 +314,11 @@ export function MagSevenBoard({ payload }: { payload: HubPayload }) {
           ))}
         </div>
       </div>
+
+      <DriverScore
+        read={equityDriverScore(payload.magSeven)}
+        note="how the NASDAQ's biggest names are trading right now"
+      />
     </div>
   );
 }
@@ -339,6 +344,11 @@ export function DowBoard({ payload }: { payload: HubPayload }) {
           ))}
         </div>
       </div>
+
+      <DriverScore
+        read={equityDriverScore(payload.dowDrivers)}
+        note="how the Dow 30 heavyweights are trading right now"
+      />
     </div>
   );
 }
@@ -401,6 +411,11 @@ export function GoldDesk({ payload }: { payload: HubPayload }) {
           ))}
         </div>
       </div>
+
+      <DriverScore
+        read={goldDriverScore(payload.goldDrivers)}
+        note="dollar, yields and risk conditions behind gold"
+      />
     </div>
   );
 }
