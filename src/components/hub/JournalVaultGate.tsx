@@ -149,11 +149,14 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
     setCode((prev) => {
       if (prev.length >= (expected ?? MAX_LENGTH)) return prev;
       const next = prev + digit;
-      const ready = expected ? next.length === expected : next.length >= MIN_LENGTH;
-      if (ready) window.setTimeout(() => submitVerify(next), 120);
+      // Only auto-submit when we know how long this member's code is. With an
+      // unknown length, submitting at MIN_LENGTH would lock out anyone whose
+      // code is longer — they confirm with the unlock key instead.
+      if (expected && next.length === expected) window.setTimeout(() => submitVerify(next), 120);
       return next;
     });
   };
+
 
 
   const backspace = () => {
