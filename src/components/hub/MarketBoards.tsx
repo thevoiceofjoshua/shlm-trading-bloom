@@ -92,19 +92,47 @@ export function IndexCards({ payload }: { payload: HubPayload }) {
 type LiqLevel = NonNullable<HubPayload["indexes"][number]["pullbacks"]>[number];
 type Structure = NonNullable<HubPayload["indexes"][number]["h1"]>;
 
-function biasPill(bias: Structure["bias"]) {
-  const map = {
-    bullish: { text: "↑ Bullish", cls: "border-emerald-500/40 text-emerald-500" },
-    bearish: { text: "↓ Bearish", cls: "border-red-500/40 text-red-500" },
-    ranging: { text: "→ Ranging", cls: "border-border text-muted-foreground" },
-  } as const;
-  const b = map[bias];
+type Mtf = NonNullable<HubPayload["indexes"][number]["mtf"]>;
+
+const DIRECTION_LABEL: Record<Mtf["direction"], { text: string; cls: string }> = {
+  bullish: { text: "🟢 BULLISH", cls: "text-emerald-500" },
+  bearish: { text: "🔴 BEARISH", cls: "text-red-500" },
+  neutral: { text: "🟡 NEUTRAL", cls: "text-foreground" },
+  conflicted: { text: "⚠️ CONFLICTED", cls: "text-foreground" },
+};
+
+const TF_LABEL: Record<Mtf["m5"], string> = { bullish: "Bullish", bearish: "Bearish", neutral: "Mixed" };
+const BOS_LABEL: Record<Mtf["bos"], string> = { bullish: "Bullish", bearish: "Bearish", none: "None" };
+const STATE_LABEL: Record<Mtf["state"], string> = { trending: "Trending", consolidating: "Consolidating" };
+const ALIGN_LABEL: Record<Mtf["alignment"], string> = {
+  strong: "Strong",
+  conflicted: "Conflicted",
+  neutral: "Neutral",
+};
+
+/** 15M context + 5M primary read. Not an entry signal. */
+function DirectionBlock({ mtf }: { mtf?: Mtf }) {
+  const dir = mtf ? DIRECTION_LABEL[mtf.direction] : null;
   return (
-    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${b.cls}`}>
-      {b.text}
-    </span>
+    <div className="space-y-1.5">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2">
+        <span className="uppercase tracking-widest text-muted-foreground">Direction:</span>
+        <span className={`min-w-0 font-display text-sm font-semibold tracking-tight ${dir?.cls ?? "text-muted-foreground"}`}>
+          {dir?.text ?? "—"}
+        </span>
+      </div>
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2">
+        <span className="uppercase tracking-widest text-muted-foreground">Structure:</span>
+        <span className="min-w-0 break-words text-[11px] leading-relaxed text-muted-foreground">
+          {mtf
+            ? `15M: ${TF_LABEL[mtf.m15]} · 5M: ${TF_LABEL[mtf.m5]} · BOS: ${BOS_LABEL[mtf.bos]} · State: ${STATE_LABEL[mtf.state]} · Alignment: ${ALIGN_LABEL[mtf.alignment]}`
+            : "—"}
+        </span>
+      </div>
+    </div>
   );
 }
+
 
 function LevelRow({ level, role, price }: { level?: LiqLevel; role: string; price: number }) {
   if (!level) {
@@ -151,22 +179,8 @@ function ScalperLevels({ quote }: { quote: HubPayload["indexes"][number] }) {
   return (
     <>
       <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="uppercase tracking-widest text-muted-foreground">1H structure — direction</p>
-          <div className="flex flex-wrap items-center gap-1.5">
-            {h1?.event && (
-              <span className="rounded-full border border-border bg-surface px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-foreground">
-                {h1.event}
-              </span>
-            )}
-            {h1?.sequence && (
-              <span className="rounded-full border border-border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                {h1.sequence}
-              </span>
-            )}
-            {h1 ? biasPill(h1.bias) : null}
-          </div>
-        </div>
+        <DirectionBlock mtf={quote.mtf} />
+
         <div className="grid grid-cols-2 gap-x-4 gap-y-3">
           <LevelRow level={h1?.target} role="Main target" price={quote.price} />
           <LevelRow level={h1?.invalidation} role="Invalidation" price={quote.price} />
