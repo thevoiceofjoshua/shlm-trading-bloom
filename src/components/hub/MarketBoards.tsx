@@ -63,6 +63,49 @@ function DriverTile({ d }: { d: { symbol: string; price: number; changePct: numb
   );
 }
 
+/* ---- Live macro impact copy: rebuilt from the current macro readings ---- */
+
+type MacroRow = { label: string; value: string; direction: "up" | "down" | "flat" };
+
+function macroImpact(list: MacroRow[], symbol: "NASDAQ" | "US30" | "GOLD"): string | null {
+  if (!list.length) return null;
+  const parts: string[] = [];
+  let net = 0;
+  for (const m of list) {
+    const l = m.label.toLowerCase();
+    const dirWord = m.direction === "up" ? "rising" : m.direction === "down" ? "easing" : "flat";
+    let effect: "supportive" | "headwind" | "neutral" = "neutral";
+    if (m.direction === "flat") effect = "neutral";
+    else if (/yield/.test(l)) effect = m.direction === "up" ? "headwind" : "supportive";
+    else if (/usd|dxy|dollar/.test(l)) effect = m.direction === "up" ? "headwind" : "supportive";
+    else if (/semis|ai/.test(l)) effect = m.direction === "up" ? "supportive" : "headwind";
+    else if (/oil|wti/.test(l)) effect = m.direction === "up" ? "headwind" : "supportive";
+    else if (/vix|risk|stress/.test(l)) effect = symbol === "GOLD" ? (m.direction === "up" ? "supportive" : "headwind") : m.direction === "up" ? "headwind" : "supportive";
+    if (effect === "supportive") net += 1;
+    if (effect === "headwind") net -= 1;
+    const verdict = effect === "supportive" ? "supportive" : effect === "headwind" ? "a headwind" : "neutral";
+    parts.push(`${m.label} ${dirWord} at ${m.value} — ${verdict}`);
+  }
+  const name = symbol === "NASDAQ" ? "the NASDAQ" : symbol === "US30" ? "the Dow" : "gold";
+  const verdict =
+    net > 0
+      ? `On balance the macro backdrop is currently supportive for ${name}.`
+      : net < 0
+        ? `On balance the macro backdrop is currently working against ${name}.`
+        : `On balance the macro backdrop is mixed for ${name} right now.`;
+  return `${parts.join(". ")}. ${verdict}`;
+}
+
+function MacroImpact({ list, symbol }: { list: MacroRow[]; symbol: "NASDAQ" | "US30" | "GOLD" }) {
+  const text = macroImpact(list, symbol);
+  if (!text) return null;
+  return (
+    <p className="mt-3 min-w-0 break-words rounded-lg border border-border bg-surface p-3 text-[11px] leading-relaxed text-muted-foreground">
+      {text}
+    </p>
+  );
+}
+
 /* -------- Driver score: bullish/bearish read from the drivers themselves ------ */
 
 type ScoreRead = { score: number; label: string; detail: string };
@@ -313,6 +356,7 @@ export function MagSevenBoard({ payload }: { payload: HubPayload }) {
             <MacroTile key={m.label} macro={m} />
           ))}
         </div>
+        <MacroImpact list={payload.nasdaqMacro ?? []} symbol="NASDAQ" />
       </div>
 
       <DriverScore
@@ -343,6 +387,7 @@ export function DowBoard({ payload }: { payload: HubPayload }) {
             <MacroTile key={m.label} macro={m} />
           ))}
         </div>
+        <MacroImpact list={payload.dowMacro} symbol="US30" />
       </div>
 
       <DriverScore
@@ -410,6 +455,7 @@ export function GoldDesk({ payload }: { payload: HubPayload }) {
             <MacroTile key={m.label} macro={m} />
           ))}
         </div>
+        <MacroImpact list={payload.goldDrivers} symbol="GOLD" />
       </div>
 
       <DriverScore
