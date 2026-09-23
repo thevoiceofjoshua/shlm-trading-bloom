@@ -316,6 +316,8 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
             onPush={push}
             onBackspace={backspace}
             onClear={clear}
+            onSubmit={verifyLength ? undefined : () => submitVerify(code)}
+
           />
 
         )}
