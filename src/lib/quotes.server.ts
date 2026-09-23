@@ -26,6 +26,17 @@ export interface FeedStructure {
   invalidation?: FeedLevel;
 }
 
+/** Multi-timeframe read: 15M context + 5M primary, for a 5-minute breakout trader. */
+export interface FeedMtf {
+  m15: "bullish" | "bearish" | "neutral";
+  m5: "bullish" | "bearish" | "neutral";
+  /** Most recent Break of Structure confirmed on a candle close. */
+  bos: "bullish" | "bearish" | "none";
+  state: "trending" | "consolidating";
+  alignment: "strong" | "conflicted" | "neutral";
+  direction: "bullish" | "bearish" | "neutral" | "conflicted";
+}
+
 export interface DelayedQuote {
   symbol: string;
   price: number;
@@ -44,6 +55,8 @@ export interface DelayedQuote {
   h1?: FeedStructure;
   /** 5m swing points sitting between price and the 1H target. */
   pullbacks?: FeedLevel[];
+  /** 15M context + 5M primary structure read (live, not locked). */
+  mtf?: FeedMtf;
   /** ISO timestamp of the daily 5:00am PST run that locked the levels in. */
   levelsSetAt?: string;
 }
@@ -52,6 +65,7 @@ export interface DelayedQuote {
 interface Bar {
   high: number;
   low: number;
+  close?: number;
 }
 
 /** Fractal swing detection: bar i is a swing when it dominates ±k neighbours. */
@@ -75,19 +89,129 @@ function swings(bars: Bar[], k = 2) {
 }
 
 function toBars(raw: unknown): Bar[] {
-  const q = raw as { high?: (number | null)[]; low?: (number | null)[] } | undefined;
+  const q = raw as { high?: (number | null)[]; low?: (number | null)[]; close?: (number | null)[] } | undefined;
   const hs = q?.high ?? [];
   const ls = q?.low ?? [];
+  const cs = q?.close ?? [];
   const out: Bar[] = [];
   for (let i = 0; i < hs.length; i += 1) {
     const h = hs[i];
     const l = ls[i];
+    const c = cs[i];
     if (typeof h === "number" && typeof l === "number" && Number.isFinite(h) && Number.isFinite(l)) {
-      out.push({ high: h, low: l });
+      out.push(typeof c === "number" && Number.isFinite(c) ? { high: h, low: l, close: c } : { high: h, low: l });
     }
   }
   return out;
 }
+
+/* --------------- Multi-timeframe structure (15M context, 5M primary) -------- */
+
+type TfBias = "bullish" | "bearish" | "neutral";
+
+interface TfRead {
+  bias: TfBias;
+  bos: "bullish" | "bearish" | "none";
+  state: "trending" | "consolidating";
+}
+
+/**
+ * One timeframe's structure read.
+ *
+ * Bias comes from the swing sequence (HH+HL bullish, LH+LL bearish, anything
+ * mixed stays neutral — no direction is forced). A Break of Structure only
+ * counts on a candle CLOSE beyond an established swing, so a wick through a
+ * high/low (a liquidity sweep) is ignored.
+ */
+function readTimeframe(bars: Bar[]): TfRead | undefined {
+  if (bars.length < 24) return undefined;
+  const { highs, lows } = swings(bars, 2);
+  if (highs.length < 2 || lows.length < 2) return undefined;
+
+  const h1 = highs[highs.length - 1]!.price;
+  const h0 = highs[highs.length - 2]!.price;
+  const l1 = lows[lows.length - 1]!.price;
+  const l0 = lows[lows.length - 2]!.price;
+
+  let bias: TfBias = "neutral";
+  if (h1 > h0 && l1 > l0) bias = "bullish";
+  else if (h1 < h0 && l1 < l0) bias = "bearish";
+
+  // Most recent close-confirmed break of an established swing.
+  let bosIndex = -1;
+  let bos: TfRead["bos"] = "none";
+  const scanFrom = Math.max(0, bars.length - 120);
+  for (const s of highs) {
+    for (let j = s.i + 3; j < bars.length; j += 1) {
+      if (j < scanFrom) continue;
+      const c = bars[j]!.close;
+      if (typeof c === "number" && c > s.price) {
+        if (j > bosIndex) {
+          bosIndex = j;
+          bos = "bullish";
+        }
+        break;
+      }
+    }
+  }
+  for (const s of lows) {
+    for (let j = s.i + 3; j < bars.length; j += 1) {
+      if (j < scanFrom) continue;
+      const c = bars[j]!.close;
+      if (typeof c === "number" && c < s.price) {
+        if (j > bosIndex) {
+          bosIndex = j;
+          bos = "bearish";
+        }
+        break;
+      }
+    }
+  }
+
+  // Trending vs consolidating: how much of the recent range price actually
+  // travelled in one direction.
+  const window = bars.slice(-40);
+  const hi = Math.max(...window.map((b) => b.high));
+  const lo = Math.min(...window.map((b) => b.low));
+  const first = window[0]?.close ?? window[0]?.high ?? 0;
+  const last = window[window.length - 1]?.close ?? window[window.length - 1]?.high ?? 0;
+  const range = hi - lo;
+  const progress = range > 0 ? Math.abs(last - first) / range : 0;
+  const state: TfRead["state"] = progress >= 0.45 ? "trending" : "consolidating";
+
+  return { bias, bos, state };
+}
+
+/** Combine the 15M context read with the 5M primary read. */
+function combineMtf(m15?: TfRead, m5?: TfRead): FeedMtf | undefined {
+  if (!m15 || !m5) return undefined;
+
+  const alignment: FeedMtf["alignment"] =
+    m15.bias !== "neutral" && m15.bias === m5.bias
+      ? "strong"
+      : m15.bias !== "neutral" && m5.bias !== "neutral" && m15.bias !== m5.bias
+        ? "conflicted"
+        : "neutral";
+
+  // 5M is primary; 15M is context. Never force a direction.
+  let direction: FeedMtf["direction"] = "neutral";
+  if (m5.bias !== "neutral") {
+    if (alignment === "conflicted") direction = "conflicted";
+    else if (m5.state === "consolidating") direction = "neutral";
+    else if (m5.bos !== "none" && m5.bos !== m5.bias) direction = "neutral";
+    else direction = m5.bias;
+  }
+
+  return {
+    m15: m15.bias,
+    m5: m5.bias,
+    bos: m5.bos !== "none" ? m5.bos : m15.bos,
+    state: m5.state,
+    alignment,
+    direction,
+  };
+}
+
 
 
 /** Yahoo symbol for each instrument shown in the Centre. */
