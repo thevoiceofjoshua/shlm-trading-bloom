@@ -197,6 +197,41 @@ function applyDelayedQuotes(
     payload.dowMovers = { top: topDow.symbol, label: `${topDow.name} is driving the Dow ${topDow.changePct >= 0 ? "higher" : "lower"}` };
   }
 
+  // Driver context is read-only here: a strongly opposing driver tilt flags the
+  // structural direction as CONFLICTED. Nothing about the drivers themselves
+  // is changed or recalculated for this.
+  const tiltFrom = (list: { changePct: number }[]): "bullish" | "bearish" | "flat" => {
+    if (list.length === 0) return "flat";
+    const up = list.filter((d) => d.changePct >= 0).length;
+    if (up >= Math.ceil(list.length * 0.7)) return "bullish";
+    if (up <= Math.floor(list.length * 0.3)) return "bearish";
+    return "flat";
+  };
+  const macroTilt = (list: { label: string; direction: "up" | "down" | "flat" }[]): "bullish" | "bearish" | "flat" => {
+    // For gold, a firmer dollar and higher yields are the headwind.
+    const dirOf = (needle: string) => list.find((m) => m.label.toLowerCase().includes(needle))?.direction;
+    const dollar = dirOf("dollar") ?? dirOf("usd") ?? dirOf("dxy");
+    const yields = dirOf("10-year") ?? dirOf("yield");
+    if (dollar === "up" && yields === "up") return "bearish";
+    if (dollar === "down" && yields === "down") return "bullish";
+    return "flat";
+  };
+  const withTilt = <T extends { mtf?: { direction: string } }>(q: T, tilt: "bullish" | "bearish" | "flat"): T => {
+    if (!q.mtf || tilt === "flat") return q;
+    const d = q.mtf.direction;
+    if ((d === "bullish" && tilt === "bearish") || (d === "bearish" && tilt === "bullish")) {
+      return { ...q, mtf: { ...q.mtf, direction: "conflicted" } };
+    }
+    return q;
+  };
+  const nasdaqTilt = tiltFrom(payload.magSeven);
+  const dowTilt = tiltFrom(payload.dowDrivers);
+  payload.indexes = payload.indexes.map((idx) =>
+    idx.symbol === "NASDAQ" ? withTilt(idx, nasdaqTilt) : idx.symbol === "US30" ? withTilt(idx, dowTilt) : idx,
+  );
+  payload.gold = withTilt(payload.gold, macroTilt(payload.goldDrivers));
+
+
   payload.dataState = "delayed";
   payload.fetchedAt = new Date().toISOString();
 }
