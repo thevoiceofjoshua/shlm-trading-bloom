@@ -217,8 +217,6 @@ export function IndexCards({ payload }: { payload: HubPayload }) {
   );
 }
 
-type LiqLevel = NonNullable<HubPayload["indexes"][number]["pullbacks"]>[number];
-type Structure = NonNullable<HubPayload["indexes"][number]["h1"]>;
 
 type Mtf = NonNullable<HubPayload["indexes"][number]["mtf"]>;
 
@@ -289,44 +287,6 @@ function DirectionBlock({ mtf }: { mtf?: Mtf }) {
 }
 
 
-function LevelRow({ level, role, price }: { level?: LiqLevel; role: string; price: number }) {
-  if (!level) {
-    return (
-      <div>
-        <p className="text-muted-foreground">{role}</p>
-        <p className="font-display text-base font-medium text-muted-foreground">—</p>
-        <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">No data</p>
-      </div>
-    );
-  }
-  const dist = level.price - price;
-  const pct = price ? (dist / price) * 100 : 0;
-  const toneCls = level.side === "high" ? "text-emerald-500" : "text-red-500";
-  return (
-    <div>
-      <p className="text-muted-foreground">
-        {role} <span className="text-muted-foreground/60">· {level.label}</span>
-      </p>
-      <p className={`font-display text-base font-medium tabular-nums ${level.swept ? "text-muted-foreground" : "text-foreground"}`}>
-        {level.price.toLocaleString()}
-      </p>
-      <div className="mt-0.5 flex items-center gap-2">
-        <span
-          className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${
-            level.swept ? "bg-border/60 text-muted-foreground" : `bg-transparent ring-1 ring-current ${toneCls}`
-          }`}
-        >
-          {level.swept ? "Swept" : "Untapped"}
-        </span>
-        <span className="text-[10px] tabular-nums text-muted-foreground">
-          {dist >= 0 ? "+" : ""}
-          {Math.abs(dist) >= 100 ? Math.round(dist).toLocaleString() : dist.toFixed(1)} ({pct >= 0 ? "+" : ""}
-          {pct.toFixed(2)}%)
-        </span>
-      </div>
-    </div>
-  );
-}
 
 function ScalperLevels({ quote }: { quote: HubPayload["indexes"][number] }) {
   return (
