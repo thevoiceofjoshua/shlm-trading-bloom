@@ -238,6 +238,23 @@ const ALIGN_LABEL: Record<Mtf["alignment"], string> = {
   neutral: "Neutral",
 };
 
+function StructurePill({ k, v, bias }: { k: string; v: string; bias: "bullish" | "bearish" | "neutral" }) {
+  const tone =
+    bias === "bullish"
+      ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+      : bias === "bearish"
+        ? "border-red-500/50 bg-red-500/10 text-red-600 dark:text-red-400"
+        : "border-border bg-surface text-foreground";
+  return (
+    <span
+      className={`inline-flex min-w-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${tone}`}
+    >
+      <span className="shrink-0 uppercase tracking-widest opacity-70">{k}</span>
+      <span className="min-w-0 truncate font-display tracking-tight">{v}</span>
+    </span>
+  );
+}
+
 /** 15M context + 5M primary read. Not an entry signal. */
 function DirectionBlock({ mtf }: { mtf?: Mtf }) {
   const dir = mtf ? DIRECTION_LABEL[mtf.direction] : null;
