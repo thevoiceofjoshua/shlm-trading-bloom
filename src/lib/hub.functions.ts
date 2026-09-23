@@ -148,7 +148,9 @@ function applyDelayedQuotes(
       dayLow: g.dayLow,
       h1: g.h1,
       pullbacks: g.pullbacks,
+      mtf: g.mtf,
       levelsSetAt: g.levelsSetAt,
+
     };
   }
 
