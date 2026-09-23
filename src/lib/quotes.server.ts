@@ -627,8 +627,26 @@ export async function fetchDelayedQuotes(): Promise<Record<string, DelayedQuote>
         quote.levelsSetAt = locked.levelsSetAt;
       }
 
+      // Live multi-timeframe read: 15M context + 5M primary. Computed from the
+      // near-24h futures series so the read isn't blank outside US cash hours.
+      // Not locked to 5:00am — 5M structure moves during the session.
+      try {
+        const structSym = STRUCT_SYMBOLS[key] ?? sym;
+        const [j15, j5] = await Promise.all([
+          getJson(`/v8/finance/chart/${encodeURIComponent(structSym)}?interval=15m&range=1mo`),
+          getJson(`/v8/finance/chart/${encodeURIComponent(structSym)}?interval=5m&range=5d&includePrePost=true`),
+        ]);
+        const mtf = combineMtf(
+          readTimeframe(toBars(j15?.chart?.result?.[0]?.indicators?.quote?.[0])),
+          readTimeframe(toBars(j5?.chart?.result?.[0]?.indicators?.quote?.[0])),
+        );
+        if (mtf) quote.mtf = mtf;
+      } catch {
+        // Feed hiccup: leave mtf unset so the card shows "—" instead of breaking.
+      }
 
       out[key] = quote;
+
 
     }),
   );
