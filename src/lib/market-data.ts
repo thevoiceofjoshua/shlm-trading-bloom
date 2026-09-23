@@ -85,6 +85,17 @@ export interface StructureRead {
   invalidation?: LiquidityLevel;
 }
 
+/** 15M context + 5M primary structure read for a 5-minute breakout trader. */
+export interface MtfRead {
+  m15: "bullish" | "bearish" | "neutral";
+  m5: "bullish" | "bearish" | "neutral";
+  /** Most recent Break of Structure confirmed on a candle close. */
+  bos: "bullish" | "bearish" | "none";
+  state: "trending" | "consolidating";
+  alignment: "strong" | "conflicted" | "neutral";
+  direction: "bullish" | "bearish" | "neutral" | "conflicted";
+}
+
 export interface LevelQuote extends Quote {
   /** Levels are optional: the delayed feed omits any it cannot source. */
   priorDayHigh?: number;
@@ -95,9 +106,12 @@ export interface LevelQuote extends Quote {
   h1?: StructureRead;
   /** 5m swing points between price and the 1H target. */
   pullbacks?: LiquidityLevel[];
+  /** 15M / 5M structure read (live, not locked to the 5:00am snapshot). */
+  mtf?: MtfRead;
   /** ISO timestamp of the 5:00am PST run that locked these levels in. */
   levelsSetAt?: string;
 }
+
 
 
 export const INDEX_QUOTES: LevelQuote[] = [
@@ -124,6 +138,8 @@ export const INDEX_QUOTES: LevelQuote[] = [
       { label: "5m swing low", price: 18_388.0, side: "low", swept: false },
       { label: "5m swing low", price: 18_342.0, side: "low", swept: true },
     ],
+    mtf: { m15: "bullish", m5: "bullish", bos: "bullish", state: "trending", alignment: "strong", direction: "bullish" },
+
   },
   {
     symbol: "US30",
@@ -148,6 +164,8 @@ export const INDEX_QUOTES: LevelQuote[] = [
       { label: "5m swing high", price: 41_868.0, side: "high", swept: false },
       { label: "5m swing high", price: 41_912.0, side: "high", swept: false },
     ],
+    mtf: { m15: "bearish", m5: "bearish", bos: "bearish", state: "trending", alignment: "strong", direction: "bearish" },
+
   },
 ];
 
@@ -272,6 +290,8 @@ export const GOLD_QUOTE: LevelQuote = {
     { label: "5m swing low", price: 2_515.6, side: "low", swept: false },
     { label: "5m swing low", price: 2_511.8, side: "low", swept: true },
   ],
+  mtf: { m15: "bullish", m5: "neutral", bos: "none", state: "consolidating", alignment: "neutral", direction: "neutral" },
+
 };
 
 
