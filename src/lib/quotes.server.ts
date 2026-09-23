@@ -608,11 +608,13 @@ export async function fetchDelayedQuotes(): Promise<Record<string, DelayedQuote>
         }
       }
 
-      // 1H structure (direction + main target) and the 5m pullback shelf.
-      // Computed fresh, then locked to the day's 5:00am PST snapshot.
-      const h1json = await getJson(`/v8/finance/chart/${encodeURIComponent(sym)}?interval=60m&range=1mo`);
-      const h1bars = toBars(h1json?.chart?.result?.[0]?.indicators?.quote?.[0]);
-      const structure = structureFrom(h1bars, quote.price, quote.dayHigh, quote.dayLow);
+      // Targets come off the 15M swings (context timeframe) and the entry shelf
+      // off the 5M swings. Computed fresh, then locked to the day's 5:00am PST
+      // snapshot.
+      const ctxJson = await getJson(`/v8/finance/chart/${encodeURIComponent(sym)}?interval=15m&range=1mo`);
+      const ctxBars = toBars(ctxJson?.chart?.result?.[0]?.indicators?.quote?.[0]);
+      const structure = structureFrom(ctxBars, quote.price, quote.dayHigh, quote.dayLow);
+
       if (structure) {
         let m5bars = toBars(preBars);
         // Right after the 5:00am lock today's 5m series is often too short
