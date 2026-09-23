@@ -361,6 +361,12 @@ function structureFrom(bars: Bar[], price: number, dayHigh: number, dayLow: numb
   let bias: FeedStructure["bias"] = "ranging";
   if (h1 > h0 && l1 > l0) bias = "bullish";
   else if (h1 < h0 && l1 < l0) bias = "bearish";
+  // Price position guard: the sequence can read HH/HL long after price has
+  // broken down through the last swing low. Don't aim the target upward in
+  // that case (and vice versa).
+  if (bias === "bullish" && price < l1) bias = "bearish";
+  else if (bias === "bearish" && price > h1) bias = "bullish";
+
 
   const sequence = `${h1 > h0 ? "HH" : "LH"} / ${l1 > l0 ? "HL" : "LL"}`;
 
