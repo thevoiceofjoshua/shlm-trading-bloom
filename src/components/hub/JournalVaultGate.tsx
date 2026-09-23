@@ -414,10 +414,22 @@ function VerifyPanel({
       </div>
 
       <p className={`mt-3 h-4 text-[11px] tracking-widest ${denied ? "font-bold text-[var(--vault-ink)]" : error ? "text-[var(--vault-accent)]" : "text-[var(--vault-muted)]"}`}>
-        {denied ? "ACCESS DENIED — retry" : error ?? "keypad or keyboard"}
+        {denied ? "ACCESS DENIED — retry" : error ?? (onSubmit ? "enter code, then unlock" : "keypad or keyboard")}
       </p>
 
       <Keypad onPush={onPush} onBackspace={onBackspace} onClear={onClear} />
+
+      {onSubmit && (
+        <button
+          type="button"
+          onClick={onSubmit}
+          disabled={code.length < MIN_LENGTH}
+          className="mt-3 w-full rounded-lg border border-[var(--vault-ink)] px-4 py-2.5 text-[11px] uppercase tracking-[0.3em] text-[var(--vault-ink)] transition-opacity disabled:opacity-40"
+        >
+          unlock
+        </button>
+      )}
+
     </div>
   );
 }
