@@ -18,7 +18,7 @@ export interface FeedLevel {
 
 export interface FeedStructure {
   bias: "bullish" | "bearish" | "ranging";
-  /** Last confirmed structure shift on the 1H. */
+  /** Last confirmed structure shift on the 15M. */
   event?: "BOS" | "CHoCH";
   /** Latest swing sequence read, e.g. "HH / HL". */
   sequence?: string;
@@ -51,9 +51,9 @@ export interface DelayedQuote {
   /** Pre-market extremes for today (only when pre-session bars exist). */
   premarketHigh?: number;
   premarketLow?: number;
-  /** 1H structure read: direction, main target, invalidation. */
+  /** 15M structure read: direction, main target, invalidation. */
   h1?: FeedStructure;
-  /** 5m swing points sitting between price and the 1H target. */
+  /** 5m swing points sitting between price and the 15M target. */
   pullbacks?: FeedLevel[];
   /** 15M context + 5M primary structure read (live, not locked). */
   mtf?: FeedMtf;
@@ -383,7 +383,7 @@ function structureFrom(bars: Bar[], price: number, dayHigh: number, dayLow: numb
   };
 }
 
-/** 5m swing points between price and the 1H target — the pullback shelf. */
+/** 5m swing points between price and the 15M target — the pullback shelf. */
 function pullbacksFrom(
   bars: Bar[],
   price: number,
@@ -497,7 +497,7 @@ async function writeStoredLevels(
 
 /**
  * Levels are computed once per trading day and then held: prices keep ticking,
- * but the 1H structure and 5m entry zones stay put until the next 5:00am PST.
+ * but the 15M structure and 5m entry zones stay put until the next 5:00am PST.
  *
  * One exception: a stored day whose 5m entry zones came out empty (the intraday
  * series isn't there yet right after the 5:00am lock) is treated as incomplete
@@ -514,7 +514,7 @@ async function dailyLevels(instrument: string, fresh: StoredLevels, dayHigh: num
     if (storedHasZones || !freshHasZones) {
       return { ...applySwept(stored.levels, dayHigh, dayLow), levelsSetAt: stored.computedAt };
     }
-    // Keep the locked 1H read, fill in the missing entry zones.
+    // Keep the locked 15M read, fill in the missing entry zones.
     const merged: StoredLevels = { h1: stored.levels.h1 ?? fresh.h1, pullbacks: fresh.pullbacks };
     await writeStoredLevels(instrument, day, merged, true, stored.computedAt);
     return { ...applySwept(merged, dayHigh, dayLow), levelsSetAt: stored.computedAt };
