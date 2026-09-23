@@ -329,36 +329,10 @@ function LevelRow({ level, role, price }: { level?: LiqLevel; role: string; pric
 }
 
 function ScalperLevels({ quote }: { quote: HubPayload["indexes"][number] }) {
-  const h1 = quote.h1;
-  const pullbacks = quote.pullbacks ?? [];
   return (
-    <>
-      <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
-        <DirectionBlock mtf={quote.mtf} />
-
-        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-          <LevelRow level={h1?.target} role="Main target" price={quote.price} />
-          <LevelRow level={h1?.invalidation} role="Invalidation" price={quote.price} />
-        </div>
-      </div>
-
-      <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
-        <p className="uppercase tracking-widest text-muted-foreground">5m execution — pullback entries</p>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-          <LevelRow level={pullbacks[0]} role="Deeper entry zone" price={quote.price} />
-          <LevelRow level={pullbacks[1]} role="First entry zone" price={quote.price} />
-        </div>
-        <p className="pt-1 text-[10px] leading-relaxed text-muted-foreground/80">
-          Trade with the 15M direction; enter on the 5m pullback into untapped levels.
-        </p>
-        <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70">
-          {quote.levelsSetAt
-            ? `Levels set ${new Date(quote.levelsSetAt).toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })} PST`
-            : "Levels set 5:00 AM PST"}
-        </p>
-      </div>
-    </>
-
+    <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
+      <DirectionBlock mtf={quote.mtf} />
+    </div>
   );
 }
 
