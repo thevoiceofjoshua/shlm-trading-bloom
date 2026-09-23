@@ -238,6 +238,23 @@ const ALIGN_LABEL: Record<Mtf["alignment"], string> = {
   neutral: "Neutral",
 };
 
+function StructurePill({ k, v, bias }: { k: string; v: string; bias: "bullish" | "bearish" | "neutral" }) {
+  const tone =
+    bias === "bullish"
+      ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+      : bias === "bearish"
+        ? "border-red-500/50 bg-red-500/10 text-red-600 dark:text-red-400"
+        : "border-border bg-surface text-foreground";
+  return (
+    <span
+      className={`inline-flex min-w-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${tone}`}
+    >
+      <span className="shrink-0 uppercase tracking-widest opacity-70">{k}</span>
+      <span className="min-w-0 truncate font-display tracking-tight">{v}</span>
+    </span>
+  );
+}
+
 /** 15M context + 5M primary read. Not an entry signal. */
 function DirectionBlock({ mtf }: { mtf?: Mtf }) {
   const dir = mtf ? DIRECTION_LABEL[mtf.direction] : null;
@@ -249,13 +266,23 @@ function DirectionBlock({ mtf }: { mtf?: Mtf }) {
           {dir?.text ?? "—"}
         </span>
       </div>
-      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2">
+      <div className="min-w-0">
         <span className="uppercase tracking-widest text-muted-foreground">Structure:</span>
-        <span className="min-w-0 break-words text-[11px] leading-relaxed text-muted-foreground">
-          {mtf
-            ? `15M: ${TF_LABEL[mtf.m15]} · 5M: ${TF_LABEL[mtf.m5]} · BOS: ${BOS_LABEL[mtf.bos]} · State: ${STATE_LABEL[mtf.state]} · Alignment: ${ALIGN_LABEL[mtf.alignment]}`
-            : "—"}
-        </span>
+        {mtf ? (
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            <StructurePill k="15M" v={TF_LABEL[mtf.m15]} bias={mtf.m15} />
+            <StructurePill k="5M" v={TF_LABEL[mtf.m5]} bias={mtf.m5} />
+            <StructurePill k="BOS" v={BOS_LABEL[mtf.bos]} bias={mtf.bos === "none" ? "neutral" : mtf.bos} />
+            <StructurePill k="State" v={STATE_LABEL[mtf.state]} bias="neutral" />
+            <StructurePill
+              k="Alignment"
+              v={ALIGN_LABEL[mtf.alignment]}
+              bias={mtf.alignment === "strong" ? mtf.m5 : "neutral"}
+            />
+          </div>
+        ) : (
+          <p className="mt-1.5 text-[11px] text-muted-foreground">—</p>
+        )}
       </div>
     </div>
   );
