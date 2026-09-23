@@ -327,8 +327,9 @@ function mkLevel(
   };
 }
 
-/** 1H read: HH/HL = bullish, LH/LL = bearish, otherwise ranging. */
+/** 15M read: HH/HL = bullish, LH/LL = bearish, otherwise ranging. */
 function structureFrom(bars: Bar[], price: number, dayHigh: number, dayLow: number): FeedStructure | undefined {
+
   if (bars.length < 12) return undefined;
   const { highs, lows } = swings(bars, 2);
   if (highs.length < 2 || lows.length < 2) return undefined;
