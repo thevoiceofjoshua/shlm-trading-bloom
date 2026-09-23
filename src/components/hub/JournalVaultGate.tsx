@@ -185,7 +185,14 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
       if (/^[0-9]$/.test(e.key)) push(e.key);
       else if (e.key === "Backspace") backspace();
       else if (e.key === "Escape") clear();
+      else if (e.key === "Enter") {
+        // Manual confirm for the unknown-length case.
+        if (modeRef.current === "verify" && !verifyLengthRef.current && codeRef.current.length >= MIN_LENGTH) {
+          void submitVerify(codeRef.current);
+        }
+      }
     };
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
