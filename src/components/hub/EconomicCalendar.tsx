@@ -96,50 +96,62 @@ type EconRow = HubPayload["econEvents"][number];
 type NewsTheme = {
   key: string;
   match: RegExp;
-  nasdaq: string;
-  dow: string;
+  /** What the number is, in one beginner sentence. */
+  what: string;
+  /** Most likely scenario for both indexes. */
+  likely: string;
 };
 
 const NEWS_THEMES: NewsTheme[] = [
   {
     key: "inflation",
     match: /cpi|inflation|ppi|pce/i,
-    nasdaq: "an inflation print moves rate expectations first, and the NASDAQ is the most rate-sensitive of the two — a hot number usually hits tech hardest, a soft one fuels the sharpest bounce",
-    dow: "the Dow reacts more slowly to inflation data, but a hot print still pressures it through higher borrowing costs for its industrial and financial names",
+    what: "This shows how fast prices are rising.",
+    likely:
+      "Higher than expected: both usually sell off, NASDAQ harder. Lower than expected: both usually rally, NASDAQ harder.",
   },
   {
     key: "jobs",
     match: /payroll|nfp|unemployment|jobless|claims|employment/i,
-    nasdaq: "jobs data cuts both ways for the NASDAQ — strong hiring means rates stay higher for longer, weak hiring revives cut hopes but raises growth fears",
-    dow: "the Dow leans on the growth read: solid hiring supports its cyclical, consumer and industrial components, a sharp miss hits them directly",
+    what: "This shows how many people are working.",
+    likely:
+      "Much stronger than expected: first move is often down (rates stay high). Much weaker: both can drop on growth fears. Close to expected: both drift and range.",
   },
   {
     key: "fed",
     match: /fed|fomc|powell|rate decision|interest rate/i,
-    nasdaq: "Fed commentary is the single biggest driver for the NASDAQ — hawkish language compresses tech valuations, dovish language expands them fast",
-    dow: "the Dow follows the Fed through the economy rather than valuations: hawkish means tighter credit for banks and industrials, dovish eases that pressure",
+    what: "This is the Fed talking about interest rates.",
+    likely:
+      "Talk of keeping rates high: both sell off, NASDAQ most. Talk of cutting: both rally hard. Expect big whipsaws either way.",
   },
   {
     key: "growth",
     match: /gdp|ism|pmi|industrial production|durable/i,
-    nasdaq: "growth data matters less to the NASDAQ than rates do, but a big miss pulls risk appetite out of the whole index",
-    dow: "growth and manufacturing data hit the Dow hardest — its industrials and materials names trade directly off this read",
+    what: "This shows how much the economy is producing.",
+    likely: "Stronger than expected: US30 usually leads up. Weaker: US30 usually leads down, NASDAQ follows.",
   },
   {
     key: "consumer",
     match: /retail sales|consumer|sentiment|confidence/i,
-    nasdaq: "the consumer read feeds NASDAQ names through ad spend and discretionary tech demand",
-    dow: "the Dow carries large consumer and retail weights, so this print tends to move it more than the NASDAQ",
+    what: "This shows how much people are spending.",
+    likely: "Stronger spending: US30 usually gains most. Weaker spending: US30 drops first, NASDAQ follows.",
   },
   {
     key: "oil",
     match: /oil|crude|inventor|opec/i,
-    nasdaq: "energy prints are a second-order input for the NASDAQ, mainly via the inflation path",
-    dow: "the Dow has direct energy and transport exposure, so this print can push it independently of tech",
+    what: "This is about the price of oil.",
+    likely: "Oil jumping: US30 pressured. Oil falling: both usually get a small lift.",
   },
 ];
 
-/** Plain-language read on how this morning's high-impact releases hit the two indexes. */
+const GENERIC: NewsTheme = {
+  key: "generic",
+  match: /.^/,
+  what: "This is a big scheduled number traders watch closely.",
+  likely: "Expect one fast move on the release, then a pullback. Both indexes usually move the same direction.",
+};
+
+/** Beginner-level read on this morning's releases. Recomputed on every data refresh. */
 export function MorningNewsImpact({ payload }: { payload: HubPayload }) {
   const todayPacific = pacificDateISO();
   const events: EconRow[] = [...payload.econEvents]
@@ -148,54 +160,51 @@ export function MorningNewsImpact({ payload }: { payload: HubPayload }) {
 
   if (events.length === 0) return null;
 
-  const themes: NewsTheme[] = [];
-  for (const event of events) {
-    const theme = NEWS_THEMES.find((t) => t.match.test(event.title));
-    if (theme && !themes.some((t) => t.key === theme.key)) themes.push(theme);
-  }
+  const rows = events.map((event) => {
+    const theme = NEWS_THEMES.find((t) => t.match.test(event.title)) ?? GENERIC;
+    const beforeOpen = event.time < "06:30";
+    return { event, theme, beforeOpen };
+  });
 
-  const first = events[0]!;
-  const timing = `${econTimeToLocal(first.date, first.time)}${events.length > 1 ? ` and ${events.length - 1} more before noon` : ""}`;
-  const titles = events.map((e) => e.title).join(", ");
+  const beforeOpen = rows.filter((r) => r.beforeOpen);
+  const afterOpen = rows.filter((r) => !r.beforeOpen);
 
-  const fallbackNasdaq =
-    "expect wider spreads and faster reversals around the release — the NASDAQ typically reacts to the rate implications of the number, not the headline itself";
-  const fallbackDow =
-    "the Dow usually moves on what the number says about the economy, so it can lag or diverge from the NASDAQ's first reaction";
+  const openRead = beforeOpen.length
+    ? `The number lands before the 6:30 AM open, so the reaction is already priced into the first candles — expect a wide, fast opening move and a pullback soon after.`
+    : `Nothing lands before the 6:30 AM open, so expect a normal open and the real move when the release hits${afterOpen[0] ? ` at ${econTimeToLocal(afterOpen[0].event.date, afterOpen[0].event.time)}` : ""}.`;
 
   return (
     <section aria-labelledby="morning-impact-title" className="border-b border-border py-6 sm:py-8">
-      <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">What it means this morning</p>
+      <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">In plain English</p>
       <h3 id="morning-impact-title" className="mt-1 font-display text-lg font-semibold sm:text-2xl">
-        How today&apos;s news hits NASDAQ and US30
+        What this means for NASDAQ and US30
       </h3>
-      <p className="mt-3 text-sm text-muted-foreground">
-        First release {timing}: {titles}.
-      </p>
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <article className="min-w-0 rounded-lg border border-border bg-card p-4">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">NASDAQ · MNQ</p>
-          <ul className="mt-2 space-y-2 text-sm leading-relaxed">
-            {(themes.length ? themes.map((t) => t.nasdaq) : [fallbackNasdaq]).map((line) => (
-              <li key={line} className="break-words">
-                {line}.
-              </li>
-            ))}
-          </ul>
-        </article>
-        <article className="min-w-0 rounded-lg border border-border bg-card p-4">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Dow · US30 · MYM</p>
-          <ul className="mt-2 space-y-2 text-sm leading-relaxed">
-            {(themes.length ? themes.map((t) => t.dow) : [fallbackDow]).map((line) => (
-              <li key={line} className="break-words">
-                {line}.
-              </li>
-            ))}
-          </ul>
-        </article>
+      <p className="mt-3 text-sm leading-relaxed">{openRead}</p>
+
+      <div className="mt-4 space-y-3">
+        {rows.map(({ event, theme, beforeOpen: pre }) => (
+          <article
+            key={`${event.date}-${event.time}-${event.title}`}
+            className="min-w-0 rounded-lg border border-border bg-card p-4"
+          >
+            <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <time dateTime={`${event.date}T${event.time}`}>{econTimeToLocal(event.date, event.time)}</time>
+              <span className="rounded-full border border-border px-2 py-0.5">
+                {pre ? "Before the 6:30 open" : "After the 6:30 open"}
+              </span>
+            </div>
+            <p className="mt-2 break-words font-display text-base font-semibold">{event.title}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{theme.what}</p>
+            <p className="mt-2 text-sm leading-relaxed">
+              <span className="font-semibold">Most likely: </span>
+              {theme.likely}
+            </p>
+          </article>
+        ))}
       </div>
+
       <p className="mt-3 text-xs text-muted-foreground">
-        Context only — not an entry signal. Wait for the release to settle before trading structure.
+        Plain guidance, not an entry signal. Let the first move settle before you trade.
       </p>
     </section>
   );
