@@ -133,9 +133,9 @@ function readTimeframe(bars: Bar[]): TfRead | undefined {
   const l1 = lows[lows.length - 1]!.price;
   const l0 = lows[lows.length - 2]!.price;
 
-  let bias: TfBias = "neutral";
-  if (h1 > h0 && l1 > l0) bias = "bullish";
-  else if (h1 < h0 && l1 < l0) bias = "bearish";
+  let sequenceBias: TfBias = "neutral";
+  if (h1 > h0 && l1 > l0) sequenceBias = "bullish";
+  else if (h1 < h0 && l1 < l0) sequenceBias = "bearish";
 
   // Most recent close-confirmed break of an established swing.
   let bosIndex = -1;
@@ -179,8 +179,27 @@ function readTimeframe(bars: Bar[]): TfRead | undefined {
   const progress = range > 0 ? Math.abs(last - first) / range : 0;
   const state: TfRead["state"] = progress >= 0.45 ? "trending" : "consolidating";
 
+  // Structure hierarchy: newest confirmed evidence wins.
+  //
+  // A swing sequence can still read HH/HL long after price has broken down
+  // through the last swing low — so a close-confirmed BOS that happened AFTER
+  // the swings the sequence is built from overrides the sequence, and price
+  // trading back outside the last swing range retires a stale sequence.
+  let bias = sequenceBias;
+  const lastSwingIndex = Math.max(highs[highs.length - 1]!.i, lows[lows.length - 1]!.i);
+  if (bos !== "none" && bos !== sequenceBias && bosIndex >= lastSwingIndex) {
+    bias = bos;
+  }
+  // Price position guard: a bullish read can't stand with price closing below
+  // the last swing low, and vice versa.
+  if (typeof last === "number" && last > 0) {
+    if (bias === "bullish" && last < l1) bias = bos === "bearish" ? "bearish" : "neutral";
+    else if (bias === "bearish" && last > h1) bias = bos === "bullish" ? "bullish" : "neutral";
+  }
+
   return { bias, bos, state };
 }
+
 
 /** Combine the 15M context read with the 5M primary read. */
 function combineMtf(m15?: TfRead, m5?: TfRead): FeedMtf | undefined {
@@ -342,6 +361,12 @@ function structureFrom(bars: Bar[], price: number, dayHigh: number, dayLow: numb
   let bias: FeedStructure["bias"] = "ranging";
   if (h1 > h0 && l1 > l0) bias = "bullish";
   else if (h1 < h0 && l1 < l0) bias = "bearish";
+  // Price position guard: the sequence can read HH/HL long after price has
+  // broken down through the last swing low. Don't aim the target upward in
+  // that case (and vice versa).
+  if (bias === "bullish" && price < l1) bias = "bearish";
+  else if (bias === "bearish" && price > h1) bias = "bullish";
+
 
   const sequence = `${h1 > h0 ? "HH" : "LH"} / ${l1 > l0 ? "HL" : "LL"}`;
 
