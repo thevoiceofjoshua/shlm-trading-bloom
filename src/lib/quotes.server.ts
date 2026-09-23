@@ -243,6 +243,19 @@ export const YAHOO_SYMBOLS: Record<string, string> = {
 /** Instruments that show day high / low, so they get a detail request. */
 const DETAILED = ["NASDAQ", "US30", "XAU/USD"];
 
+/**
+ * Symbols used for the 15M / 5M structure read only. The futures contracts
+ * (MNQ/MYM/MGC equivalents) trade nearly 24h, so the structure read stays
+ * populated outside US cash hours. Displayed prices still come from the
+ * instruments above.
+ */
+const STRUCT_SYMBOLS: Record<string, string> = {
+  NASDAQ: "NQ=F",
+  US30: "YM=F",
+  "XAU/USD": "GC=F",
+};
+
+
 const HOSTS = ["https://query1.finance.yahoo.com", "https://query2.finance.yahoo.com"];
 const UA = "Mozilla/5.0";
 
