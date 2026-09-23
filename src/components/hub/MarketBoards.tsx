@@ -217,8 +217,6 @@ export function IndexCards({ payload }: { payload: HubPayload }) {
   );
 }
 
-type LiqLevel = NonNullable<HubPayload["indexes"][number]["pullbacks"]>[number];
-type Structure = NonNullable<HubPayload["indexes"][number]["h1"]>;
 
 type Mtf = NonNullable<HubPayload["indexes"][number]["mtf"]>;
 
@@ -289,76 +287,12 @@ function DirectionBlock({ mtf }: { mtf?: Mtf }) {
 }
 
 
-function LevelRow({ level, role, price }: { level?: LiqLevel; role: string; price: number }) {
-  if (!level) {
-    return (
-      <div>
-        <p className="text-muted-foreground">{role}</p>
-        <p className="font-display text-base font-medium text-muted-foreground">—</p>
-        <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">No data</p>
-      </div>
-    );
-  }
-  const dist = level.price - price;
-  const pct = price ? (dist / price) * 100 : 0;
-  const toneCls = level.side === "high" ? "text-emerald-500" : "text-red-500";
-  return (
-    <div>
-      <p className="text-muted-foreground">
-        {role} <span className="text-muted-foreground/60">· {level.label}</span>
-      </p>
-      <p className={`font-display text-base font-medium tabular-nums ${level.swept ? "text-muted-foreground" : "text-foreground"}`}>
-        {level.price.toLocaleString()}
-      </p>
-      <div className="mt-0.5 flex items-center gap-2">
-        <span
-          className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${
-            level.swept ? "bg-border/60 text-muted-foreground" : `bg-transparent ring-1 ring-current ${toneCls}`
-          }`}
-        >
-          {level.swept ? "Swept" : "Untapped"}
-        </span>
-        <span className="text-[10px] tabular-nums text-muted-foreground">
-          {dist >= 0 ? "+" : ""}
-          {Math.abs(dist) >= 100 ? Math.round(dist).toLocaleString() : dist.toFixed(1)} ({pct >= 0 ? "+" : ""}
-          {pct.toFixed(2)}%)
-        </span>
-      </div>
-    </div>
-  );
-}
 
 function ScalperLevels({ quote }: { quote: HubPayload["indexes"][number] }) {
-  const h1 = quote.h1;
-  const pullbacks = quote.pullbacks ?? [];
   return (
-    <>
-      <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
-        <DirectionBlock mtf={quote.mtf} />
-
-        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-          <LevelRow level={h1?.target} role="Main target" price={quote.price} />
-          <LevelRow level={h1?.invalidation} role="Invalidation" price={quote.price} />
-        </div>
-      </div>
-
-      <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
-        <p className="uppercase tracking-widest text-muted-foreground">5m execution — pullback entries</p>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-          <LevelRow level={pullbacks[0]} role="Deeper entry zone" price={quote.price} />
-          <LevelRow level={pullbacks[1]} role="First entry zone" price={quote.price} />
-        </div>
-        <p className="pt-1 text-[10px] leading-relaxed text-muted-foreground/80">
-          Trade with the 15M direction; enter on the 5m pullback into untapped levels.
-        </p>
-        <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70">
-          {quote.levelsSetAt
-            ? `Levels set ${new Date(quote.levelsSetAt).toLocaleString("en-US", { timeZone: "America/Los_Angeles", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })} PST`
-            : "Levels set 5:00 AM PST"}
-        </p>
-      </div>
-    </>
-
+    <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
+      <DirectionBlock mtf={quote.mtf} />
+    </div>
   );
 }
 
