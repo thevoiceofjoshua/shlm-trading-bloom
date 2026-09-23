@@ -179,22 +179,8 @@ function ScalperLevels({ quote }: { quote: HubPayload["indexes"][number] }) {
   return (
     <>
       <div className="mt-4 space-y-2 border-t border-border pt-3 text-xs">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="uppercase tracking-widest text-muted-foreground">1H structure — direction</p>
-          <div className="flex flex-wrap items-center gap-1.5">
-            {h1?.event && (
-              <span className="rounded-full border border-border bg-surface px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-foreground">
-                {h1.event}
-              </span>
-            )}
-            {h1?.sequence && (
-              <span className="rounded-full border border-border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                {h1.sequence}
-              </span>
-            )}
-            {h1 ? biasPill(h1.bias) : null}
-          </div>
-        </div>
+        <DirectionBlock mtf={quote.mtf} />
+
         <div className="grid grid-cols-2 gap-x-4 gap-y-3">
           <LevelRow level={h1?.target} role="Main target" price={quote.price} />
           <LevelRow level={h1?.invalidation} role="Invalidation" price={quote.price} />
