@@ -138,6 +138,8 @@ export const INDEX_QUOTES: LevelQuote[] = [
       { label: "5m swing low", price: 18_388.0, side: "low", swept: false },
       { label: "5m swing low", price: 18_342.0, side: "low", swept: true },
     ],
+    mtf: { m15: "bullish", m5: "bullish", bos: "bullish", state: "trending", alignment: "strong", direction: "bullish" },
+
   },
   {
     symbol: "US30",
@@ -162,6 +164,8 @@ export const INDEX_QUOTES: LevelQuote[] = [
       { label: "5m swing high", price: 41_868.0, side: "high", swept: false },
       { label: "5m swing high", price: 41_912.0, side: "high", swept: false },
     ],
+    mtf: { m15: "bearish", m5: "bearish", bos: "bearish", state: "trending", alignment: "strong", direction: "bearish" },
+
   },
 ];
 
@@ -286,6 +290,8 @@ export const GOLD_QUOTE: LevelQuote = {
     { label: "5m swing low", price: 2_515.6, side: "low", swept: false },
     { label: "5m swing low", price: 2_511.8, side: "low", swept: true },
   ],
+  mtf: { m15: "bullish", m5: "neutral", bos: "none", state: "consolidating", alignment: "neutral", direction: "neutral" },
+
 };
 
 
