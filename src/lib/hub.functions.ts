@@ -122,7 +122,9 @@ function applyDelayedQuotes(
       premarketLow: q.premarketLow,
       h1: q.h1,
       pullbacks: q.pullbacks,
+      mtf: q.mtf,
       levelsSetAt: q.levelsSetAt,
+
     };
   });
 
