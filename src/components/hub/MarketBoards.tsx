@@ -249,13 +249,23 @@ function DirectionBlock({ mtf }: { mtf?: Mtf }) {
           {dir?.text ?? "—"}
         </span>
       </div>
-      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2">
+      <div className="min-w-0">
         <span className="uppercase tracking-widest text-muted-foreground">Structure:</span>
-        <span className="min-w-0 break-words text-[11px] leading-relaxed text-muted-foreground">
-          {mtf
-            ? `15M: ${TF_LABEL[mtf.m15]} · 5M: ${TF_LABEL[mtf.m5]} · BOS: ${BOS_LABEL[mtf.bos]} · State: ${STATE_LABEL[mtf.state]} · Alignment: ${ALIGN_LABEL[mtf.alignment]}`
-            : "—"}
-        </span>
+        {mtf ? (
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            <StructurePill k="15M" v={TF_LABEL[mtf.m15]} bias={mtf.m15} />
+            <StructurePill k="5M" v={TF_LABEL[mtf.m5]} bias={mtf.m5} />
+            <StructurePill k="BOS" v={BOS_LABEL[mtf.bos]} bias={mtf.bos === "none" ? "neutral" : mtf.bos} />
+            <StructurePill k="State" v={STATE_LABEL[mtf.state]} bias="neutral" />
+            <StructurePill
+              k="Alignment"
+              v={ALIGN_LABEL[mtf.alignment]}
+              bias={mtf.alignment === "strong" ? mtf.m5 : "neutral"}
+            />
+          </div>
+        ) : (
+          <p className="mt-1.5 text-[11px] text-muted-foreground">—</p>
+        )}
       </div>
     </div>
   );
