@@ -194,7 +194,7 @@ function ScalperLevels({ quote }: { quote: HubPayload["indexes"][number] }) {
           <LevelRow level={pullbacks[1]} role="First entry zone" price={quote.price} />
         </div>
         <p className="pt-1 text-[10px] leading-relaxed text-muted-foreground/80">
-          Trade with the 1H direction; enter on the 5m pullback into untapped levels.
+          Trade with the 15M direction; enter on the 5m pullback into untapped levels.
         </p>
         <p className="text-[10px] uppercase tracking-widest text-muted-foreground/70">
           {quote.levelsSetAt

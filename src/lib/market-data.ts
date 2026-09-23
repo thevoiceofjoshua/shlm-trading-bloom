@@ -74,10 +74,10 @@ export interface LiquidityLevel {
   swept: boolean;
 }
 
-/** 1H read: direction plus the draw on liquidity and the invalidation level. */
+/** 15M read: direction plus the draw on liquidity and the invalidation level. */
 export interface StructureRead {
   bias: "bullish" | "bearish" | "ranging";
-  /** Last confirmed 1H structure shift. */
+  /** Last confirmed 15M structure shift. */
   event?: "BOS" | "CHoCH";
   /** Latest swing sequence, e.g. "HH / HL". */
   sequence?: string;
@@ -102,9 +102,9 @@ export interface LevelQuote extends Quote {
   priorDayLow?: number;
   premarketHigh?: number;
   premarketLow?: number;
-  /** 1H structure — direction and main target. */
+  /** 15M structure — direction and main target. */
   h1?: StructureRead;
-  /** 5m swing points between price and the 1H target. */
+  /** 5m swing points between price and the 15M target. */
   pullbacks?: LiquidityLevel[];
   /** 15M / 5M structure read (live, not locked to the 5:00am snapshot). */
   mtf?: MtfRead;
@@ -131,8 +131,8 @@ export const INDEX_QUOTES: LevelQuote[] = [
       bias: "bullish",
       event: "BOS",
       sequence: "HH / HL",
-      target: { label: "1H swing high", price: 18_560.0, side: "high", swept: false },
-      invalidation: { label: "1H swing low", price: 18_262.0, side: "low", swept: false },
+      target: { label: "15m swing high", price: 18_560.0, side: "high", swept: false },
+      invalidation: { label: "15m swing low", price: 18_262.0, side: "low", swept: false },
     },
     pullbacks: [
       { label: "5m swing low", price: 18_388.0, side: "low", swept: false },
@@ -157,8 +157,8 @@ export const INDEX_QUOTES: LevelQuote[] = [
       bias: "bearish",
       event: "CHoCH",
       sequence: "LH / LL",
-      target: { label: "1H swing low", price: 41_640.0, side: "low", swept: false },
-      invalidation: { label: "1H swing high", price: 42_010.0, side: "high", swept: false },
+      target: { label: "15m swing low", price: 41_640.0, side: "low", swept: false },
+      invalidation: { label: "15m swing high", price: 42_010.0, side: "high", swept: false },
     },
     pullbacks: [
       { label: "5m swing high", price: 41_868.0, side: "high", swept: false },
@@ -283,8 +283,8 @@ export const GOLD_QUOTE: LevelQuote = {
     bias: "bullish",
     event: "BOS",
     sequence: "HH / HL",
-    target: { label: "1H swing high", price: 2_531.5, side: "high", swept: false },
-    invalidation: { label: "1H swing low", price: 2_505.2, side: "low", swept: false },
+    target: { label: "15m swing high", price: 2_531.5, side: "high", swept: false },
+    invalidation: { label: "15m swing low", price: 2_505.2, side: "low", swept: false },
   },
   pullbacks: [
     { label: "5m swing low", price: 2_515.6, side: "low", swept: false },
