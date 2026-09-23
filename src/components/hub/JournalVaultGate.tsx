@@ -49,6 +49,11 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
   const verifyBoxes = verifyLength ?? MAX_LENGTH;
   const verifyLengthRef = useRef(verifyLength);
   verifyLengthRef.current = verifyLength;
+  const codeRef = useRef(code);
+  codeRef.current = code;
+  const modeRef = useRef(mode);
+  modeRef.current = mode;
+
 
 
   useEffect(() => {
@@ -149,11 +154,14 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
     setCode((prev) => {
       if (prev.length >= (expected ?? MAX_LENGTH)) return prev;
       const next = prev + digit;
-      const ready = expected ? next.length === expected : next.length >= MIN_LENGTH;
-      if (ready) window.setTimeout(() => submitVerify(next), 120);
+      // Only auto-submit when we know how long this member's code is. With an
+      // unknown length, submitting at MIN_LENGTH would lock out anyone whose
+      // code is longer — they confirm with the unlock key instead.
+      if (expected && next.length === expected) window.setTimeout(() => submitVerify(next), 120);
       return next;
     });
   };
+
 
 
   const backspace = () => {
@@ -177,7 +185,14 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
       if (/^[0-9]$/.test(e.key)) push(e.key);
       else if (e.key === "Backspace") backspace();
       else if (e.key === "Escape") clear();
+      else if (e.key === "Enter") {
+        // Manual confirm for the unknown-length case.
+        if (modeRef.current === "verify" && !verifyLengthRef.current && codeRef.current.length >= MIN_LENGTH) {
+          void submitVerify(codeRef.current);
+        }
+      }
     };
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -301,6 +316,8 @@ export function JournalVaultGate({ getStatus, setPasscode, verify, onUnlock }: P
             onPush={push}
             onBackspace={backspace}
             onClear={clear}
+            onSubmit={verifyLength ? undefined : () => submitVerify(code)}
+
           />
 
         )}
@@ -363,7 +380,17 @@ function SetupPanel({ code, confirm, denied, error, onPush, onBackspace, onClear
   );
 }
 
-function VerifyPanel({ code, boxes, denied, error, onPush, onBackspace, onClear }: PanelProps & { boxes: number }) {
+function VerifyPanel({
+  code,
+  boxes,
+  denied,
+  error,
+  onPush,
+  onBackspace,
+  onClear,
+  onSubmit,
+}: PanelProps & { boxes: number; onSubmit?: () => void }) {
+
   return (
     <div className={denied ? "vault-glitch mt-7" : "mt-7"}>
       <p className="text-[10px] uppercase tracking-[0.3em] text-[var(--vault-muted)]">enter passcode</p>
@@ -387,10 +414,22 @@ function VerifyPanel({ code, boxes, denied, error, onPush, onBackspace, onClear 
       </div>
 
       <p className={`mt-3 h-4 text-[11px] tracking-widest ${denied ? "font-bold text-[var(--vault-ink)]" : error ? "text-[var(--vault-accent)]" : "text-[var(--vault-muted)]"}`}>
-        {denied ? "ACCESS DENIED — retry" : error ?? "keypad or keyboard"}
+        {denied ? "ACCESS DENIED — retry" : error ?? (onSubmit ? "enter code, then unlock" : "keypad or keyboard")}
       </p>
 
       <Keypad onPush={onPush} onBackspace={onBackspace} onClear={onClear} />
+
+      {onSubmit && (
+        <button
+          type="button"
+          onClick={onSubmit}
+          disabled={code.length < MIN_LENGTH}
+          className="mt-3 w-full rounded-lg border border-[var(--vault-ink)] px-4 py-2.5 text-[11px] uppercase tracking-[0.3em] text-[var(--vault-ink)] transition-opacity disabled:opacity-40"
+        >
+          unlock
+        </button>
+      )}
+
     </div>
   );
 }
