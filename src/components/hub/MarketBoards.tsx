@@ -63,6 +63,91 @@ function DriverTile({ d }: { d: { symbol: string; price: number; changePct: numb
   );
 }
 
+/* -------- Driver score: bullish/bearish read from the drivers themselves ------ */
+
+type ScoreRead = { score: number; label: string; detail: string };
+
+function scoreLabel(score: number) {
+  if (score >= 40) return "BULLISH";
+  if (score >= 15) return "LEANING BULLISH";
+  if (score <= -40) return "BEARISH";
+  if (score <= -15) return "LEANING BEARISH";
+  return "NEUTRAL";
+}
+
+function equityDriverScore(list: { changePct: number }[]): ScoreRead | null {
+  if (!list.length) return null;
+  const up = list.filter((d) => d.changePct > 0).length;
+  const down = list.filter((d) => d.changePct < 0).length;
+  const avg = list.reduce((a, d) => a + d.changePct, 0) / list.length;
+  // Breadth (how many are green) and average move, blended into a -100..100 score.
+  const breadth = ((up - down) / list.length) * 60;
+  const strength = Math.max(-40, Math.min(40, avg * 25));
+  const score = Math.round(Math.max(-100, Math.min(100, breadth + strength)));
+  return {
+    score,
+    label: scoreLabel(score),
+    detail: `${up} up · ${down} down · avg ${avg >= 0 ? "+" : ""}${avg.toFixed(2)}%`,
+  };
+}
+
+function goldDriverScore(list: { label: string; direction: "up" | "down" | "flat" }[]): ScoreRead | null {
+  if (!list.length) return null;
+  // For gold, a firmer dollar and higher yields are headwinds; risk stress is a tailwind.
+  const signFor = (label: string) => (/vix|risk|stress/i.test(label) ? 1 : -1);
+  let total = 0;
+  let counted = 0;
+  let supportive = 0;
+  let against = 0;
+  for (const m of list) {
+    if (m.direction === "flat") {
+      counted += 1;
+      continue;
+    }
+    const vote = (m.direction === "up" ? 1 : -1) * signFor(m.label);
+    total += vote;
+    counted += 1;
+    if (vote > 0) supportive += 1;
+    else against += 1;
+  }
+  const score = Math.round((total / Math.max(counted, 1)) * 100);
+  return {
+    score,
+    label: scoreLabel(score),
+    detail: `${supportive} supportive · ${against} headwind · ${counted - supportive - against} flat`,
+  };
+}
+
+function DriverScore({ read, note }: { read: ScoreRead | null; note: string }) {
+  if (!read) return null;
+  const tone = read.score > 14 ? "text-emerald-500" : read.score < -14 ? "text-red-500" : "text-muted-foreground";
+  const dot = read.score > 14 ? "🟢" : read.score < -14 ? "🔴" : "🟡";
+  const width = Math.min(Math.abs(read.score), 100);
+  return (
+    <div className="mt-5 min-w-0 border-t border-border pt-4">
+      <SectionHead title="Driver score" />
+      <div className="mt-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <p className={`min-w-0 font-display text-base font-medium ${tone}`}>
+          {dot} {read.label}
+        </p>
+        <p className={`shrink-0 text-sm font-medium tabular-nums ${tone}`}>
+          {read.score > 0 ? "+" : ""}
+          {read.score}
+        </p>
+      </div>
+      <div className="mt-2 h-1 w-full rounded-full bg-border">
+        <div
+          className={`h-1 rounded-full ${read.score >= 0 ? "bg-emerald-500" : "bg-red-500"}`}
+          style={{ width: `${width}%` }}
+        />
+      </div>
+      <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
+        {read.detail} — {note}
+      </p>
+    </div>
+  );
+}
+
 export function IndexCards({ payload }: { payload: HubPayload }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
