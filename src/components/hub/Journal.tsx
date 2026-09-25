@@ -1711,10 +1711,18 @@ function startOfWeek(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate() - diff);
 }
 
+const SCOPES = [
+  { key: "week", label: "This week" },
+  { key: "month", label: "This month" },
+  { key: "all", label: "All time" },
+] as const;
+type ScopeKey = (typeof SCOPES)[number]["key"];
+
 function WeekMonthSummary({ userId }: { userId: string }) {
   const fetchRange = useServerFn(getMemberNotesRange);
+  const [scope, setScope] = useState<ScopeKey>("week");
 
-  const { weekFrom, weekTo, monthFrom, monthTo } = useMemo(() => {
+  const { weekFrom, weekTo, monthFrom, monthTo, monthLabel } = useMemo(() => {
     const now = new Date();
     const ws = startOfWeek(now);
     const we = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + 6);
@@ -1723,54 +1731,60 @@ function WeekMonthSummary({ userId }: { userId: string }) {
       weekTo: toKey(we),
       monthFrom: toKey(new Date(now.getFullYear(), now.getMonth(), 1)),
       monthTo: toKey(new Date(now.getFullYear(), now.getMonth() + 1, 0)),
+      monthLabel: now.toLocaleDateString("en-US", { month: "long" }),
     };
   }, []);
 
-  const from = weekFrom < monthFrom ? weekFrom : monthFrom;
-  const to = weekTo > monthTo ? weekTo : monthTo;
-
+  // One fetch covers every scope; win rate needs all-time history.
   const { data: rows } = useQuery({
-    queryKey: ["member-notes-summary", userId, from, to],
-    queryFn: () => fetchRange({ data: { from, to } }),
+    queryKey: ["member-notes-summary", userId, "all-history"],
+    queryFn: () => fetchRange({ data: { from: "0001-01-01", to: "9999-12-31" } }),
     enabled: !!userId,
   });
 
-  const totals = useMemo(() => {
+  const stats = useMemo(() => {
     const list = (rows ?? []) as { note_date: string; session: string; body: string }[];
-    const sum = (a: string, b: string) => {
-      let total = 0;
-      let entries = 0;
-      let trades = 0;
-      for (const r of list) {
-        if (r.note_date < a || r.note_date > b) continue;
-        const entry = parseEntry(r.body ?? "", r.session);
-        total += pnlNumber(entry);
-        entries++;
-        trades += (entry.trades ?? []).length;
-      }
-      return { total, entries, trades };
+    return {
+      week: scopeStats(list, weekFrom, weekTo),
+      month: scopeStats(list, monthFrom, monthTo),
+      all: scopeStats(list),
     };
-    return { week: sum(weekFrom, weekTo), month: sum(monthFrom, monthTo) };
   }, [rows, weekFrom, weekTo, monthFrom, monthTo]);
 
-  const monthLabel = new Date().toLocaleDateString("en-US", { month: "long" });
+  const current = stats[scope];
+  const label =
+    scope === "week"
+      ? `This week · ${monthLabel}`
+      : scope === "month"
+        ? `This month · ${monthLabel}`
+        : "All time";
+  const sub =
+    scope === "week"
+      ? `${weekFrom.slice(5)} – ${weekTo.slice(5)}`
+      : scope === "month"
+        ? "Calendar month to date"
+        : "Every entry in your journal";
 
   return (
     <div className="mt-6 border-t border-border pt-5">
-      <ScopeCard
-        label={`This week · ${monthLabel}`}
-        sub={`${weekFrom.slice(5)} – ${weekTo.slice(5)}`}
-        stats={scopeStats(rows ?? [], weekFrom, weekTo)}
-      />
-      <div className="mt-3">
-        <ScopeCard
-          label={`This month · ${monthLabel}`}
-          sub="Calendar month to date"
-          stats={scopeStats(rows ?? [], monthFrom, monthTo)}
-        />
+      <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Summary scope">
+        {SCOPES.map((s) => (
+          <button
+            key={s.key}
+            type="button"
+            role="tab"
+            aria-selected={scope === s.key}
+            onClick={() => setScope(s.key)}
+            className={`min-h-8 rounded-full border px-3 py-1 text-[11px] font-medium transition-colors sm:text-xs ${
+              scope === s.key ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground hover:bg-accent"
+            }`}
+          >
+            {s.label}
+          </button>
+        ))}
       </div>
       <div className="mt-3">
-        <ScopeCard label="All time" sub="Every entry in your journal" stats={scopeStats(rows ?? [])} />
+        <ScopeCard label={label} sub={sub} stats={current} />
       </div>
     </div>
   );
