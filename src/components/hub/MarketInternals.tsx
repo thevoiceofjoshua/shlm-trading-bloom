@@ -41,37 +41,55 @@ function Pill({ k, v, tone }: { k: string; v: string; tone: string }) {
 
 function ReadCard({ read }: { read: Read }) {
   const name = read.symbol === "NASDAQ" ? "NASDAQ · MNQ" : "Dow · MYM";
+  const shown = read.readings.filter((r) => r.available);
+  const showVix = read.vix.available;
   return (
     <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
       <p className="text-xs uppercase tracking-widest text-muted-foreground">{name}</p>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {read.readings.map((r) => (
-          <Pill
-            key={r.key}
-            k={`$${r.key}`}
-            v={r.available && r.bias ? LABELS[r.key][r.bias] : "DATA UNAVAILABLE"}
-            tone={r.available && r.bias ? (r.bias === "neutral" ? "neutral" : r.bias) : "muted"}
-          />
-        ))}
-        <Pill
-          k="VIX"
-          v={read.vix.available ? `${read.vix.value} (${(read.vix.changePct ?? 0) >= 0 ? "+" : ""}${read.vix.changePct}%)` : "DATA UNAVAILABLE"}
-          tone={read.vix.available ? "neutral" : "muted"}
-        />
-      </div>
-      <p className="mt-2 text-[11px] text-muted-foreground">{read.vix.note}</p>
-      <div className="mt-3 space-y-2 border-t border-border pt-3 text-xs">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="uppercase tracking-widest text-muted-foreground">Internal participation:</span>
-          <Pill k="" v={PART[read.participation].text} tone={PART[read.participation].tone} />
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="uppercase tracking-widest text-muted-foreground">Breakout confirmation:</span>
-          <Pill k="" v={BRK[read.breakout].text} tone={BRK[read.breakout].tone} />
-        </div>
-        {read.divergence && <p className="font-display text-sm font-semibold">{read.divergence}</p>}
-        <p className="text-[11px] text-muted-foreground">{read.note}</p>
-      </div>
+      {shown.length === 0 && !showVix ? (
+        <p className="mt-3 text-[11px] text-muted-foreground">
+          No internals connected for this index yet — rows appear automatically once a data source is live.
+        </p>
+      ) : (
+        <>
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {shown.map((r) => (
+              <Pill
+                key={r.key}
+                k={`$${r.key}`}
+                v={LABELS[r.key][r.bias!]}
+                tone={r.bias === "neutral" ? "neutral" : r.bias!}
+              />
+            ))}
+            {showVix && (
+              <Pill
+                k="VIX"
+                v={`${read.vix.value} (${(read.vix.changePct ?? 0) >= 0 ? "+" : ""}${read.vix.changePct}%)`}
+                tone="neutral"
+              />
+            )}
+          </div>
+          {showVix && <p className="mt-2 text-[11px] text-muted-foreground">{read.vix.note}</p>}
+          {(read.participation !== "unavailable" || read.breakout !== "unavailable" || read.divergence) && (
+            <div className="mt-3 space-y-2 border-t border-border pt-3 text-xs">
+              {read.participation !== "unavailable" && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="uppercase tracking-widest text-muted-foreground">Internal participation:</span>
+                  <Pill k="" v={PART[read.participation].text} tone={PART[read.participation].tone} />
+                </div>
+              )}
+              {read.breakout !== "unavailable" && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="uppercase tracking-widest text-muted-foreground">Breakout confirmation:</span>
+                  <Pill k="" v={BRK[read.breakout].text} tone={BRK[read.breakout].tone} />
+                </div>
+              )}
+              {read.divergence && <p className="font-display text-sm font-semibold">{read.divergence}</p>}
+            </div>
+          )}
+        </>
+      )}
+      <p className="mt-2 text-[11px] text-muted-foreground">{read.note}</p>
     </div>
   );
 }
