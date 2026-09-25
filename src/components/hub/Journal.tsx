@@ -184,6 +184,11 @@ function newTrade(): Trade {
   return { id: Math.random().toString(36).slice(2, 10), instrument: "", direction: "", result: "", pnl: "", note: "" };
 }
 
+/** Fingerprint of an imported row — identical fingerprints are already in the list, so skip them. */
+function importedKey(t: { instrument: string; direction: string; pnl: string; note: string }): string {
+  return `${t.instrument}|${t.direction}|${t.pnl}|${t.note}`;
+}
+
 function formatMoney(n: number): string {
   const sign = n > 0 ? "+" : n < 0 ? "-" : "";
   const abs = Math.abs(n);
