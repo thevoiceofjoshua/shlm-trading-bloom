@@ -147,7 +147,9 @@ function CentrePage() {
 
             <IndexCards payload={payload} />
 
-            <MarketInternals payload={payload} />
+            {/* Market Internals hidden until a paid NYSE internals source is connected —
+                restore by uncommenting this line (component + logic kept intact).
+                <MarketInternals payload={payload} /> */}
 
 
             <div className="grid items-stretch gap-6 lg:grid-cols-2">
