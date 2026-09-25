@@ -1335,7 +1335,8 @@ function TradesEditor({
         noteDate={noteDate}
         session={entry.session}
         onImport={(imported) => {
-          const next = imported.map((t) => ({ ...newTrade(), ...t }));
+          const added = imported.map((t) => ({ ...newTrade(), ...t }));
+          const next = [...trades, ...added];
           onChange({ trades: next, tradeCount: String(next.length) });
           setSectionCollapsed(false);
           setCollapsedIds(new Set());
