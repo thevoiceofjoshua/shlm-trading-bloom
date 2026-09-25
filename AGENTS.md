@@ -8,3 +8,4 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- Market Internals is a separate read-only layer (src/lib/internals.server.ts); it must never modify Direction/Structure or Drivers — keeps the confirmation stack independent.
