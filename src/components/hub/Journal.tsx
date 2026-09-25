@@ -180,6 +180,54 @@ function hasPnl(entry: Entry): boolean {
   return entry.pnl.trim() !== "" && Number.isFinite(Number.parseFloat(entry.pnl.replace(/[^0-9.-]/g, "")));
 }
 
+/** Win/loss/BE for one trade: result mark first, P&L sign as fallback, null when undecidable. */
+function classifyTrade(t: Trade): "win" | "loss" | "breakeven" | null {
+  if (t.result === "win" || t.result === "loss" || t.result === "breakeven") return t.result;
+  const raw = (t.pnl ?? "").trim();
+  if (raw === "") return null;
+  const n = Number.parseFloat(raw.replace(/[^0-9.-]/g, ""));
+  if (!Number.isFinite(n)) return null;
+  if (n > 0) return "win";
+  if (n < 0) return "loss";
+  return "breakeven";
+}
+
+interface ScopeStats {
+  total: number;
+  entries: number;
+  trades: number;
+  wins: number;
+  losses: number;
+  be: number;
+  winRate: number | null;
+}
+
+/** Aggregate P&L + win rate over saved entries, optionally bounded by note_date. */
+function scopeStats(list: { note_date: string; session: string; body: string }[], from?: string, to?: string): ScopeStats {
+  let total = 0;
+  let entries = 0;
+  let trades = 0;
+  let wins = 0;
+  let losses = 0;
+  let be = 0;
+  for (const r of list) {
+    if (from && r.note_date < from) continue;
+    if (to && r.note_date > to) continue;
+    const entry = parseEntry(r.body ?? "", r.session);
+    total += pnlNumber(entry);
+    entries++;
+    for (const t of entry.trades ?? []) {
+      trades++;
+      const c = classifyTrade(t);
+      if (c === "win") wins++;
+      else if (c === "loss") losses++;
+      else if (c === "breakeven") be++;
+    }
+  }
+  const decided = wins + losses;
+  return { total, entries, trades, wins, losses, be, winRate: decided > 0 ? Math.round((wins / decided) * 100) : null };
+}
+
 function newTrade(): Trade {
   return { id: Math.random().toString(36).slice(2, 10), instrument: "", direction: "", result: "", pnl: "", note: "" };
 }
@@ -1663,10 +1711,18 @@ function startOfWeek(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate() - diff);
 }
 
+const SCOPES = [
+  { key: "week", label: "This week" },
+  { key: "month", label: "This month" },
+  { key: "all", label: "All time" },
+] as const;
+type ScopeKey = (typeof SCOPES)[number]["key"];
+
 function WeekMonthSummary({ userId }: { userId: string }) {
   const fetchRange = useServerFn(getMemberNotesRange);
+  const [scope, setScope] = useState<ScopeKey>("week");
 
-  const { weekFrom, weekTo, monthFrom, monthTo } = useMemo(() => {
+  const { weekFrom, weekTo, monthFrom, monthTo, monthLabel } = useMemo(() => {
     const now = new Date();
     const ws = startOfWeek(now);
     const we = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + 6);
@@ -1675,66 +1731,101 @@ function WeekMonthSummary({ userId }: { userId: string }) {
       weekTo: toKey(we),
       monthFrom: toKey(new Date(now.getFullYear(), now.getMonth(), 1)),
       monthTo: toKey(new Date(now.getFullYear(), now.getMonth() + 1, 0)),
+      monthLabel: now.toLocaleDateString("en-US", { month: "long" }),
     };
   }, []);
 
-  const from = weekFrom < monthFrom ? weekFrom : monthFrom;
-  const to = weekTo > monthTo ? weekTo : monthTo;
-
+  // One fetch covers every scope; win rate needs all-time history.
   const { data: rows } = useQuery({
-    queryKey: ["member-notes-summary", userId, from, to],
-    queryFn: () => fetchRange({ data: { from, to } }),
+    queryKey: ["member-notes-summary", userId, "all-history"],
+    queryFn: () => fetchRange({ data: { from: "0001-01-01", to: "9999-12-31" } }),
     enabled: !!userId,
   });
 
-  const totals = useMemo(() => {
+  const stats = useMemo(() => {
     const list = (rows ?? []) as { note_date: string; session: string; body: string }[];
-    const sum = (a: string, b: string) => {
-      let total = 0;
-      let entries = 0;
-      let trades = 0;
-      for (const r of list) {
-        if (r.note_date < a || r.note_date > b) continue;
-        const entry = parseEntry(r.body ?? "", r.session);
-        total += pnlNumber(entry);
-        entries++;
-        trades += (entry.trades ?? []).length;
-      }
-      return { total, entries, trades };
+    return {
+      week: scopeStats(list, weekFrom, weekTo),
+      month: scopeStats(list, monthFrom, monthTo),
+      all: scopeStats(list),
     };
-    return { week: sum(weekFrom, weekTo), month: sum(monthFrom, monthTo) };
   }, [rows, weekFrom, weekTo, monthFrom, monthTo]);
 
-  const monthLabel = new Date().toLocaleDateString("en-US", { month: "long" });
+  const current = stats[scope];
+  const label =
+    scope === "week"
+      ? `This week · ${monthLabel}`
+      : scope === "month"
+        ? `This month · ${monthLabel}`
+        : "All time";
+  const sub =
+    scope === "week"
+      ? `${weekFrom.slice(5)} – ${weekTo.slice(5)}`
+      : scope === "month"
+        ? "Calendar month to date"
+        : "Every entry in your journal";
 
   return (
-    <div className="mt-6 grid min-w-0 gap-3 border-t border-border pt-5 sm:grid-cols-2">
-      <SummaryTile label="This week" sub={`${weekFrom.slice(5)} – ${weekTo.slice(5)}`} {...totals.week} />
-      <SummaryTile label={`This month · ${monthLabel}`} sub="Calendar month to date" {...totals.month} />
+    <div className="mt-6 border-t border-border pt-5">
+      <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Summary scope">
+        {SCOPES.map((s) => (
+          <button
+            key={s.key}
+            type="button"
+            role="tab"
+            aria-selected={scope === s.key}
+            onClick={() => setScope(s.key)}
+            className={`min-h-8 rounded-full border px-3 py-1 text-[11px] font-medium transition-colors sm:text-xs ${
+              scope === s.key ? "border-foreground bg-foreground text-background" : "border-border text-muted-foreground hover:bg-accent"
+            }`}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+      <div className="mt-3">
+        <ScopeCard label={label} sub={sub} stats={current} />
+      </div>
     </div>
   );
 }
 
-function SummaryTile({
+function ScopeCard({
   label,
   sub,
-  total,
-  entries,
-  trades,
+  stats,
 }: {
   label: string;
   sub: string;
-  total: number;
-  entries: number;
-  trades: number;
+  stats: ScopeStats;
 }) {
-  const color = total > 0 ? "text-emerald-500" : total < 0 ? "text-red-500" : "text-muted-foreground";
+  const color = stats.total > 0 ? "text-emerald-500" : stats.total < 0 ? "text-red-500" : "text-muted-foreground";
+  const rateColor =
+    stats.winRate === null
+      ? "text-muted-foreground"
+      : stats.winRate >= 50
+        ? "text-emerald-500"
+        : "text-red-500";
+  const rateText =
+    stats.winRate === null
+      ? "No decided trades yet"
+      : `${stats.winRate}% · ${stats.wins}W / ${stats.losses}L${stats.be > 0 ? ` / ${stats.be}BE` : ""}`;
   return (
     <div className="min-w-0 overflow-hidden rounded-xl border border-border bg-background px-3 py-3 sm:px-4">
-      <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">{label}</p>
-      <p className={`mt-1 max-w-full truncate font-display text-2xl font-medium tabular-nums ${color}`}>{formatMoney(total)}</p>
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+        <div className="min-w-0">
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">{label}</p>
+          <p className={`mt-1 max-w-full truncate font-display text-2xl font-medium tabular-nums ${color}`}>{formatMoney(stats.total)}</p>
+        </div>
+        <div className="shrink-0 text-right">
+          <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">Win rate</p>
+          <p className={`mt-1 font-display text-2xl font-medium tabular-nums ${rateColor}`}>
+            {stats.winRate === null ? "—" : `${stats.winRate}%`}
+          </p>
+        </div>
+      </div>
       <p className="mt-1 break-words text-[11px] text-muted-foreground">
-        {entries} {entries === 1 ? "entry" : "entries"} · {trades} {trades === 1 ? "trade" : "trades"} · {sub}
+        {stats.entries} {stats.entries === 1 ? "entry" : "entries"} · {stats.trades} {stats.trades === 1 ? "trade" : "trades"} · {rateText} · {sub}
       </p>
     </div>
   );
