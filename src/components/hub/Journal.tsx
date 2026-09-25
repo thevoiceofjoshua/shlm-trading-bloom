@@ -184,6 +184,11 @@ function newTrade(): Trade {
   return { id: Math.random().toString(36).slice(2, 10), instrument: "", direction: "", result: "", pnl: "", note: "" };
 }
 
+/** Fingerprint of an imported row — identical fingerprints are already in the list, so skip them. */
+function importedKey(t: { instrument: string; direction: string; pnl: string; note: string }): string {
+  return `${t.instrument}|${t.direction}|${t.pnl}|${t.note}`;
+}
+
 function formatMoney(n: number): string {
   const sign = n > 0 ? "+" : n < 0 ? "-" : "";
   const abs = Math.abs(n);
@@ -1335,7 +1340,16 @@ function TradesEditor({
         noteDate={noteDate}
         session={entry.session}
         onImport={(imported) => {
-          const next = imported.map((t) => ({ ...newTrade(), ...t }));
+          const seen = new Set(trades.map((t) => importedKey(t)));
+          const added = imported
+            .map((t) => ({ ...newTrade(), ...t }))
+            .filter((t) => {
+              const key = importedKey(t);
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+          const next = [...trades, ...added];
           onChange({ trades: next, tradeCount: String(next.length) });
           setSectionCollapsed(false);
           setCollapsedIds(new Set());
