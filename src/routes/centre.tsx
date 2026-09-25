@@ -12,6 +12,7 @@ import { IndexCards, MagSevenBoard, DowBoard, GoldDesk } from "@/components/hub/
 import { EconomicCalendar, MorningNewsImpact, MorningNewsSpotlight } from "@/components/hub/EconomicCalendar";
 import { Journal } from "@/components/hub/Journal";
 import { BetaIndicator } from "@/components/hub/BetaIndicator";
+import { MarketInternals } from "@/components/hub/MarketInternals";
 
 
 import { AdminPreviewTag } from "@/components/AdminBar";
@@ -145,6 +146,8 @@ function CentrePage() {
             <SessionBar payload={payload} />
 
             <IndexCards payload={payload} />
+
+            <MarketInternals payload={payload} />
 
 
             <div className="grid items-stretch gap-6 lg:grid-cols-2">

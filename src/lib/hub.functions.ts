@@ -47,6 +47,8 @@ export interface HubPayload {
   econEvents: typeof ECON_EVENTS;
   /** True when the calendar rows come from the live economic feed. */
   econLive?: boolean;
+  /** Market Internals confirmation layer (separate module). */
+  internals?: import("@/lib/internals.server").InternalsPayload;
 }
 
 async function checkAccess(context: any): Promise<HubAccess> {
@@ -280,6 +282,15 @@ export const getHubData = createServerFn({ method: "POST" })
         if (Object.keys(quotes).length > 0) applyDelayedQuotes(payload, quotes);
       } catch {
         // Feed unavailable — sample dataset stays in place.
+      }
+
+      // Market Internals: separate layer, reads Direction/Structure read-only.
+      try {
+        const { computeInternals } = await import("@/lib/internals.server");
+        const mtfOf = (s: string) => payload.indexes.find((i) => i.symbol === s)?.mtf as any;
+        payload.internals = await computeInternals({ NASDAQ: mtfOf("NASDAQ"), US30: mtfOf("US30") });
+      } catch {
+        // Leave unset — the section shows DATA UNAVAILABLE.
       }
 
       // Live economic calendar: real releases when reachable, else samples.
