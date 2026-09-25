@@ -111,7 +111,7 @@ function readFor(sym: "NASDAQ" | "US30", mtf: FeedMtf | undefined, series: Serie
   if (avail.length === 0) {
     return {
       symbol: sym, readings, vix, participation: "unavailable", breakout: "unavailable",
-      note: "DATA UNAVAILABLE — $TICK, $ADD and $VOLD have no data source connected, so participation and breakout confirmation can't be judged.",
+      note: "NYSE internals ($TICK, $ADD and $VOLD) aren't connected yet, so participation and breakout confirmation can't be judged.",
     };
   }
   const dir = mtf?.direction;
