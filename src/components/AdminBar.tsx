@@ -46,7 +46,7 @@ export function AdminBar() {
         type="button"
         onClick={() => setMin(false)}
         aria-label="Show admin controls"
-        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-[100] flex items-center gap-2 rounded-full border border-border bg-card/90 px-4 py-2.5 text-xs font-medium text-foreground shadow-xl backdrop-blur-xl transition-[transform,opacity] duration-300 hover:-translate-y-0.5 motion-reduce:transition-none sm:bottom-auto sm:top-20"
+        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] left-4 z-[100] flex items-center gap-2 rounded-full border border-border bg-card/90 px-4 py-2.5 text-xs font-medium text-foreground shadow-xl backdrop-blur-xl transition-[transform,opacity] duration-300 hover:-translate-y-0.5 motion-reduce:transition-none"
       >
         <span className="size-1.5 rounded-full bg-primary" />
         {label}
