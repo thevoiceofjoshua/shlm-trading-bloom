@@ -55,7 +55,7 @@ export function AdminBar() {
   }
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[100] flex justify-center px-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:inset-x-auto sm:bottom-auto sm:right-4 sm:top-20 sm:justify-end sm:px-0 sm:pb-0">
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[100] flex justify-start px-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-auto sm:left-4 sm:bottom-[max(1.25rem,env(safe-area-inset-bottom))] sm:justify-start sm:px-0 sm:pb-0">
       <div className="pointer-events-auto w-full max-w-[560px] animate-in fade-in sm:max-w-none rounded-[26px] border border-border bg-card/85 p-2 shadow-2xl backdrop-blur-xl transition-all duration-300 motion-reduce:transition-none sm:w-auto">
         <div className="flex items-center gap-2">
           <button
