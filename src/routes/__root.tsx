@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AdminBar } from "@/components/AdminBar";
 import { AdminModePrompt } from "@/components/AdminModePrompt";
+import { TawkChat } from "@/components/TawkChat";
 
 function NotFoundComponent() {
   return (
