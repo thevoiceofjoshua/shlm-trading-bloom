@@ -45,6 +45,8 @@ export const template = {
   subject: (data: Record<string, any>) =>
     `Beta access request — ${data['username'] || 'TradingView user'}`,
   displayName: 'Beta access request (admin)',
+  // Always delivered to the founder, independent of ADMIN_NOTIFICATION_EMAIL.
+  to: 'joschewagner56@gmail.com',
   previewData: {
     username: 'shlm_trader',
     memberEmail: 'member@example.com',
