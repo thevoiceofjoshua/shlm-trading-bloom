@@ -162,16 +162,29 @@ export function MorningNewsImpact({ payload }: { payload: HubPayload }) {
 
   const rows = events.map((event) => {
     const theme = NEWS_THEMES.find((t) => t.match.test(event.title)) ?? GENERIC;
-    const beforeOpen = event.time < "06:30";
-    return { event, theme, beforeOpen };
+    const timing =
+      event.time < "06:30"
+        ? {
+            label: "Before the 6:30 open",
+            context:
+              "This lands before the open. Its first reaction can set the direction and volatility traders carry into the 6:30 opening candles; watch whether that move continues or reverses at the open.",
+          }
+        : event.time === "06:30"
+          ? {
+              label: "At the 6:30 open",
+              context:
+                "This lands as the open begins and can directly trigger the first sharp move, widen volatility, or reverse the initial candle.",
+            }
+          : {
+              label: "After the 6:30 open",
+              context:
+                "This lands after the open but still belongs to the opening sequence. Price may position for it beforehand, then accelerate or reverse when the number hits.",
+            };
+    return { event, theme, timing };
   });
 
-  const beforeOpen = rows.filter((r) => r.beforeOpen);
-  const afterOpen = rows.filter((r) => !r.beforeOpen);
-
-  const openRead = beforeOpen.length
-    ? `The number lands before the 6:30 AM open, so the reaction is already priced into the first candles — expect a wide, fast opening move and a pullback soon after.`
-    : `Nothing lands before the 6:30 AM open, so expect a normal open and the real move when the release hits${afterOpen[0] ? ` at ${econTimeToLocal(afterOpen[0].event.date, afterOpen[0].event.time)}` : ""}.`;
+  const openRead =
+    "Every high-impact release below can shape the 6:30 AM opening move. A release before the open can set the initial direction and volatility; one at or after the open can start, accelerate, or reverse that move.";
 
   return (
     <section aria-labelledby="morning-impact-title" className="border-b border-border py-6 sm:py-8">
@@ -182,7 +195,7 @@ export function MorningNewsImpact({ payload }: { payload: HubPayload }) {
       <p className="mt-3 text-sm leading-relaxed">{openRead}</p>
 
       <div className="mt-4 space-y-3">
-        {rows.map(({ event, theme, beforeOpen: pre }) => (
+        {rows.map(({ event, theme, timing }) => (
           <article
             key={`${event.date}-${event.time}-${event.title}`}
             className="min-w-0 rounded-lg border border-border bg-card p-4"
@@ -190,7 +203,7 @@ export function MorningNewsImpact({ payload }: { payload: HubPayload }) {
             <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
               <time dateTime={`${event.date}T${event.time}`}>{econTimeToLocal(event.date, event.time)}</time>
               <span className="rounded-full border border-border px-2 py-0.5">
-                {pre ? "Before the 6:30 open" : "After the 6:30 open"}
+                {timing.label}
               </span>
             </div>
             <p className="mt-2 break-words font-display text-base font-semibold">{event.title}</p>
@@ -198,6 +211,10 @@ export function MorningNewsImpact({ payload }: { payload: HubPayload }) {
             <p className="mt-2 text-sm leading-relaxed">
               <span className="font-semibold">Most likely: </span>
               {theme.likely}
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              <span className="font-semibold text-foreground">At the open: </span>
+              {timing.context}
             </p>
           </article>
         ))}
