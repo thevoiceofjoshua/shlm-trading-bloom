@@ -320,7 +320,7 @@ function classify(
     const low = score <= 15 && fails.length >= 7;
     let label: BehaviorLabel | null = null;
     if (score >= 90 && passes.length >= 7) label = "FAST";
-    else if (low && sweptHigh >= 2 && sweptLow >= 2 && lastInside) label = "RANGE BOUND";
+    else if (low && sweepStrict.state === "confirmed") label = "RANGE BOUND";
     else if (low && fb.count >= 5 && fb.levels.length >= 3 && chk("structure") === false && chk("momentum") === false) label = "CHOPPY";
     else if (low && quietAvail.length === 5 && quietCount === 5) label = "SLOW";
     if (label) note = { label, text: `Note: conditions reading unusually ${label}` };
