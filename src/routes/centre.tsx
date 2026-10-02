@@ -127,7 +127,9 @@ function CentrePage() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 sm:pb-8 sm:pt-8 lg:px-8">
-        <WeeklyNotificationBanner enabled={!!payload && (payload.access.hasAccess || payload.access.isAdmin)} />
+        {payload && (payload.access.hasAccess || payload.access.isAdmin) && (
+          <WeeklyNotificationBanner enabled={true} />
+        )}
         {!payload ? (
           <div className="flex items-center justify-center py-20">
             <p className="text-sm text-muted-foreground">{isLoading ? "Loading market data…" : "Unable to load hub data."}</p>

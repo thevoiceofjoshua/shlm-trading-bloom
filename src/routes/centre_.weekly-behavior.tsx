@@ -70,7 +70,7 @@ function WeeklyBehaviorPage() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 sm:pb-8 sm:pt-8 lg:px-8">
-        <WeeklyNotificationBanner enabled={!!res && !locked} />
+        {res && !locked && <WeeklyNotificationBanner enabled={true} />}
         <h1 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">Weekly Behavior</h1>
         <p className="mt-1 text-xs text-muted-foreground">
           How the NY session tends to behave each day. Context only — not an entry signal.
