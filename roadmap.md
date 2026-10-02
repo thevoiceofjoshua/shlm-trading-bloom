@@ -80,4 +80,4 @@
 - [x] Log four Weekly Behavior transitions with daily deduplication and seven-day retention
 - [x] Schedule five-minute background checks securely and poll activity every minute
 - [x] Show ten-second banner and bottom Notification Center on both Centre pages
-- [ ] Verify event transition tests, access boundaries, and page rendering
+- [ ] Verify signed-in page rendering and event history (blocked: externally managed sign-in is unavailable in the test browser)
