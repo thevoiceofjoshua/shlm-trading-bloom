@@ -246,6 +246,14 @@ function CentreMenu({
               Calendar, entries and PnL totals
             </span>
           </button>
+          <Link
+            to="/centre/weekly-behavior"
+            role="menuitem"
+            className="block w-full border-t border-border px-4 py-3 text-left text-sm hover:bg-accent"
+          >
+            <span className="font-medium">Weekly Behavior</span>
+            <span className="mt-0.5 block text-xs text-muted-foreground">Day-of-week NY session context</span>
+          </Link>
           {showBeta && (
             <button
               type="button"
