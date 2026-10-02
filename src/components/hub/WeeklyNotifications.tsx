@@ -27,7 +27,8 @@ function useBanner(enabled: boolean) {
     if (!newest) return;
     const seen = localStorage.getItem(key);
     if (seen === newest.id) return;
-    const count = seen ? Math.max(1, data.events.findIndex((event) => event.id === seen)) : 0;
+    const seenIndex = seen ? data.events.findIndex((event) => event.id === seen) : -1;
+    const count = seenIndex < 0 ? data.events.length : seenIndex;
     localStorage.setItem(key, newest.id);
     if (count) setBanner({ message: newest.message, count });
   }, [data]);
