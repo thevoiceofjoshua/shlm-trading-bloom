@@ -286,7 +286,7 @@ function round(n: number, dp = 2) {
   return Math.round(n * f) / f;
 }
 
-async function getJson(path: string): Promise<any | null> {
+export async function getJson(path: string): Promise<any | null> {
   for (const host of HOSTS) {
     try {
       const res = await fetch(`${host}${path}`, {
