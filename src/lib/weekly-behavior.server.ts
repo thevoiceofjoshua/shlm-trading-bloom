@@ -19,8 +19,10 @@ export interface ClassifierCheck {
   reason: string;
 }
 
+export type BehaviorLabel = "FAST" | "CHOPPY" | "SLOW" | "RANGE BOUND";
+
 export type DayStatus =
-  | { kind: "classified"; label: "CHOPPY" | "FAST"; developing: boolean; reason: string; score: number; checks: ClassifierCheck[] }
+  | { kind: "classified"; label: BehaviorLabel; developing: boolean; reason: string; score: number; checks: ClassifierCheck[] }
   | { kind: "waiting"; reason: string; checks: ClassifierCheck[] }
   | { kind: "not_today"; reason: string }
   | { kind: "closed"; reason: string };
@@ -29,6 +31,8 @@ export interface WeeklyBehaviorPayload {
   todayDow: number; // LA day of week (0=Sun)
   monday: DayStatus;
   friday: DayStatus;
+  /** Rare caution note for Tue/Wed/Thu — only when the read is overwhelming. */
+  fixedNote: { day: 2 | 3 | 4; label: BehaviorLabel; text: string } | null;
   computedAt: string;
 }
 
@@ -62,7 +66,6 @@ async function bars(symbol: string): Promise<Bar[]> {
     const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i];
     if ([o, h, l, c].some((x) => typeof x !== "number")) return;
     const { key, sm } = laShifted(t * 1000);
-    if (sm >= PRENY_END) return; // only overnight → 6:30 PT matters
     out.push({ t, o, h, l, c, v: typeof q.volume?.[i] === "number" ? q.volume[i] : null, key, sm });
   });
   return out;
