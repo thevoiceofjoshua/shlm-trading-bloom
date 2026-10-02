@@ -82,11 +82,42 @@ function group(all: Bar[], todayKey: string) {
   return { today, prior };
 }
 
+interface Level { name: string; price: number; side: "high" | "low"; from: number }
+
+/** Breaks of a level that close back inside within 3 bars and don't continue in the next 6. */
+function failedBreaks(bs: Bar[], levels: Level[]) {
+  let count = 0;
+  const hitLevels = new Set<string>();
+  const perLevel = new Map<string, number>();
+  for (const L of levels) {
+    const out = (b: Bar) => (L.side === "high" ? b.h > L.price : b.l < L.price);
+    const closedOut = (b: Bar) => (L.side === "high" ? b.c > L.price : b.c < L.price);
+    for (let i = 0; i < bs.length; i++) {
+      const b = bs[i];
+      if (b.sm < L.from || !out(b)) continue;
+      if (i > 0 && closedOut(bs[i - 1])) continue; // already outside, not a fresh break
+      const back = bs.slice(i, i + 4).findIndex((x) => !closedOut(x));
+      if (back === -1) continue;
+      const after = bs.slice(i + back + 1, i + back + 7);
+      if (after.length && after.some(closedOut)) continue; // had follow-through
+      if (!after.length) continue; // too fresh to judge
+      count++;
+      hitLevels.add(L.name);
+      perLevel.set(L.name + L.side, (perLevel.get(L.name + L.side) ?? 0) + 1);
+      i += back + 3;
+    }
+  }
+  return { count, levels: [...hitLevels], perLevel };
+}
+
 function classify(
-  nq: Bar[], us2: Bar[], todayKey: string, nowSm: number,
+  nqAll: Bar[], us2All: Bar[], todayKey: string, nowSm: number,
   structure: boolean | null, structureWhy: string,
   catalyst: boolean | null, catalystWhy: string,
-): DayStatus {
+  strict = false,
+): { status: DayStatus; note: { label: BehaviorLabel; text: string } | null } {
+  const nq = nqAll.filter((b) => b.sm < PRENY_END);
+  const us2 = us2All.filter((b) => b.sm < PRENY_END);
   const { today, prior } = group(nq, todayKey);
   const checks: ClassifierCheck[] = [];
   const push = (key: CheckKey, label: string, weight: number, passed: boolean | null, reason: string) =>
