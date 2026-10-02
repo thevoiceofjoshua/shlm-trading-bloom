@@ -119,7 +119,7 @@ type SweepRead =
  * then within 3 candles an engulfing reversal and/or a close through the last minor swing confirms it.
  * A later close back beyond the swept extreme cancels it and scanning resumes.
  */
-function detectSweep(today: Bar[], london: Bar[], avgCandle: number, minFrac: number, requireBoth: boolean): SweepRead {
+export function detectSweep(today: Bar[], london: Bar[], avgCandle: number, minFrac: number, requireBoth: boolean): SweepRead {
   const lH = Math.max(...london.map((b) => b.h)), lL = Math.min(...london.map((b) => b.l));
   const minDist = minFrac * (avgCandle || 0);
   if (!(minDist > 0)) return { state: "none" };
