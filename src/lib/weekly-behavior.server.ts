@@ -19,8 +19,10 @@ export interface ClassifierCheck {
   reason: string;
 }
 
+export type BehaviorLabel = "FAST" | "CHOPPY" | "SLOW" | "RANGE BOUND";
+
 export type DayStatus =
-  | { kind: "classified"; label: "CHOPPY" | "FAST"; developing: boolean; reason: string; score: number; checks: ClassifierCheck[] }
+  | { kind: "classified"; label: BehaviorLabel; developing: boolean; reason: string; score: number; checks: ClassifierCheck[] }
   | { kind: "waiting"; reason: string; checks: ClassifierCheck[] }
   | { kind: "not_today"; reason: string }
   | { kind: "closed"; reason: string };
@@ -29,6 +31,8 @@ export interface WeeklyBehaviorPayload {
   todayDow: number; // LA day of week (0=Sun)
   monday: DayStatus;
   friday: DayStatus;
+  /** Rare caution note for Tue/Wed/Thu — only when the read is overwhelming. */
+  fixedNote: { day: 2 | 3 | 4; label: BehaviorLabel; text: string } | null;
   computedAt: string;
 }
 
@@ -62,7 +66,6 @@ async function bars(symbol: string): Promise<Bar[]> {
     const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i];
     if ([o, h, l, c].some((x) => typeof x !== "number")) return;
     const { key, sm } = laShifted(t * 1000);
-    if (sm >= PRENY_END) return; // only overnight → 6:30 PT matters
     out.push({ t, o, h, l, c, v: typeof q.volume?.[i] === "number" ? q.volume[i] : null, key, sm });
   });
   return out;
@@ -79,11 +82,42 @@ function group(all: Bar[], todayKey: string) {
   return { today, prior };
 }
 
+interface Level { name: string; price: number; side: "high" | "low"; from: number }
+
+/** Breaks of a level that close back inside within 3 bars and don't continue in the next 6. */
+function failedBreaks(bs: Bar[], levels: Level[]) {
+  let count = 0;
+  const hitLevels = new Set<string>();
+  const perLevel = new Map<string, number>();
+  for (const L of levels) {
+    const out = (b: Bar) => (L.side === "high" ? b.h > L.price : b.l < L.price);
+    const closedOut = (b: Bar) => (L.side === "high" ? b.c > L.price : b.c < L.price);
+    for (let i = 0; i < bs.length; i++) {
+      const b = bs[i];
+      if (b.sm < L.from || !out(b)) continue;
+      if (i > 0 && closedOut(bs[i - 1])) continue; // already outside, not a fresh break
+      const back = bs.slice(i, i + 4).findIndex((x) => !closedOut(x));
+      if (back === -1) continue;
+      const after = bs.slice(i + back + 1, i + back + 7);
+      if (after.length && after.some(closedOut)) continue; // had follow-through
+      if (!after.length) continue; // too fresh to judge
+      count++;
+      hitLevels.add(L.name);
+      perLevel.set(L.name + L.side, (perLevel.get(L.name + L.side) ?? 0) + 1);
+      i += back + 3;
+    }
+  }
+  return { count, levels: [...hitLevels], perLevel };
+}
+
 function classify(
-  nq: Bar[], us2: Bar[], todayKey: string, nowSm: number,
+  nqAll: Bar[], us2All: Bar[], todayKey: string, nowSm: number,
   structure: boolean | null, structureWhy: string,
   catalyst: boolean | null, catalystWhy: string,
-): DayStatus {
+  strict = false,
+): { status: DayStatus; note: { label: BehaviorLabel; text: string } | null } {
+  const nq = nqAll.filter((b) => b.sm < PRENY_END);
+  const us2 = us2All.filter((b) => b.sm < PRENY_END);
   const { today, prior } = group(nq, todayKey);
   const checks: ClassifierCheck[] = [];
   const push = (key: CheckKey, label: string, weight: number, passed: boolean | null, reason: string) =>
@@ -155,17 +189,96 @@ function classify(
 
   const avail = checks.filter((c) => c.passed !== null);
   if (avail.length < 4 || nowSm < ASIA_END) {
-    return { kind: "waiting", reason: avail.length < 4 ? "Not enough market data yet" : "Overnight session still forming", checks };
+    return { status: { kind: "waiting", reason: avail.length < 4 ? "Not enough market data yet" : "Overnight session still forming", checks }, note: null };
   }
   const max = avail.reduce((s, c) => s + c.weight, 0);
   const got = avail.filter((c) => c.passed).reduce((s, c) => s + c.weight, 0);
   const score = Math.round((got / max) * 100);
   const passes = avail.filter((c) => c.passed);
+  const fails = avail.filter((c) => c.passed === false);
   const fast = score >= 65 && passes.length >= 3;
-  const reason = fast
-    ? passes.sort((a, b) => b.weight - a.weight).slice(0, 2).map((c) => c.reason).join(" + ")
-    : avail.filter((c) => !c.passed).sort((a, b) => b.weight - a.weight).slice(0, 2).map((c) => c.reason).join(" + ");
-  return { kind: "classified", label: fast ? "FAST" : "CHOPPY", developing: !fast && score >= 40, reason, score, checks };
+  const chk = (k: CheckKey) => checks.find((c) => c.key === k)?.passed ?? null;
+
+  // ---- Level map for fakeout / range reads ----
+  const keys = [...new Set(nqAll.map((b) => b.key))].filter((k) => k < todayKey).sort();
+  const prevDay = keys.length ? nqAll.filter((b) => b.key === keys[keys.length - 1]) : [];
+  const levels: Level[] = [];
+  const hl = (bs: Bar[], name: string, from: number) => {
+    if (bs.length < 6) return;
+    levels.push({ name, price: Math.max(...bs.map((b) => b.h)), side: "high", from });
+    levels.push({ name, price: Math.min(...bs.map((b) => b.l)), side: "low", from });
+  };
+  if (prevDay.length >= 60) hl(prevDay, "prior-day", 0);
+  hl(asia, "Asia", ASIA_END);
+  const londonFormed = nowSm >= LONDON_END && london.length >= 12;
+  if (londonFormed) hl(london, "London", LONDON_END);
+  const fb = failedBreaks(today, levels);
+
+  // ---- RANGE BOUND (London oscillation) ----
+  let sweptHigh = 0, sweptLow = 0, maxRun = 0, lastInside = false;
+  if (londonFormed) {
+    const lH = Math.max(...london.map((b) => b.h)), lL = Math.min(...london.map((b) => b.l));
+    const post = today.filter((b) => b.sm >= LONDON_END);
+    sweptHigh = fb.perLevel.get("Londonhigh") ?? 0;
+    sweptLow = fb.perLevel.get("Londonlow") ?? 0;
+    let run = 0;
+    for (const b of post) { run = b.c > lH || b.c < lL ? run + 1 : 0; maxRun = Math.max(maxRun, run); }
+    const last = today[today.length - 1]?.c;
+    lastInside = last != null && last <= lH && last >= lL;
+  }
+  const rangeConds = [londonFormed, sweptHigh >= 1, sweptLow >= 1, londonFormed && maxRun <= 6, lastInside, chk("momentum") === false];
+
+  // ---- CHOPPY (fakeouts) ----
+  const choppyConds = [fb.count >= 3, fb.levels.length >= 2, chk("structure") === false, chk("momentum") === false];
+
+  // ---- SLOW (quiet) ----
+  const overnightRatio = enough ? range(today) / (avg(prior.map(range)) || 1) : null;
+  const quiet: { v: boolean | null; why: string }[] = [
+    { v: chk("volume") === null ? null : chk("volume") === false, why: "Low volume" },
+    { v: overnightRatio == null ? null : overnightRatio < 0.8, why: "Compressed overnight range" },
+    { v: chk("displacement") === null ? null : chk("displacement") === false, why: "Small 5-minute candles" },
+    { v: chk("momentum") === null ? null : chk("momentum") === false, why: "Weak pre-NY momentum" },
+    { v: chk("london") === null ? null : chk("london") === false, why: "London stayed inside Asia" },
+  ];
+  const quietAvail = quiet.filter((q) => q.v !== null);
+  const quietCount = quiet.filter((q) => q.v === true).length;
+  const slowOk = quietAvail.length >= 3 && quietCount >= 4;
+
+  const frac = (c: boolean[]) => c.filter(Boolean).length / c.length;
+  const reads: { label: BehaviorLabel; ok: boolean; close: number; reason: string }[] = [
+    { label: "RANGE BOUND", ok: rangeConds.every(Boolean), close: frac(rangeConds), reason: "Swept London high and low, no breakout" },
+    {
+      label: "CHOPPY", ok: choppyConds.every(Boolean), close: frac(choppyConds),
+      reason: fb.count ? `Repeated false breaks at ${fb.levels.join(" and ")} levels` : "No follow-through on level breaks",
+    },
+    {
+      label: "SLOW", ok: slowOk, close: Math.min(1, quietCount / 4),
+      reason: quiet.filter((q) => q.v === true).slice(0, 2).map((q) => q.why).join(" + ") || "Quiet market",
+    },
+  ];
+
+  let status: DayStatus;
+  if (fast) {
+    const reason = [...passes].sort((a, b) => b.weight - a.weight).slice(0, 2).map((c) => c.reason).join(" + ");
+    status = { kind: "classified", label: "FAST", developing: false, reason, score, checks };
+  } else {
+    const hit = reads.find((r) => r.ok);
+    const pick = hit ?? reads.reduce((a, b) => (b.close > a.close ? b : a));
+    status = { kind: "classified", label: pick.label, developing: !hit, reason: pick.reason, score, checks };
+  }
+
+  // ---- Strict caution note (Tue/Wed/Thu) ----
+  let note: { label: BehaviorLabel; text: string } | null = null;
+  if (strict && avail.length >= 7) {
+    const low = score <= 15 && fails.length >= 7;
+    let label: BehaviorLabel | null = null;
+    if (score >= 90 && passes.length >= 7) label = "FAST";
+    else if (low && sweptHigh >= 2 && sweptLow >= 2 && lastInside) label = "RANGE BOUND";
+    else if (low && fb.count >= 5 && fb.levels.length >= 3 && chk("structure") === false && chk("momentum") === false) label = "CHOPPY";
+    else if (low && quietAvail.length === 5 && quietCount === 5) label = "SLOW";
+    if (label) note = { label, text: `Note: conditions reading unusually ${label}` };
+  }
+  return { status, note };
 }
 
 export async function computeWeeklyBehavior(now: Date = new Date()): Promise<WeeklyBehaviorPayload> {
@@ -184,9 +297,11 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
 
   let monday = idle(1);
   let friday = idle(5);
+  let fixedNote: WeeklyBehaviorPayload["fixedNote"] = null;
+  const live = sessionDow >= 1 && sessionDow <= 5 ? sessionDow : null;
   const target = sessionDow === 1 || sessionDow === 5 ? sessionDow : null;
 
-  if (target) {
+  if (live) {
     try {
       const [nq, us2, quotes, econ] = await Promise.all([
         bars("NQ=F").catch(() => []),
@@ -208,12 +323,14 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
         catalyst = hits.length > 0;
         catalystWhy = catalyst ? `${hits[0].title} near the open` : "No major U.S. release near the open";
       }
-      const s = classify(nq, us2, todayKey, nowSm, structure, structureWhy, catalyst, catalystWhy);
-      if (target === 1) monday = s; else friday = s;
+      const r = classify(nq, us2, todayKey, nowSm, structure, structureWhy, catalyst, catalystWhy, !target);
+      if (target === 1) monday = r.status;
+      else if (target === 5) friday = r.status;
+      else if (r.note) fixedNote = { day: live as 2 | 3 | 4, ...r.note };
     } catch {
       const w: DayStatus = { kind: "waiting", reason: "Market data feed unavailable", checks: [] };
-      if (target === 1) monday = w; else friday = w;
+      if (target === 1) monday = w; else if (target === 5) friday = w;
     }
   }
-  return { todayDow: sessionDow, monday, friday, computedAt: now.toISOString() };
+  return { todayDow: sessionDow, monday, friday, fixedNote, computedAt: now.toISOString() };
 }
