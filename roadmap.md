@@ -77,7 +77,7 @@
 - [ ] Staff-only beta modal playback check requires signing into a Founder or SHLM MOD account in the preview
 
 ## Weekly Behavior notifications
-- [ ] Log four Weekly Behavior transitions with daily deduplication and seven-day retention
-- [ ] Schedule five-minute background checks securely and poll activity every minute
-- [ ] Show ten-second banner and bottom Notification Center on both Centre pages
+- [x] Log four Weekly Behavior transitions with daily deduplication and seven-day retention
+- [x] Schedule five-minute background checks securely and poll activity every minute
+- [x] Show ten-second banner and bottom Notification Center on both Centre pages
 - [ ] Verify event transition tests, access boundaries, and page rendering
