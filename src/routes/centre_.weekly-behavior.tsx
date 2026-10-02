@@ -91,6 +91,7 @@ function WeeklyBehaviorPage() {
                 day={d}
                 today={data?.todayDow === d}
                 status={d === 1 ? data?.monday ?? null : d === 5 ? data?.friday ?? null : undefined}
+                note={data?.fixedNote?.day === d ? data.fixedNote.text : null}
               />
             ))}
           </div>
@@ -100,7 +101,7 @@ function WeeklyBehaviorPage() {
   );
 }
 
-function DayCard({ day, today, status }: { day: number; today: boolean; status: DayStatus | null | undefined }) {
+function DayCard({ day, today, status, note }: { day: number; today: boolean; status: DayStatus | null | undefined; note?: string | null }) {
   const dynamic = day === 1 || day === 5;
   let headline: string;
   let sub: string | null = null;
@@ -108,6 +109,7 @@ function DayCard({ day, today, status }: { day: number; today: boolean; status: 
 
   if (!dynamic) {
     headline = FIXED[day];
+    sub = note ?? null;
   } else if (!status) {
     headline = "WAITING FOR DATA";
     sub = "Market data feed unavailable";
