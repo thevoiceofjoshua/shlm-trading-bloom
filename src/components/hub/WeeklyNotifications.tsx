@@ -21,6 +21,10 @@ function useBanner(enabled: boolean) {
   const { data } = useActivity(enabled);
   const [banner, setBanner] = useState<{ message: string; count: number } | null>(null);
   useEffect(() => {
+    if (!enabled) {
+      setBanner(null);
+      return;
+    }
     if (!data?.sessionDate) return;
     const key = `shlm-weekly-activity-seen:${data.sessionDate}`;
     const newest = data.events[0];
@@ -31,7 +35,7 @@ function useBanner(enabled: boolean) {
     const count = seenIndex < 0 ? data.events.length : seenIndex;
     localStorage.setItem(key, newest.id);
     if (count) setBanner({ message: newest.message, count });
-  }, [data]);
+  }, [data, enabled]);
   useEffect(() => {
     if (!banner) return;
     const id = window.setTimeout(() => setBanner(null), 10_000);
@@ -42,7 +46,7 @@ function useBanner(enabled: boolean) {
 
 export function WeeklyNotificationBanner({ enabled }: { enabled: boolean }) {
   const { banner, dismiss } = useBanner(enabled);
-  if (!banner) return null;
+  if (!enabled || !banner) return null;
   return (
     <div role="status" className="mb-5 flex min-h-11 items-center gap-3 border-l-2 border-foreground bg-surface px-4 py-2 text-sm text-foreground">
       <span className="min-w-0 flex-1 truncate">{banner.message}{banner.count > 1 ? ` · +${banner.count - 1} more` : ""}</span>
@@ -53,6 +57,7 @@ export function WeeklyNotificationBanner({ enabled }: { enabled: boolean }) {
 
 export function WeeklyNotificationCenter({ enabled }: { enabled: boolean }) {
   const { data, isError } = useActivity(enabled);
+  if (!enabled) return null;
   return (
     <section aria-labelledby="weekly-notification-title" className="mt-8 border-t border-border pt-6">
       <h2 id="weekly-notification-title" className="font-display text-lg font-medium">Notification Center</h2>
