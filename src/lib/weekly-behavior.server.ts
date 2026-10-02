@@ -34,7 +34,12 @@ export interface WeeklyBehaviorPayload {
   /** Rare caution note for Tue/Wed/Thu — only when the read is overwhelming. */
   fixedNote: { day: 2 | 3 | 4; label: BehaviorLabel; text: string } | null;
   computedAt: string;
+  sessionDate: string;
+  lastBarTs: number;
+  sweepEvents: SweepEvent[];
 }
+
+export interface SweepEvent { kind: "detected" | "confirmed" | "canceled"; ts: number; side: "high" | "low"; message: string }
 
 interface Bar { t: number; o: number; h: number; l: number; c: number; v: number | null; key: string; sm: number }
 
@@ -119,7 +124,7 @@ type SweepRead =
  * then within 3 candles an engulfing reversal and/or a close through the last minor swing confirms it.
  * A later close back beyond the swept extreme cancels it and scanning resumes.
  */
-export function detectSweep(today: Bar[], london: Bar[], avgCandle: number, minFrac: number, requireBoth: boolean): SweepRead {
+export function detectSweep(today: Bar[], london: Bar[], avgCandle: number, minFrac: number, requireBoth: boolean, events?: SweepEvent[]): SweepRead {
   const lH = Math.max(...london.map((b) => b.h)), lL = Math.min(...london.map((b) => b.l));
   const minDist = minFrac * (avgCandle || 0);
   if (!(minDist > 0)) return { state: "none" };
@@ -130,6 +135,7 @@ export function detectSweep(today: Bar[], london: Bar[], avgCandle: number, minF
     const s = today[i];
     const side: "high" | "low" | null = s.h - lH >= minDist ? "high" : lL - s.l >= minDist ? "low" : null;
     if (!side) { i++; continue; }
+    events?.push({ kind: "detected", ts: s.t, side, message: `Swept London ${side}, awaiting confirmation` });
     const hi = side === "high";
     // Minor swing point formed during the approach.
     let swing: number | null = null;
@@ -154,9 +160,14 @@ export function detectSweep(today: Bar[], london: Bar[], avgCandle: number, minF
       continue;
     }
     const confirmAt = i + 1 + (engulf ? 0 : bosIdx);
+    const how = engulf && bos ? "engulfing + break of structure" : engulf ? "engulfing" : "break of structure";
+    events?.push({ kind: "confirmed", ts: today[confirmAt].t, side, message: `Confirmed reversal (${how}) — reading toward London ${side === "high" ? "low" : "high"}` });
     const cancelAt = today.slice(confirmAt + 1).findIndex((b) => (hi ? b.c > lH : b.c < lL));
-    if (cancelAt >= 0) { result = { state: "none" }; i = confirmAt + 1 + cancelAt + 1; continue; }
-    result = { state: "confirmed", side, how: engulf && bos ? "engulfing + break of structure" : engulf ? "engulfing" : "break of structure" };
+    if (cancelAt >= 0) {
+      events?.push({ kind: "canceled", ts: today[confirmAt + 1 + cancelAt].t, side, message: "Sweep canceled, watching both sides again" });
+      result = { state: "none" }; i = confirmAt + 1 + cancelAt + 1; continue;
+    }
+    result = { state: "confirmed", side, how };
     i = confirmAt + 1;
   }
   return result;
@@ -167,7 +178,7 @@ function classify(
   structure: boolean | null, structureWhy: string,
   catalyst: boolean | null, catalystWhy: string,
   strict = false,
-): { status: DayStatus; note: { label: BehaviorLabel; text: string } | null } {
+): { status: DayStatus; note: { label: BehaviorLabel; text: string } | null; sweepEvents: SweepEvent[] } {
   const nq = nqAll.filter((b) => b.sm < PRENY_END);
   const us2 = us2All.filter((b) => b.sm < PRENY_END);
   const { today, prior } = group(nq, todayKey);
@@ -241,7 +252,7 @@ function classify(
 
   const avail = checks.filter((c) => c.passed !== null);
   if (avail.length < 4 || nowSm < ASIA_END) {
-    return { status: { kind: "waiting", reason: avail.length < 4 ? "Not enough market data yet" : "Overnight session still forming", checks }, note: null };
+    return { status: { kind: "waiting", reason: avail.length < 4 ? "Not enough market data yet" : "Overnight session still forming", checks }, note: null, sweepEvents: [] };
   }
   const max = avail.reduce((s, c) => s + c.weight, 0);
   const got = avail.filter((c) => c.passed).reduce((s, c) => s + c.weight, 0);
@@ -268,7 +279,8 @@ function classify(
 
   // ---- RANGE BOUND (single-sided London sweep + confirmed reversal) ----
   const avgCandle = avg(today.map((b) => b.h - b.l));
-  const sweep = londonFormed ? detectSweep(today, london, avgCandle, 0.25, false) : { state: "none" as const };
+  const sweepEvents: SweepEvent[] = [];
+  const sweep = londonFormed ? detectSweep(today, london, avgCandle, 0.25, false, sweepEvents) : { state: "none" as const };
   const sweepStrict = londonFormed && strict ? detectSweep(today, london, avgCandle, 0.5, true) : { state: "none" as const };
   const rangeConds = [londonFormed, sweep.state !== "none", sweep.state === "confirmed"];
   const rangeReason = sweep.state === "none"
@@ -325,7 +337,7 @@ function classify(
     else if (low && quietAvail.length === 5 && quietCount === 5) label = "SLOW";
     if (label) note = { label, text: `Note: conditions reading unusually ${label}` };
   }
-  return { status, note };
+  return { status, note, sweepEvents };
 }
 
 export async function computeWeeklyBehavior(now: Date = new Date()): Promise<WeeklyBehaviorPayload> {
@@ -345,6 +357,8 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
   let monday = idle(1);
   let friday = idle(5);
   let fixedNote: WeeklyBehaviorPayload["fixedNote"] = null;
+  let sweepEvents: SweepEvent[] = [];
+  let lastBarTs = 0;
   const live = sessionDow >= 1 && sessionDow <= 5 ? sessionDow : null;
   const target = sessionDow === 1 || sessionDow === 5 ? sessionDow : null;
 
@@ -357,6 +371,7 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
         fetchDelayedQuotes().catch(() => ({} as Record<string, any>)),
         fetchLiveEconEvents().catch(() => []),
       ]);
+      lastBarTs = Math.max(0, ...nq.filter((b) => b.key === todayKey && b.sm < PRENY_END).map((b) => b.t));
       const mtfs = [quotes["NASDAQ"]?.mtf, quotes["US30"]?.mtf].filter(Boolean) as { direction: string; state: string }[];
       const dir = mtfs.some((m) => (m.direction === "bullish" || m.direction === "bearish") && m.state === "trending");
       const structure = mtfs.length ? dir : null;
@@ -371,6 +386,7 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
         catalystWhy = catalyst ? `${hits[0].title} near the open` : "No major U.S. release near the open";
       }
       const r = classify(nq, us2, todayKey, nowSm, structure, structureWhy, catalyst, catalystWhy, !target);
+      sweepEvents = r.sweepEvents;
       if (target === 1) monday = r.status;
       else if (target === 5) friday = r.status;
       else if (r.note) fixedNote = { day: live as 2 | 3 | 4, ...r.note };
@@ -379,5 +395,5 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
       if (target === 1) monday = w; else if (target === 5) friday = w;
     }
   }
-  return { todayDow: sessionDow, monday, friday, fixedNote, computedAt: now.toISOString() };
+  return { todayDow: sessionDow, monday, friday, fixedNote, computedAt: now.toISOString(), sessionDate: todayKey, lastBarTs, sweepEvents };
 }
