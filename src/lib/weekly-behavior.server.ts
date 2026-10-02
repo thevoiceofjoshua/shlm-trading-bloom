@@ -214,19 +214,14 @@ function classify(
   if (londonFormed) hl(london, "London", LONDON_END);
   const fb = failedBreaks(today, levels);
 
-  // ---- RANGE BOUND (London oscillation) ----
-  let sweptHigh = 0, sweptLow = 0, maxRun = 0, lastInside = false;
-  if (londonFormed) {
-    const lH = Math.max(...london.map((b) => b.h)), lL = Math.min(...london.map((b) => b.l));
-    const post = today.filter((b) => b.sm >= LONDON_END);
-    sweptHigh = fb.perLevel.get("Londonhigh") ?? 0;
-    sweptLow = fb.perLevel.get("Londonlow") ?? 0;
-    let run = 0;
-    for (const b of post) { run = b.c > lH || b.c < lL ? run + 1 : 0; maxRun = Math.max(maxRun, run); }
-    const last = today[today.length - 1]?.c;
-    lastInside = last != null && last <= lH && last >= lL;
-  }
-  const rangeConds = [londonFormed, sweptHigh >= 1, sweptLow >= 1, londonFormed && maxRun <= 6, lastInside, chk("momentum") === false];
+  // ---- RANGE BOUND (single-sided London sweep + confirmed reversal) ----
+  const avgCandle = avg(today.map((b) => b.h - b.l));
+  const sweep = londonFormed ? detectSweep(today, london, avgCandle, 0.25, false) : { state: "none" as const };
+  const sweepStrict = londonFormed && strict ? detectSweep(today, london, avgCandle, 0.5, true) : { state: "none" as const };
+  const rangeConds = [londonFormed, sweep.state !== "none", sweep.state === "confirmed"];
+  const rangeReason = sweep.state === "none"
+    ? "No confirmed London sweep"
+    : `Swept London ${sweep.side}, ${sweep.state === "confirmed" ? `confirmed reversal (${sweep.how})` : "awaiting confirmation"}`;
 
   // ---- CHOPPY (fakeouts) ----
   const choppyConds = [fb.count >= 3, fb.levels.length >= 2, chk("structure") === false, chk("momentum") === false];
