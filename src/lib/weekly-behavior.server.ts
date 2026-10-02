@@ -110,6 +110,58 @@ function failedBreaks(bs: Bar[], levels: Level[]) {
   return { count, levels: [...hitLevels], perLevel };
 }
 
+type SweepRead =
+  | { state: "none" }
+  | { state: "pending" | "confirmed"; side: "high" | "low"; how?: string };
+
+/**
+ * Single-sided London sweep: a candle pierces the London high/low by ≥ minFrac × avg candle,
+ * then within 3 candles an engulfing reversal and/or a close through the last minor swing confirms it.
+ * A later close back beyond the swept extreme cancels it and scanning resumes.
+ */
+function detectSweep(today: Bar[], london: Bar[], avgCandle: number, minFrac: number, requireBoth: boolean): SweepRead {
+  const lH = Math.max(...london.map((b) => b.h)), lL = Math.min(...london.map((b) => b.l));
+  const minDist = minFrac * (avgCandle || 0);
+  if (!(minDist > 0)) return { state: "none" };
+  let result: SweepRead = { state: "none" };
+  let i = today.findIndex((b) => b.sm >= LONDON_END);
+  if (i < 0) return result;
+  while (i < today.length) {
+    const s = today[i];
+    const side: "high" | "low" | null = s.h - lH >= minDist ? "high" : lL - s.l >= minDist ? "low" : null;
+    if (!side) { i++; continue; }
+    const hi = side === "high";
+    // Minor swing point formed during the approach.
+    let swing: number | null = null;
+    for (let k = i - 3; k >= Math.max(2, i - 12); k--) {
+      const b = today[k], n = [today[k - 1], today[k - 2], today[k + 1], today[k + 2]];
+      if (hi ? n.every((x) => b.l < x.l) : n.every((x) => b.h > x.h)) { swing = hi ? b.l : b.h; break; }
+    }
+    if (swing == null) {
+      const pre = today.slice(Math.max(0, i - 6), i);
+      if (pre.length) swing = hi ? Math.min(...pre.map((b) => b.l)) : Math.max(...pre.map((b) => b.h));
+    }
+    const next = today[i + 1];
+    const sTop = Math.max(s.o, s.c), sBot = Math.min(s.o, s.c);
+    const engulf = !!next && (hi ? next.c < next.o && next.o >= sTop && next.c <= sBot : next.c > next.o && next.o <= sBot && next.c >= sTop);
+    const win = today.slice(i + 1, i + 4);
+    const bosIdx = swing == null ? -1 : win.findIndex((b) => (hi ? b.c < swing! : b.c > swing!));
+    const bos = bosIdx >= 0;
+    const ok = requireBoth ? engulf && bos : engulf || bos;
+    if (!ok) {
+      if (win.length < 3) result = { state: "pending", side }; // window still open
+      i++;
+      continue;
+    }
+    const confirmAt = i + 1 + (engulf ? 0 : bosIdx);
+    const cancelAt = today.slice(confirmAt + 1).findIndex((b) => (hi ? b.c > lH : b.c < lL));
+    if (cancelAt >= 0) { result = { state: "none" }; i = confirmAt + 1 + cancelAt + 1; continue; }
+    result = { state: "confirmed", side, how: engulf && bos ? "engulfing + break of structure" : engulf ? "engulfing" : "break of structure" };
+    i = confirmAt + 1;
+  }
+  return result;
+}
+
 function classify(
   nqAll: Bar[], us2All: Bar[], todayKey: string, nowSm: number,
   structure: boolean | null, structureWhy: string,
@@ -214,19 +266,14 @@ function classify(
   if (londonFormed) hl(london, "London", LONDON_END);
   const fb = failedBreaks(today, levels);
 
-  // ---- RANGE BOUND (London oscillation) ----
-  let sweptHigh = 0, sweptLow = 0, maxRun = 0, lastInside = false;
-  if (londonFormed) {
-    const lH = Math.max(...london.map((b) => b.h)), lL = Math.min(...london.map((b) => b.l));
-    const post = today.filter((b) => b.sm >= LONDON_END);
-    sweptHigh = fb.perLevel.get("Londonhigh") ?? 0;
-    sweptLow = fb.perLevel.get("Londonlow") ?? 0;
-    let run = 0;
-    for (const b of post) { run = b.c > lH || b.c < lL ? run + 1 : 0; maxRun = Math.max(maxRun, run); }
-    const last = today[today.length - 1]?.c;
-    lastInside = last != null && last <= lH && last >= lL;
-  }
-  const rangeConds = [londonFormed, sweptHigh >= 1, sweptLow >= 1, londonFormed && maxRun <= 6, lastInside, chk("momentum") === false];
+  // ---- RANGE BOUND (single-sided London sweep + confirmed reversal) ----
+  const avgCandle = avg(today.map((b) => b.h - b.l));
+  const sweep = londonFormed ? detectSweep(today, london, avgCandle, 0.25, false) : { state: "none" as const };
+  const sweepStrict = londonFormed && strict ? detectSweep(today, london, avgCandle, 0.5, true) : { state: "none" as const };
+  const rangeConds = [londonFormed, sweep.state !== "none", sweep.state === "confirmed"];
+  const rangeReason = sweep.state === "none"
+    ? "No confirmed London sweep"
+    : `Swept London ${sweep.side}, ${sweep.state === "confirmed" ? `confirmed reversal (${sweep.how})` : "awaiting confirmation"}`;
 
   // ---- CHOPPY (fakeouts) ----
   const choppyConds = [fb.count >= 3, fb.levels.length >= 2, chk("structure") === false, chk("momentum") === false];
@@ -246,7 +293,7 @@ function classify(
 
   const frac = (c: boolean[]) => c.filter(Boolean).length / c.length;
   const reads: { label: BehaviorLabel; ok: boolean; close: number; reason: string }[] = [
-    { label: "RANGE BOUND", ok: rangeConds.every(Boolean), close: frac(rangeConds), reason: "Swept London high and low, no breakout" },
+    { label: "RANGE BOUND", ok: rangeConds.every(Boolean), close: frac(rangeConds), reason: rangeReason },
     {
       label: "CHOPPY", ok: choppyConds.every(Boolean), close: frac(choppyConds),
       reason: fb.count ? `Repeated false breaks at ${fb.levels.join(" and ")} levels` : "No follow-through on level breaks",
@@ -273,7 +320,7 @@ function classify(
     const low = score <= 15 && fails.length >= 7;
     let label: BehaviorLabel | null = null;
     if (score >= 90 && passes.length >= 7) label = "FAST";
-    else if (low && sweptHigh >= 2 && sweptLow >= 2 && lastInside) label = "RANGE BOUND";
+    else if (low && sweepStrict.state === "confirmed") label = "RANGE BOUND";
     else if (low && fb.count >= 5 && fb.levels.length >= 3 && chk("structure") === false && chk("momentum") === false) label = "CHOPPY";
     else if (low && quietAvail.length === 5 && quietCount === 5) label = "SLOW";
     if (label) note = { label, text: `Note: conditions reading unusually ${label}` };
