@@ -135,7 +135,9 @@ export function detectSweep(today: Bar[], london: Bar[], avgCandle: number, minF
     const s = today[i];
     const side: "high" | "low" | null = s.h - lH >= minDist ? "high" : lL - s.l >= minDist ? "low" : null;
     if (!side) { i++; continue; }
-    events?.push({ kind: "detected", ts: s.t, side, message: `Swept London ${side}, awaiting confirmation` });
+    if (i === 0 || !(side === "high" ? today[i - 1].c > lH : today[i - 1].c < lL)) {
+      events?.push({ kind: "detected", ts: s.t, side, message: `Swept London ${side}, awaiting confirmation` });
+    }
     const hi = side === "high";
     // Minor swing point formed during the approach.
     let swing: number | null = null;
