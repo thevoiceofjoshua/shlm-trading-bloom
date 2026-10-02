@@ -9,100 +9,45 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TestCheckoutRouteImport } from './routes/test-checkout'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as SuccessRouteImport } from './routes/success'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as RefundRouteImport } from './routes/refund'
-import { Route as ProgramRouteImport } from './routes/program'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as DiscordRouteImport } from './routes/discord'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as CentreRouteImport } from './routes/centre'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as ApplyRouteImport } from './routes/apply'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as FeaturesRiskRouteImport } from './routes/features.risk'
-import { Route as FeaturesMentorshipRouteImport } from './routes/features.mentorship'
-import { Route as FeaturesCurriculumRouteImport } from './routes/features.curriculum'
-import { Route as FeaturesCommunityRouteImport } from './routes/features.community'
-import { Route as EnrollApplicationIdRouteImport } from './routes/enroll.$applicationId'
-import { Route as CentreWeeklyBehaviorRouteImport } from './routes/centre_.weekly-behavior'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ApplyRouteImport } from './routes/apply'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CentreRouteImport } from './routes/centre'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as DiscordRouteImport } from './routes/discord'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProgramRouteImport } from './routes/program'
+import { Route as RefundRouteImport } from './routes/refund'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SuccessRouteImport } from './routes/success'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TestCheckoutRouteImport } from './routes/test-checkout'
 import { Route as BlogBreakoutStrategyRouteImport } from './routes/blog.breakout-strategy'
-import { Route as ApiPublicSubmitApplicationRouteImport } from './routes/api/public/submit-application'
+import { Route as CentreWeeklyBehaviorRouteImport } from './routes/centre_.weekly-behavior'
+import { Route as EnrollApplicationIdRouteImport } from './routes/enroll.$applicationId'
+import { Route as FeaturesCommunityRouteImport } from './routes/features.community'
+import { Route as FeaturesCurriculumRouteImport } from './routes/features.curriculum'
+import { Route as FeaturesMentorshipRouteImport } from './routes/features.mentorship'
+import { Route as FeaturesRiskRouteImport } from './routes/features.risk'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
-import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
-import { Route as ApiPublicEnrollApplicationIdRouteImport } from './routes/api/public/enroll.$applicationId'
-import { Route as ApiPublicCheckoutVerifyRouteImport } from './routes/api/public/checkout.verify'
-import { Route as ApiPublicCheckoutTestRouteImport } from './routes/api/public/checkout.test'
-import { Route as ApiPublicCheckoutExtensionRouteImport } from './routes/api/public/checkout.extension'
-import { Route as ApiPublicCheckoutCreateRouteImport } from './routes/api/public/checkout.create'
-import { Route as ApiPublicAdminSetRoleRouteImport } from './routes/api/public/admin.set-role'
-import { Route as ApiPublicAdminSendPaymentLinkRouteImport } from './routes/api/public/admin.send-payment-link'
-import { Route as ApiPublicAdminRemoveApplicationRouteImport } from './routes/api/public/admin.remove-application'
-import { Route as ApiPublicAdminDenyApplicationRouteImport } from './routes/api/public/admin.deny-application'
-import { Route as ApiPublicAdminApplicationsRouteImport } from './routes/api/public/admin.applications'
+import { Route as ApiPublicSubmitApplicationRouteImport } from './routes/api/public/submit-application'
 import { Route as ApiPublicAdminAccountsRouteImport } from './routes/api/public/admin.accounts'
+import { Route as ApiPublicAdminApplicationsRouteImport } from './routes/api/public/admin.applications'
+import { Route as ApiPublicAdminDenyApplicationRouteImport } from './routes/api/public/admin.deny-application'
+import { Route as ApiPublicAdminRemoveApplicationRouteImport } from './routes/api/public/admin.remove-application'
+import { Route as ApiPublicAdminSendPaymentLinkRouteImport } from './routes/api/public/admin.send-payment-link'
+import { Route as ApiPublicAdminSetRoleRouteImport } from './routes/api/public/admin.set-role'
+import { Route as ApiPublicCheckoutCreateRouteImport } from './routes/api/public/checkout.create'
+import { Route as ApiPublicCheckoutExtensionRouteImport } from './routes/api/public/checkout.extension'
+import { Route as ApiPublicCheckoutTestRouteImport } from './routes/api/public/checkout.test'
+import { Route as ApiPublicCheckoutVerifyRouteImport } from './routes/api/public/checkout.verify'
+import { Route as ApiPublicEnrollApplicationIdRouteImport } from './routes/api/public/enroll.$applicationId'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
-const TestCheckoutRoute = TestCheckoutRouteImport.update({
-  id: '/test-checkout',
-  path: '/test-checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SuccessRoute = SuccessRouteImport.update({
-  id: '/success',
-  path: '/success',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RefundRoute = RefundRouteImport.update({
-  id: '/refund',
-  path: '/refund',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProgramRoute = ProgramRouteImport.update({
-  id: '/program',
-  path: '/program',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DiscordRoute = DiscordRouteImport.update({
-  id: '/discord',
-  path: '/discord',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CentreRoute = CentreRouteImport.update({
-  id: '/centre',
-  path: '/centre',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApplyRoute = ApplyRouteImport.update({
-  id: '/apply',
-  path: '/apply',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -110,34 +55,69 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ApplyRoute = ApplyRouteImport.update({
+  id: '/apply',
+  path: '/apply',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FeaturesRiskRoute = FeaturesRiskRouteImport.update({
-  id: '/features/risk',
-  path: '/features/risk',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FeaturesMentorshipRoute = FeaturesMentorshipRouteImport.update({
-  id: '/features/mentorship',
-  path: '/features/mentorship',
+const CentreRoute = CentreRouteImport.update({
+  id: '/centre',
+  path: '/centre',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FeaturesCurriculumRoute = FeaturesCurriculumRouteImport.update({
-  id: '/features/curriculum',
-  path: '/features/curriculum',
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FeaturesCommunityRoute = FeaturesCommunityRouteImport.update({
-  id: '/features/community',
-  path: '/features/community',
+const DiscordRoute = DiscordRouteImport.update({
+  id: '/discord',
+  path: '/discord',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EnrollApplicationIdRoute = EnrollApplicationIdRouteImport.update({
-  id: '/enroll/$applicationId',
-  path: '/enroll/$applicationId',
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramRoute = ProgramRouteImport.update({
+  id: '/program',
+  path: '/program',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundRoute = RefundRouteImport.update({
+  id: '/refund',
+  path: '/refund',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuccessRoute = SuccessRouteImport.update({
+  id: '/success',
+  path: '/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestCheckoutRoute = TestCheckoutRouteImport.update({
+  id: '/test-checkout',
+  path: '/test-checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogBreakoutStrategyRoute = BlogBreakoutStrategyRouteImport.update({
+  id: '/blog/breakout-strategy',
+  path: '/blog/breakout-strategy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CentreWeeklyBehaviorRoute = CentreWeeklyBehaviorRouteImport.update({
@@ -145,9 +125,34 @@ const CentreWeeklyBehaviorRoute = CentreWeeklyBehaviorRouteImport.update({
   path: '/centre/weekly-behavior',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogBreakoutStrategyRoute = BlogBreakoutStrategyRouteImport.update({
-  id: '/blog/breakout-strategy',
-  path: '/blog/breakout-strategy',
+const EnrollApplicationIdRoute = EnrollApplicationIdRouteImport.update({
+  id: '/enroll/$applicationId',
+  path: '/enroll/$applicationId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesCommunityRoute = FeaturesCommunityRouteImport.update({
+  id: '/features/community',
+  path: '/features/community',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesCurriculumRoute = FeaturesCurriculumRouteImport.update({
+  id: '/features/curriculum',
+  path: '/features/curriculum',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesMentorshipRoute = FeaturesMentorshipRouteImport.update({
+  id: '/features/mentorship',
+  path: '/features/mentorship',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeaturesRiskRoute = FeaturesRiskRouteImport.update({
+  id: '/features/risk',
+  path: '/features/risk',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
+  id: '/api/public/stripe-webhook',
+  path: '/api/public/stripe-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicSubmitApplicationRoute =
@@ -156,59 +161,15 @@ const ApiPublicSubmitApplicationRoute =
     path: '/api/public/submit-application',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
-  id: '/api/public/stripe-webhook',
-  path: '/api/public/stripe-webhook',
+const ApiPublicAdminAccountsRoute = ApiPublicAdminAccountsRouteImport.update({
+  id: '/api/public/admin/accounts',
+  path: '/api/public/admin/accounts',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LovableEmailTransactionalPreviewRoute =
-  LovableEmailTransactionalPreviewRouteImport.update({
-    id: '/lovable/email/transactional/preview',
-    path: '/lovable/email/transactional/preview',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicEnrollApplicationIdRoute =
-  ApiPublicEnrollApplicationIdRouteImport.update({
-    id: '/api/public/enroll/$applicationId',
-    path: '/api/public/enroll/$applicationId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicCheckoutVerifyRoute = ApiPublicCheckoutVerifyRouteImport.update({
-  id: '/api/public/checkout/verify',
-  path: '/api/public/checkout/verify',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicCheckoutTestRoute = ApiPublicCheckoutTestRouteImport.update({
-  id: '/api/public/checkout/test',
-  path: '/api/public/checkout/test',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicCheckoutExtensionRoute =
-  ApiPublicCheckoutExtensionRouteImport.update({
-    id: '/api/public/checkout/extension',
-    path: '/api/public/checkout/extension',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicCheckoutCreateRoute = ApiPublicCheckoutCreateRouteImport.update({
-  id: '/api/public/checkout/create',
-  path: '/api/public/checkout/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicAdminSetRoleRoute = ApiPublicAdminSetRoleRouteImport.update({
-  id: '/api/public/admin/set-role',
-  path: '/api/public/admin/set-role',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicAdminSendPaymentLinkRoute =
-  ApiPublicAdminSendPaymentLinkRouteImport.update({
-    id: '/api/public/admin/send-payment-link',
-    path: '/api/public/admin/send-payment-link',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicAdminRemoveApplicationRoute =
-  ApiPublicAdminRemoveApplicationRouteImport.update({
-    id: '/api/public/admin/remove-application',
-    path: '/api/public/admin/remove-application',
+const ApiPublicAdminApplicationsRoute =
+  ApiPublicAdminApplicationsRouteImport.update({
+    id: '/api/public/admin/applications',
+    path: '/api/public/admin/applications',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicAdminDenyApplicationRoute =
@@ -217,17 +178,56 @@ const ApiPublicAdminDenyApplicationRoute =
     path: '/api/public/admin/deny-application',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicAdminApplicationsRoute =
-  ApiPublicAdminApplicationsRouteImport.update({
-    id: '/api/public/admin/applications',
-    path: '/api/public/admin/applications',
+const ApiPublicAdminRemoveApplicationRoute =
+  ApiPublicAdminRemoveApplicationRouteImport.update({
+    id: '/api/public/admin/remove-application',
+    path: '/api/public/admin/remove-application',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicAdminAccountsRoute = ApiPublicAdminAccountsRouteImport.update({
-  id: '/api/public/admin/accounts',
-  path: '/api/public/admin/accounts',
+const ApiPublicAdminSendPaymentLinkRoute =
+  ApiPublicAdminSendPaymentLinkRouteImport.update({
+    id: '/api/public/admin/send-payment-link',
+    path: '/api/public/admin/send-payment-link',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAdminSetRoleRoute = ApiPublicAdminSetRoleRouteImport.update({
+  id: '/api/public/admin/set-role',
+  path: '/api/public/admin/set-role',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCheckoutCreateRoute = ApiPublicCheckoutCreateRouteImport.update({
+  id: '/api/public/checkout/create',
+  path: '/api/public/checkout/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCheckoutExtensionRoute =
+  ApiPublicCheckoutExtensionRouteImport.update({
+    id: '/api/public/checkout/extension',
+    path: '/api/public/checkout/extension',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicCheckoutTestRoute = ApiPublicCheckoutTestRouteImport.update({
+  id: '/api/public/checkout/test',
+  path: '/api/public/checkout/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCheckoutVerifyRoute = ApiPublicCheckoutVerifyRouteImport.update({
+  id: '/api/public/checkout/verify',
+  path: '/api/public/checkout/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicEnrollApplicationIdRoute =
+  ApiPublicEnrollApplicationIdRouteImport.update({
+    id: '/api/public/enroll/$applicationId',
+    path: '/api/public/enroll/$applicationId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -495,88 +495,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/test-checkout': {
-      id: '/test-checkout'
-      path: '/test-checkout'
-      fullPath: '/test-checkout'
-      preLoaderRoute: typeof TestCheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/success': {
-      id: '/success'
-      path: '/success'
-      fullPath: '/success'
-      preLoaderRoute: typeof SuccessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/refund': {
-      id: '/refund'
-      path: '/refund'
-      fullPath: '/refund'
-      preLoaderRoute: typeof RefundRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/program': {
-      id: '/program'
-      path: '/program'
-      fullPath: '/program'
-      preLoaderRoute: typeof ProgramRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/discord': {
-      id: '/discord'
-      path: '/discord'
-      fullPath: '/discord'
-      preLoaderRoute: typeof DiscordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/centre': {
-      id: '/centre'
-      path: '/centre'
-      fullPath: '/centre'
-      preLoaderRoute: typeof CentreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/apply': {
-      id: '/apply'
-      path: '/apply'
-      fullPath: '/apply'
-      preLoaderRoute: typeof ApplyRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -586,53 +509,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/apply': {
+      id: '/apply'
+      path: '/apply'
+      fullPath: '/apply'
+      preLoaderRoute: typeof ApplyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/features/risk': {
-      id: '/features/risk'
-      path: '/features/risk'
-      fullPath: '/features/risk'
-      preLoaderRoute: typeof FeaturesRiskRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/features/mentorship': {
-      id: '/features/mentorship'
-      path: '/features/mentorship'
-      fullPath: '/features/mentorship'
-      preLoaderRoute: typeof FeaturesMentorshipRouteImport
+    '/centre': {
+      id: '/centre'
+      path: '/centre'
+      fullPath: '/centre'
+      preLoaderRoute: typeof CentreRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/features/curriculum': {
-      id: '/features/curriculum'
-      path: '/features/curriculum'
-      fullPath: '/features/curriculum'
-      preLoaderRoute: typeof FeaturesCurriculumRouteImport
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/features/community': {
-      id: '/features/community'
-      path: '/features/community'
-      fullPath: '/features/community'
-      preLoaderRoute: typeof FeaturesCommunityRouteImport
+    '/discord': {
+      id: '/discord'
+      path: '/discord'
+      fullPath: '/discord'
+      preLoaderRoute: typeof DiscordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/enroll/$applicationId': {
-      id: '/enroll/$applicationId'
-      path: '/enroll/$applicationId'
-      fullPath: '/enroll/$applicationId'
-      preLoaderRoute: typeof EnrollApplicationIdRouteImport
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/centre_/weekly-behavior': {
-      id: '/centre_/weekly-behavior'
-      path: '/centre/weekly-behavior'
-      fullPath: '/centre/weekly-behavior'
-      preLoaderRoute: typeof CentreWeeklyBehaviorRouteImport
+    '/program': {
+      id: '/program'
+      path: '/program'
+      fullPath: '/program'
+      preLoaderRoute: typeof ProgramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund': {
+      id: '/refund'
+      path: '/refund'
+      fullPath: '/refund'
+      preLoaderRoute: typeof RefundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/success': {
+      id: '/success'
+      path: '/success'
+      fullPath: '/success'
+      preLoaderRoute: typeof SuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test-checkout': {
+      id: '/test-checkout'
+      path: '/test-checkout'
+      fullPath: '/test-checkout'
+      preLoaderRoute: typeof TestCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/breakout-strategy': {
@@ -642,11 +600,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogBreakoutStrategyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/submit-application': {
-      id: '/api/public/submit-application'
-      path: '/api/public/submit-application'
-      fullPath: '/api/public/submit-application'
-      preLoaderRoute: typeof ApiPublicSubmitApplicationRouteImport
+    '/centre_/weekly-behavior': {
+      id: '/centre_/weekly-behavior'
+      path: '/centre/weekly-behavior'
+      fullPath: '/centre/weekly-behavior'
+      preLoaderRoute: typeof CentreWeeklyBehaviorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/enroll/$applicationId': {
+      id: '/enroll/$applicationId'
+      path: '/enroll/$applicationId'
+      fullPath: '/enroll/$applicationId'
+      preLoaderRoute: typeof EnrollApplicationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features/community': {
+      id: '/features/community'
+      path: '/features/community'
+      fullPath: '/features/community'
+      preLoaderRoute: typeof FeaturesCommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features/curriculum': {
+      id: '/features/curriculum'
+      path: '/features/curriculum'
+      fullPath: '/features/curriculum'
+      preLoaderRoute: typeof FeaturesCurriculumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features/mentorship': {
+      id: '/features/mentorship'
+      path: '/features/mentorship'
+      fullPath: '/features/mentorship'
+      preLoaderRoute: typeof FeaturesMentorshipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/features/risk': {
+      id: '/features/risk'
+      path: '/features/risk'
+      fullPath: '/features/risk'
+      preLoaderRoute: typeof FeaturesRiskRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/stripe-webhook': {
@@ -656,74 +649,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/transactional/preview': {
-      id: '/lovable/email/transactional/preview'
-      path: '/lovable/email/transactional/preview'
-      fullPath: '/lovable/email/transactional/preview'
-      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+    '/api/public/submit-application': {
+      id: '/api/public/submit-application'
+      path: '/api/public/submit-application'
+      fullPath: '/api/public/submit-application'
+      preLoaderRoute: typeof ApiPublicSubmitApplicationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/enroll/$applicationId': {
-      id: '/api/public/enroll/$applicationId'
-      path: '/api/public/enroll/$applicationId'
-      fullPath: '/api/public/enroll/$applicationId'
-      preLoaderRoute: typeof ApiPublicEnrollApplicationIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/checkout/verify': {
-      id: '/api/public/checkout/verify'
-      path: '/api/public/checkout/verify'
-      fullPath: '/api/public/checkout/verify'
-      preLoaderRoute: typeof ApiPublicCheckoutVerifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/checkout/test': {
-      id: '/api/public/checkout/test'
-      path: '/api/public/checkout/test'
-      fullPath: '/api/public/checkout/test'
-      preLoaderRoute: typeof ApiPublicCheckoutTestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/checkout/extension': {
-      id: '/api/public/checkout/extension'
-      path: '/api/public/checkout/extension'
-      fullPath: '/api/public/checkout/extension'
-      preLoaderRoute: typeof ApiPublicCheckoutExtensionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/checkout/create': {
-      id: '/api/public/checkout/create'
-      path: '/api/public/checkout/create'
-      fullPath: '/api/public/checkout/create'
-      preLoaderRoute: typeof ApiPublicCheckoutCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/admin/set-role': {
-      id: '/api/public/admin/set-role'
-      path: '/api/public/admin/set-role'
-      fullPath: '/api/public/admin/set-role'
-      preLoaderRoute: typeof ApiPublicAdminSetRoleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/admin/send-payment-link': {
-      id: '/api/public/admin/send-payment-link'
-      path: '/api/public/admin/send-payment-link'
-      fullPath: '/api/public/admin/send-payment-link'
-      preLoaderRoute: typeof ApiPublicAdminSendPaymentLinkRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/admin/remove-application': {
-      id: '/api/public/admin/remove-application'
-      path: '/api/public/admin/remove-application'
-      fullPath: '/api/public/admin/remove-application'
-      preLoaderRoute: typeof ApiPublicAdminRemoveApplicationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/admin/deny-application': {
-      id: '/api/public/admin/deny-application'
-      path: '/api/public/admin/deny-application'
-      fullPath: '/api/public/admin/deny-application'
-      preLoaderRoute: typeof ApiPublicAdminDenyApplicationRouteImport
+    '/api/public/admin/accounts': {
+      id: '/api/public/admin/accounts'
+      path: '/api/public/admin/accounts'
+      fullPath: '/api/public/admin/accounts'
+      preLoaderRoute: typeof ApiPublicAdminAccountsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/admin/applications': {
@@ -733,11 +670,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAdminApplicationsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/admin/accounts': {
-      id: '/api/public/admin/accounts'
-      path: '/api/public/admin/accounts'
-      fullPath: '/api/public/admin/accounts'
-      preLoaderRoute: typeof ApiPublicAdminAccountsRouteImport
+    '/api/public/admin/deny-application': {
+      id: '/api/public/admin/deny-application'
+      path: '/api/public/admin/deny-application'
+      fullPath: '/api/public/admin/deny-application'
+      preLoaderRoute: typeof ApiPublicAdminDenyApplicationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin/remove-application': {
+      id: '/api/public/admin/remove-application'
+      path: '/api/public/admin/remove-application'
+      fullPath: '/api/public/admin/remove-application'
+      preLoaderRoute: typeof ApiPublicAdminRemoveApplicationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin/send-payment-link': {
+      id: '/api/public/admin/send-payment-link'
+      path: '/api/public/admin/send-payment-link'
+      fullPath: '/api/public/admin/send-payment-link'
+      preLoaderRoute: typeof ApiPublicAdminSendPaymentLinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin/set-role': {
+      id: '/api/public/admin/set-role'
+      path: '/api/public/admin/set-role'
+      fullPath: '/api/public/admin/set-role'
+      preLoaderRoute: typeof ApiPublicAdminSetRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/checkout/create': {
+      id: '/api/public/checkout/create'
+      path: '/api/public/checkout/create'
+      fullPath: '/api/public/checkout/create'
+      preLoaderRoute: typeof ApiPublicCheckoutCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/checkout/extension': {
+      id: '/api/public/checkout/extension'
+      path: '/api/public/checkout/extension'
+      fullPath: '/api/public/checkout/extension'
+      preLoaderRoute: typeof ApiPublicCheckoutExtensionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/checkout/test': {
+      id: '/api/public/checkout/test'
+      path: '/api/public/checkout/test'
+      fullPath: '/api/public/checkout/test'
+      preLoaderRoute: typeof ApiPublicCheckoutTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/checkout/verify': {
+      id: '/api/public/checkout/verify'
+      path: '/api/public/checkout/verify'
+      fullPath: '/api/public/checkout/verify'
+      preLoaderRoute: typeof ApiPublicCheckoutVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/enroll/$applicationId': {
+      id: '/api/public/enroll/$applicationId'
+      path: '/api/public/enroll/$applicationId'
+      fullPath: '/api/public/enroll/$applicationId'
+      preLoaderRoute: typeof ApiPublicEnrollApplicationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
