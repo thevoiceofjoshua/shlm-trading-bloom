@@ -135,7 +135,7 @@ export function detectSweep(today: Bar[], london: Bar[], avgCandle: number, minF
     const s = today[i];
     const side: "high" | "low" | null = s.h - lH >= minDist ? "high" : lL - s.l >= minDist ? "low" : null;
     if (!side) { i++; continue; }
-    if (i === 0 || !(side === "high" ? today[i - 1].c > lH : today[i - 1].c < lL)) {
+    if (i === 0 || !(side === "high" ? today[i - 1].h - lH >= minDist : lL - today[i - 1].l >= minDist)) {
       events?.push({ kind: "detected", ts: s.t, side, message: `Swept London ${side}, awaiting confirmation` });
     }
     const hi = side === "high";

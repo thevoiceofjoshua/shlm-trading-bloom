@@ -7,7 +7,8 @@ export const getTodayActivity = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const access = await checkAccess(context);
     if (!access.hasAccess && !access.isAdmin) return { events: [], sessionDate: "" };
-    const { sessionDay } = await import("@/lib/weekly-activity.server");
+    const { sessionDay, recordWeeklyActivity } = await import("@/lib/weekly-activity.server");
+    await recordWeeklyActivity().catch((error) => console.error("Weekly activity page check failed", error));
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const sessionDate = sessionDay();
     const { data, error } = await supabaseAdmin.from("weekly_behavior_events")
