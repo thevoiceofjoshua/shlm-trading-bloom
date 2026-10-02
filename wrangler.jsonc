@@ -2,6 +2,7 @@
   // Build/runtime environment variables for shlm-trading-bloom
   "name": "shlm-trading-bloom",
   "compatibility_date": "2026-09-08",
+  "triggers": { "crons": ["*/5 * * * *"] },
   "vars": {
     "SUPABASE_PROJECT_ID": "ugnyssxvtwvbbckycmru",
     "SUPABASE_PUBLISHABLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnbnlzc3h2dHd2YmJja3ljbXJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNDYyMDksImV4cCI6MjEwNDkyMjIwOX0.d5ZthlUj0Xmd1puZ3lM0cXjbk_CQDuZvO38cpxIVWpE",

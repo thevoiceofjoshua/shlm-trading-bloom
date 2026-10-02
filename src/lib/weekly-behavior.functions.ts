@@ -16,7 +16,12 @@ export const getWeeklyBehavior = createServerFn({ method: "POST" })
     if (!access.hasAccess && !access.isAdmin) return { access, data: null };
     try {
       const { computeWeeklyBehavior } = await import("@/lib/weekly-behavior.server");
-      return { access, data: await computeWeeklyBehavior() };
+      const reading = await computeWeeklyBehavior();
+      if (reading.lastBarTs) {
+        const { recordWeeklyActivity } = await import("@/lib/weekly-activity.server");
+        await recordWeeklyActivity(reading).catch((error) => console.error("Weekly activity backup failed", error));
+      }
+      return { access, data: reading };
     } catch {
       return { access, data: null };
     }
