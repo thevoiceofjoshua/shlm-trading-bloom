@@ -51,7 +51,7 @@ export interface HubPayload {
   internals?: import("@/lib/internals.server").InternalsPayload;
 }
 
-async function checkAccess(context: any): Promise<HubAccess> {
+export async function checkAccess(context: any): Promise<HubAccess> {
   // Role check via user_roles: `admin` = full store, `shlm_mod` = Centre only.
   const { data: roleRows } = await context.supabase
     .from("user_roles")
