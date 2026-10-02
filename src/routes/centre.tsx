@@ -136,6 +136,12 @@ function CentrePage() {
               <div className="min-w-0">
                 <h1 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">SHLM Centre</h1>
                 <FeedBadges payload={payload} dataUpdatedAt={dataUpdatedAt || Date.now()} />
+                <Link
+                  to="/centre/weekly-behavior"
+                  className="mt-3 inline-flex min-h-10 items-center rounded-full border border-border px-4 text-sm font-medium transition-colors hover:bg-accent"
+                >
+                  Weekly Behavior →
+                </Link>
               </div>
               {payload.access.isAdmin && !payload.access.memberAccess && (
                 <div className="shrink-0"><AdminPreviewTag /></div>

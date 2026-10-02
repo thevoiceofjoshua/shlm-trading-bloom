@@ -28,6 +28,7 @@ import { Route as FeaturesMentorshipRouteImport } from './routes/features.mentor
 import { Route as FeaturesCurriculumRouteImport } from './routes/features.curriculum'
 import { Route as FeaturesCommunityRouteImport } from './routes/features.community'
 import { Route as EnrollApplicationIdRouteImport } from './routes/enroll.$applicationId'
+import { Route as CentreWeeklyBehaviorRouteImport } from './routes/centre_.weekly-behavior'
 import { Route as BlogBreakoutStrategyRouteImport } from './routes/blog.breakout-strategy'
 import { Route as ApiPublicSubmitApplicationRouteImport } from './routes/api/public/submit-application'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
@@ -139,6 +140,11 @@ const EnrollApplicationIdRoute = EnrollApplicationIdRouteImport.update({
   path: '/enroll/$applicationId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CentreWeeklyBehaviorRoute = CentreWeeklyBehaviorRouteImport.update({
+  id: '/centre_/weekly-behavior',
+  path: '/centre/weekly-behavior',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogBreakoutStrategyRoute = BlogBreakoutStrategyRouteImport.update({
   id: '/blog/breakout-strategy',
   path: '/blog/breakout-strategy',
@@ -239,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/centre/weekly-behavior': typeof CentreWeeklyBehaviorRoute
   '/enroll/$applicationId': typeof EnrollApplicationIdRoute
   '/features/community': typeof FeaturesCommunityRoute
   '/features/curriculum': typeof FeaturesCurriculumRoute
@@ -275,6 +282,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/centre/weekly-behavior': typeof CentreWeeklyBehaviorRoute
   '/enroll/$applicationId': typeof EnrollApplicationIdRoute
   '/features/community': typeof FeaturesCommunityRoute
   '/features/curriculum': typeof FeaturesCurriculumRoute
@@ -312,6 +320,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/centre_/weekly-behavior': typeof CentreWeeklyBehaviorRoute
   '/enroll/$applicationId': typeof EnrollApplicationIdRoute
   '/features/community': typeof FeaturesCommunityRoute
   '/features/curriculum': typeof FeaturesCurriculumRoute
@@ -350,6 +359,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/test-checkout'
     | '/blog/breakout-strategy'
+    | '/centre/weekly-behavior'
     | '/enroll/$applicationId'
     | '/features/community'
     | '/features/curriculum'
@@ -386,6 +396,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/test-checkout'
     | '/blog/breakout-strategy'
+    | '/centre/weekly-behavior'
     | '/enroll/$applicationId'
     | '/features/community'
     | '/features/curriculum'
@@ -422,6 +433,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/test-checkout'
     | '/blog/breakout-strategy'
+    | '/centre_/weekly-behavior'
     | '/enroll/$applicationId'
     | '/features/community'
     | '/features/curriculum'
@@ -459,6 +471,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TestCheckoutRoute: typeof TestCheckoutRoute
   BlogBreakoutStrategyRoute: typeof BlogBreakoutStrategyRoute
+  CentreWeeklyBehaviorRoute: typeof CentreWeeklyBehaviorRoute
   EnrollApplicationIdRoute: typeof EnrollApplicationIdRoute
   FeaturesCommunityRoute: typeof FeaturesCommunityRoute
   FeaturesCurriculumRoute: typeof FeaturesCurriculumRoute
@@ -615,6 +628,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnrollApplicationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/centre_/weekly-behavior': {
+      id: '/centre_/weekly-behavior'
+      path: '/centre/weekly-behavior'
+      fullPath: '/centre/weekly-behavior'
+      preLoaderRoute: typeof CentreWeeklyBehaviorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/breakout-strategy': {
       id: '/blog/breakout-strategy'
       path: '/blog/breakout-strategy'
@@ -739,6 +759,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TestCheckoutRoute: TestCheckoutRoute,
   BlogBreakoutStrategyRoute: BlogBreakoutStrategyRoute,
+  CentreWeeklyBehaviorRoute: CentreWeeklyBehaviorRoute,
   EnrollApplicationIdRoute: EnrollApplicationIdRoute,
   FeaturesCommunityRoute: FeaturesCommunityRoute,
   FeaturesCurriculumRoute: FeaturesCurriculumRoute,
