@@ -293,7 +293,7 @@ function classify(
 
   const frac = (c: boolean[]) => c.filter(Boolean).length / c.length;
   const reads: { label: BehaviorLabel; ok: boolean; close: number; reason: string }[] = [
-    { label: "RANGE BOUND", ok: rangeConds.every(Boolean), close: frac(rangeConds), reason: "Swept London high and low, no breakout" },
+    { label: "RANGE BOUND", ok: rangeConds.every(Boolean), close: frac(rangeConds), reason: rangeReason },
     {
       label: "CHOPPY", ok: choppyConds.every(Boolean), close: frac(choppyConds),
       reason: fb.count ? `Repeated false breaks at ${fb.levels.join(" and ")} levels` : "No follow-through on level breaks",
