@@ -190,7 +190,8 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
     try {
       const [nq, us2, quotes, econ] = await Promise.all([
         bars("NQ=F").catch(() => []),
-        bars("2YY=F").catch(() => []),
+        bars("ZT=F") // 2-year T-note futures: tracks US02Y inversely; breakout test is direction-agnostic
+       .catch(() => []),
         fetchDelayedQuotes().catch(() => ({} as Record<string, any>)),
         fetchLiveEconEvents().catch(() => []),
       ]);
