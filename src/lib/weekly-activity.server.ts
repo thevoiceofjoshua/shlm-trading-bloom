@@ -23,7 +23,7 @@ export async function recordWeeklyActivity(data?: WeeklyBehaviorPayload) {
     p_weekday: reading.todayDow,
     p_reading: snapshot,
     p_last_bar_ts: reading.lastBarTs,
-    p_candidates: reading.sweepEvents,
+    p_candidates: reading.sweepEvents.map((event) => ({ kind: event.kind, ts: event.ts, side: event.side, message: event.message })),
   });
   if (error) console.error("Weekly activity recording failed", error.message);
   return reading;

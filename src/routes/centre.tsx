@@ -13,6 +13,7 @@ import { EconomicCalendar, MorningNewsImpact, MorningNewsSpotlight } from "@/com
 import { Journal } from "@/components/hub/Journal";
 import { BetaIndicator } from "@/components/hub/BetaIndicator";
 import { MarketInternals } from "@/components/hub/MarketInternals";
+import { WeeklyNotificationBanner, WeeklyNotificationCenter } from "@/components/hub/WeeklyNotifications";
 
 
 import { AdminPreviewTag } from "@/components/AdminBar";
@@ -46,6 +47,8 @@ export const Route = createFileRoute("/centre")({
       { name: "description", content: "Your premium trading command center — NASDAQ, US30, Gold, and economic calendar." },
       { property: "og:title", content: "SHLM Centre — SHLM" },
       { property: "og:description", content: "Premium trading command center for SHLM members." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -124,6 +127,7 @@ function CentrePage() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 sm:pb-8 sm:pt-8 lg:px-8">
+        <WeeklyNotificationBanner enabled={!!payload && (payload.access.hasAccess || payload.access.isAdmin)} />
         {!payload ? (
           <div className="flex items-center justify-center py-20">
             <p className="text-sm text-muted-foreground">{isLoading ? "Loading market data…" : "Unable to load hub data."}</p>
@@ -170,6 +174,7 @@ function CentrePage() {
             <MorningNewsImpact payload={payload} />
 
             <EconomicCalendar payload={payload} />
+            <WeeklyNotificationCenter enabled={true} />
           </div>
         )}
       </main>
