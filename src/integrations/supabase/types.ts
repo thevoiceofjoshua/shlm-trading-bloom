@@ -449,6 +449,60 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_behavior_events: {
+        Row: {
+          created_at: string
+          event_key: string
+          id: string
+          kind: string
+          message: string
+          session_date: string
+          weekday: number
+        }
+        Insert: {
+          created_at?: string
+          event_key: string
+          id?: string
+          kind: string
+          message: string
+          session_date: string
+          weekday: number
+        }
+        Update: {
+          created_at?: string
+          event_key?: string
+          id?: string
+          kind?: string
+          message?: string
+          session_date?: string
+          weekday?: number
+        }
+        Relationships: []
+      }
+      weekly_behavior_state: {
+        Row: {
+          created_at: string
+          last_bar_ts: number
+          reading: Json
+          session_date: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          last_bar_ts?: number
+          reading?: Json
+          session_date: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          last_bar_ts?: number
+          reading?: Json
+          session_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -460,6 +514,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      record_weekly_behavior_tick: {
+        Args: {
+          p_candidates: Json
+          p_date: string
+          p_last_bar_ts: number
+          p_reading: Json
+          p_weekday: number
+        }
+        Returns: undefined
       }
     }
     Enums: {
