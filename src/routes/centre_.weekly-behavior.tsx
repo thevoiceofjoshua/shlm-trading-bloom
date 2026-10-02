@@ -125,7 +125,7 @@ function DayCard({ day, today, status, note }: { day: number; today: boolean; st
     sub = status.reason;
     tone = "border-border bg-surface text-muted-foreground";
   } else {
-    headline = "CHOPPY / FAST";
+    headline = "FAST / CHOPPY / SLOW / RANGE";
     sub = status.reason;
     tone = "border-border bg-surface text-muted-foreground";
   }
