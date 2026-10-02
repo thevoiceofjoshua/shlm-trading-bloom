@@ -25,6 +25,10 @@ function useBanner(enabled: boolean) {
       setBanner(null);
       return;
     }
+    if (data && !data.sessionDate) {
+      setBanner(null);
+      return;
+    }
     if (!data?.sessionDate) return;
     const key = `shlm-weekly-activity-seen:${data.sessionDate}`;
     const newest = data.events[0];

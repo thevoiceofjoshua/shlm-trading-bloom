@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AdminBar } from "@/components/AdminBar";
 import { AdminModePrompt } from "@/components/AdminModePrompt";
 import { TawkChat } from "@/components/TawkChat";
+import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -165,6 +166,17 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    const { data: subscription } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      // Never reuse Centre access decisions or activity from another session.
+      for (const queryKey of ["hub-data", "weekly-behavior", "weekly-activity"]) {
+        queryClient.removeQueries({ queryKey: [queryKey] });
+      }
+    });
+    return () => subscription.subscription.unsubscribe();
+  }, [queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
