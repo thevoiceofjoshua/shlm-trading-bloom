@@ -158,6 +158,7 @@ export function detectSweep(today: Bar[], london: Bar[], avgCandle: number, minF
     const ok = requireBoth ? engulf && bos : engulf || bos;
     if (!ok) {
       if (win.length < 3) result = { state: "pending", side }; // window still open
+      else events?.push({ kind: "canceled", ts: win[2].t, side, message: "Sweep canceled, watching both sides again" });
       i++;
       continue;
     }
