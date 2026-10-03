@@ -30,6 +30,10 @@ export interface InstrumentContext {
     | { state: "set"; high: number; low: number; size: number; position: "above" | "below" | "inside" }
     | null;
   lastBarTs: number;
+  /** Trading day the values belong to (the last completed one when markets are closed). */
+  sessionDate: string;
+  /** True when today has no bars yet and values come from the last session. */
+  lastSession: boolean;
 }
 
 export interface MarketContext {
@@ -67,7 +71,13 @@ const hi = (b: Bar[]) => Math.max(...b.map((x) => x.h));
 const lo = (b: Bar[]) => Math.min(...b.map((x) => x.l));
 const avg = (a: number[]) => (a.length ? a.reduce((s, x) => s + x, 0) / a.length : 0);
 
-function instrument(all: Bar[], todayKey: string, nowSm: number): InstrumentContext | null {
+function instrument(all: Bar[], liveKey: string, liveSm: number): InstrumentContext | null {
+  let todayKey = liveKey, nowSm = liveSm, lastSession = false;
+  if (!all.some((b) => b.key === liveKey)) {
+    const keys = [...new Set(all.map((b) => b.key))].sort();
+    if (!keys.length) return null;
+    todayKey = keys[keys.length - 1]; nowSm = 24 * 60; lastSession = true;
+  }
   const today = all.filter((b) => b.key === todayKey);
   if (!today.length) return null;
   const keys = [...new Set(all.map((b) => b.key))].filter((k) => k < todayKey).sort();
@@ -118,11 +128,17 @@ function instrument(all: Bar[], todayKey: string, nowSm: number): InstrumentCont
     else openingRange = { state: "set", high: H, low: L, size: H - L, position: price > H ? "above" : price < L ? "below" : "inside" };
   }
 
-  return { price, levels, volatility, sweep, openingRange, lastBarTs: today[today.length - 1].t };
+  return { price, levels, volatility, sweep, openingRange, lastBarTs: today[today.length - 1].t, sessionDate: todayKey, lastSession };
 }
 
 /** 2-year yield read from 2-year T-note futures (price moves opposite to yield). */
-function us02y(all: Bar[], todayKey: string, nowSm: number): MarketContext["us02y"] {
+function us02y(all: Bar[], liveKey: string, liveSm: number): MarketContext["us02y"] {
+  let todayKey = liveKey, nowSm = liveSm;
+  if (!all.some((b) => b.key === liveKey)) {
+    const keys = [...new Set(all.map((b) => b.key))].sort();
+    if (!keys.length) return null;
+    todayKey = keys[keys.length - 1]; nowSm = 24 * 60;
+  }
   const today = all.filter((b) => b.key === todayKey);
   if (today.length < 12) return null;
   const last = today[today.length - 1].c;
