@@ -1,3 +1,4 @@
+import { WiseConnectCard } from "@/components/WiseConnectCard";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
@@ -492,6 +493,7 @@ function AdminPage() {
         )}
 
         {passcode && <ManageRoles passcode={passcode} />}
+        {passcode && <WiseConnectCard />}
       </div>
     </div>
   );

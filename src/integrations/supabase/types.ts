@@ -242,6 +242,48 @@ export type Database = {
         }
         Relationships: []
       }
+      recruiter_bank_accounts: {
+        Row: {
+          bank_name: string | null
+          country: string | null
+          created_at: string
+          currency: string
+          holder_name: string
+          id: string
+          last4: string | null
+          mode: string
+          recruiter_id: string
+          updated_at: string
+          wise_recipient_id: number
+        }
+        Insert: {
+          bank_name?: string | null
+          country?: string | null
+          created_at?: string
+          currency: string
+          holder_name: string
+          id?: string
+          last4?: string | null
+          mode: string
+          recruiter_id: string
+          updated_at?: string
+          wise_recipient_id: number
+        }
+        Update: {
+          bank_name?: string | null
+          country?: string | null
+          created_at?: string
+          currency?: string
+          holder_name?: string
+          id?: string
+          last4?: string | null
+          mode?: string
+          recruiter_id?: string
+          updated_at?: string
+          wise_recipient_id?: number
+        }
+        Relationships: []
+      }
       recruiter_lands: {
         Row: {
           created_at: string
@@ -266,6 +308,69 @@ export type Database = {
           id?: string
           month?: string
           recruiter_id?: string
+        }
+        Relationships: []
+      }
+      recruiter_payouts: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_transaction_id: string
+          error: string | null
+          fee: number | null
+          id: string
+          mode: string
+          quote_id: string | null
+          rate: number | null
+          recruiter_id: string
+          status: string
+          target_amount: number | null
+          target_currency: string | null
+          updated_at: string
+          wise_status: string | null
+          wise_transfer_id: number | null
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_transaction_id?: string
+          error?: string | null
+          fee?: number | null
+          id?: string
+          mode: string
+          quote_id?: string | null
+          rate?: number | null
+          recruiter_id: string
+          status?: string
+          target_amount?: number | null
+          target_currency?: string | null
+          updated_at?: string
+          wise_status?: string | null
+          wise_transfer_id?: number | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_transaction_id?: string
+          error?: string | null
+          fee?: number | null
+          id?: string
+          mode?: string
+          quote_id?: string | null
+          rate?: number | null
+          recruiter_id?: string
+          status?: string
+          target_amount?: number | null
+          target_currency?: string | null
+          updated_at?: string
+          wise_status?: string | null
+          wise_transfer_id?: number | null
         }
         Relationships: []
       }
@@ -557,6 +662,60 @@ export type Database = {
         }
         Relationships: []
       }
+      wise_connection: {
+        Row: {
+          connected_at: string
+          id: string
+          mode: string
+          profile_id: number
+          profile_name: string | null
+          token_cipher: string
+          token_iv: string
+          updated_at: string
+        }
+        Insert: {
+          connected_at?: string
+          id?: string
+          mode: string
+          profile_id: number
+          profile_name?: string | null
+          token_cipher: string
+          token_iv: string
+          updated_at?: string
+        }
+        Update: {
+          connected_at?: string
+          id?: string
+          mode?: string
+          profile_id?: number
+          profile_name?: string | null
+          token_cipher?: string
+          token_iv?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      wise_settings: {
+        Row: {
+          active_mode: string
+          id: number
+          sandbox_verified_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          active_mode?: string
+          id?: number
+          sandbox_verified_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active_mode?: string
+          id?: number
+          sandbox_verified_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -578,6 +737,16 @@ export type Database = {
           p_weekday: number
         }
         Returns: undefined
+      }
+      reserve_recruiter_payout: {
+        Args: {
+          p_amount_cents: number
+          p_created_by: string
+          p_mode: string
+          p_rate_cents: number
+          p_recruiter: string
+        }
+        Returns: string
       }
     }
     Enums: {
