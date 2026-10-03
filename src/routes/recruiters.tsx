@@ -160,7 +160,7 @@ function RecruiterCard({
   const pending = useRef(0);
   const bonus = Math.floor(row.thisMonth / BONUS_PER) * BONUS_AMOUNT;
 
-  const shift = (delta: number) =>
+  const shift = (delta: number) => {
     qc.setQueryData(["recruiter-portal"], (old: any) =>
       old
         ? {
@@ -171,12 +171,29 @@ function RecruiterCard({
           }
         : old,
     );
+    const cents = delta * LAND_RATE * 100;
+    qc.setQueryData(["payout-summary"], (old: any) =>
+      old
+        ? {
+            ...old,
+            rows: old.rows.map((p: PayoutSummary) =>
+              p.recruiterId === row.id
+                ? { ...p, earnedCents: p.earnedCents + cents, owedCents: p.owedCents + cents }
+                : p,
+            ),
+          }
+        : old,
+    );
+  };
 
   const apply = async (delta: number) => {
     if (!delta) return;
     setErr(null);
     setAmount("");
-    await qc.cancelQueries({ queryKey: ["recruiter-portal"] });
+    await Promise.all([
+      qc.cancelQueries({ queryKey: ["recruiter-portal"] }),
+      qc.cancelQueries({ queryKey: ["payout-summary"] }),
+    ]);
     shift(delta); // optimistic
     pending.current += 1;
     try {
@@ -186,7 +203,10 @@ function RecruiterCard({
       setErr(e instanceof Error ? e.message : "Update failed — change undone");
     } finally {
       pending.current -= 1;
-      if (pending.current === 0) qc.invalidateQueries({ queryKey: ["recruiter-portal"] });
+      if (pending.current === 0) {
+        qc.invalidateQueries({ queryKey: ["recruiter-portal"] });
+        qc.invalidateQueries({ queryKey: ["payout-summary"] });
+      }
     }
   };
 
