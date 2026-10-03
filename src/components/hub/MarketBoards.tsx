@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import type { HubPayload } from "@/lib/hub.functions";
+import { MarketMapStrip } from "@/components/hub/CentreInsights";
 
 function changeColor(pct: number) {
   if (pct > 0) return "text-emerald-500";
@@ -58,7 +59,12 @@ function DriverTile({ d }: { d: { symbol: string; price: number; changePct: numb
       </div>
       <p className="mt-1 font-display text-base font-medium tabular-nums">{d.price.toFixed(1)}</p>
       <div className="mt-2">{strengthBar(d.changePct)}</div>
-      <p className="mt-2 text-[11px] leading-snug text-muted-foreground">{d.note}</p>
+      <p className="mt-2 text-[11px] leading-snug text-muted-foreground">
+        <span className={`font-semibold uppercase tracking-wider ${changeColor(d.changePct)}`}>
+          {d.changePct > 0 ? "Bullish" : d.changePct < 0 ? "Bearish" : "Neutral"}
+        </span>{" "}
+        · {d.note}
+      </p>
     </div>
   );
 }
@@ -66,6 +72,16 @@ function DriverTile({ d }: { d: { symbol: string; price: number; changePct: numb
 /* ---- Live macro impact copy: rebuilt from the current macro readings ---- */
 
 type MacroRow = { label: string; value: string; direction: "up" | "down" | "flat" };
+
+function macroEffect(label: string, direction: MacroRow["direction"], symbol: "NASDAQ" | "US30" | "GOLD") {
+  const l = label.toLowerCase();
+  if (direction === "flat") return "neutral" as const;
+  const up = direction === "up";
+  if (/vix|risk|stress/.test(l)) return (symbol === "GOLD" ? up : !up) ? ("supportive" as const) : ("headwind" as const);
+  if (/semis|ai/.test(l)) return up ? ("supportive" as const) : ("headwind" as const);
+  if (/yield|usd|dxy|dollar|oil|wti/.test(l)) return up ? ("headwind" as const) : ("supportive" as const);
+  return "neutral" as const;
+}
 
 function macroImpact(list: MacroRow[], symbol: "NASDAQ" | "US30" | "GOLD"): string | null {
   if (!list.length) return null;
@@ -211,6 +227,7 @@ export function IndexCards({ payload }: { payload: HubPayload }) {
           <RangePills high={idx.dayHigh} low={idx.dayLow} />
 
           <ScalperLevels quote={idx} />
+          <MarketMapStrip payload={payload} symbol={idx.symbol as "NASDAQ" | "US30"} />
         </div>
       ))}
     </div>
@@ -314,7 +331,7 @@ export function MagSevenBoard({ payload }: { payload: HubPayload }) {
         <SectionHead title="Macro drivers" />
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           {(payload.nasdaqMacro ?? []).map((m) => (
-            <MacroTile key={m.label} macro={m} />
+            <MacroTile key={m.label} macro={m} symbol="NASDAQ" />
           ))}
         </div>
         <MacroImpact list={payload.nasdaqMacro ?? []} symbol="NASDAQ" />
@@ -345,7 +362,7 @@ export function DowBoard({ payload }: { payload: HubPayload }) {
         <SectionHead title="Macro drivers" />
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           {payload.dowMacro.map((m) => (
-            <MacroTile key={m.label} macro={m} />
+            <MacroTile key={m.label} macro={m} symbol="US30" />
           ))}
         </div>
         <MacroImpact list={payload.dowMacro} symbol="US30" />
@@ -360,8 +377,10 @@ export function DowBoard({ payload }: { payload: HubPayload }) {
 }
 
 
-function MacroTile({ macro }: { macro: HubPayload["dowMacro"][number] }) {
+function MacroTile({ macro, symbol }: { macro: HubPayload["dowMacro"][number]; symbol: "NASDAQ" | "US30" | "GOLD" }) {
   const [open, setOpen] = useState(false);
+  const eff = macroEffect(macro.label, macro.direction, symbol);
+  const tag = eff === "supportive" ? { t: "Bullish", c: "text-emerald-500" } : eff === "headwind" ? { t: "Bearish", c: "text-red-500" } : { t: "Neutral", c: "text-muted-foreground" };
   const arrow = macro.direction === "up" ? "↑" : macro.direction === "down" ? "↓" : "→";
   return (
     <div className="rounded-lg border border-border bg-surface p-3">
@@ -369,6 +388,7 @@ function MacroTile({ macro }: { macro: HubPayload["dowMacro"][number] }) {
         <span className="text-xs font-medium">{macro.label}</span>
         <span className="font-display text-sm font-medium tabular-nums">{macro.value}</span>
       </div>
+      <p className={`mt-1 text-[10px] font-semibold uppercase tracking-widest ${tag.c}`}>{tag.t} for {symbol === "GOLD" ? "gold" : symbol === "US30" ? "US30" : "NAS100"}</p>
       <p className="mt-1 text-xs text-muted-foreground">
         <span className={changeColor(macro.direction === "up" ? 1 : macro.direction === "down" ? -1 : 0)}>
           {arrow}
@@ -407,13 +427,14 @@ export function GoldDesk({ payload }: { payload: HubPayload }) {
       <RangePills high={g.dayHigh} low={g.dayLow} dp={1} />
 
       <ScalperLevels quote={g} />
+      <MarketMapStrip payload={payload} symbol="XAU/USD" />
 
 
       <div className="mt-5 border-t border-border pt-4">
         <SectionHead title="Gold drivers" />
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           {payload.goldDrivers.map((m) => (
-            <MacroTile key={m.label} macro={m} />
+            <MacroTile key={m.label} macro={m} symbol="GOLD" />
           ))}
         </div>
         <MacroImpact list={payload.goldDrivers} symbol="GOLD" />
@@ -423,6 +444,51 @@ export function GoldDesk({ payload }: { payload: HubPayload }) {
         read={goldDriverScore(payload.goldDrivers)}
         note="dollar, yields and risk conditions behind gold"
       />
+    </div>
+  );
+}
+
+/** One driver board at a time: NAS100 / US30 / Gold. Same boards, same data. */
+export function DriverTabs({ payload }: { payload: HubPayload }) {
+  const [tab, setTab] = useState<"NASDAQ" | "US30" | "GOLD">("NASDAQ");
+  const tabs = [
+    { k: "NASDAQ" as const, t: "NAS100" },
+    { k: "US30" as const, t: "US30" },
+    { k: "GOLD" as const, t: "Gold" },
+  ];
+  const y = payload.context?.us02y;
+  return (
+    <div className="min-w-0 space-y-3">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+        <h2 className="truncate font-display text-base font-semibold uppercase tracking-widest sm:text-lg">Market Drivers</h2>
+        <div role="tablist" className="inline-flex rounded-full border border-border p-0.5">
+          {tabs.map(({ k, t }) => (
+            <button
+              key={k}
+              role="tab"
+              aria-selected={tab === k}
+              onClick={() => setTab(k)}
+              className={`min-h-8 rounded-full px-3 text-xs font-medium ${tab === k ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm">
+        <span className="font-semibold">US02Y</span>{" "}
+        {y ? (
+          <>
+            <span className={y.direction === "up" ? "text-red-500" : y.direction === "down" ? "text-emerald-500" : "text-muted-foreground"}>
+              {y.direction === "up" ? "↑ Rising" : y.direction === "down" ? "↓ Easing" : "→ Flat"}
+            </span>
+            <span className="text-muted-foreground"> — {y.reason}. 2-year T-note futures, delayed.</span>
+          </>
+        ) : (
+          <span className="text-muted-foreground">DATA UNAVAILABLE</span>
+        )}
+      </div>
+      {tab === "NASDAQ" ? <MagSevenBoard payload={payload} /> : tab === "US30" ? <DowBoard payload={payload} /> : <GoldDesk payload={payload} />}
     </div>
   );
 }
