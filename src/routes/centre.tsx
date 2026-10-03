@@ -9,8 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { getHubData, type HubPayload } from "@/lib/hub.functions";
 import { SessionBar } from "@/components/hub/SessionBar";
 import { IndexCards, DriverTabs } from "@/components/hub/MarketBoards";
-import { MarketBrief, MarketConditions, LiquidityRadar, OpeningRange, SymbolCompare, TradeReadiness, MobileCollapse, openingRangeMarkets, compareCards } from "@/components/hub/CentreInsights";
-import { EconomicCalendar, MorningNewsImpact, MorningNewsSpotlight } from "@/components/hub/EconomicCalendar";
+import { MarketBrief, MarketConditions, LiquidityRadar, OpeningRange, TradeReadiness, MobileCollapse, openingRangeMarkets } from "@/components/hub/CentreInsights";
+import { EconomicCalendar, MorningNewsSpotlight } from "@/components/hub/EconomicCalendar";
 import { Journal } from "@/components/hub/Journal";
 import { BetaIndicator } from "@/components/hub/BetaIndicator";
 import { MarketInternals } from "@/components/hub/MarketInternals";
@@ -128,9 +128,6 @@ function CentrePage() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 pb-28 pt-6 sm:px-6 sm:pb-8 sm:pt-8 lg:px-8">
-        {payload && (payload.access.hasAccess || payload.access.isAdmin) && (
-          <WeeklyNotificationBanner enabled={true} />
-        )}
         {!payload ? (
           <div className="flex items-center justify-center py-20">
             <p className="text-sm text-muted-foreground">{isLoading ? "Loading market data…" : "Unable to load hub data."}</p>
@@ -155,10 +152,10 @@ function CentrePage() {
               )}
             </div>
 
+            <WeeklyNotificationBanner enabled={true} />
+            <SessionBar payload={payload} />
 
             <MarketBrief payload={payload} />
-
-            <SessionBar payload={payload} />
 
             {/* Market Internals hidden until a paid NYSE internals source is connected —
                 restore by adding <MarketInternals payload={payload} /> here (component + logic kept intact). */}
@@ -168,35 +165,28 @@ function CentrePage() {
             {/* Sections without real data are hidden — never shown with sample or "unavailable" content. */}
             {payload.dataState !== "sample" && <IndexCards payload={payload} />}
 
-            <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-              <LiquidityRadar payload={payload} />
-              {payload.dataState !== "sample" && <DriverTabs payload={payload} />}
-            </div>
+            <LiquidityRadar payload={payload} />
 
-            {payload.econLive && (
-              <>
-                <MorningNewsSpotlight payload={payload} />
-                <MorningNewsImpact payload={payload} />
-                <MobileCollapse title="Economic calendar">
-                  <EconomicCalendar payload={payload} />
-                </MobileCollapse>
-              </>
-            )}
+            {payload.dataState !== "sample" && <DriverTabs payload={payload} />}
 
             {openingRangeMarkets(payload).length > 0 && (
               <MobileCollapse title="NY Opening Range">
                 <OpeningRange payload={payload} />
               </MobileCollapse>
             )}
-            {compareCards(payload).length > 0 && (
-              <MobileCollapse title="Market Environment">
-                <SymbolCompare payload={payload} />
-              </MobileCollapse>
-            )}
             <MobileCollapse title="Trade Readiness">
               <TradeReadiness readOnly={!!payload.access.readOnly} />
             </MobileCollapse>
             <WeeklyNotificationCenter enabled={true} />
+
+            {payload.econLive && (
+              <>
+                <MorningNewsSpotlight payload={payload} />
+                <MobileCollapse title="Economic calendar">
+                  <EconomicCalendar payload={payload} />
+                </MobileCollapse>
+              </>
+            )}
           </div>
         )}
       </main>

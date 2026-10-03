@@ -65,8 +65,6 @@ export function MobileCollapse({ title, children }: { title: string; children: R
 /* ------------------------------ Market Brief ------------------------------ */
 
 export function MarketBrief({ payload }: { payload: HubPayload }) {
-  const live = payload.sessions.sessions.find((s) => s.state === "open");
-  const session = live ? live.label : payload.sessions.marketsClosed ? "Markets closed" : "Pre-New York";
   const nas = ctxOf(payload, "NASDAQ");
   const st = marketState(nas, mtfOf(payload, "NASDAQ"));
   const near = nearestOpen(nas);
@@ -80,7 +78,6 @@ export function MarketBrief({ payload }: { payload: HubPayload }) {
 
   const envTone = (v: string | null): Tone => (v === "Aligned" ? "pos" : v === "Conflicting" ? "neg" : "info");
   const allRows: [string, string | null, Tone][] = [
-    ["Session", session, "info"],
     ["Market State", st?.label ?? null, st ? stateTone(st.label) : "info"],
     ["Volatility", nas?.volatility?.level ?? null, nas?.volatility ? volTone(nas.volatility.level) : "info"],
     ["Liquidity", liq, "info"],
@@ -191,19 +188,19 @@ export function LiquidityRadar({ payload }: { payload: HubPayload }) {
   );
   if (!sym || !ctx || !r) return null; // no real levels — hide the card
   return (
-    <Card title="Liquidity Radar" right={<SymbolTabs value={sym} onChange={setSym} keys={available} />}>
-      {(
-        <>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Side title="↑ Upside liquidity" list={r.above} />
-            <Side title="↓ Downside liquidity" list={r.below} />
-          </div>
-          <p className="mt-3 text-[10px] text-muted-foreground">
-            Resting session highs/lows around futures price {fmt(ctx.price, sym)}. Near = within {NEAR_PCT}%. Shows where liquidity sits — not where price will go. Delayed ~15 min.
-          </p>
-        </>
-      )}
-    </Card>
+    <section className="min-w-0 rounded-2xl border border-border bg-card p-4 sm:p-5">
+      <h2 className="font-display text-base font-semibold uppercase tracking-widest sm:text-lg">Liquidity Radar</h2>
+      <div className="mt-3 w-full overflow-x-auto pb-1">
+        <SymbolTabs value={sym} onChange={setSym} keys={available} />
+      </div>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <Side title="↑ Upside liquidity" list={r.above} />
+        <Side title="↓ Downside liquidity" list={r.below} />
+      </div>
+      <p className="mt-3 text-[10px] text-muted-foreground">
+        Resting session highs/lows around futures price {fmt(ctx.price, sym)}. Near = within {NEAR_PCT}%. Shows where liquidity sits — not where price will go. Delayed ~15 min.
+      </p>
+    </section>
   );
 }
 
