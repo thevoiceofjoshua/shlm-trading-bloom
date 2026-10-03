@@ -39,7 +39,10 @@ function Card({ title, right, children, className = "" }: { title: string; right
   );
 }
 
-const Delayed = () => <span>Delayed ~15 min</span>;
+function Delayed({ payload }: { payload?: HubPayload }) {
+  const last = payload && Object.values(payload.context?.instruments ?? {}).find((c) => c?.lastSession);
+  return <span>{last ? `Last session ${last.sessionDate} · delayed` : "Delayed ~15 min"}</span>;
+}
 
 /** On phones the body collapses behind a tap; on larger screens it is always open. */
 export function MobileCollapse({ title, children }: { title: string; children: ReactNode }) {
@@ -87,7 +90,7 @@ export function MarketBrief({ payload }: { payload: HubPayload }) {
     ["Major Scheduled Event", ev ? `${econTimeToLocal(ev.date, ev.time)} ${ev.title}` : "None today", ev ? "warn" : "info"],
   ];
   return (
-    <Card title="SHLM Market Brief" right={<Delayed />} className="border-foreground/40">
+    <Card title="SHLM Market Brief" right={<Delayed payload={payload} />} className="border-foreground/40">
       <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
         {rows.map(([k, v, t]) => (
           <div key={k} className="grid grid-cols-[minmax(0,9.5rem)_minmax(0,1fr)] items-baseline gap-2 border-b border-border/60 pb-2 text-sm">
@@ -217,7 +220,7 @@ export function MarketConditions({ payload }: { payload: HubPayload }) {
   const fixed: Record<number, string> = { 2: "MANIPULATION → EXPANSION", 3: "MANIPULATION → EXPANSION", 4: "BIG PUSH / EXPANSION" };
 
   return (
-    <Card title="Market Conditions" right={<Delayed />}>
+    <Card title="Market Conditions" right={<Delayed payload={payload} />}>
       <div className="divide-y divide-border">
         <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)] gap-2 pb-2 text-[10px] uppercase tracking-widest text-muted-foreground">
           <span>Market</span><span>State</span><span>5M Volatility</span>
