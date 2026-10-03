@@ -81,3 +81,5 @@
 - [x] Schedule five-minute background checks securely and poll activity every minute
 - [x] Show ten-second banner and bottom Notification Center on both Centre pages
 - [ ] Verify signed-in page rendering and event history (blocked: externally managed sign-in is unavailable in the test browser)
+- [x] SHLM Centre premium refinement (Brief, Market Map strip, Liquidity Radar, driver tabs/tags, Conditions, Opening Range, Environment, Readiness)
+- [ ] Verify the refined Centre signed-in on a live weekday (needs user sign-in)
