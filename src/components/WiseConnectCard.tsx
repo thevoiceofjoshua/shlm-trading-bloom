@@ -50,7 +50,7 @@ export function WiseConnectCard() {
             {(["sandbox", "live"] as Mode[]).map((m) => (
               <button
                 key={m}
-                disabled={busy || s.activeMode === m || (m === "live" && !s.sandboxVerified)}
+                disabled={busy || s.activeMode === m}
                 onClick={() => run(() => switchMode({ data: { mode: m } }), `Switched to ${m}.`)}
                 className={`min-h-9 rounded-full px-4 text-xs font-semibold uppercase tracking-wider disabled:opacity-60 ${
                   s.activeMode === m ? "bg-foreground text-background" : "border border-border"
@@ -59,9 +59,6 @@ export function WiseConnectCard() {
                 {m}
               </button>
             ))}
-            {!s.sandboxVerified && (
-              <span className="text-xs text-muted-foreground">Live unlocks after a sandbox payout completes.</span>
-            )}
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
