@@ -26,11 +26,24 @@ function currentMonth(): string {
 }
 
 async function roleOf(context: any): Promise<"admin" | "recruiter" | null> {
-  const { data } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId);
+  // userId comes from the token verified by requireSupabaseAuth; look up its
+  // roles with the server client so a quiet RLS/read hiccup can't hide them.
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", context.userId);
+  if (error) throw new Error(`Role lookup failed: ${error.message}`);
   const held = ((data ?? []) as { role: string }[]).map((r) => r.role);
   if (held.includes("admin")) return "admin";
   if (held.includes("recruiter")) return "recruiter";
   return null;
+}
+
+class NotAuthorized extends Error {
+  constructor() {
+    super("NOT_AUTHORIZED");
+  }
 }
 
 export const getRecruiterAccess = createServerFn({ method: "POST" })
