@@ -41,7 +41,7 @@ export interface WeeklyBehaviorPayload {
 
 export interface SweepEvent { kind: "detected" | "confirmed" | "canceled"; ts: number; side: "high" | "low"; message: string }
 
-interface Bar { t: number; o: number; h: number; l: number; c: number; v: number | null; key: string; sm: number }
+export interface Bar { t: number; o: number; h: number; l: number; c: number; v: number | null; key: string; sm: number }
 
 const SHIFT_MIN = 9 * 60; // 15:00 PT prior day → 00:00 of the session key
 const ASIA_END = 9 * 60; // 00:00 PT
@@ -51,7 +51,7 @@ const PRENY_END = 15 * 60 + 30; // 06:30 PT
 const fmt = new Intl.DateTimeFormat("en-CA", {
   timeZone: SITE_TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false,
 });
-function laShifted(tsMs: number): { key: string; sm: number } {
+export function laShifted(tsMs: number): { key: string; sm: number } {
   const p = fmt.formatToParts(new Date(tsMs + SHIFT_MIN * 60_000));
   const g = (t: string) => p.find((x) => x.type === t)?.value ?? "0";
   return { key: `${g("year")}-${g("month")}-${g("day")}`, sm: (parseInt(g("hour"), 10) % 24) * 60 + parseInt(g("minute"), 10) };

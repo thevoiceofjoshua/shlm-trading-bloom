@@ -17,6 +17,12 @@ function sessionContext(laTime: string): string {
   return "Outside trading windows";
 }
 
+/** Only the instruments the Centre monitors, in short form. */
+function relevantMarkets(affects?: string[]): string[] {
+  const map: Record<string, string> = { NASDAQ: "NAS100", US30: "US30", "XAU/USD": "Gold" };
+  return (affects ?? []).map((a) => map[a]).filter((a): a is string => !!a);
+}
+
 /** Forex Factory tier language: solid = high, outlined = medium, faint = low. */
 const IMPACT_BADGE: Record<string, string> = {
   high: "bg-foreground text-background",
@@ -278,6 +284,11 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
                 </div>
                 <div className="flex min-w-0 items-center gap-2">
                   <span className="min-w-0 break-words text-sm">{e.title}</span>
+                  {relevantMarkets(e.affects).length > 0 && (
+                    <span className="shrink-0 text-[10px] uppercase tracking-widest text-muted-foreground">
+                      {relevantMarkets(e.affects).join(" · ")}
+                    </span>
+                  )}
                   <span
                     className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${
                       IMPACT_BADGE[e.impact] ?? IMPACT_BADGE.medium

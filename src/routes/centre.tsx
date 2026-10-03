@@ -8,7 +8,8 @@ import type { AuthUser } from "@/hooks/use-auth-user";
 import { supabase } from "@/integrations/supabase/client";
 import { getHubData, type HubPayload } from "@/lib/hub.functions";
 import { SessionBar } from "@/components/hub/SessionBar";
-import { IndexCards, MagSevenBoard, DowBoard, GoldDesk } from "@/components/hub/MarketBoards";
+import { IndexCards, DriverTabs } from "@/components/hub/MarketBoards";
+import { MarketBrief, MarketConditions, LiquidityRadar, OpeningRange, SymbolCompare, TradeReadiness, MobileCollapse } from "@/components/hub/CentreInsights";
 import { EconomicCalendar, MorningNewsImpact, MorningNewsSpotlight } from "@/components/hub/EconomicCalendar";
 import { Journal } from "@/components/hub/Journal";
 import { BetaIndicator } from "@/components/hub/BetaIndicator";
@@ -155,27 +156,37 @@ function CentrePage() {
             </div>
 
 
+            <MarketBrief payload={payload} />
+
             <SessionBar payload={payload} />
+
+            {/* Market Internals hidden until a paid NYSE internals source is connected —
+                restore by adding <MarketInternals payload={payload} /> here (component + logic kept intact). */}
+
+            <MarketConditions payload={payload} />
 
             <IndexCards payload={payload} />
 
-            {/* Market Internals hidden until a paid NYSE internals source is connected —
-                restore by uncommenting this line (component + logic kept intact).
-                <MarketInternals payload={payload} /> */}
-
-
-            <div className="grid items-stretch gap-6 lg:grid-cols-2">
-              <MagSevenBoard payload={payload} />
-              <DowBoard payload={payload} />
+            <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+              <LiquidityRadar payload={payload} />
+              <DriverTabs payload={payload} />
             </div>
-
-
-            <GoldDesk payload={payload} />
 
             <MorningNewsSpotlight payload={payload} />
             <MorningNewsImpact payload={payload} />
+            <MobileCollapse title="Economic calendar">
+              <EconomicCalendar payload={payload} />
+            </MobileCollapse>
 
-            <EconomicCalendar payload={payload} />
+            <MobileCollapse title="NY Opening Range">
+              <OpeningRange payload={payload} />
+            </MobileCollapse>
+            <MobileCollapse title="Market Environment">
+              <SymbolCompare payload={payload} />
+            </MobileCollapse>
+            <MobileCollapse title="Trade Readiness">
+              <TradeReadiness readOnly={!!payload.access.readOnly} />
+            </MobileCollapse>
             <WeeklyNotificationCenter enabled={true} />
           </div>
         )}

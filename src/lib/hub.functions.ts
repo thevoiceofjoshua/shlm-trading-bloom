@@ -49,6 +49,8 @@ export interface HubPayload {
   econLive?: boolean;
   /** Market Internals confirmation layer (separate module). */
   internals?: import("@/lib/internals.server").InternalsPayload;
+  /** Session levels, volatility, opening range, 2Y yield (read-only context layer). */
+  context?: import("@/lib/market-context.server").MarketContext;
 }
 
 export async function checkAccess(context: any): Promise<HubAccess> {
@@ -291,6 +293,14 @@ export const getHubData = createServerFn({ method: "POST" })
         payload.internals = await computeInternals({ NASDAQ: mtfOf("NASDAQ"), US30: mtfOf("US30") });
       } catch {
         // Leave unset — the section shows DATA UNAVAILABLE.
+      }
+
+      // Market context: session levels, volatility, opening range (read-only).
+      try {
+        const { computeMarketContext } = await import("@/lib/market-context.server");
+        payload.context = await computeMarketContext();
+      } catch {
+        // Leave unset — sections show DATA UNAVAILABLE.
       }
 
       // Live economic calendar: real releases when reachable, else samples.
