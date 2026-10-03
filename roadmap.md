@@ -94,3 +94,4 @@
 - [x] Recruiter role (lifetime access) assignable in Manage roles
 - [x] /recruiters page: Founder sees all, recruiter sees own; +1/-1/Add for Founder
 - [x] Monthly count derived from ledger (auto-resets each month)
+- [ ] Wise payouts: Founder connects sandbox token, recruiter adds sandbox bank, run sandbox payout end to end, then unlock Live (needs user's Wise sandbox token + publish)

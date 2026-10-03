@@ -14,3 +14,4 @@
 - Centre market context (src/lib/market-context.server.ts) is a read-only layer reusing Weekly Behavior's session/sweep helpers; Brief, Comparison and Market State are pure summaries in src/lib/centre-insights.ts — keeps summaries from becoming independent indicators.
 
 - Recruiter earnings use an append-only `recruiter_lands` ledger tagged by Pacific calendar month; "this month" is derived, so there is no scheduled reset job. Why: no timer to fail, history preserved.
+- Recruiter payouts go through Wise (src/lib/wise.server.ts + payouts.functions.ts): Founder token stored AES-GCM encrypted (WISE_ENC_KEY) in service-only wise_connection, only recipient IDs + masked bank summaries stored, payouts reserved atomically via reserve_recruiter_payout; the webhook never trusts its payload and re-reads the transfer from Wise. Why: no raw bank numbers or token ever reach the database in plain form or a browser, and no double-paying.
