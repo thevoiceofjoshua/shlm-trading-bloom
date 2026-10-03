@@ -12,9 +12,17 @@ export function useRecruiterAccess(userId: string | null | undefined) {
       return;
     }
     let active = true;
-    fetchAccess()
-      .then((r) => active && setAllowed(!!r.role))
-      .catch(() => active && setAllowed(false));
+    // A single dropped request must not hide the menu link for the whole
+    // session — retry a couple of times before giving up.
+    const attempt = (n: number) => {
+      fetchAccess()
+        .then((r) => active && setAllowed(!!r.role))
+        .catch(() => {
+          if (!active) return;
+          if (n < 2) setTimeout(() => active && attempt(n + 1), 1500);
+        });
+    };
+    attempt(0);
     return () => {
       active = false;
     };
