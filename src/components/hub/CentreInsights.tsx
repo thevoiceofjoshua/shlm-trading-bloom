@@ -13,7 +13,6 @@ import {
   structureClarity, liquidityClarity, radar, nearestOpen, nextMajorEvent, laDateISO, type Tone,
 } from "@/lib/centre-insights";
 
-const UNAVAILABLE = "DATA UNAVAILABLE";
 
 const TONE: Record<Tone, string> = {
   pos: "text-emerald-600 dark:text-emerald-400",
@@ -71,36 +70,39 @@ export function MarketBrief({ payload }: { payload: HubPayload }) {
   const nas = ctxOf(payload, "NASDAQ");
   const st = marketState(nas, mtfOf(payload, "NASDAQ"));
   const near = nearestOpen(nas);
-  const ev = nextMajorEvent(payload);
+  const ev = payload.econLive ? nextMajorEvent(payload) : null;
   const y = payload.context?.us02y ?? null;
-  const env = (k: ContextSymbol) => driverAlignment(payload, k) ?? UNAVAILABLE;
-  const liq = near.above || near.below ? [near.above?.label, near.below?.label].filter(Boolean).join(" / ") : UNAVAILABLE;
+  const env = (k: ContextSymbol) => driverAlignment(payload, k) ?? null;
+  const liq = near.above || near.below ? [near.above?.label, near.below?.label].filter(Boolean).join(" / ") : null;
   const watch = !nas
-    ? "Market data is unavailable — check levels on your own chart before New York."
-    : `NY interaction with ${liq === UNAVAILABLE ? "the nearest session levels" : liq} and whether price ${st?.label === "EXPANDING" || st?.label === "TRENDING" ? "sustains the move or returns inside the established range" : "stays inside the current range or breaks out of it"}.`;
+    ? null
+    : `NY interaction with ${liq ?? "the nearest session levels"} and whether price ${st?.label === "EXPANDING" || st?.label === "TRENDING" ? "sustains the move or returns inside the established range" : "stays inside the current range or breaks out of it"}.`;
 
-  const rows: [string, string, Tone][] = [
+  const envTone = (v: string | null): Tone => (v === "Aligned" ? "pos" : v === "Conflicting" ? "neg" : "info");
+  const allRows: [string, string | null, Tone][] = [
     ["Session", session, "info"],
-    ["Market State", st?.label ?? UNAVAILABLE, st ? stateTone(st.label) : "info"],
-    ["Volatility", nas?.volatility?.level ?? UNAVAILABLE, nas?.volatility ? volTone(nas.volatility.level) : "info"],
+    ["Market State", st?.label ?? null, st ? stateTone(st.label) : "info"],
+    ["Volatility", nas?.volatility?.level ?? null, nas?.volatility ? volTone(nas.volatility.level) : "info"],
     ["Liquidity", liq, "info"],
-    ["US02Y", y ? `${y.direction === "up" ? "↑ Rising" : y.direction === "down" ? "↓ Easing" : "→ Flat"}` : UNAVAILABLE, "info"],
-    ["US30 Environment", env("US30"), env("US30") === "Aligned" ? "pos" : env("US30") === "Conflicting" ? "neg" : "info"],
-    ["NAS100 Environment", env("NASDAQ"), env("NASDAQ") === "Aligned" ? "pos" : env("NASDAQ") === "Conflicting" ? "neg" : "info"],
-    ["Major Scheduled Event", ev ? `${econTimeToLocal(ev.date, ev.time)} ${ev.title}` : "None today", ev ? "warn" : "info"],
+    ["US02Y", y ? `${y.direction === "up" ? "↑ Rising" : y.direction === "down" ? "↓ Easing" : "→ Flat"}` : null, "info"],
+    ["US30 Environment", env("US30"), envTone(env("US30"))],
+    ["NAS100 Environment", env("NASDAQ"), envTone(env("NASDAQ"))],
+    ["Major Scheduled Event", ev ? `${econTimeToLocal(ev.date, ev.time)} ${ev.title}` : payload.econLive ? "None today" : null, ev ? "warn" : "info"],
   ];
+  // Rows without real data are hidden, never labeled unavailable.
+  const rows = allRows.filter((r): r is [string, string, Tone] => r[1] != null);
   return (
     <Card title="SHLM Market Brief" right={<Delayed payload={payload} />} className="border-foreground/40">
       <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
         {rows.map(([k, v, t]) => (
           <div key={k} className="grid grid-cols-[minmax(0,9.5rem)_minmax(0,1fr)] items-baseline gap-2 border-b border-border/60 pb-2 text-sm">
             <dt className="text-[11px] uppercase tracking-widest text-muted-foreground">{k}</dt>
-            <dd className={`min-w-0 break-words font-medium ${v === UNAVAILABLE ? "text-muted-foreground" : TONE[t]}`}>{v}</dd>
+            <dd className={`min-w-0 break-words font-medium ${TONE[t]}`}>{v}</dd>
           </div>
         ))}
       </dl>
-      <p className="mt-3 text-[11px] uppercase tracking-widest text-muted-foreground">What to watch</p>
-      <p className="mt-1 text-sm leading-relaxed">{watch}</p>
+      {watch && <p className="mt-3 text-[11px] uppercase tracking-widest text-muted-foreground">What to watch</p>}
+      {watch && <p className="mt-1 text-sm leading-relaxed">{watch}</p>}
       <p className="mt-2 text-[10px] text-muted-foreground">Summary of the sections below. Context only — not a trade signal.</p>
     </Card>
   );
@@ -111,11 +113,12 @@ export function MarketBrief({ payload }: { payload: HubPayload }) {
 export function MarketMapStrip({ payload, symbol }: { payload: HubPayload; symbol: ContextSymbol }) {
   const ctx = ctxOf(payload, symbol);
   const order = ["Asia", "London", "Previous Day", "Overnight"];
+  if (!ctx) return null; // no real data — hide the strip entirely
   return (
     <div className="mt-4 border-t border-border pt-3">
       <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Market map · futures levels</p>
-      {!ctx || !ctx.levels.length ? (
-        <p className="mt-2 text-xs text-muted-foreground">{ctx ? "Session levels still forming" : UNAVAILABLE}</p>
+      {!ctx.levels.length ? (
+        <p className="mt-2 text-xs text-muted-foreground">Session levels still forming</p>
       ) : (
         <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:grid-cols-4">
           {order.map((name) => {
@@ -142,10 +145,10 @@ export function MarketMapStrip({ payload, symbol }: { payload: HubPayload; symbo
 
 /* ------------------------------ Liquidity Radar ----------------------------- */
 
-function SymbolTabs({ value, onChange }: { value: ContextSymbol; onChange: (k: ContextSymbol) => void }) {
+function SymbolTabs({ value, onChange, keys }: { value: ContextSymbol; onChange: (k: ContextSymbol) => void; keys: ContextSymbol[] }) {
   return (
     <div role="tablist" className="inline-flex rounded-full border border-border p-0.5">
-      {INSTRUMENTS.map((i) => (
+      {INSTRUMENTS.filter((i) => keys.includes(i.key)).map((i) => (
         <button
           key={i.key}
           role="tab"
@@ -161,8 +164,10 @@ function SymbolTabs({ value, onChange }: { value: ContextSymbol; onChange: (k: C
 }
 
 export function LiquidityRadar({ payload }: { payload: HubPayload }) {
-  const [sym, setSym] = useState<ContextSymbol>("NASDAQ");
-  const ctx = ctxOf(payload, sym);
+  const available = INSTRUMENTS.filter((i) => radar(ctxOf(payload, i.key))).map((i) => i.key);
+  const [pick, setSym] = useState<ContextSymbol>("NASDAQ");
+  const sym = available.includes(pick) ? pick : available[0];
+  const ctx = sym ? ctxOf(payload, sym) : undefined;
   const r = radar(ctx);
   const Side = ({ title, list }: { title: string; list: NonNullable<ReturnType<typeof radar>>["above"] }) => (
     <div className="min-w-0">
@@ -184,11 +189,10 @@ export function LiquidityRadar({ payload }: { payload: HubPayload }) {
       )}
     </div>
   );
+  if (!sym || !ctx || !r) return null; // no real levels — hide the card
   return (
-    <Card title="Liquidity Radar" right={<SymbolTabs value={sym} onChange={setSym} />}>
-      {!ctx || !r ? (
-        <p className="text-sm text-muted-foreground">{UNAVAILABLE}</p>
-      ) : (
+    <Card title="Liquidity Radar" right={<SymbolTabs value={sym} onChange={setSym} keys={available} />}>
+      {(
         <>
           <div className="grid gap-4 sm:grid-cols-2">
             <Side title="↑ Upside liquidity" list={r.above} />
@@ -219,40 +223,43 @@ export function MarketConditions({ payload }: { payload: HubPayload }) {
   const status = day === 1 ? w?.monday : day === 5 ? w?.friday : null;
   const fixed: Record<number, string> = { 2: "MANIPULATION → EXPANSION", 3: "MANIPULATION → EXPANSION", 4: "BIG PUSH / EXPANSION" };
 
+  const condRows = INSTRUMENTS.map((i) => {
+    const ctx = ctxOf(payload, i.key);
+    return { i, ctx, st: marketState(ctx, mtfOf(payload, i.key)) };
+  }).filter((r) => r.st && r.ctx?.volatility); // only markets with both real readings
+  const feedDown = status?.kind === "waiting" && status.reason === "Market data feed unavailable";
+  const showDay = !!w && !feedDown;
+  if (!condRows.length && !showDay) return null;
+
   return (
     <Card title="Market Conditions" right={<Delayed payload={payload} />}>
-      <div className="divide-y divide-border">
+      {condRows.length > 0 && <div className="divide-y divide-border">
         <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)] gap-2 pb-2 text-[10px] uppercase tracking-widest text-muted-foreground">
           <span>Market</span><span>State</span><span>5M Volatility</span>
         </div>
-        {INSTRUMENTS.map((i) => {
-          const ctx = ctxOf(payload, i.key);
-          const st = marketState(ctx, mtfOf(payload, i.key));
-          return (
+        {condRows.map(({ i, ctx, st }) => (
             <div key={i.key} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1fr)] items-baseline gap-2 py-2 text-sm">
               <span className="font-medium">{i.name}</span>
               <span className="min-w-0">
-                <span className={`font-semibold ${st ? TONE[stateTone(st.label)] : "text-muted-foreground"}`}>{st?.label ?? UNAVAILABLE}</span>
-                {st && <span className="block text-[10px] text-muted-foreground">{st.why}</span>}
+                <span className={`font-semibold ${TONE[stateTone(st!.label)]}`}>{st!.label}</span>
+                <span className="block text-[10px] text-muted-foreground">{st!.why}</span>
               </span>
-              <span className={`font-semibold ${ctx?.volatility ? TONE[volTone(ctx.volatility.level)] : "text-muted-foreground"}`}>
-                {ctx?.volatility ? ctx.volatility.level : UNAVAILABLE}
-                {ctx?.volatility && <span className="block text-[10px] font-normal text-muted-foreground">{ctx.volatility.ratio}× 5-day avg candle</span>}
+              <span className={`font-semibold ${TONE[volTone(ctx!.volatility!.level)]}`}>
+                {ctx!.volatility!.level}
+                <span className="block text-[10px] font-normal text-muted-foreground">{ctx!.volatility!.ratio}× 5-day avg candle</span>
               </span>
             </div>
-          );
-        })}
-      </div>
+        ))}
+      </div>}
 
-      <div className="mt-4 rounded-xl border border-border bg-surface p-3">
+
+      {showDay && <div className={`${condRows.length ? "mt-4 " : ""}rounded-xl border border-border bg-surface p-3`}>
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-2">
           <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Day character</p>
           <Link to="/centre/weekly-behavior" className="text-xs underline underline-offset-2">Full read →</Link>
         </div>
-        {!w ? (
-          <p className="mt-1 text-sm text-muted-foreground">Loading…</p>
-        ) : day && fixed[day] ? (
-          <p className="mt-1 font-display text-sm font-semibold">{fixed[day]}{w.fixedNote ? <span className="block text-[11px] font-normal text-muted-foreground">{w.fixedNote.text}</span> : null}</p>
+        {day && fixed[day] ? (
+          <p className="mt-1 font-display text-sm font-semibold">{fixed[day]}{w!.fixedNote ? <span className="block text-[11px] font-normal text-muted-foreground">{w!.fixedNote.text}</span> : null}</p>
         ) : status?.kind === "classified" ? (
           <>
             <p className="mt-1 font-display text-sm font-semibold">{status.developing ? "Developing — " : ""}{status.label}</p>
@@ -266,25 +273,47 @@ export function MarketConditions({ payload }: { payload: HubPayload }) {
         ) : (
           <p className="mt-1 text-sm text-muted-foreground">{status && "reason" in status ? status.reason : "Markets closed"}</p>
         )}
-      </div>
+      </div>}
     </Card>
   );
 }
 
 /* ------------------------------ NY Opening Range ---------------------------- */
 
+/** Markets with a real opening-range reading (pending counts — it is normal pre-open). */
+export function openingRangeMarkets(payload: HubPayload) {
+  return INSTRUMENTS.filter((i) => ctxOf(payload, i.key)?.openingRange);
+}
+
+/** Comparison cards with only the rows that have real values. */
+export function compareCards(payload: HubPayload) {
+  return INSTRUMENTS.map((i) => {
+    const ctx: InstrumentContext | undefined = ctxOf(payload, i.key);
+    const mtf = mtfOf(payload, i.key);
+    const all: [string, string | null | undefined][] = [
+      ["Structure", structureClarity(mtf)],
+      ["Volatility", ctx?.volatility?.level],
+      ["Drivers", driverAlignment(payload, i.key)],
+      ["Liquidity", liquidityClarity(ctx)],
+      ["State", marketState(ctx, mtf)?.label],
+    ];
+    const rows = all.filter((r): r is [string, string] => !!r[1]);
+    return { i, rows, hasCtx: !!ctx };
+  }).filter((c) => c.hasCtx && c.rows.length > 0);
+}
+
 export function OpeningRange({ payload }: { payload: HubPayload }) {
+  const markets = openingRangeMarkets(payload);
+  if (!markets.length) return null;
   return (
     <Card title="NY Opening Range" right={<span>6:30–6:45 AM PT · Delayed</span>}>
       <div className="grid gap-3 sm:grid-cols-3">
-        {INSTRUMENTS.map((i) => {
-          const or = ctxOf(payload, i.key)?.openingRange ?? null;
+        {markets.map((i) => {
+          const or = ctxOf(payload, i.key)!.openingRange!;
           return (
             <div key={i.key} className="min-w-0 rounded-xl border border-border bg-surface p-3 text-sm">
               <p className="text-[11px] uppercase tracking-widest text-muted-foreground">{i.name}</p>
-              {!or ? (
-                <p className="mt-1 text-muted-foreground">{UNAVAILABLE}</p>
-              ) : or.state === "pending" ? (
+              {or.state === "pending" ? (
                 <p className="mt-1 text-muted-foreground">Forms at the 6:30 AM open</p>
               ) : (
                 <>
@@ -312,35 +341,26 @@ export function OpeningRange({ payload }: { payload: HubPayload }) {
 /* ----------------------------- Symbol comparison ---------------------------- */
 
 export function SymbolCompare({ payload }: { payload: HubPayload }) {
-  const tone = (v: string | null | undefined) =>
-    !v ? "text-muted-foreground" : ["Clear", "Aligned"].includes(v) ? TONE.pos : ["Conflicted", "Conflicting", "Unclear"].includes(v) ? TONE.neg : TONE.info;
+  const tone = (v: string) =>
+    ["Clear", "Aligned"].includes(v) ? TONE.pos : ["Conflicted", "Conflicting", "Unclear"].includes(v) ? TONE.neg : TONE.info;
+  const cards = compareCards(payload);
+  if (!cards.length) return null;
   return (
     <Card title="Market Environment" right={<span>Comparison only — not a pick</span>}>
       <div className="grid gap-3 sm:grid-cols-3">
-        {INSTRUMENTS.map((i) => {
-          const ctx: InstrumentContext | undefined = ctxOf(payload, i.key);
-          const mtf = mtfOf(payload, i.key);
-          const rows: [string, string | null | undefined][] = [
-            ["Structure", structureClarity(mtf)],
-            ["Volatility", ctx?.volatility?.level],
-            ["Drivers", driverAlignment(payload, i.key)],
-            ["Liquidity", liquidityClarity(ctx)],
-            ["State", marketState(ctx, mtf)?.label],
-          ];
-          return (
+        {cards.map(({ i, rows }) => (
             <div key={i.key} className="min-w-0 rounded-xl border border-border bg-surface p-3">
               <p className="font-display text-sm font-semibold">{i.name}</p>
               <dl className="mt-2 space-y-1 text-xs">
                 {rows.map(([k, v]) => (
                   <div key={k} className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2">
                     <dt className="text-muted-foreground">{k}</dt>
-                    <dd className={`min-w-0 truncate font-medium ${tone(v)}`}>{v ?? "Unavailable"}</dd>
+                    <dd className={`min-w-0 truncate font-medium ${tone(v)}`}>{v}</dd>
                   </div>
                 ))}
               </dl>
             </div>
-          );
-        })}
+        ))}
       </div>
     </Card>
   );
