@@ -49,7 +49,7 @@ function RecruitersPage() {
     queryKey: ["recruiter-portal"],
     queryFn: () => fetchPortal(),
     enabled: ready,
-    retry: false,
+    retry: (n, e) => n < 2 && !(e instanceof Error && e.message.includes("NOT_AUTHORIZED")),
   });
 
   return (
@@ -64,6 +64,11 @@ function RecruitersPage() {
         <div className="mt-8">
           {!ready || q.isLoading ? (
             <p className="text-sm text-muted-foreground">Loading…</p>
+          ) : q.isError && !(q.error instanceof Error && q.error.message.includes("NOT_AUTHORIZED")) ? (
+            <div className="rounded-3xl border border-border p-8 text-center">
+              <p className="font-display text-lg font-semibold">Couldn't load the portal</p>
+              <p className="mt-1 text-sm text-muted-foreground">{q.error instanceof Error ? q.error.message : "Please refresh."}</p>
+            </div>
           ) : q.isError ? (
             <div className="rounded-3xl border border-border p-8 text-center">
               <p className="font-display text-lg font-semibold">Not authorized</p>
