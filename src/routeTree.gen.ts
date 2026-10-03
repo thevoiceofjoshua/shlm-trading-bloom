@@ -30,6 +30,7 @@ import { Route as FeaturesCommunityRouteImport } from './routes/features.communi
 import { Route as EnrollApplicationIdRouteImport } from './routes/enroll.$applicationId'
 import { Route as CentreWeeklyBehaviorRouteImport } from './routes/centre_.weekly-behavior'
 import { Route as BlogBreakoutStrategyRouteImport } from './routes/blog.breakout-strategy'
+import { Route as ApiPublicWeeklyTickRouteImport } from './routes/api/public/weekly-tick'
 import { Route as ApiPublicSubmitApplicationRouteImport } from './routes/api/public/submit-application'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -150,6 +151,11 @@ const BlogBreakoutStrategyRoute = BlogBreakoutStrategyRouteImport.update({
   path: '/blog/breakout-strategy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicWeeklyTickRoute = ApiPublicWeeklyTickRouteImport.update({
+  id: '/api/public/weekly-tick',
+  path: '/api/public/weekly-tick',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSubmitApplicationRoute =
   ApiPublicSubmitApplicationRouteImport.update({
     id: '/api/public/submit-application',
@@ -253,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
+  '/api/public/weekly-tick': typeof ApiPublicWeeklyTickRoute
   '/api/public/admin/accounts': typeof ApiPublicAdminAccountsRoute
   '/api/public/admin/applications': typeof ApiPublicAdminApplicationsRoute
   '/api/public/admin/deny-application': typeof ApiPublicAdminDenyApplicationRoute
@@ -290,6 +297,7 @@ export interface FileRoutesByTo {
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
+  '/api/public/weekly-tick': typeof ApiPublicWeeklyTickRoute
   '/api/public/admin/accounts': typeof ApiPublicAdminAccountsRoute
   '/api/public/admin/applications': typeof ApiPublicAdminApplicationsRoute
   '/api/public/admin/deny-application': typeof ApiPublicAdminDenyApplicationRoute
@@ -328,6 +336,7 @@ export interface FileRoutesById {
   '/features/risk': typeof FeaturesRiskRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
+  '/api/public/weekly-tick': typeof ApiPublicWeeklyTickRoute
   '/api/public/admin/accounts': typeof ApiPublicAdminAccountsRoute
   '/api/public/admin/applications': typeof ApiPublicAdminApplicationsRoute
   '/api/public/admin/deny-application': typeof ApiPublicAdminDenyApplicationRoute
@@ -367,6 +376,7 @@ export interface FileRouteTypes {
     | '/features/risk'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
+    | '/api/public/weekly-tick'
     | '/api/public/admin/accounts'
     | '/api/public/admin/applications'
     | '/api/public/admin/deny-application'
@@ -404,6 +414,7 @@ export interface FileRouteTypes {
     | '/features/risk'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
+    | '/api/public/weekly-tick'
     | '/api/public/admin/accounts'
     | '/api/public/admin/applications'
     | '/api/public/admin/deny-application'
@@ -441,6 +452,7 @@ export interface FileRouteTypes {
     | '/features/risk'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
+    | '/api/public/weekly-tick'
     | '/api/public/admin/accounts'
     | '/api/public/admin/applications'
     | '/api/public/admin/deny-application'
@@ -479,6 +491,7 @@ export interface RootRouteChildren {
   FeaturesRiskRoute: typeof FeaturesRiskRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicSubmitApplicationRoute: typeof ApiPublicSubmitApplicationRoute
+  ApiPublicWeeklyTickRoute: typeof ApiPublicWeeklyTickRoute
   ApiPublicAdminAccountsRoute: typeof ApiPublicAdminAccountsRoute
   ApiPublicAdminApplicationsRoute: typeof ApiPublicAdminApplicationsRoute
   ApiPublicAdminDenyApplicationRoute: typeof ApiPublicAdminDenyApplicationRoute
@@ -642,6 +655,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogBreakoutStrategyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/weekly-tick': {
+      id: '/api/public/weekly-tick'
+      path: '/api/public/weekly-tick'
+      fullPath: '/api/public/weekly-tick'
+      preLoaderRoute: typeof ApiPublicWeeklyTickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/submit-application': {
       id: '/api/public/submit-application'
       path: '/api/public/submit-application'
@@ -767,6 +787,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturesRiskRoute: FeaturesRiskRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicSubmitApplicationRoute: ApiPublicSubmitApplicationRoute,
+  ApiPublicWeeklyTickRoute: ApiPublicWeeklyTickRoute,
   ApiPublicAdminAccountsRoute: ApiPublicAdminAccountsRoute,
   ApiPublicAdminApplicationsRoute: ApiPublicAdminApplicationsRoute,
   ApiPublicAdminDenyApplicationRoute: ApiPublicAdminDenyApplicationRoute,
