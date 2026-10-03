@@ -89,7 +89,8 @@ function RecruitersPage() {
                 <li>
                   <span className="font-semibold text-foreground">{usd(BONUS_AMOUNT)} monthly bonus, stacking.</span> Land{" "}
                   {BONUS_PER} clients within a single calendar month and you earn an extra one-time bonus of {usd(BONUS_AMOUNT)} for
-                  that month. Land {BONUS_PER * 2} in the same month and that's another {usd(BONUS_AMOUNT)} ({usd(BONUS_PER * 2 >= 40 ? BONUS_AMOUNT * 2 : BONUS_AMOUNT)} total bonus for the month), and it keeps stacking for every additional {BONUS_PER} landed in that same month.
+                  that month. Land {BONUS_PER * 2} in the same month and that's another {usd(BONUS_AMOUNT)} ({usd(BONUS_AMOUNT * 2)}{" "}
+                  total bonus for the month), and it keeps stacking for every additional {BONUS_PER} landed in that same month.
                 </li>
                 <li>
                   <span className="font-semibold text-foreground">Lifetime never resets.</span> Your lifetime landed count and lifetime
