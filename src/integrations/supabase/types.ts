@@ -242,6 +242,33 @@ export type Database = {
         }
         Relationships: []
       }
+      recruiter_lands: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          delta: number
+          id: string
+          month: string
+          recruiter_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          delta: number
+          id?: string
+          month: string
+          recruiter_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          delta?: number
+          id?: string
+          month?: string
+          recruiter_id?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           author: string
@@ -554,7 +581,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user" | "shlm_mod" | "free_member"
+      app_role: "admin" | "user" | "shlm_mod" | "free_member" | "recruiter"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -682,7 +709,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user", "shlm_mod", "free_member"],
+      app_role: ["admin", "user", "shlm_mod", "free_member", "recruiter"],
     },
   },
 } as const
