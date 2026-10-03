@@ -73,34 +73,37 @@ export function MarketBrief({ payload }: { payload: HubPayload }) {
   const near = nearestOpen(nas);
   const ev = nextMajorEvent(payload);
   const y = payload.context?.us02y ?? null;
-  const env = (k: ContextSymbol) => driverAlignment(payload, k) ?? UNAVAILABLE;
-  const liq = near.above || near.below ? [near.above?.label, near.below?.label].filter(Boolean).join(" / ") : UNAVAILABLE;
+  const env = (k: ContextSymbol) => driverAlignment(payload, k) ?? null;
+  const liq = near.above || near.below ? [near.above?.label, near.below?.label].filter(Boolean).join(" / ") : null;
   const watch = !nas
-    ? "Market data is unavailable — check levels on your own chart before New York."
-    : `NY interaction with ${liq === UNAVAILABLE ? "the nearest session levels" : liq} and whether price ${st?.label === "EXPANDING" || st?.label === "TRENDING" ? "sustains the move or returns inside the established range" : "stays inside the current range or breaks out of it"}.`;
+    ? null
+    : `NY interaction with ${liq ?? "the nearest session levels"} and whether price ${st?.label === "EXPANDING" || st?.label === "TRENDING" ? "sustains the move or returns inside the established range" : "stays inside the current range or breaks out of it"}.`;
 
-  const rows: [string, string, Tone][] = [
+  const envTone = (v: string | null): Tone => (v === "Aligned" ? "pos" : v === "Conflicting" ? "neg" : "info");
+  const allRows: [string, string | null, Tone][] = [
     ["Session", session, "info"],
-    ["Market State", st?.label ?? UNAVAILABLE, st ? stateTone(st.label) : "info"],
-    ["Volatility", nas?.volatility?.level ?? UNAVAILABLE, nas?.volatility ? volTone(nas.volatility.level) : "info"],
+    ["Market State", st?.label ?? null, st ? stateTone(st.label) : "info"],
+    ["Volatility", nas?.volatility?.level ?? null, nas?.volatility ? volTone(nas.volatility.level) : "info"],
     ["Liquidity", liq, "info"],
-    ["US02Y", y ? `${y.direction === "up" ? "↑ Rising" : y.direction === "down" ? "↓ Easing" : "→ Flat"}` : UNAVAILABLE, "info"],
-    ["US30 Environment", env("US30"), env("US30") === "Aligned" ? "pos" : env("US30") === "Conflicting" ? "neg" : "info"],
-    ["NAS100 Environment", env("NASDAQ"), env("NASDAQ") === "Aligned" ? "pos" : env("NASDAQ") === "Conflicting" ? "neg" : "info"],
-    ["Major Scheduled Event", ev ? `${econTimeToLocal(ev.date, ev.time)} ${ev.title}` : "None today", ev ? "warn" : "info"],
+    ["US02Y", y ? `${y.direction === "up" ? "↑ Rising" : y.direction === "down" ? "↓ Easing" : "→ Flat"}` : null, "info"],
+    ["US30 Environment", env("US30"), envTone(env("US30"))],
+    ["NAS100 Environment", env("NASDAQ"), envTone(env("NASDAQ"))],
+    ["Major Scheduled Event", ev ? `${econTimeToLocal(ev.date, ev.time)} ${ev.title}` : payload.econLive ? "None today" : null, ev ? "warn" : "info"],
   ];
+  // Rows without real data are hidden, never labeled unavailable.
+  const rows = allRows.filter((r): r is [string, string, Tone] => r[1] != null);
   return (
     <Card title="SHLM Market Brief" right={<Delayed payload={payload} />} className="border-foreground/40">
       <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
         {rows.map(([k, v, t]) => (
           <div key={k} className="grid grid-cols-[minmax(0,9.5rem)_minmax(0,1fr)] items-baseline gap-2 border-b border-border/60 pb-2 text-sm">
             <dt className="text-[11px] uppercase tracking-widest text-muted-foreground">{k}</dt>
-            <dd className={`min-w-0 break-words font-medium ${v === UNAVAILABLE ? "text-muted-foreground" : TONE[t]}`}>{v}</dd>
+            <dd className={`min-w-0 break-words font-medium ${TONE[t]}`}>{v}</dd>
           </div>
         ))}
       </dl>
-      <p className="mt-3 text-[11px] uppercase tracking-widest text-muted-foreground">What to watch</p>
-      <p className="mt-1 text-sm leading-relaxed">{watch}</p>
+      {watch && <p className="mt-3 text-[11px] uppercase tracking-widest text-muted-foreground">What to watch</p>}
+      {watch && <p className="mt-1 text-sm leading-relaxed">{watch}</p>}
       <p className="mt-2 text-[10px] text-muted-foreground">Summary of the sections below. Context only — not a trade signal.</p>
     </Card>
   );
