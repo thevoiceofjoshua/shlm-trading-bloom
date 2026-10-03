@@ -113,10 +113,9 @@ function DayCard({ day, today, status, note }: { day: number; today: boolean; st
   if (!dynamic) {
     headline = FIXED[day];
     sub = note ?? null;
-  } else if (!status) {
-    headline = "WAITING FOR DATA";
-    sub = "Market data feed unavailable";
-    tone = "border-border bg-surface text-muted-foreground";
+  } else if (!status || (status.kind === "waiting" && status.reason === "Market data feed unavailable")) {
+    // Feed failed — hide the reading rather than show a broken state.
+    return null;
   } else if (status.kind === "classified") {
     headline = status.label;
     sub = `${status.developing ? "Developing — " : ""}${status.reason}`;

@@ -475,19 +475,15 @@ export function DriverTabs({ payload }: { payload: HubPayload }) {
           ))}
         </div>
       </div>
-      <div className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm">
-        <span className="font-semibold">US02Y</span>{" "}
-        {y ? (
-          <>
-            <span className={y.direction === "up" ? "text-red-500" : y.direction === "down" ? "text-emerald-500" : "text-muted-foreground"}>
-              {y.direction === "up" ? "↑ Rising" : y.direction === "down" ? "↓ Easing" : "→ Flat"}
-            </span>
-            <span className="text-muted-foreground"> — {y.reason}. 2-year T-note futures, delayed.</span>
-          </>
-        ) : (
-          <span className="text-muted-foreground">DATA UNAVAILABLE</span>
-        )}
-      </div>
+      {y && (
+        <div className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm">
+          <span className="font-semibold">US02Y</span>{" "}
+          <span className={y.direction === "up" ? "text-red-500" : y.direction === "down" ? "text-emerald-500" : "text-muted-foreground"}>
+            {y.direction === "up" ? "↑ Rising" : y.direction === "down" ? "↓ Easing" : "→ Flat"}
+          </span>
+          <span className="text-muted-foreground"> — {y.reason}. 2-year T-note futures, delayed.</span>
+        </div>
+      )}
       {tab === "NASDAQ" ? <MagSevenBoard payload={payload} /> : tab === "US30" ? <DowBoard payload={payload} /> : <GoldDesk payload={payload} />}
     </div>
   );

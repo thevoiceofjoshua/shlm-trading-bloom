@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getHubData, type HubPayload } from "@/lib/hub.functions";
 import { SessionBar } from "@/components/hub/SessionBar";
 import { IndexCards, DriverTabs } from "@/components/hub/MarketBoards";
-import { MarketBrief, MarketConditions, LiquidityRadar, OpeningRange, SymbolCompare, TradeReadiness, MobileCollapse } from "@/components/hub/CentreInsights";
+import { MarketBrief, MarketConditions, LiquidityRadar, OpeningRange, SymbolCompare, TradeReadiness, MobileCollapse, openingRangeMarkets, compareCards } from "@/components/hub/CentreInsights";
 import { EconomicCalendar, MorningNewsImpact, MorningNewsSpotlight } from "@/components/hub/EconomicCalendar";
 import { Journal } from "@/components/hub/Journal";
 import { BetaIndicator } from "@/components/hub/BetaIndicator";
@@ -165,25 +165,34 @@ function CentrePage() {
 
             <MarketConditions payload={payload} />
 
-            <IndexCards payload={payload} />
+            {/* Sections without real data are hidden — never shown with sample or "unavailable" content. */}
+            {payload.dataState !== "sample" && <IndexCards payload={payload} />}
 
             <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
               <LiquidityRadar payload={payload} />
-              <DriverTabs payload={payload} />
+              {payload.dataState !== "sample" && <DriverTabs payload={payload} />}
             </div>
 
-            <MorningNewsSpotlight payload={payload} />
-            <MorningNewsImpact payload={payload} />
-            <MobileCollapse title="Economic calendar">
-              <EconomicCalendar payload={payload} />
-            </MobileCollapse>
+            {payload.econLive && (
+              <>
+                <MorningNewsSpotlight payload={payload} />
+                <MorningNewsImpact payload={payload} />
+                <MobileCollapse title="Economic calendar">
+                  <EconomicCalendar payload={payload} />
+                </MobileCollapse>
+              </>
+            )}
 
-            <MobileCollapse title="NY Opening Range">
-              <OpeningRange payload={payload} />
-            </MobileCollapse>
-            <MobileCollapse title="Market Environment">
-              <SymbolCompare payload={payload} />
-            </MobileCollapse>
+            {openingRangeMarkets(payload).length > 0 && (
+              <MobileCollapse title="NY Opening Range">
+                <OpeningRange payload={payload} />
+              </MobileCollapse>
+            )}
+            {compareCards(payload).length > 0 && (
+              <MobileCollapse title="Market Environment">
+                <SymbolCompare payload={payload} />
+              </MobileCollapse>
+            )}
             <MobileCollapse title="Trade Readiness">
               <TradeReadiness readOnly={!!payload.access.readOnly} />
             </MobileCollapse>
