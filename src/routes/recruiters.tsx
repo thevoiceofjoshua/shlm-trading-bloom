@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { HomeButton } from "@/components/HomeButton";
@@ -95,22 +95,38 @@ function RecruiterCard({ row, editable }: { row: RecruiterRow; editable: boolean
   const adjust = useServerFn(adjustRecruiterLands);
   const qc = useQueryClient();
   const [amount, setAmount] = useState("");
-  const [busy, setBusy] = useState(false);
+  const busy = false;
   const [err, setErr] = useState<string | null>(null);
+  const pending = useRef(0);
   const bonus = Math.floor(row.thisMonth / BONUS_PER) * BONUS_AMOUNT;
 
+  const shift = (delta: number) =>
+    qc.setQueryData(["recruiter-portal"], (old: any) =>
+      old
+        ? {
+            ...old,
+            rows: old.rows.map((r: RecruiterRow) =>
+              r.id === row.id ? { ...r, lifetime: r.lifetime + delta, thisMonth: r.thisMonth + delta } : r,
+            ),
+          }
+        : old,
+    );
+
   const apply = async (delta: number) => {
-    if (!delta || busy) return;
-    setBusy(true);
+    if (!delta) return;
     setErr(null);
+    setAmount("");
+    await qc.cancelQueries({ queryKey: ["recruiter-portal"] });
+    shift(delta); // optimistic
+    pending.current += 1;
     try {
       await adjust({ data: { recruiterId: row.id, delta } });
-      setAmount("");
-      await qc.invalidateQueries({ queryKey: ["recruiter-portal"] });
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Update failed");
+      shift(-delta); // roll back just this change
+      setErr(e instanceof Error ? e.message : "Update failed — change undone");
     } finally {
-      setBusy(false);
+      pending.current -= 1;
+      if (pending.current === 0) qc.invalidateQueries({ queryKey: ["recruiter-portal"] });
     }
   };
 
