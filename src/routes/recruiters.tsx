@@ -12,6 +12,8 @@ import {
   BONUS_AMOUNT,
   type RecruiterRow,
 } from "@/lib/recruiters.functions";
+import { getPayoutSummary, type PayoutSummary } from "@/lib/payouts.functions";
+import { FounderPayoutPanel, RecruiterPayoutPanel } from "@/components/RecruiterPayouts";
 
 export const Route = createFileRoute("/recruiters")({
   component: RecruitersPage,
@@ -51,6 +53,13 @@ function RecruitersPage() {
     enabled: ready,
     retry: (n, e) => n < 2 && !(e instanceof Error && e.message.includes("NOT_AUTHORIZED")),
   });
+  const fetchPayouts = useServerFn(getPayoutSummary);
+  const pq = useQuery({
+    queryKey: ["payout-summary"],
+    queryFn: () => fetchPayouts(),
+    enabled: ready && q.isSuccess,
+    retry: 1,
+  });
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -81,7 +90,14 @@ function RecruitersPage() {
           ) : (
             <div className="grid gap-4">
               {q.data?.rows.map((r) => (
-                <RecruiterCard key={r.id} row={r} editable={q.data!.isFounder} />
+                <RecruiterCard
+                  key={r.id}
+                  row={r}
+                  editable={q.data!.isFounder}
+                  payout={pq.data?.rows.find((x) => x.recruiterId === r.id)}
+                  mode={pq.data?.mode ?? "sandbox"}
+                  connected={!!pq.data?.connected}
+                />
               ))}
             </div>
           )}
@@ -91,7 +107,19 @@ function RecruitersPage() {
   );
 }
 
-function RecruiterCard({ row, editable }: { row: RecruiterRow; editable: boolean }) {
+function RecruiterCard({
+  row,
+  editable,
+  payout,
+  mode,
+  connected,
+}: {
+  row: RecruiterRow;
+  editable: boolean;
+  payout?: PayoutSummary;
+  mode: string;
+  connected: boolean;
+}) {
   const adjust = useServerFn(adjustRecruiterLands);
   const qc = useQueryClient();
   const [amount, setAmount] = useState("");
@@ -173,6 +201,12 @@ function RecruiterCard({ row, editable }: { row: RecruiterRow; editable: boolean
           {err && <span className="text-sm text-destructive">{err}</span>}
         </div>
       )}
+      {payout &&
+        (editable ? (
+          <FounderPayoutPanel s={payout} name={row.name} mode={mode} connected={connected} />
+        ) : (
+          <RecruiterPayoutPanel s={payout} mode={mode} connected={connected} />
+        ))}
     </div>
   );
 }
