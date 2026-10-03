@@ -146,6 +146,33 @@ export type Database = {
         }
         Relationships: []
       }
+      member_readiness: {
+        Row: {
+          checks: Json
+          created_at: string
+          id: string
+          ready_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checks?: Json
+          created_at?: string
+          id?: string
+          ready_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checks?: Json
+          created_at?: string
+          id?: string
+          ready_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       member_rules: {
         Row: {
           consequence: string
