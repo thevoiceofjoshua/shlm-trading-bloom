@@ -48,6 +48,17 @@ export function AccountMenu({
           </span>
           <span>Hi, {user.firstName}</span>
         </div>
+        <a
+          href="/dashboard"
+          className={cn(
+            "flex min-h-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition-colors",
+            scrolled
+              ? "border-border text-foreground hover:bg-accent"
+              : "border-white/20 text-white hover:bg-white/10",
+          )}
+        >
+          Dashboard
+        </a>
         <button
           type="button"
           onClick={handleSignOut}
