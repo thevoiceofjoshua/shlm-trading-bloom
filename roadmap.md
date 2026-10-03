@@ -83,3 +83,9 @@
 - [ ] Verify signed-in page rendering and event history (blocked: externally managed sign-in is unavailable in the test browser)
 - [x] SHLM Centre premium refinement (Brief, Market Map strip, Liquidity Radar, driver tabs/tags, Conditions, Opening Range, Environment, Readiness)
 - [ ] Verify the refined Centre signed-in on a live weekday (needs user sign-in) — scheduled for Monday after ~6:30 AM Pacific: confirm Sunday-night/Monday ticks recorded, banner pops, Notification Center fills, hidden-until-real-data sections appear
+
+## SHLM Centre layout and polish pass
+- [ ] Reorder the Centre so session context leads, supporting tools follow Drivers, and news/calendar close the page
+- [ ] Fix the narrow-screen Liquidity Radar heading and controls layout
+- [ ] Consolidate repeated Market Environment, session-summary, driver-explanation, and morning-news content
+- [ ] Polish news explanations while preserving distinct per-release commentary
