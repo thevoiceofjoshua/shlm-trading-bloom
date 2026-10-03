@@ -23,7 +23,7 @@ function read(): AdminState {
   if (typeof window === "undefined") {
     return { adminMode: false, viewAsMember: false, passcode: "", decided: false, scope: "full", promptRequested: false };
   }
-  const ss = window.sessionStorage;
+  const ss = window.localStorage;
   return {
     adminMode: ss.getItem(MODE_KEY) === "1",
     viewAsMember: ss.getItem(VIEW_KEY) === "1",
@@ -36,7 +36,7 @@ function read(): AdminState {
 
 function write(patch: Partial<AdminState>) {
   if (typeof window === "undefined") return;
-  const ss = window.sessionStorage;
+  const ss = window.localStorage;
   if (patch.adminMode !== undefined) ss.setItem(MODE_KEY, patch.adminMode ? "1" : "0");
   if (patch.viewAsMember !== undefined) ss.setItem(VIEW_KEY, patch.viewAsMember ? "1" : "0");
   if (patch.passcode !== undefined) {
