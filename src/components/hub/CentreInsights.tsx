@@ -3,14 +3,14 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import type { HubPayload } from "@/lib/hub.functions";
-import type { ContextSymbol, InstrumentContext } from "@/lib/market-context.server";
+import type { ContextSymbol } from "@/lib/market-context.server";
 import { getWeeklyBehavior } from "@/lib/weekly-behavior.functions";
 import { getReadiness, saveReadiness } from "@/lib/readiness.functions";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 import { econTimeToLocal } from "@/lib/hub-session";
 import {
   INSTRUMENTS, NEAR_PCT, ctxOf, mtfOf, marketState, stateTone, volTone, driverAlignment,
-  structureClarity, liquidityClarity, radar, nearestOpen, nextMajorEvent, laDateISO, type Tone,
+  radar, nearestOpen, nextMajorEvent, laDateISO, type Tone,
 } from "@/lib/centre-insights";
 
 
@@ -65,8 +65,6 @@ export function MobileCollapse({ title, children }: { title: string; children: R
 /* ------------------------------ Market Brief ------------------------------ */
 
 export function MarketBrief({ payload }: { payload: HubPayload }) {
-  const live = payload.sessions.sessions.find((s) => s.state === "open");
-  const session = live ? live.label : payload.sessions.marketsClosed ? "Markets closed" : "Pre-New York";
   const nas = ctxOf(payload, "NASDAQ");
   const st = marketState(nas, mtfOf(payload, "NASDAQ"));
   const near = nearestOpen(nas);
@@ -80,7 +78,6 @@ export function MarketBrief({ payload }: { payload: HubPayload }) {
 
   const envTone = (v: string | null): Tone => (v === "Aligned" ? "pos" : v === "Conflicting" ? "neg" : "info");
   const allRows: [string, string | null, Tone][] = [
-    ["Session", session, "info"],
     ["Market State", st?.label ?? null, st ? stateTone(st.label) : "info"],
     ["Volatility", nas?.volatility?.level ?? null, nas?.volatility ? volTone(nas.volatility.level) : "info"],
     ["Liquidity", liq, "info"],
@@ -147,14 +144,14 @@ export function MarketMapStrip({ payload, symbol }: { payload: HubPayload; symbo
 
 function SymbolTabs({ value, onChange, keys }: { value: ContextSymbol; onChange: (k: ContextSymbol) => void; keys: ContextSymbol[] }) {
   return (
-    <div role="tablist" className="inline-flex rounded-full border border-border p-0.5">
+    <div role="tablist" className="flex w-full rounded-full border border-border p-0.5 sm:w-auto sm:max-w-md">
       {INSTRUMENTS.filter((i) => keys.includes(i.key)).map((i) => (
         <button
           key={i.key}
           role="tab"
           aria-selected={value === i.key}
           onClick={() => onChange(i.key)}
-          className={`min-h-8 rounded-full px-3 text-xs font-medium ${value === i.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          className={`min-h-8 min-w-0 flex-1 rounded-full px-2 text-xs font-medium sm:px-3 ${value === i.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
         >
           {i.name}
         </button>
@@ -191,19 +188,19 @@ export function LiquidityRadar({ payload }: { payload: HubPayload }) {
   );
   if (!sym || !ctx || !r) return null; // no real levels — hide the card
   return (
-    <Card title="Liquidity Radar" right={<SymbolTabs value={sym} onChange={setSym} keys={available} />}>
-      {(
-        <>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Side title="↑ Upside liquidity" list={r.above} />
-            <Side title="↓ Downside liquidity" list={r.below} />
-          </div>
-          <p className="mt-3 text-[10px] text-muted-foreground">
-            Resting session highs/lows around futures price {fmt(ctx.price, sym)}. Near = within {NEAR_PCT}%. Shows where liquidity sits — not where price will go. Delayed ~15 min.
-          </p>
-        </>
-      )}
-    </Card>
+    <section className="min-w-0 rounded-2xl border border-border bg-card p-4 sm:p-5">
+      <h2 className="font-display text-base font-semibold uppercase tracking-widest sm:text-lg">Liquidity Radar</h2>
+      <div className="mt-3 w-full pb-1">
+        <SymbolTabs value={sym} onChange={setSym} keys={available} />
+      </div>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <Side title="↑ Upside liquidity" list={r.above} />
+        <Side title="↓ Downside liquidity" list={r.below} />
+      </div>
+      <p className="mt-3 text-[10px] text-muted-foreground">
+        Resting session highs/lows around futures price {fmt(ctx.price, sym)}. Near = within {NEAR_PCT}%. Shows where liquidity sits — not where price will go. Delayed ~15 min.
+      </p>
+    </section>
   );
 }
 
@@ -285,23 +282,6 @@ export function openingRangeMarkets(payload: HubPayload) {
   return INSTRUMENTS.filter((i) => ctxOf(payload, i.key)?.openingRange);
 }
 
-/** Comparison cards with only the rows that have real values. */
-export function compareCards(payload: HubPayload) {
-  return INSTRUMENTS.map((i) => {
-    const ctx: InstrumentContext | undefined = ctxOf(payload, i.key);
-    const mtf = mtfOf(payload, i.key);
-    const all: [string, string | null | undefined][] = [
-      ["Structure", structureClarity(mtf)],
-      ["Volatility", ctx?.volatility?.level],
-      ["Drivers", driverAlignment(payload, i.key)],
-      ["Liquidity", liquidityClarity(ctx)],
-      ["State", marketState(ctx, mtf)?.label],
-    ];
-    const rows = all.filter((r): r is [string, string] => !!r[1]);
-    return { i, rows, hasCtx: !!ctx };
-  }).filter((c) => c.hasCtx && c.rows.length > 0);
-}
-
 export function OpeningRange({ payload }: { payload: HubPayload }) {
   const markets = openingRangeMarkets(payload);
   if (!markets.length) return null;
@@ -333,34 +313,6 @@ export function OpeningRange({ payload }: { payload: HubPayload }) {
             </div>
           );
         })}
-      </div>
-    </Card>
-  );
-}
-
-/* ----------------------------- Symbol comparison ---------------------------- */
-
-export function SymbolCompare({ payload }: { payload: HubPayload }) {
-  const tone = (v: string) =>
-    ["Clear", "Aligned"].includes(v) ? TONE.pos : ["Conflicted", "Conflicting", "Unclear"].includes(v) ? TONE.neg : TONE.info;
-  const cards = compareCards(payload);
-  if (!cards.length) return null;
-  return (
-    <Card title="Market Environment" right={<span>Comparison only — not a pick</span>}>
-      <div className="grid gap-3 sm:grid-cols-3">
-        {cards.map(({ i, rows }) => (
-            <div key={i.key} className="min-w-0 rounded-xl border border-border bg-surface p-3">
-              <p className="font-display text-sm font-semibold">{i.name}</p>
-              <dl className="mt-2 space-y-1 text-xs">
-                {rows.map(([k, v]) => (
-                  <div key={k} className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2">
-                    <dt className="text-muted-foreground">{k}</dt>
-                    <dd className={`min-w-0 truncate font-medium ${tone(v)}`}>{v}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-        ))}
       </div>
     </Card>
   );

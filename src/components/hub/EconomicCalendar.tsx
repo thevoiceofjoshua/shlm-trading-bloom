@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Activity, Clock3, Info } from "lucide-react";
 import type { HubPayload } from "@/lib/hub.functions";
 import { econTimeToLocal } from "@/lib/hub-session";
 import { SESSIONS } from "@/lib/market-data";
@@ -48,6 +49,13 @@ export function MorningNewsSpotlight({ payload }: { payload: HubPayload }) {
     .filter((event) => event.date === todayPacific && event.impact === "high" && event.time < "12:00")
     .sort((a, b) => a.time.localeCompare(b.time));
 
+  const rows = morningEvents.map((event) => {
+    const theme = NEWS_THEMES.find((item) => item.match.test(event.title)) ?? GENERIC;
+    const timing = newsTiming(event.time);
+    return { event, theme, timing };
+  });
+  const timingNotes = [...new Map(rows.map(({ timing }) => [timing.label, timing])).values()];
+
   return (
     <section aria-labelledby="morning-news-title" className="border-y border-border py-6 sm:py-8">
       <div className="flex flex-wrap items-end justify-between gap-2">
@@ -62,13 +70,14 @@ export function MorningNewsSpotlight({ payload }: { payload: HubPayload }) {
         </span>
       </div>
 
-      {morningEvents.length > 0 ? (
+      {rows.length > 0 ? (
         <div className="mt-5 grid gap-3 md:grid-cols-2">
-          {morningEvents.map((event) => (
+          {rows.map(({ event, theme, timing }) => (
             <article key={`${event.date}-${event.time}-${event.title}`} className="rounded-lg border border-foreground/30 bg-card p-4 sm:p-5">
               <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
                 <time dateTime={`${event.date}T${event.time}`}>{econTimeToLocal(event.date, event.time)}</time>
                 {event.currency && <span className="rounded-full border border-border px-2 py-0.5">{event.currency}</span>}
+                <span className="rounded-full border border-border px-2 py-0.5">{timing.label}</span>
               </div>
               <h3 className="mt-3 break-words font-display text-lg font-bold leading-tight sm:text-2xl">{event.title}</h3>
               {(event.forecast || event.previous) && (
@@ -87,11 +96,44 @@ export function MorningNewsSpotlight({ payload }: { payload: HubPayload }) {
                   )}
                 </dl>
               )}
+              <div className="mt-4 grid gap-2">
+                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-lg border border-border bg-surface p-3">
+                  <Info aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">What it measures</p>
+                    <p className="mt-1 text-sm leading-relaxed">{theme.what}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-lg border border-foreground/20 bg-card p-3">
+                  <Activity aria-hidden className="mt-0.5 h-4 w-4 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Likely response</p>
+                    <p className="mt-1 text-sm leading-relaxed">{theme.likely}</p>
+                  </div>
+                </div>
+              </div>
             </article>
           ))}
         </div>
       ) : (
         <p className="mt-5 text-sm text-muted-foreground">No high-impact morning releases.</p>
+      )}
+
+      {timingNotes.length > 0 && (
+        <div className="mt-4 border-t border-border pt-4">
+          <div className="grid gap-3 lg:grid-cols-3">
+            {timingNotes.map((timing) => (
+              <div key={timing.label} className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 rounded-lg bg-surface p-3">
+                <Clock3 aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{timing.label}</p>
+                  <p className="mt-1 text-xs leading-relaxed">{timing.context}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">Context only, not an entry signal. Let the first move settle before you trade.</p>
+        </div>
       )}
     </section>
   );
@@ -157,80 +199,23 @@ const GENERIC: NewsTheme = {
   likely: "Expect one fast move on the release, then a pullback. Both indexes usually move the same direction.",
 };
 
-/** Beginner-level read on this morning's releases. Recomputed on every data refresh. */
-export function MorningNewsImpact({ payload }: { payload: HubPayload }) {
-  const todayPacific = pacificDateISO();
-  const events: EconRow[] = [...payload.econEvents]
-    .filter((event) => event.date === todayPacific && event.impact === "high" && event.time < "12:00")
-    .sort((a, b) => a.time.localeCompare(b.time));
-
-  if (events.length === 0) return null;
-
-  const rows = events.map((event) => {
-    const theme = NEWS_THEMES.find((t) => t.match.test(event.title)) ?? GENERIC;
-    const timing =
-      event.time < "06:30"
-        ? {
-            label: "Before the 6:30 open",
-            context:
-              "This lands before the open. Its first reaction can set the direction and volatility traders carry into the 6:30 opening candles; watch whether that move continues or reverses at the open.",
-          }
-        : event.time === "06:30"
-          ? {
-              label: "At the 6:30 open",
-              context:
-                "This lands as the open begins and can directly trigger the first sharp move, widen volatility, or reverse the initial candle.",
-            }
-          : {
-              label: "After the 6:30 open",
-              context:
-                "This lands after the open but still belongs to the opening sequence. Price may position for it beforehand, then accelerate or reverse when the number hits.",
-            };
-    return { event, theme, timing };
-  });
-
-  const openRead =
-    "Every high-impact release below can shape the 6:30 AM opening move. A release before the open can set the initial direction and volatility; one at or after the open can start, accelerate, or reverse that move.";
-
-  return (
-    <section aria-labelledby="morning-impact-title" className="border-b border-border py-6 sm:py-8">
-      <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">In plain English</p>
-      <h3 id="morning-impact-title" className="mt-1 font-display text-lg font-semibold sm:text-2xl">
-        What this means for NASDAQ and US30
-      </h3>
-      <p className="mt-3 text-sm leading-relaxed">{openRead}</p>
-
-      <div className="mt-4 space-y-3">
-        {rows.map(({ event, theme, timing }) => (
-          <article
-            key={`${event.date}-${event.time}-${event.title}`}
-            className="min-w-0 rounded-lg border border-border bg-card p-4"
-          >
-            <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-              <time dateTime={`${event.date}T${event.time}`}>{econTimeToLocal(event.date, event.time)}</time>
-              <span className="rounded-full border border-border px-2 py-0.5">
-                {timing.label}
-              </span>
-            </div>
-            <p className="mt-2 break-words font-display text-base font-semibold">{event.title}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{theme.what}</p>
-            <p className="mt-2 text-sm leading-relaxed">
-              <span className="font-semibold">Most likely: </span>
-              {theme.likely}
-            </p>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              <span className="font-semibold text-foreground">At the open: </span>
-              {timing.context}
-            </p>
-          </article>
-        ))}
-      </div>
-
-      <p className="mt-3 text-xs text-muted-foreground">
-        Plain guidance, not an entry signal. Let the first move settle before you trade.
-      </p>
-    </section>
-  );
+function newsTiming(time: string) {
+  if (time < "06:30") {
+    return {
+      label: "Before the 6:30 open",
+      context: "The first reaction can shape the direction and volatility carried into the opening candles. Watch whether it continues or reverses at the open.",
+    };
+  }
+  if (time === "06:30") {
+    return {
+      label: "At the 6:30 open",
+      context: "The release can trigger the first sharp move, widen volatility, or reverse the initial candle as the open begins.",
+    };
+  }
+  return {
+    label: "After the 6:30 open",
+    context: "Price may position beforehand, then accelerate or reverse when the number lands during the opening sequence.",
+  };
 }
 
 export function EconomicCalendar({ payload }: { payload: HubPayload }) {
@@ -377,11 +362,11 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
         <p className="mt-4 text-sm text-muted-foreground">No releases left this week.</p>
       )}
 
-      <p className="mt-4 text-[11px] text-muted-foreground">
-        {payload.econLive
-          ? "Live calendar — USD + high-impact global releases, local time."
-          : "Sample data — live feed unavailable."}
-      </p>
+      {payload.econLive && (
+        <p className="mt-4 text-[11px] text-muted-foreground">
+          Live calendar — USD + high-impact global releases, local time.
+        </p>
+      )}
     </div>
   );
 }
