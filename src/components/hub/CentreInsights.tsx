@@ -144,14 +144,14 @@ export function MarketMapStrip({ payload, symbol }: { payload: HubPayload; symbo
 
 function SymbolTabs({ value, onChange, keys }: { value: ContextSymbol; onChange: (k: ContextSymbol) => void; keys: ContextSymbol[] }) {
   return (
-    <div role="tablist" className="inline-flex rounded-full border border-border p-0.5">
+    <div role="tablist" className="flex w-full rounded-full border border-border p-0.5 sm:w-auto sm:max-w-md">
       {INSTRUMENTS.filter((i) => keys.includes(i.key)).map((i) => (
         <button
           key={i.key}
           role="tab"
           aria-selected={value === i.key}
           onClick={() => onChange(i.key)}
-          className={`min-h-8 rounded-full px-3 text-xs font-medium ${value === i.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          className={`min-h-8 min-w-0 flex-1 rounded-full px-2 text-xs font-medium sm:px-3 ${value === i.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
         >
           {i.name}
         </button>
@@ -190,7 +190,7 @@ export function LiquidityRadar({ payload }: { payload: HubPayload }) {
   return (
     <section className="min-w-0 rounded-2xl border border-border bg-card p-4 sm:p-5">
       <h2 className="font-display text-base font-semibold uppercase tracking-widest sm:text-lg">Liquidity Radar</h2>
-      <div className="mt-3 w-full overflow-x-auto pb-1">
+      <div className="mt-3 w-full pb-1">
         <SymbolTabs value={sym} onChange={setSym} keys={available} />
       </div>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">

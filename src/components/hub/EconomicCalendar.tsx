@@ -362,11 +362,11 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
         <p className="mt-4 text-sm text-muted-foreground">No releases left this week.</p>
       )}
 
-      <p className="mt-4 text-[11px] text-muted-foreground">
-        {payload.econLive
-          ? "Live calendar — USD + high-impact global releases, local time."
-          : "Sample data — live feed unavailable."}
-      </p>
+      {payload.econLive && (
+        <p className="mt-4 text-[11px] text-muted-foreground">
+          Live calendar — USD + high-impact global releases, local time.
+        </p>
+      )}
     </div>
   );
 }
