@@ -50,8 +50,9 @@ export const saveWiseToken = createServerFn({ method: "POST" })
     } catch {
       throw new Error(`Wise rejected that token for ${data.mode}. Check it was created in the ${data.mode === "sandbox" ? "sandbox" : "live"} Wise site.`);
     }
-    const p = (profiles ?? []).find((x) => String(x.type).toUpperCase() === "BUSINESS") ?? profiles?.[0];
-    if (!p) throw new Error("No Wise profile found on that account.");
+    // Payouts are sent from the Founder's PERSONAL Wise profile.
+    const p = (profiles ?? []).find((x) => String(x.type).toUpperCase() === "PERSONAL");
+    if (!p) throw new Error("No personal profile found on that Wise account.");
     const enc = await encryptToken(data.token);
     const db = await admin();
     const { error } = await db.from("wise_connection").upsert(
@@ -60,7 +61,9 @@ export const saveWiseToken = createServerFn({ method: "POST" })
         token_cipher: enc.cipher,
         token_iv: enc.iv,
         profile_id: p.id,
-        profile_name: p.businessName ?? p.details?.name ?? p.fullName ?? p.details?.firstName ?? "Wise profile",
+        profile_name:
+          p.fullName ??
+          ([p.details?.firstName, p.details?.lastName].filter(Boolean).join(" ") || "Personal Wise profile"),
         connected_at: new Date().toISOString(),
       },
       { onConflict: "mode" },
