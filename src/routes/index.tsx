@@ -157,38 +157,6 @@ function LiveClock({ scrolled }: { scrolled: boolean }) {
   );
 }
 
-function PromoBanner() {
-  const [copied, setCopied] = useState(false);
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText("1MILL");
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {}
-  };
-  return (
-    <div className="bg-foreground text-background">
-      <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-[11px] font-medium sm:gap-3 sm:text-xs">
-        <span className="hidden h-1.5 w-1.5 rounded-full bg-background/70 sm:inline-block" aria-hidden />
-        <span className="uppercase tracking-[0.18em]">
-          Limited offer — Use code{" "}
-          <button
-            type="button"
-            onClick={copy}
-            className={cn(
-              "mx-0.5 inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 font-mono font-bold tracking-widest text-background transition-colors",
-              copied ? "bg-background/25" : "bg-background/10 hover:bg-background/20",
-            )}
-            aria-label="Copy promo code 1MILL"
-          >
-            1MILL
-          </button>{" "}
-          for 20% off
-        </span>
-      </div>
-    </div>
-  );
-}
 
 function Header({
   mobileMenuOpen,
