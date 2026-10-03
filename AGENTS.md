@@ -12,3 +12,5 @@
 - Weekly Behavior (src/lib/weekly-behavior.server.ts) is a read-only context layer: it reuses quote/calendar helpers and must never alter Centre boards or emit trade instructions — keeps it independent of existing signals.
 - Weekly Behavior activity is persisted by a service-only atomic database routine; the server's scheduled handler and authorized page checks run it, while member pages only read the resulting feed — prevents duplicate events and exposes no write access to members.
 - Centre market context (src/lib/market-context.server.ts) is a read-only layer reusing Weekly Behavior's session/sweep helpers; Brief, Comparison and Market State are pure summaries in src/lib/centre-insights.ts — keeps summaries from becoming independent indicators.
+
+- Recruiter earnings use an append-only `recruiter_lands` ledger tagged by Pacific calendar month; "this month" is derived, so there is no scheduled reset job. Why: no timer to fail, history preserved.

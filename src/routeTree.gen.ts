@@ -14,6 +14,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SuccessRouteImport } from './routes/success'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RefundRouteImport } from './routes/refund'
+import { Route as RecruitersRouteImport } from './routes/recruiters'
 import { Route as ProgramRouteImport } from './routes/program'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as DiscordRouteImport } from './routes/discord'
@@ -69,6 +70,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const RefundRoute = RefundRouteImport.update({
   id: '/refund',
   path: '/refund',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecruitersRoute = RecruitersRouteImport.update({
+  id: '/recruiters',
+  path: '/recruiters',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgramRoute = ProgramRouteImport.update({
@@ -245,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/discord': typeof DiscordRoute
   '/privacy': typeof PrivacyRoute
   '/program': typeof ProgramRoute
+  '/recruiters': typeof RecruitersRoute
   '/refund': typeof RefundRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/success': typeof SuccessRoute
@@ -283,6 +290,7 @@ export interface FileRoutesByTo {
   '/discord': typeof DiscordRoute
   '/privacy': typeof PrivacyRoute
   '/program': typeof ProgramRoute
+  '/recruiters': typeof RecruitersRoute
   '/refund': typeof RefundRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/success': typeof SuccessRoute
@@ -322,6 +330,7 @@ export interface FileRoutesById {
   '/discord': typeof DiscordRoute
   '/privacy': typeof PrivacyRoute
   '/program': typeof ProgramRoute
+  '/recruiters': typeof RecruitersRoute
   '/refund': typeof RefundRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/success': typeof SuccessRoute
@@ -362,6 +371,7 @@ export interface FileRouteTypes {
     | '/discord'
     | '/privacy'
     | '/program'
+    | '/recruiters'
     | '/refund'
     | '/sitemap.xml'
     | '/success'
@@ -400,6 +410,7 @@ export interface FileRouteTypes {
     | '/discord'
     | '/privacy'
     | '/program'
+    | '/recruiters'
     | '/refund'
     | '/sitemap.xml'
     | '/success'
@@ -438,6 +449,7 @@ export interface FileRouteTypes {
     | '/discord'
     | '/privacy'
     | '/program'
+    | '/recruiters'
     | '/refund'
     | '/sitemap.xml'
     | '/success'
@@ -477,6 +489,7 @@ export interface RootRouteChildren {
   DiscordRoute: typeof DiscordRoute
   PrivacyRoute: typeof PrivacyRoute
   ProgramRoute: typeof ProgramRoute
+  RecruitersRoute: typeof RecruitersRoute
   RefundRoute: typeof RefundRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SuccessRoute: typeof SuccessRoute
@@ -541,6 +554,13 @@ declare module '@tanstack/react-router' {
       path: '/refund'
       fullPath: '/refund'
       preLoaderRoute: typeof RefundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recruiters': {
+      id: '/recruiters'
+      path: '/recruiters'
+      fullPath: '/recruiters'
+      preLoaderRoute: typeof RecruitersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/program': {
@@ -773,6 +793,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiscordRoute: DiscordRoute,
   PrivacyRoute: PrivacyRoute,
   ProgramRoute: ProgramRoute,
+  RecruitersRoute: RecruitersRoute,
   RefundRoute: RefundRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SuccessRoute: SuccessRoute,

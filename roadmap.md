@@ -89,3 +89,8 @@
 - [x] Fix the narrow-screen Liquidity Radar heading and controls layout
 - [x] Consolidate repeated Market Environment, session-summary, driver-explanation, and morning-news content
 - [x] Polish news explanations while preserving distinct per-release commentary
+
+## Recruiter Portal
+- [x] Recruiter role (lifetime access) assignable in Manage roles
+- [x] /recruiters page: Founder sees all, recruiter sees own; +1/-1/Add for Founder
+- [x] Monthly count derived from ledger (auto-resets each month)

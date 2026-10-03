@@ -120,7 +120,7 @@ export async function removeApplicationImpl(applicationId: string) {
 // Account role management (Founder only — verifyPasscode rejects SHLM MOD).
 // ---------------------------------------------------------------------------
 
-export type ManagedRole = "admin" | "shlm_mod" | "free_member" | "member" | "revoked";
+export type ManagedRole = "admin" | "shlm_mod" | "free_member" | "recruiter" | "member" | "revoked";
 
 export type AdminAccountRow = {
   id: string;
@@ -158,9 +158,10 @@ export async function listAccountsImpl(): Promise<AdminAccountRow[]> {
     const role = r.role as ManagedRole;
     const current = roleByUser.get(r.user_id);
     // Highest privilege wins if somehow multiple rows exist.
-    const rank: Record<string, number> = { admin: 3, shlm_mod: 2, free_member: 1 };
+    const rank: Record<string, number> = { admin: 4, shlm_mod: 3, recruiter: 2, free_member: 1 };
     if (!current || (rank[role] ?? 0) > (rank[current] ?? 0)) {
-      if (role === "admin" || role === "shlm_mod" || role === "free_member") roleByUser.set(r.user_id, role);
+      if (role === "admin" || role === "shlm_mod" || role === "free_member" || role === "recruiter")
+        roleByUser.set(r.user_id, role);
     }
   }
 

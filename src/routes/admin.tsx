@@ -497,6 +497,7 @@ function AdminPage() {
 const ROLE_OPTIONS: { value: ManagedRole; label: string }[] = [
   { value: "member", label: "Member (no special role)" },
   { value: "free_member", label: "Free member (lifetime)" },
+  { value: "recruiter", label: "Recruiter (lifetime + portal)" },
   { value: "shlm_mod", label: "SHLM MOD" },
   { value: "admin", label: "Founder (admin)" },
   { value: "revoked", label: "No access (revoked)" },

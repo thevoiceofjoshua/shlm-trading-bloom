@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import type { AuthUser } from "@/hooks/use-auth-user";
 import { useAdminMode } from "@/hooks/use-admin-mode";
+import { useRecruiterAccess } from "@/hooks/use-recruiter-access";
 
 export function AccountMenu({
   user,
@@ -16,6 +17,7 @@ export function AccountMenu({
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const { isStaff, modOnly, adminMode, exit, reopenPrompt } = useAdminMode();
+  const showRecruiters = useRecruiterAccess(user.id);
 
   useEffect(() => {
     if (!open) return;
@@ -59,6 +61,19 @@ export function AccountMenu({
         >
           Dashboard
         </a>
+        {showRecruiters && (
+          <a
+            href="/recruiters"
+            className={cn(
+              "flex min-h-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition-colors",
+              scrolled
+                ? "border-border text-foreground hover:bg-accent"
+                : "border-white/20 text-white hover:bg-white/10",
+            )}
+          >
+            Recruiter Portal
+          </a>
+        )}
         <button
           type="button"
           onClick={handleSignOut}
@@ -117,6 +132,15 @@ export function AccountMenu({
           >
             Dashboard
           </a>
+          {showRecruiters && (
+            <a
+              href="/recruiters"
+              className="flex items-center border-t border-border px-4 py-2.5 text-sm hover:bg-accent"
+              role="menuitem"
+            >
+              Recruiter Portal
+            </a>
+          )}
           {isStaff && (
             <button
               type="button"
