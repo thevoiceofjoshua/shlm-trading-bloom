@@ -13,7 +13,6 @@ import {
   structureClarity, liquidityClarity, radar, nearestOpen, nextMajorEvent, laDateISO, type Tone,
 } from "@/lib/centre-insights";
 
-const UNAVAILABLE = "DATA UNAVAILABLE";
 
 const TONE: Record<Tone, string> = {
   pos: "text-emerald-600 dark:text-emerald-400",
