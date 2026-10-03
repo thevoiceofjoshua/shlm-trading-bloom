@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -69,6 +70,37 @@ function RecruitersPage() {
         <p className="mt-2 text-sm text-muted-foreground">
           {usd(LAND_RATE)} per member landed · {usd(BONUS_AMOUNT)} bonus for every {BONUS_PER} landed in a calendar month.
         </p>
+
+        <Accordion type="single" collapsible className="mt-4 w-full rounded-3xl border border-border bg-card px-5">
+          <AccordionItem value="how-this-works" className="border-b-0">
+            <AccordionTrigger className="font-display text-base font-semibold hover:no-underline">
+              How this works
+            </AccordionTrigger>
+            <AccordionContent className="pb-5">
+              <p className="font-display text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+                How you get paid
+              </p>
+              <ul className="mt-3 space-y-3 text-sm leading-relaxed text-muted-foreground">
+                <li>
+                  <span className="font-semibold text-foreground">$100 per client landed.</span> You earn {usd(LAND_RATE)} for every
+                  client you land — a one-time payment per client, not recurring or monthly. Landing one client pays you {usd(LAND_RATE)}{" "}
+                  one time, period.
+                </li>
+                <li>
+                  <span className="font-semibold text-foreground">{usd(BONUS_AMOUNT)} monthly bonus, stacking.</span> Land{" "}
+                  {BONUS_PER} clients within a single calendar month and you earn an extra one-time bonus of {usd(BONUS_AMOUNT)} for
+                  that month. Land {BONUS_PER * 2} in the same month and that's another {usd(BONUS_AMOUNT)} ({usd(BONUS_AMOUNT * 2)}{" "}
+                  total bonus for the month), and it keeps stacking for every additional {BONUS_PER} landed in that same month.
+                </li>
+                <li>
+                  <span className="font-semibold text-foreground">Lifetime never resets.</span> Your lifetime landed count and lifetime
+                  earnings keep growing forever and never reset. Only the "this month" count (used for the bonus) resets to 0 at the
+                  start of each new calendar month.
+                </li>
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         <div className="mt-8">
           {!ready || q.isLoading ? (
