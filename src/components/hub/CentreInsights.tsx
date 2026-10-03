@@ -10,7 +10,7 @@ import { useAdminMode } from "@/hooks/use-admin-mode";
 import { econTimeToLocal } from "@/lib/hub-session";
 import {
   INSTRUMENTS, NEAR_PCT, ctxOf, mtfOf, marketState, stateTone, volTone, driverAlignment,
-  structureClarity, liquidityClarity, radar, nearestOpen, nextMajorEvent, laDateISO, type Tone,
+  radar, nearestOpen, nextMajorEvent, laDateISO, type Tone,
 } from "@/lib/centre-insights";
 
 
@@ -282,23 +282,6 @@ export function openingRangeMarkets(payload: HubPayload) {
   return INSTRUMENTS.filter((i) => ctxOf(payload, i.key)?.openingRange);
 }
 
-/** Comparison cards with only the rows that have real values. */
-export function compareCards(payload: HubPayload) {
-  return INSTRUMENTS.map((i) => {
-    const ctx: InstrumentContext | undefined = ctxOf(payload, i.key);
-    const mtf = mtfOf(payload, i.key);
-    const all: [string, string | null | undefined][] = [
-      ["Structure", structureClarity(mtf)],
-      ["Volatility", ctx?.volatility?.level],
-      ["Drivers", driverAlignment(payload, i.key)],
-      ["Liquidity", liquidityClarity(ctx)],
-      ["State", marketState(ctx, mtf)?.label],
-    ];
-    const rows = all.filter((r): r is [string, string] => !!r[1]);
-    return { i, rows, hasCtx: !!ctx };
-  }).filter((c) => c.hasCtx && c.rows.length > 0);
-}
-
 export function OpeningRange({ payload }: { payload: HubPayload }) {
   const markets = openingRangeMarkets(payload);
   if (!markets.length) return null;
@@ -330,34 +313,6 @@ export function OpeningRange({ payload }: { payload: HubPayload }) {
             </div>
           );
         })}
-      </div>
-    </Card>
-  );
-}
-
-/* ----------------------------- Symbol comparison ---------------------------- */
-
-export function SymbolCompare({ payload }: { payload: HubPayload }) {
-  const tone = (v: string) =>
-    ["Clear", "Aligned"].includes(v) ? TONE.pos : ["Conflicted", "Conflicting", "Unclear"].includes(v) ? TONE.neg : TONE.info;
-  const cards = compareCards(payload);
-  if (!cards.length) return null;
-  return (
-    <Card title="Market Environment" right={<span>Comparison only — not a pick</span>}>
-      <div className="grid gap-3 sm:grid-cols-3">
-        {cards.map(({ i, rows }) => (
-            <div key={i.key} className="min-w-0 rounded-xl border border-border bg-surface p-3">
-              <p className="font-display text-sm font-semibold">{i.name}</p>
-              <dl className="mt-2 space-y-1 text-xs">
-                {rows.map(([k, v]) => (
-                  <div key={k} className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2">
-                    <dt className="text-muted-foreground">{k}</dt>
-                    <dd className={`min-w-0 truncate font-medium ${tone(v)}`}>{v}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-        ))}
       </div>
     </Card>
   );
