@@ -17,7 +17,7 @@ export function AccountMenu({
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const { isStaff, modOnly, adminMode, exit, reopenPrompt } = useAdminMode();
-  const showRecruiters = useRecruiterAccess(user.id);
+  const { allowed: showRecruiters, error: recruiterError } = useRecruiterAccess(user.id);
 
   useEffect(() => {
     if (!open) return;
@@ -73,6 +73,11 @@ export function AccountMenu({
           >
             Recruiter Portal
           </a>
+        )}
+        {!showRecruiters && recruiterError && (
+          <p className="break-words rounded-2xl border border-destructive/40 px-4 py-2 text-xs text-destructive">
+            Recruiter check failed: {recruiterError}
+          </p>
         )}
         <button
           type="button"
