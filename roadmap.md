@@ -88,4 +88,4 @@
 - [x] Reorder the Centre so session context leads, supporting tools follow Drivers, and news/calendar close the page
 - [x] Fix the narrow-screen Liquidity Radar heading and controls layout
 - [x] Consolidate repeated Market Environment, session-summary, driver-explanation, and morning-news content
-- [ ] Polish news explanations while preserving distinct per-release commentary
+- [x] Polish news explanations while preserving distinct per-release commentary
