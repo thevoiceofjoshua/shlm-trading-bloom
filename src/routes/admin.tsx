@@ -34,7 +34,7 @@ function AdminPage() {
 
   // Admin mode already verified the passcode this session — reuse it so the
   // console unlocks without retyping. Manual entry still works as a fallback.
-  const { adminMode, passcode: sessionPasscode, role, checked } = useAdminMode();
+  const { adminMode, passcode: sessionPasscode, role, checked, enter } = useAdminMode();
   const modOnlyAccount = checked && role === "shlm_mod";
   const [passcodeInput, setPasscodeInput] = useState("");
   const [passcode, setPasscode] = useState("");
@@ -253,7 +253,10 @@ function AdminPage() {
           className="mt-6"
           onSubmit={(e) => {
             e.preventDefault();
-            setPasscode(passcodeInput.trim());
+            const code = passcodeInput.trim();
+            setPasscode(code);
+            // Remember a verified passcode until sign-out so it isn't asked again.
+            if (code) void enter(code).catch(() => {});
           }}
         >
           <VaultField
