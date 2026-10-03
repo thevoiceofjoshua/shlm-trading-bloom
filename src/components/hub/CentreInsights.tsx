@@ -71,7 +71,7 @@ export function MarketBrief({ payload }: { payload: HubPayload }) {
   const nas = ctxOf(payload, "NASDAQ");
   const st = marketState(nas, mtfOf(payload, "NASDAQ"));
   const near = nearestOpen(nas);
-  const ev = nextMajorEvent(payload);
+  const ev = payload.econLive ? nextMajorEvent(payload) : null;
   const y = payload.context?.us02y ?? null;
   const env = (k: ContextSymbol) => driverAlignment(payload, k) ?? null;
   const liq = near.above || near.below ? [near.above?.label, near.below?.label].filter(Boolean).join(" / ") : null;
