@@ -87,9 +87,7 @@ export const setWiseMode = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ mode: modeSchema }).parse(d))
   .handler(async ({ data, context }) => {
     await requireFounder(context.userId);
-    const { admin, getActiveMode } = await import("@/lib/wise.server");
-    if (data.mode === "live" && !(await getActiveMode()).sandboxVerified)
-      throw new Error("Live stays locked until a sandbox payout has completed.");
+    const { admin } = await import("@/lib/wise.server");
     await (await admin()).from("wise_settings").update({ active_mode: data.mode }).eq("id", 1);
     return { ok: true };
   });

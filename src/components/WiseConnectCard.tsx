@@ -59,9 +59,6 @@ export function WiseConnectCard() {
                 {m}
               </button>
             ))}
-            {!s.sandboxVerified && (
-              <span className="text-xs text-muted-foreground">Live unlocks after a sandbox payout completes.</span>
-            )}
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
