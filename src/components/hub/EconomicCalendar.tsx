@@ -239,6 +239,14 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
   const events = [...payload.econEvents]
     .filter((e) => e.date >= todayStr)
     .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  // Group by calendar day — one bordered block per day.
+  const groups: { date: string; events: { e: EconRow; idx: number }[] }[] = [];
+  events.forEach((e, idx) => {
+    const last = groups[groups.length - 1];
+    if (last && last.date === e.date) last.events.push({ e, idx });
+    else groups.push({ date: e.date, events: [{ e, idx }] });
+  });
+
   const [open, setOpen] = useState<number | null>(null);
 
   // Next upcoming high-impact release — low rows stay background context.
@@ -262,87 +270,105 @@ export function EconomicCalendar({ payload }: { payload: HubPayload }) {
         </div>
       )}
 
-      <div className="mt-4 divide-y divide-border">
-        {events.map((e, i) => {
-          const localTime = econTimeToLocal(e.date, e.time);
-          const dateLabel = new Date(e.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-          const isOpen = open === i;
-          const isLow = e.impact === "low";
+      {/* One bordered block per calendar day, newest-first as before. */}
+      <div className="mt-4 space-y-3">
+        {groups.map((group) => {
+          const header = new Date(group.date + "T00:00:00").toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+          });
           return (
-            <div key={i}>
-              <button
-                type="button"
-                aria-expanded={isOpen}
-                onClick={() => setOpen(isOpen ? null : i)}
-                className={`flex min-h-11 w-full flex-wrap items-center justify-between gap-2 py-2.5 text-left text-sm transition-colors hover:text-foreground ${
-                  isLow ? "text-muted-foreground/70" : ""
-                }`}
-              >
-                <div className="flex shrink-0 items-center gap-3">
-                  <span className="font-medium tabular-nums">{localTime}</span>
-                  <span className="text-muted-foreground">{dateLabel}</span>
-                </div>
-                <div className="flex min-w-0 items-center gap-2">
-                  <span className="min-w-0 break-words text-sm">{e.title}</span>
-                  {relevantMarkets(e.affects).length > 0 && (
-                    <span className="shrink-0 text-[10px] uppercase tracking-widest text-muted-foreground">
-                      {relevantMarkets(e.affects).join(" · ")}
-                    </span>
-                  )}
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${
-                      IMPACT_BADGE[e.impact] ?? IMPACT_BADGE.medium
-                    }`}
-                  >
-                    {e.impact}
-                  </span>
-                  <span className={`text-xs text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}>▾</span>
-                </div>
-              </button>
-
-              {isOpen && (
-                <div className="pb-4">
-                  <div className="rounded-xl border border-border bg-surface p-4">
-                    <div className="flex flex-wrap items-center gap-2">
-                      {e.currency && (
-                        <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-widest text-muted-foreground">
-                          {e.currency}
-                        </span>
-                      )}
-                      <span className="text-xs text-muted-foreground">{sessionContext(e.time)}</span>
-                    </div>
-
-                    <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                      {[
-                        { label: "Actual", value: e.actual },
-                        { label: "Forecast", value: e.forecast },
-                        { label: "Previous", value: e.previous },
-                      ].map((f) => (
-                        <div key={f.label} className="rounded-lg border border-border bg-card px-3 py-2">
-                          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{f.label}</p>
-                          <p className="mt-0.5 font-display text-base tabular-nums">{f.value ?? "—"}</p>
+            <section key={group.date} aria-label={header} className="rounded-xl border border-border bg-surface/40 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2.5">
+                <h4 className="font-display text-sm font-semibold uppercase tracking-widest">{header}</h4>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {group.date === todayStr ? "Today" : `${group.events.length} ${group.events.length === 1 ? "release" : "releases"}`}
+                </span>
+              </div>
+              <div className="divide-y divide-border">
+                {group.events.map(({ e, idx }) => {
+                  const localTime = econTimeToLocal(e.date, e.time);
+                  const isOpen = open === idx;
+                  const isLow = e.impact === "low";
+                  return (
+                    <div key={idx}>
+                      <button
+                        type="button"
+                        aria-expanded={isOpen}
+                        onClick={() => setOpen(isOpen ? null : idx)}
+                        className={`flex min-h-11 w-full flex-wrap items-center justify-between gap-2 py-2.5 text-left text-sm transition-colors hover:text-foreground ${
+                          isLow ? "text-muted-foreground/70" : ""
+                        }`}
+                      >
+                        <div className="flex shrink-0 items-center gap-3">
+                          <span className="font-medium tabular-nums">{localTime}</span>
                         </div>
-                      ))}
-                    </div>
-
-                    {e.detail && <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{e.detail}</p>}
-
-                    {e.affects && e.affects.length > 0 && (
-                      <div className="mt-3">
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">What it moves</p>
-                        <div className="mt-1.5 flex flex-wrap gap-1.5">
-                          {e.affects.map((a) => (
-                            <span key={a} className="rounded-full border border-border px-2.5 py-1 text-xs text-foreground">
-                              {a}
+                        <div className="flex min-w-0 items-center gap-2">
+                          <span className="min-w-0 break-words text-sm">{e.title}</span>
+                          {relevantMarkets(e.affects).length > 0 && (
+                            <span className="shrink-0 text-[10px] uppercase tracking-widest text-muted-foreground">
+                              {relevantMarkets(e.affects).join(" · ")}
                             </span>
-                          ))}
+                          )}
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${
+                              IMPACT_BADGE[e.impact] ?? IMPACT_BADGE.medium
+                            }`}
+                          >
+                            {e.impact}
+                          </span>
+                          <span className={`text-xs text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}>▾</span>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+                      </button>
+
+                      {isOpen && (
+                        <div className="pb-4">
+                          <div className="rounded-xl border border-border bg-card p-4">
+                            <div className="flex flex-wrap items-center gap-2">
+                              {e.currency && (
+                                <span className="rounded-full border border-border px-2 py-0.5 text-[10px] uppercase tracking-widest text-muted-foreground">
+                                  {e.currency}
+                                </span>
+                              )}
+                              <span className="text-xs text-muted-foreground">{sessionContext(e.time)}</span>
+                            </div>
+
+                            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                              {[
+                                { label: "Actual", value: e.actual },
+                                { label: "Forecast", value: e.forecast },
+                                { label: "Previous", value: e.previous },
+                              ].map((f) => (
+                                <div key={f.label} className="rounded-lg border border-border bg-card px-3 py-2">
+                                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{f.label}</p>
+                                  <p className="mt-0.5 font-display text-base tabular-nums">{f.value ?? "—"}</p>
+                                </div>
+                              ))}
+                            </div>
+
+                            {e.detail && <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{e.detail}</p>}
+
+                            {e.affects && e.affects.length > 0 && (
+                              <div className="mt-3">
+                                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">What it moves</p>
+                                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                                  {e.affects.map((a) => (
+                                    <span key={a} className="rounded-full border border-border px-2.5 py-1 text-xs text-foreground">
+                                      {a}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
           );
         })}
       </div>
