@@ -12,7 +12,9 @@ export const getMyMembership = createServerFn({ method: "POST" })
       .from("user_roles")
       .select("role")
       .eq("user_id", context.userId);
-    const lifetime = ((roleRows ?? []) as { role: string }[]).some((r) => r.role === "free_member");
+    const lifetime = ((roleRows ?? []) as { role: string }[]).some(
+      (r) => r.role === "free_member" || r.role === "recruiter",
+    );
 
     let query = context.supabase
       .from("purchases")

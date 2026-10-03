@@ -63,7 +63,7 @@ export async function checkAccess(context: any): Promise<HubAccess> {
   const isAdmin = held.includes("admin");
   const isMod = held.includes("shlm_mod");
   // Complimentary lifetime member: same access as a paid member, no admin rights.
-  const isFreeMember = held.includes("free_member");
+  const isFreeMember = held.includes("free_member") || held.includes("recruiter");
 
   // Paid membership check
   const email = (context.claims.email as string | undefined) ?? null;
