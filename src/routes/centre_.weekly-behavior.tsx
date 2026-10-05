@@ -73,7 +73,7 @@ function WeeklyBehaviorPage() {
         {res && !locked && <WeeklyNotificationBanner enabled={true} />}
         <h1 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">Weekly Behavior</h1>
         <p className="mt-1 text-xs text-muted-foreground">
-          How the NY session tends to behave each day. Context only — not an entry signal.
+          How the NY session tends to behave each day. Monday/Friday labels are read from NASDAQ (NQ futures) price action, with index structure from NASDAQ + US30 and a 2-year Treasury futures check. Context only — not an entry signal.
         </p>
 
         {!ready || isLoading ? (
@@ -146,9 +146,19 @@ function DayCard({ day, today, status, note }: { day: number; today: boolean; st
         {headline}
       </span>
       {sub && <p className="mt-2 text-[11px] text-muted-foreground">{sub}</p>}
+      {dynamic && status?.kind === "classified" && (
+        <ul className="mt-3 space-y-1">
+          {status.checks.filter((c) => c.passed !== null).map((c) => (
+            <li key={c.key} className="flex justify-between gap-2 text-[10px] text-muted-foreground">
+              <span className="min-w-0">{c.passed ? "✓" : "·"} {c.reason}</span>
+              <span className="shrink-0 uppercase tracking-wider">{c.source}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       {dynamic && (
         <p className="mt-3 text-[10px] uppercase tracking-widest text-muted-foreground">
-          {status?.kind === "classified" && status.phase === "live" ? "Live session read · since 6:30 AM PT" : status?.kind === "classified" ? "Premarket read · before 6:30 AM PT" : "Live classifier"}
+          {status?.kind === "classified" && status.phase === "live" ? "Live session read · NASDAQ · since 6:30 AM PT" : status?.kind === "classified" ? "Premarket read · NASDAQ · before 6:30 AM PT" : "Live classifier"}
         </p>
       )}
     </div>
