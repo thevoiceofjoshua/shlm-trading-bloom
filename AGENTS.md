@@ -15,3 +15,5 @@
 
 - Recruiter earnings use an append-only `recruiter_lands` ledger tagged by Pacific calendar month; "this month" is derived, so there is no scheduled reset job. Why: no timer to fail, history preserved.
 - Recruiter payouts go through Wise (src/lib/wise.server.ts + payouts.functions.ts): Founder token stored AES-GCM encrypted (WISE_ENC_KEY) in service-only wise_connection, only recipient IDs + masked bank summaries stored, payouts reserved atomically via reserve_recruiter_payout; the webhook never trusts its payload and re-reads the transfer from Wise. Why: no raw bank numbers or token ever reach the database in plain form or a browser, and no double-paying.
+
+- Weekly Behavior US30 read runs the unchanged NASDAQ classifier functions on YM=F bars as a separate output (payload.us30); its sweeps are not logged and it never feeds the NASDAQ label. Why: genuinely independent read without touching NASDAQ logic.
