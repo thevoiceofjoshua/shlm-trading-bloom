@@ -259,7 +259,11 @@ export function MarketConditions({ payload }: { payload: HubPayload }) {
           <p className="mt-1 font-display text-sm font-semibold">{fixed[day]}{w!.fixedNote ? <span className="block text-[11px] font-normal text-muted-foreground">{w!.fixedNote.text}</span> : null}</p>
         ) : status?.kind === "classified" ? (
           <>
-            <p className="mt-1 font-display text-sm font-semibold">{status.developing ? "Developing — " : ""}{status.label}</p>
+            <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">{status.phase === "live" ? "Live session read" : "Premarket read"}</p>
+            <p className="font-display text-sm font-semibold">{status.developing ? "Developing — " : ""}{status.label}</p>
+            {status.phase === "live" && status.premarketLabel && (
+              <p className="text-[11px] text-muted-foreground">Premarket read was {status.premarketLabel}</p>
+            )}
             <p className="text-[11px] text-muted-foreground">{status.reason}</p>
             <ul className="mt-2 flex flex-wrap gap-1.5">
               {status.checks.filter((c) => c.passed !== null).sort((a, b) => b.weight - a.weight).slice(0, 3).map((c) => (
