@@ -93,6 +93,7 @@ function WeeklyBehaviorPage() {
                 day={d}
                 today={data?.todayDow === d}
                 status={d === 1 ? data?.monday ?? null : d === 5 ? data?.friday ?? null : undefined}
+                us30={d === 1 ? data?.us30?.monday : d === 5 ? data?.us30?.friday : undefined}
                 note={data?.fixedNote?.day === d ? data.fixedNote.text : null}
               />
             ))}
@@ -104,7 +105,26 @@ function WeeklyBehaviorPage() {
   );
 }
 
-function DayCard({ day, today, status, note }: { day: number; today: boolean; status: DayStatus | null | undefined; note?: string | null }) {
+
+function readText(s: DayStatus | null | undefined): string | null {
+  if (!s) return null;
+  if (s.kind === "classified") return `${s.label}${s.developing ? " (developing)" : ""}`;
+  if (s.kind === "waiting" && s.reason !== "Market data feed unavailable" && s.reason !== "US30 data unavailable") return "WAITING FOR DATA";
+  return null;
+}
+function SymbolReads({ nq, ym }: { nq: DayStatus | null | undefined; ym: DayStatus | null | undefined }) {
+  const rows = [["NASDAQ", readText(nq)], ["US30", readText(ym)]].filter((r) => r[1]);
+  if (!rows.length) return null;
+  return (
+    <div className="mt-2 space-y-0.5">
+      {rows.map(([n, t]) => (
+        <p key={n} className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground">{n}:</span> {t}</p>
+      ))}
+    </div>
+  );
+}
+
+function DayCard({ day, today, status, us30, note }: { day: number; today: boolean; status: DayStatus | null | undefined; us30?: DayStatus | null; note?: string | null }) {
   const dynamic = day === 1 || day === 5;
   let headline: string;
   let sub: string | null = null;
@@ -145,6 +165,7 @@ function DayCard({ day, today, status, note }: { day: number; today: boolean; st
       <span className={`mt-3 inline-flex max-w-full rounded-full border px-3 py-1.5 font-display text-sm font-semibold tracking-tight ${tone}`}>
         {headline}
       </span>
+      {dynamic && <SymbolReads nq={status} ym={us30} />}
       {sub && <p className="mt-2 text-[11px] text-muted-foreground">{sub}</p>}
       {dynamic && status?.kind === "classified" && (
         <ul className="mt-3 space-y-1">
