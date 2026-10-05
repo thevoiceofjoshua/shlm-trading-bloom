@@ -4,6 +4,7 @@ import { template as paymentLink } from './payment-link'
 import { template as applicationDenial } from './application-denial'
 import { template as paymentReceipt } from './payment-receipt'
 import { template as betaUsername } from './beta-username'
+import { template as smsAlert } from './sms-alert'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -20,5 +21,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'application-denial': applicationDenial,
   'payment-receipt': paymentReceipt,
   'beta-username': betaUsername,
+  'sms-alert': smsAlert,
 }
 
