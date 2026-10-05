@@ -51,8 +51,8 @@ function smsText(e: { kind: string; message: string; created_at: string }, phase
   const body = rest.join(" — ");
   if (e.kind === "classification") {
     const read = phase === "live" ? "live session read" : "premarket read";
-    return `SHLM: ${DAY[dayCode] ?? dayCode} -> ${body.replace(/^Classified: /, "")} (${read})`.slice(0, 140);
+    return `SHLM: ${DAY[dayCode] ?? dayCode} -> ${body.replace(/^Classified: /, "")} (NASDAQ, ${read})`.slice(0, 140);
   }
-  const short = body.replace(/^Swept (\w+) (high|low), awaiting confirmation$/, "sweep detected - $1 $2");
-  return `SHLM: ${short}, ${time}`.slice(0, 140);
+  const short = body.replace(/^NASDAQ: /, "").replace(/^Swept (\w+) (high|low), awaiting confirmation$/, "sweep detected - $1 $2");
+  return `SHLM: NASDAQ ${short}, ${time}`.slice(0, 140);
 }

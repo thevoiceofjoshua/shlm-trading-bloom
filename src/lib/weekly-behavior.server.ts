@@ -17,7 +17,17 @@ export interface ClassifierCheck {
   /** null = data unavailable, excluded from scoring. */
   passed: boolean | null;
   reason: string;
+  /** Instrument(s) this check reads, for display. */
+  source?: string;
 }
+
+/** Which instrument feeds each check (display only). */
+export const CHECK_SOURCE: Record<CheckKey, string> = {
+  overnight: "NASDAQ", london: "NASDAQ", volume: "NASDAQ", displacement: "NASDAQ", momentum: "NASDAQ",
+  structure: "NASDAQ + US30", catalyst: "U.S. calendar", us02y: "2Y Treasury futures",
+};
+/** Price-action levels, sweeps and fakeouts are all read from NASDAQ (NQ) futures. */
+export const LABEL_SOURCE = "NASDAQ";
 
 export type BehaviorLabel = "FAST" | "CHOPPY" | "SLOW" | "RANGE BOUND";
 
@@ -200,7 +210,7 @@ function classify(
   const { today, prior } = group(nq, todayKey);
   const checks: ClassifierCheck[] = [];
   const push = (key: CheckKey, label: string, weight: number, passed: boolean | null, reason: string) =>
-    checks.push({ key, label, weight, passed, reason });
+    checks.push({ key, label, weight, passed, reason, source: CHECK_SOURCE[key] });
 
   const enough = today.length >= 24 && prior.length >= 2;
   const asia = today.filter((b) => b.sm < ASIA_END);
@@ -380,7 +390,7 @@ function classifyLive(
 
   const checks: ClassifierCheck[] = [];
   const push = (key: CheckKey, label: string, weight: number, passed: boolean | null, reason: string) =>
-    checks.push({ key, label, weight, passed, reason });
+    checks.push({ key, label, weight, passed, reason, source: CHECK_SOURCE[key] });
 
   const priorRange = avg(windows.map(range)) || 1;
   const rangeRatio = range(post) / priorRange;
@@ -526,5 +536,6 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
       if (target === 1) monday = w; else if (target === 5) friday = w;
     }
   }
+  sweepEvents = sweepEvents.map((e) => ({ ...e, message: `NASDAQ: ${e.message}` }));
   return { todayDow: sessionDow, monday, friday, fixedNote, computedAt: now.toISOString(), sessionDate: todayKey, lastBarTs, sweepEvents };
 }
