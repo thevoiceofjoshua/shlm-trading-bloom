@@ -61,7 +61,8 @@ export async function sendPaymentLinkImpl(applicationId: string, promoCode?: str
     templateData: {
       fullName: app.full_name,
       tier: tierInfo.name,
-      checkoutUrl: `${SITE_URL}/enroll/${app.id}`,
+      // Goes straight to a fresh Stripe Checkout session — no sign-in step.
+      checkoutUrl: `${SITE_URL}/api/public/enroll/${app.id}`,
       amount: displayAmount,
       promoCode: normalizedCode,
       discountPercent: discount > 0 ? `${Math.round(discount * 100)}` : undefined,
