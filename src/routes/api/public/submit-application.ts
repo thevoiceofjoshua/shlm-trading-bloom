@@ -80,6 +80,26 @@ export const Route = createFileRoute("/api/public/submit-application")({
           return json({ error: error.message }, 500);
         }
 
+        // Every application gets a member account automatically (no password; the
+        // applicant signs in later with Google or an email link using this address).
+        // If the email already has an account, it is left untouched.
+        try {
+          const { error: createErr } = await supabaseAdmin.auth.admin.createUser({
+            email: data.email.trim().toLowerCase(),
+            email_confirm: true,
+            user_metadata: {
+              full_name: data.fullName,
+              ...(data.phone ? { phone: data.phone } : {}),
+              source: "application",
+            },
+          });
+          if (createErr && !/already|exists|registered/i.test(createErr.message)) {
+            console.error("Auto account creation failed", createErr.message);
+          }
+        } catch (err) {
+          console.error("Auto account creation threw", err);
+        }
+
         const applicantTz = data.timezone || "America/Los_Angeles";
         const formatIn = (tz: string) =>
           new Date(scheduledIso).toLocaleString("en-US", {
