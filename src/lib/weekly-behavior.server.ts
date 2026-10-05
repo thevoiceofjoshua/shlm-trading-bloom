@@ -22,7 +22,13 @@ export interface ClassifierCheck {
 export type BehaviorLabel = "FAST" | "CHOPPY" | "SLOW" | "RANGE BOUND";
 
 export type DayStatus =
-  | { kind: "classified"; label: BehaviorLabel; developing: boolean; reason: string; score: number; checks: ClassifierCheck[] }
+  | {
+      kind: "classified"; label: BehaviorLabel; developing: boolean; reason: string; score: number; checks: ClassifierCheck[];
+      /** "premarket" = overnight/pre-6:30 setup read; "live" = realized NY session read. */
+      phase?: "premarket" | "live";
+      /** When phase is "live", the unchanged premarket verdict for context. */
+      premarketLabel?: BehaviorLabel;
+    }
   | { kind: "waiting"; reason: string; checks: ClassifierCheck[] }
   | { kind: "not_today"; reason: string }
   | { kind: "closed"; reason: string };
@@ -47,6 +53,9 @@ const SHIFT_MIN = 9 * 60; // 15:00 PT prior day → 00:00 of the session key
 const ASIA_END = 9 * 60; // 00:00 PT
 const LONDON_END = 14 * 60; // 05:00 PT
 const PRENY_END = 15 * 60 + 30; // 06:30 PT
+const NY_END = 22 * 60; // 13:00 PT
+const LIVE_MIN_BARS = 6; // 30 minutes of NY trading before the live read takes over
+const LIVE_SETTLED_BARS = 12; // after 60 minutes the live read is no longer "developing"
 
 const fmt = new Intl.DateTimeFormat("en-CA", {
   timeZone: SITE_TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false,
@@ -124,19 +133,23 @@ type SweepRead =
  * then within 3 candles an engulfing reversal and/or a close through the last minor swing confirms it.
  * A later close back beyond the swept extreme cancels it and scanning resumes.
  */
-export function detectSweep(today: Bar[], london: Bar[], avgCandle: number, minFrac: number, requireBoth: boolean, events?: SweepEvent[]): SweepRead {
+export function detectSweep(
+  today: Bar[], london: Bar[], avgCandle: number, minFrac: number, requireBoth: boolean, events?: SweepEvent[],
+  opts: { startSm?: number; name?: string } = {},
+): SweepRead {
+  const name = opts.name ?? "London";
   const lH = Math.max(...london.map((b) => b.h)), lL = Math.min(...london.map((b) => b.l));
   const minDist = minFrac * (avgCandle || 0);
   if (!(minDist > 0)) return { state: "none" };
   let result: SweepRead = { state: "none" };
-  let i = today.findIndex((b) => b.sm >= LONDON_END);
+  let i = today.findIndex((b) => b.sm >= (opts.startSm ?? LONDON_END));
   if (i < 0) return result;
   while (i < today.length) {
     const s = today[i];
     const side: "high" | "low" | null = s.h - lH >= minDist ? "high" : lL - s.l >= minDist ? "low" : null;
     if (!side) { i++; continue; }
     if (i === 0 || !(side === "high" ? today[i - 1].h - lH >= minDist : lL - today[i - 1].l >= minDist)) {
-      events?.push({ kind: "detected", ts: s.t, side, message: `Swept London ${side}, awaiting confirmation` });
+      events?.push({ kind: "detected", ts: s.t, side, message: `Swept ${name} ${side}, awaiting confirmation` });
     }
     const hi = side === "high";
     // Minor swing point formed during the approach.
@@ -164,7 +177,7 @@ export function detectSweep(today: Bar[], london: Bar[], avgCandle: number, minF
     }
     const confirmAt = i + 1 + (engulf ? 0 : bosIdx);
     const how = engulf && bos ? "engulfing + break of structure" : engulf ? "engulfing" : "break of structure";
-    events?.push({ kind: "confirmed", ts: today[confirmAt].t, side, message: `Confirmed reversal (${how}) — reading toward London ${side === "high" ? "low" : "high"}` });
+    events?.push({ kind: "confirmed", ts: today[confirmAt].t, side, message: `Confirmed reversal (${how}) — reading toward ${name} ${side === "high" ? "low" : "high"}` });
     const cancelAt = today.slice(confirmAt + 1).findIndex((b) => (hi ? b.c > lH : b.c < lL));
     if (cancelAt >= 0) {
       events?.push({ kind: "canceled", ts: today[confirmAt + 1 + cancelAt].t, side, message: "Sweep canceled, watching both sides again" });
@@ -343,6 +356,118 @@ function classify(
   return { status, note, sweepEvents };
 }
 
+/**
+ * Live NY-session read (additive second phase). Uses only bars from the 6:30 PT open onward and
+ * compares them with the same elapsed window on prior sessions. The premarket read is untouched.
+ */
+function classifyLive(
+  nqAll: Bar[], todayKey: string, pre: DayStatus,
+  structure: boolean | null, structureWhy: string,
+  catalyst: boolean | null, catalystWhy: string,
+  events: SweepEvent[],
+): DayStatus | null {
+  const { today: full, prior } = group(nqAll, todayKey);
+  const post = full.filter((b) => b.sm >= PRENY_END && b.sm < NY_END);
+  if (post.length < LIVE_MIN_BARS || prior.length < 2) return null;
+  const preBars = full.filter((b) => b.sm < PRENY_END);
+  const asia = preBars.filter((b) => b.sm < ASIA_END);
+  const london = preBars.filter((b) => b.sm >= ASIA_END && b.sm < LONDON_END);
+  const elapsed = post[post.length - 1].sm - PRENY_END + 5;
+  const windows = prior
+    .map((d) => d.filter((b) => b.sm >= PRENY_END && b.sm < PRENY_END + elapsed))
+    .filter((w) => w.length >= Math.min(LIVE_MIN_BARS, post.length));
+  if (windows.length < 2) return null;
+
+  const checks: ClassifierCheck[] = [];
+  const push = (key: CheckKey, label: string, weight: number, passed: boolean | null, reason: string) =>
+    checks.push({ key, label, weight, passed, reason });
+
+  const priorRange = avg(windows.map(range)) || 1;
+  const rangeRatio = range(post) / priorRange;
+  push("overnight", "NY session range", 15, rangeRatio >= 1.3, rangeRatio >= 1.3 ? "Expanded NY session range" : "Normal-to-tight NY range");
+
+  const vols = post.map((b) => b.v).filter((v): v is number => v != null && v > 0);
+  const priorVols = windows.flat().map((b) => b.v).filter((v): v is number => v != null && v > 0);
+  if (vols.length >= LIVE_MIN_BARS && priorVols.length >= 12) {
+    const r = avg(vols) / (avg(priorVols) || 1);
+    push("volume", "NY volume", 10, r >= 1.3, r >= 1.3 ? "Above-normal NY volume" : "Normal-to-low NY volume");
+  } else push("volume", "NY volume", 10, null, "Volume unavailable");
+
+  const priorBody = avg(windows.flat().map((b) => Math.abs(b.c - b.o))) || 1;
+  const disp = post.filter((b) => {
+    const rr = b.h - b.l || 1;
+    const nearExtreme = b.c >= b.o ? (b.h - b.c) / rr <= 0.25 : (b.c - b.l) / rr <= 0.25;
+    return Math.abs(b.c - b.o) >= 1.5 * priorBody && nearExtreme;
+  });
+  push("displacement", "5M displacement", 15, disp.length > 0, disp.length ? "Strong 5-minute displacement in NY" : "Small 5-minute candles in NY");
+
+  const move = Math.abs(post[post.length - 1].c - post[0].o);
+  const momOk = move >= 0.6 * priorRange;
+  push("momentum", "NY momentum", 10, momOk, momOk ? "Strong directional move since the open" : "Little net progress since the open");
+
+  push("structure", "Index structure", 15, structure, structureWhy);
+  push("catalyst", "U.S. catalyst", 10, catalyst, catalystWhy);
+
+  const avail = checks.filter((c) => c.passed !== null);
+  if (avail.length < 4) return null;
+  const max = avail.reduce((s, c) => s + c.weight, 0);
+  const got = avail.filter((c) => c.passed).reduce((s, c) => s + c.weight, 0);
+  const score = Math.round((got / max) * 100);
+  const passes = avail.filter((c) => c.passed);
+  const chk = (k: CheckKey) => checks.find((c) => c.key === k)?.passed ?? null;
+  const fast = score >= 65 && passes.length >= 3;
+
+  // Levels: prior day, Asia, London, and the premarket range itself.
+  const keys = [...new Set(nqAll.map((b) => b.key))].filter((k) => k < todayKey).sort();
+  const prevDay = keys.length ? nqAll.filter((b) => b.key === keys[keys.length - 1]) : [];
+  const levels: Level[] = [];
+  const hl = (bs: Bar[], name: string) => {
+    if (bs.length < 6) return;
+    levels.push({ name, price: Math.max(...bs.map((b) => b.h)), side: "high", from: PRENY_END });
+    levels.push({ name, price: Math.min(...bs.map((b) => b.l)), side: "low", from: PRENY_END });
+  };
+  if (prevDay.length >= 60) hl(prevDay, "prior-day");
+  hl(asia, "Asia");
+  hl(london, "London");
+  hl(preBars, "premarket");
+  const fb = failedBreaks(post, levels);
+
+  // Sweeps during the live session: London levels (continuing the premarket scan) and the premarket range.
+  const avgCandle = avg(full.map((b) => b.h - b.l));
+  if (london.length >= 12) detectSweep(full, london, avgCandle, 0.25, false, events);
+  const sweep = preBars.length >= 24
+    ? detectSweep(full, preBars, avgCandle, 0.25, false, events, { startSm: PRENY_END, name: "premarket" })
+    : { state: "none" as const };
+
+  const quiet = [rangeRatio < 0.8, chk("volume") === false, chk("displacement") === false, chk("momentum") === false];
+  const quietCount = quiet.filter(Boolean).length;
+  const choppyConds = [fb.count >= 3, fb.levels.length >= 2, chk("momentum") === false];
+  const rangeConds = [sweep.state !== "none", sweep.state === "confirmed"];
+  const frac = (c: boolean[]) => c.filter(Boolean).length / c.length;
+  const reads: { label: BehaviorLabel; ok: boolean; close: number; reason: string }[] = [
+    {
+      label: "RANGE BOUND", ok: rangeConds.every(Boolean), close: frac(rangeConds),
+      reason: sweep.state === "none" ? "No confirmed sweep of the premarket range"
+        : `Swept premarket ${sweep.side}, ${sweep.state === "confirmed" ? `confirmed reversal (${sweep.how})` : "awaiting confirmation"}`,
+    },
+    {
+      label: "CHOPPY", ok: choppyConds.every(Boolean), close: frac(choppyConds),
+      reason: fb.count ? `Repeated false breaks at ${fb.levels.join(" and ")} levels since the open` : "No follow-through on level breaks",
+    },
+    { label: "SLOW", ok: quietCount >= 3, close: Math.min(1, quietCount / 3), reason: "Quiet NY session so far" },
+  ];
+
+  const settling = post.length < LIVE_SETTLED_BARS;
+  const premarketLabel = pre.kind === "classified" ? pre.label : undefined;
+  if (fast) {
+    const reason = [...passes].sort((a, b) => b.weight - a.weight).slice(0, 2).map((c) => c.reason).join(" + ");
+    return { kind: "classified", label: "FAST", developing: settling, reason, score, checks, phase: "live", premarketLabel };
+  }
+  const hit = reads.find((r) => r.ok);
+  const pick = hit ?? reads.reduce((a, b) => (b.close > a.close ? b : a));
+  return { kind: "classified", label: pick.label, developing: settling || !hit, reason: pick.reason, score, checks, phase: "live", premarketLabel };
+}
+
 export async function computeWeeklyBehavior(now: Date = new Date()): Promise<WeeklyBehaviorPayload> {
   const dow = laDow(now);
   const { key: todayKey, sm: nowSm } = laShifted(now.getTime());
@@ -374,7 +499,7 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
         fetchDelayedQuotes().catch(() => ({} as Record<string, any>)),
         fetchLiveEconEvents().catch(() => []),
       ]);
-      lastBarTs = Math.max(0, ...nq.filter((b) => b.key === todayKey && b.sm < PRENY_END).map((b) => b.t));
+      lastBarTs = Math.max(0, ...nq.filter((b) => b.key === todayKey && b.sm < NY_END).map((b) => b.t));
       const mtfs = [quotes["NASDAQ"]?.mtf, quotes["US30"]?.mtf].filter(Boolean) as { direction: string; state: string }[];
       const dir = mtfs.some((m) => (m.direction === "bullish" || m.direction === "bearish") && m.state === "trending");
       const structure = mtfs.length ? dir : null;
@@ -390,8 +515,11 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
       }
       const r = classify(nq, us2, todayKey, nowSm, structure, structureWhy, catalyst, catalystWhy, !target);
       sweepEvents = r.sweepEvents;
-      if (target === 1) monday = r.status;
-      else if (target === 5) friday = r.status;
+      let status: DayStatus = r.status.kind === "classified" ? { ...r.status, phase: "premarket" } : r.status;
+      const liveRead = classifyLive(nq, todayKey, status, structure, structureWhy, catalyst, catalystWhy, sweepEvents);
+      if (liveRead && target) status = liveRead;
+      if (target === 1) monday = status;
+      else if (target === 5) friday = status;
       else if (r.note) fixedNote = { day: live as 2 | 3 | 4, ...r.note };
     } catch {
       const w: DayStatus = { kind: "waiting", reason: "Market data feed unavailable", checks: [] };
