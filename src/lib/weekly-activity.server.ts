@@ -42,9 +42,22 @@ async function textNewEvents(sessionDate: string, since: string, reads: { nq: an
   if (!data?.length) return;
   const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
   for (const e of data) {
+    // Text cutoff: only events logged before 7:45 AM Pacific get a text.
+    // Notification Center logging is unaffected — these rows stay recorded.
+    if (!beforeTextCutoff(e.created_at)) continue;
     await sendTemplateEmail("sms-alert", to, { templateData: { text: smsText(e, reads) }, idempotencyKey: `wb-sms-${e.id}` })
       .catch((err) => console.error("Weekly activity text failed", err));
   }
+}
+
+/** True when the event's created_at falls before 7:45 AM Pacific. */
+function beforeTextCutoff(created_at: string): boolean {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Los_Angeles", hour: "2-digit", minute: "2-digit", hour12: false,
+  }).formatToParts(new Date(created_at));
+  const get = (t: string) => parseInt(parts.find((p) => p.type === t)?.value ?? "0", 10);
+  const mins = (get("hour") % 24) * 60 + get("minute");
+  return mins < 7 * 60 + 45;
 }
 
 const DAY: Record<string, string> = { MON: "Monday", TUE: "Tuesday", WED: "Wednesday", THU: "Thursday", FRI: "Friday" };
