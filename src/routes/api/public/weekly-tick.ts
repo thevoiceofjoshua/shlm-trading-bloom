@@ -14,7 +14,7 @@ async function handle(request: Request) {
   const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", weekday: "short", hour: "2-digit", hour12: false }).formatToParts(new Date());
   const day = parts.find((p) => p.type === "weekday")?.value;
   const hour = Number(parts.find((p) => p.type === "hour")?.value ?? 0) % 24;
-  if (day === "Sat" || (day === "Sun" && hour < 15) || (day === "Fri" && hour >= 7)) {
+  if (day === "Sat" || (day === "Sun" && hour < 15) || (day === "Fri" && hour >= 14)) {
     return Response.json({ ok: true, skipped: "outside session window" });
   }
   const { recordWeeklyActivity } = await import("@/lib/weekly-activity.server");

@@ -118,7 +118,9 @@ function DayCard({ day, today, status, note }: { day: number; today: boolean; st
     return null;
   } else if (status.kind === "classified") {
     headline = status.label;
-    sub = `${status.developing ? "Developing — " : ""}${status.reason}`;
+    sub = `${status.developing ? "Developing — " : ""}${status.reason}${
+      status.phase === "live" && status.premarketLabel ? ` · Premarket read was ${status.premarketLabel}` : ""
+    }`;
     tone = status.label === "FAST"
       ? "border-foreground bg-foreground text-background"
       : "border-border bg-surface text-foreground";
@@ -144,7 +146,11 @@ function DayCard({ day, today, status, note }: { day: number; today: boolean; st
         {headline}
       </span>
       {sub && <p className="mt-2 text-[11px] text-muted-foreground">{sub}</p>}
-      {dynamic && <p className="mt-3 text-[10px] uppercase tracking-widest text-muted-foreground">Live classifier</p>}
+      {dynamic && (
+        <p className="mt-3 text-[10px] uppercase tracking-widest text-muted-foreground">
+          {status?.kind === "classified" && status.phase === "live" ? "Live session read · since 6:30 AM PT" : status?.kind === "classified" ? "Premarket read · before 6:30 AM PT" : "Live classifier"}
+        </p>
+      )}
     </div>
   );
 }
