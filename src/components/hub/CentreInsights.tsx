@@ -1,3 +1,4 @@
+import type { DayStatus } from "@/lib/weekly-behavior.server";
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
