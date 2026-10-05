@@ -1,3 +1,4 @@
+import type { DayStatus } from "@/lib/weekly-behavior.server";
 import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -261,6 +262,7 @@ export function MarketConditions({ payload }: { payload: HubPayload }) {
           <>
             <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">{status.phase === "live" ? "Live session read" : "Premarket read"} · NASDAQ</p>
             <p className="font-display text-sm font-semibold">{status.developing ? "Developing — " : ""}{status.label}</p>
+            <SymbolReads nq={status} ym={day === 1 ? w?.us30?.monday : w?.us30?.friday} />
             {status.phase === "live" && status.premarketLabel && (
               <p className="text-[11px] text-muted-foreground">Premarket read was {status.premarketLabel}</p>
             )}
@@ -364,5 +366,23 @@ export function TradeReadiness({ readOnly }: { readOnly: boolean }) {
         Preparation checklist only — it does not tell you to take a trade. {readOnly ? "Read-only view: ticks aren't saved." : "Resets each day."}
       </p>
     </Card>
+  );
+}
+
+function readText(s: DayStatus | null | undefined): string | null {
+  if (!s) return null;
+  if (s.kind === "classified") return `${s.label}${s.developing ? " (developing)" : ""}`;
+  if (s.kind === "waiting" && s.reason !== "Market data feed unavailable" && s.reason !== "US30 data unavailable") return "WAITING FOR DATA";
+  return null;
+}
+function SymbolReads({ nq, ym }: { nq: DayStatus | null | undefined; ym: DayStatus | null | undefined }) {
+  const rows = [["NASDAQ", readText(nq)], ["US30", readText(ym)]].filter((r) => r[1]);
+  if (!rows.length) return null;
+  return (
+    <div className="mt-2 space-y-0.5">
+      {rows.map(([n, t]) => (
+        <p key={n} className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground">{n}:</span> {t}</p>
+      ))}
+    </div>
   );
 }

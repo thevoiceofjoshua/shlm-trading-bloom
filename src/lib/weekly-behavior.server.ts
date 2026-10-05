@@ -53,6 +53,8 @@ export interface WeeklyBehaviorPayload {
   sessionDate: string;
   lastBarTs: number;
   sweepEvents: SweepEvent[];
+  /** Independent US30 (YM=F) read, same methodology, own bars. Never affects the NASDAQ read. */
+  us30: { monday: DayStatus; friday: DayStatus };
 }
 
 export interface SweepEvent { kind: "detected" | "confirmed" | "canceled"; ts: number; side: "high" | "low"; message: string }
@@ -497,13 +499,16 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
   let fixedNote: WeeklyBehaviorPayload["fixedNote"] = null;
   let sweepEvents: SweepEvent[] = [];
   let lastBarTs = 0;
+  let ymMonday = monday;
+  let ymFriday = friday;
   const live = sessionDow >= 1 && sessionDow <= 5 ? sessionDow : null;
   const target = sessionDow === 1 || sessionDow === 5 ? sessionDow : null;
 
   if (live) {
     try {
-      const [nq, us2, quotes, econ] = await Promise.all([
+      const [nq, ym, us2, quotes, econ] = await Promise.all([
         bars("NQ=F").catch(() => []),
+        bars("YM=F").catch(() => [] as Bar[]),
         bars("ZT=F") // 2-year T-note futures: tracks US02Y inversely; breakout test is direction-agnostic
        .catch(() => []),
         fetchDelayedQuotes().catch(() => ({} as Record<string, any>)),
@@ -531,11 +536,23 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
       if (target === 1) monday = status;
       else if (target === 5) friday = status;
       else if (r.note) fixedNote = { day: live as 2 | 3 | 4, ...r.note };
+
+      // Independent US30 read: same classifiers run on YM=F's own bars. Its sweeps are not logged.
+      if (target) {
+        let ymStatus: DayStatus = { kind: "waiting", reason: "US30 data unavailable", checks: [] };
+        if (ym.length) {
+          const y = classify(ym, us2, todayKey, nowSm, structure, structureWhy, catalyst, catalystWhy, false);
+          ymStatus = y.status.kind === "classified" ? { ...y.status, phase: "premarket" } : y.status;
+          const yLive = classifyLive(ym, todayKey, ymStatus, structure, structureWhy, catalyst, catalystWhy, []);
+          if (yLive) ymStatus = yLive;
+        }
+        if (target === 1) ymMonday = ymStatus; else ymFriday = ymStatus;
+      }
     } catch {
       const w: DayStatus = { kind: "waiting", reason: "Market data feed unavailable", checks: [] };
-      if (target === 1) monday = w; else if (target === 5) friday = w;
+      if (target === 1) { monday = w; ymMonday = w; } else if (target === 5) { friday = w; ymFriday = w; }
     }
   }
   sweepEvents = sweepEvents.map((e) => ({ ...e, message: `NASDAQ: ${e.message}` }));
-  return { todayDow: sessionDow, monday, friday, fixedNote, computedAt: now.toISOString(), sessionDate: todayKey, lastBarTs, sweepEvents };
+  return { todayDow: sessionDow, monday, friday, fixedNote, computedAt: now.toISOString(), sessionDate: todayKey, lastBarTs, sweepEvents, us30: { monday: ymMonday, friday: ymFriday } };
 }
