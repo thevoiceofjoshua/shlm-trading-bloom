@@ -176,15 +176,16 @@
 
   <section class="log mono" id="log" aria-label="Today's log"></section>
 
-  <p class="rule">Open 5:00&ndash;7:15 PM and 6:20&ndash;7:30 AM Pacific. One win ends the day. Two losses is your limit, and a losing third ends it. Resets at 4:50 PM.</p>
+  <p class="rule">Open 5:00&ndash;7:15 PM and 6:20&ndash;7:30 AM Pacific. One win ends the day. Two losses is your limit, and a losing third ends it. Resets at 4:50 PM and 6:15 AM.</p>
 </main>
 
 <script>
 (function () {
-  var KEY = 'shlm-trade-limit-v2';
+  var KEY = 'shlm-trade-limit-v3';
   var UNDO_MS = 15000;
   var tz = 'America/Los_Angeles';
-  var RESET = 16 * 60 + 50;                 // trading day resets 4:50 PM PT
+  var RESET_PM = 16 * 60 + 50;              // resets 4:50 PM PT, before the evening window
+  var RESET_AM = 6 * 60 + 15;               // resets 6:15 AM PT, before the morning window
   var WINDOWS = [[17 * 60, 19 * 60 + 15],   // 5:00 PM to 7:15 PM
                  [6 * 60 + 20, 7 * 60 + 30]]; // 6:20 AM to 7:30 AM
   var $ = function (id) { return document.getElementById(id); };
@@ -197,9 +198,17 @@
     parts.forEach(function (p) { if (p.type === 'hour') h = +p.value; if (p.type === 'minute') m = +p.value; });
     return h * 60 + m;
   }
-  // A trading day runs 4:50 PM to 4:50 PM Pacific: the evening window plus the next morning.
+  function ptDate(ms) { return new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date(ms)); }
+  // Each window gets its own fresh count: evening runs 4:50 PM to 6:15 AM, morning 6:15 AM to 4:50 PM.
   function dayKey() {
-    return new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date(Date.now() + (24 * 60 - RESET) * 60000));
+    var m = ptMinutes();
+    if (m >= RESET_PM) return ptDate(Date.now()) + '-pm';
+    if (m >= RESET_AM) return ptDate(Date.now()) + '-am';
+    return ptDate(Date.now() - 864e5) + '-pm';
+  }
+  function nextReset() {
+    var m = ptMinutes();
+    return (m >= RESET_AM && m < RESET_PM) ? '4:50 PM' : '6:15 AM';
   }
   function windowOpen() {
     var m = ptMinutes();
@@ -229,9 +238,9 @@
 
   function copy(open) {
     var t = state.trades, n = t.length;
-    if (n && t[n - 1].r === 'W') return ['done', 'Green. Done for the day.', 'You got your win. Close the platform and protect it. Resets at 4:50 PM.', 'Locked'];
-    if (n >= 3) return ['stop', 'Called for the day.', 'Three losses. No more trades until the reset at 4:50 PM.', 'Locked'];
-    if (!open) return ['', 'Terminal closed.', 'Next window opens at ' + nextOpen() + '.' + (n ? ' Your ' + (n === 1 ? 'loss carries' : 'two losses carry') + ' over until 4:50 PM.' : ''), 'Closed'];
+    if (n && t[n - 1].r === 'W') return ['done', 'Green. Done for the day.', 'You got your win. Close the platform and protect it. Resets at ' + nextReset() + '.', 'Locked'];
+    if (n >= 3) return ['stop', 'Called for the day.', 'Three losses. No more trades until the reset at ' + nextReset() + '.', 'Locked'];
+    if (!open) return ['', 'Terminal closed.', 'Next window opens at ' + nextOpen() + ' with a fresh count.', 'Closed'];
     if (n === 0) return ['', 'One win, and you\u2019re done.', 'Wait for your setup. Log each trade the moment it closes.', 'Open'];
     if (n === 1) return ['', 'One loss. Reset.', 'Don\u2019t chase it back. One more trade before your limit.', 'Armed'];
     return ['warn', 'You\u2019ve hit your limit.', 'Two losses. Only take a third if the real setup is in front of you. If it loses, you\u2019re done.', 'Limit'];
@@ -264,7 +273,7 @@
 
     $('actions').hidden = !canTrade;
     $('locked').hidden = canTrade;
-    $('locked').textContent = lock ? 'Terminal locked until 4:50 PM' : 'Terminal opens at ' + nextOpen();
+    $('locked').textContent = lock ? 'Terminal locked until ' + nextReset() : 'Terminal opens at ' + nextOpen();
     $('locked').className = 'locked mono' + (lock ? (c[0] === 'done' ? ' done' : '') : ' done');
     $('btnWin').disabled = !canTrade; $('btnLoss').disabled = !canTrade;
     $('btnWin').textContent = n === 2 ? 'Third: win' : 'Log win';
