@@ -271,6 +271,14 @@ function CentreMenu({
             <span className="font-medium">Weekly Behavior</span>
             <span className="mt-0.5 block text-xs text-muted-foreground">Day-of-week NY session context</span>
           </Link>
+          <a
+            href="/guard/"
+            role="menuitem"
+            className="block w-full border-t border-border px-4 py-3 text-left text-sm hover:bg-accent"
+          >
+            <span className="font-medium">Session Guard</span>
+            <span className="mt-0.5 block text-xs text-muted-foreground">Trade limit and session lockout</span>
+          </a>
           {showBeta && (
             <button
               type="button"
