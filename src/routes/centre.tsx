@@ -273,6 +273,8 @@ function CentreMenu({
           </Link>
           <a
             href="/guard/"
+            target="_blank"
+            rel="noopener noreferrer"
             role="menuitem"
             className="block w-full border-t border-border px-4 py-3 text-left text-sm hover:bg-accent"
           >
