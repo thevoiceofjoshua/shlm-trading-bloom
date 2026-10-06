@@ -1,0 +1,12 @@
+{
+  "name": "SHLM Session Guard",
+  "short_name": "SHLM Guard",
+  "start_url": "/guard/",
+  "scope": "/guard/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "icons": [
+    { "src": "/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
