@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { LAND_RATE } from "@/lib/recruiters.functions";
+import { LAND_RATE, BONUS_PER, BONUS_AMOUNT } from "@/lib/recruiters.functions";
 
 const modeSchema = z.enum(["sandbox", "live"]);
 
@@ -244,7 +244,7 @@ export const getPayoutSummary = createServerFn({ method: "POST" })
     if (ids.length === 0) return { mode, sandboxVerified, connected: !!conn, isFounder: r.isFounder, rows: [] as PayoutSummary[] };
 
     const [{ data: lands }, { data: pays }, { data: banks }] = await Promise.all([
-      db.from("recruiter_lands").select("recruiter_id, delta").in("recruiter_id", ids),
+      db.from("recruiter_lands").select("recruiter_id, delta, month").in("recruiter_id", ids),
       db.from("recruiter_payouts").select("*").in("recruiter_id", ids).eq("mode", mode).order("created_at", { ascending: false }),
       db.from("recruiter_bank_accounts").select("*").in("recruiter_id", ids).eq("mode", mode),
     ]);
@@ -260,7 +260,12 @@ export const getPayoutSummary = createServerFn({ method: "POST" })
     }
 
     const rows: PayoutSummary[] = ids.map((id) => {
-      const earnedCents = ((lands ?? []) as any[]).filter((l) => l.recruiter_id === id).reduce((s, l) => s + l.delta, 0) * LAND_RATE * 100;
+      const myLands = ((lands ?? []) as any[]).filter((l) => l.recruiter_id === id);
+      const byMonth = new Map<string, number>();
+      for (const l of myLands) byMonth.set(l.month, (byMonth.get(l.month) ?? 0) + l.delta);
+      let bonusCents = 0;
+      for (const total of byMonth.values()) bonusCents += Math.floor(Math.max(0, total) / BONUS_PER) * BONUS_AMOUNT * 100;
+      const earnedCents = myLands.reduce((s, l) => s + l.delta, 0) * LAND_RATE * 100 + bonusCents;
       const mine = ((pays ?? []) as any[]).filter((p) => p.recruiter_id === id);
       const paidCents = mine.filter((p) => p.status === "completed").reduce((s, p) => s + p.amount_cents, 0);
       const inFlightCents = mine.filter((p) => !["completed", "failed", "cancelled"].includes(p.status)).reduce((s, p) => s + p.amount_cents, 0);
@@ -351,6 +356,8 @@ export const confirmPayout = createServerFn({ method: "POST" })
       p_mode: mode,
       p_amount_cents: data.amountCents,
       p_rate_cents: LAND_RATE * 100,
+      p_bonus_per: BONUS_PER,
+      p_bonus_cents: BONUS_AMOUNT * 100,
       p_created_by: context.userId,
     });
     if (rErr) throw new Error(rErr.message.includes("owed") ? "That's more than this recruiter is owed." : "Couldn't reserve the payout.");

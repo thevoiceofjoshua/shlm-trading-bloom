@@ -171,7 +171,9 @@ function RecruiterCard({
           }
         : old,
     );
-    const cents = delta * LAND_RATE * 100;
+    const before = Math.floor(Math.max(0, row.thisMonth) / BONUS_PER);
+    const after = Math.floor(Math.max(0, row.thisMonth + delta) / BONUS_PER);
+    const cents = delta * LAND_RATE * 100 + (after - before) * BONUS_AMOUNT * 100;
     qc.setQueryData(["payout-summary"], (old: any) =>
       old
         ? {
