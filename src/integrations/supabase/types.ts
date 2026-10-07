@@ -741,6 +741,8 @@ export type Database = {
       reserve_recruiter_payout: {
         Args: {
           p_amount_cents: number
+          p_bonus_cents: number
+          p_bonus_per: number
           p_created_by: string
           p_mode: string
           p_rate_cents: number
