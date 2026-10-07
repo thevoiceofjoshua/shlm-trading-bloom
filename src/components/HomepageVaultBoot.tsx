@@ -17,7 +17,7 @@ const BOOT_LINES = [
 ];
 
 export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
-  const { checked: adminChecked, isStaff, role, enter, dismissPrompt } = useAdminMode();
+  const { checked: adminChecked, isStaff, role, enter, dismissPrompt, adminMode } = useAdminMode();
   const [mode, setMode] = useState<Mode>("signin");
   const [phase, setPhase] = useState<Phase>("booting");
   const [email, setEmail] = useState("");
@@ -69,6 +69,11 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
 
   useEffect(() => {
     if (!sessionFound || !adminChecked || phase === "opening") return;
+    if (isStaff && adminMode) {
+      // Already unlocked this session (server-verified passcode) — open straight away.
+      setPhase("opening");
+      return;
+    }
     if (isStaff) {
       setAdminRequested(true);
       setAdminStage("passcode");
@@ -82,7 +87,7 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
     }
     const timer = window.setTimeout(() => setPhase("opening"), 700);
     return () => window.clearTimeout(timer);
-  }, [adminChecked, adminRequested, isStaff, phase, sessionFound]);
+  }, [adminChecked, adminMode, adminRequested, isStaff, phase, sessionFound]);
 
   useEffect(() => {
     if (phase !== "opening") return;
