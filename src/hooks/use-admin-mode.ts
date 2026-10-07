@@ -92,6 +92,8 @@ export function useAdminMode() {
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT") {
+        // Signed-out visitors must see the full vault sign-in again.
+        window.sessionStorage.removeItem("shlm.homeIntroSeen");
         write({ adminMode: false, viewAsMember: false, passcode: "", decided: false, scope: "full", promptRequested: false });
       }
       void check(session?.user.id ?? null, session?.user.email ?? null);

@@ -100,7 +100,9 @@ let introSeenThisVisit = false;
 function Index() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // Skip the vault intro when returning to the home page in the same visit.
-  const [introComplete, setIntroComplete] = useState(introSeenThisVisit);
+  const [introComplete, setIntroComplete] = useState(
+    () => introSeenThisVisit && typeof window !== "undefined" && window.sessionStorage.getItem(INTRO_SEEN_KEY) === "1",
+  );
   useEffect(() => {
     if (!introSeenThisVisit && window.sessionStorage.getItem(INTRO_SEEN_KEY) === "1") {
       introSeenThisVisit = true;
