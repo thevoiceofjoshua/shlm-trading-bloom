@@ -93,12 +93,27 @@ export const Route = createFileRoute("/")({
   }),
 });
 
+const INTRO_SEEN_KEY = "shlm.homeIntroSeen";
+// Survives in-app navigation (Home button, Back) without a hydration mismatch.
+let introSeenThisVisit = false;
+
 function Index() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [introComplete, setIntroComplete] = useState(false);
+  // Skip the vault intro when returning to the home page in the same visit.
+  const [introComplete, setIntroComplete] = useState(introSeenThisVisit);
+  useEffect(() => {
+    if (!introSeenThisVisit && window.sessionStorage.getItem(INTRO_SEEN_KEY) === "1") {
+      introSeenThisVisit = true;
+      setIntroComplete(true);
+    }
+  }, []);
   const getFn = useServerFn(getSiteStats);
   const { data: stats } = useSuspenseQuery(siteStatsQuery(() => getFn()));
-  const completeIntro = useCallback(() => setIntroComplete(true), []);
+  const completeIntro = useCallback(() => {
+    introSeenThisVisit = true;
+    window.sessionStorage.setItem(INTRO_SEEN_KEY, "1");
+    setIntroComplete(true);
+  }, []);
 
   if (!introComplete) {
     return <HomepageVaultBoot onComplete={completeIntro} />;
