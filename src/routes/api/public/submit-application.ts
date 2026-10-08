@@ -22,7 +22,7 @@ const inputSchema = z.object({
   fullName: z.string().min(1).max(120),
   email: z.string().email(),
   phone: z.string().max(40).optional().or(z.literal("")),
-  referredBy: z.string().trim().min(1, "Please enter who referred you.").max(120),
+  referredBy: z.string().trim().min(1, "Please choose who referred you.").max(120),
   experience: z.string().max(2000).optional().or(z.literal("")),
   goals: z.string().max(2000).optional().or(z.literal("")),
   scheduledAt: z.string().min(1),
@@ -61,6 +61,16 @@ export const Route = createFileRoute("/api/public/submit-application")({
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+        let referredId: string | null = null;
+        let referredName = "Other / no one";
+        if (data.referredBy !== "other") {
+          const { listReferrers } = await import("@/lib/referrers.server");
+          const match = (await listReferrers(supabaseAdmin)).find((r) => r.id === data.referredBy);
+          if (!match) return json({ error: "Please choose who referred you." }, 400);
+          referredId = match.id;
+          referredName = match.name;
+        }
+
         const { data: row, error } = await supabaseAdmin
           .from("applications")
           .insert({
@@ -72,7 +82,9 @@ export const Route = createFileRoute("/api/public/submit-application")({
             goals: data.goals || null,
             scheduled_at: scheduledIso,
             timezone: data.timezone || null,
-          })
+            referred_by_recruiter_id: referredId,
+            referred_by_name: referredName,
+          } as any)
           .select("id")
           .single();
 
@@ -122,7 +134,7 @@ export const Route = createFileRoute("/api/public/submit-application")({
                 fullName: data.fullName,
                 email: data.email,
                 phone: data.phone,
-                referredBy: data.referredBy,
+                referredBy: referredName,
                 tier: TIER_LABELS[data.tier] ?? data.tier,
                 experience: data.experience,
                 goals: data.goals,
