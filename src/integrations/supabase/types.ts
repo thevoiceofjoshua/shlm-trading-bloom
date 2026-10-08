@@ -26,6 +26,8 @@ export type Database = {
           payment_link_session_id: string | null
           payment_link_status: string
           phone: string | null
+          referred_by_name: string | null
+          referred_by_recruiter_id: string | null
           scheduled_at: string
           status: string
           tier: string
@@ -42,6 +44,8 @@ export type Database = {
           payment_link_session_id?: string | null
           payment_link_status?: string
           phone?: string | null
+          referred_by_name?: string | null
+          referred_by_recruiter_id?: string | null
           scheduled_at: string
           status?: string
           tier: string
@@ -58,6 +62,8 @@ export type Database = {
           payment_link_session_id?: string | null
           payment_link_status?: string
           phone?: string | null
+          referred_by_name?: string | null
+          referred_by_recruiter_id?: string | null
           scheduled_at?: string
           status?: string
           tier?: string
@@ -286,6 +292,7 @@ export type Database = {
       }
       recruiter_lands: {
         Row: {
+          application_id: string | null
           created_at: string
           created_by: string | null
           delta: number
@@ -294,6 +301,7 @@ export type Database = {
           recruiter_id: string
         }
         Insert: {
+          application_id?: string | null
           created_at?: string
           created_by?: string | null
           delta: number
@@ -302,6 +310,7 @@ export type Database = {
           recruiter_id: string
         }
         Update: {
+          application_id?: string | null
           created_at?: string
           created_by?: string | null
           delta?: number
