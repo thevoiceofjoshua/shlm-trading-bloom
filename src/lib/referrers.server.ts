@@ -15,7 +15,10 @@ export async function listReferrers(admin: Admin): Promise<{ id: string; name: s
       (typeof meta["full_name"] === "string" && (meta["full_name"] as string).trim()) ||
       (typeof meta["name"] === "string" && (meta["name"] as string).trim()) ||
       "";
-    out.push({ id, name: full || displayFirstName(null, u?.user?.email) });
+    const raw = full || displayFirstName(null, u?.user?.email);
+    // Tidy casing: "tipis ivy" -> "Tipis Ivy"
+    const name = raw.replace(/\S+/g, (w) => w.charAt(0).toUpperCase() + w.slice(1));
+    out.push({ id, name });
   }
   return out.sort((a, b) => a.name.localeCompare(b.name));
 }
