@@ -62,6 +62,29 @@ function RecruitersPage() {
     retry: 1,
   });
 
+  // Live updates: refresh portal + payouts the moment lands/payouts change.
+  const liveQc = useQueryClient();
+  useEffect(() => {
+    if (!ready) return;
+    let t: ReturnType<typeof setTimeout> | undefined;
+    const refresh = () => {
+      clearTimeout(t);
+      t = setTimeout(() => {
+        liveQc.invalidateQueries({ queryKey: ["recruiter-portal"] });
+        liveQc.invalidateQueries({ queryKey: ["payout-summary"] });
+      }, 300);
+    };
+    const channel = supabase
+      .channel("recruiter-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "recruiter_lands" }, refresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "recruiter_payouts" }, refresh)
+      .subscribe();
+    return () => {
+      clearTimeout(t);
+      supabase.removeChannel(channel);
+    };
+  }, [ready, liveQc]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-4xl px-5 py-10 sm:py-14">
