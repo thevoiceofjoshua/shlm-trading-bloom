@@ -151,12 +151,12 @@ function ApplyPage() {
             <Field label="Timezone" name="timezone" defaultValue={guessTz} />
             <div className="sm:col-span-2">
               <label className="block">
-                <span className="mb-2 block text-xs uppercase tracking-[0.18em] text-muted-foreground">Who referred you? *</span>
+                <span className="block text-sm font-medium text-foreground">Who referred you?<span className="text-destructive"> *</span></span>
                 <select
                   name="referredBy"
                   required
                   defaultValue=""
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="mt-2 h-12 w-full rounded-xl border border-border bg-background px-4 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   <option value="" disabled>Select who referred you</option>
                   {referrers.map((r) => (
