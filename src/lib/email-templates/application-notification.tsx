@@ -6,6 +6,7 @@ interface Props {
   fullName?: string
   email?: string
   phone?: string
+  referredBy?: string
   tier?: string
   experience?: string
   goals?: string
@@ -18,6 +19,7 @@ const Email = ({
   fullName = 'New applicant',
   email = '',
   phone = '',
+  referredBy = '',
   tier = '',
   experience = '',
   goals = '',
@@ -54,6 +56,7 @@ const Email = ({
             <Row label="Email" value={email || '—'} />
             <Row label="Phone" value={phone || '—'} />
             <Row label="Entry level" value={tier || '—'} />
+            <Row label="Referred by" value={referredBy || '—'} highlight />
           </Section>
 
           {/* Call card */}

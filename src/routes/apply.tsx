@@ -53,6 +53,7 @@ function ApplyPage() {
           fullName: String(fd.get("fullName") || ""),
           email: String(fd.get("email") || ""),
           phone: String(fd.get("phone") || ""),
+          referredBy: String(fd.get("referredBy") || "").trim(),
           experience: String(fd.get("experience") || ""),
           goals: String(fd.get("goals") || ""),
           scheduledAt: String(fd.get("scheduledAt") || ""),
@@ -141,6 +142,9 @@ function ApplyPage() {
             <Field label="Email" name="email" type="email" required />
             <Field label="Phone" name="phone" type="tel" />
             <Field label="Timezone" name="timezone" defaultValue={guessTz} />
+            <div className="sm:col-span-2">
+              <Field label="Who referred you?" name="referredBy" required />
+            </div>
           </div>
 
           <TextArea label="Trading experience" name="experience" placeholder="How long have you traded and what markets?" />
