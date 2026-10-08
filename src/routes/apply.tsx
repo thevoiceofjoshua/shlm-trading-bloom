@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { HomeButton } from "@/components/HomeButton";
 
@@ -37,6 +37,13 @@ function ApplyPage() {
   const [done, setDone] = useState<null | { timezone: string; scheduledAtLocal: string; scheduledAtLA: string }>(null);
   const [error, setError] = useState<string | null>(null);
   const guessTz = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "America/Los_Angeles";
+  const [referrers, setReferrers] = useState<{ id: string; name: string }[]>([]);
+  useEffect(() => {
+    fetch(`${API_BASE}/api/public/recruiters-list`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((list) => Array.isArray(list) && setReferrers(list))
+      .catch(() => {});
+  }, []);
   const promoApplied = promo?.toUpperCase() === "1MILL";
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -143,7 +150,21 @@ function ApplyPage() {
             <Field label="Phone" name="phone" type="tel" />
             <Field label="Timezone" name="timezone" defaultValue={guessTz} />
             <div className="sm:col-span-2">
-              <Field label="Who referred you?" name="referredBy" required />
+              <label className="block">
+                <span className="block text-sm font-medium text-foreground">Who referred you?<span className="text-destructive"> *</span></span>
+                <select
+                  name="referredBy"
+                  required
+                  defaultValue=""
+                  className="mt-2 h-12 w-full rounded-xl border border-border bg-background px-4 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  <option value="" disabled>Select who referred you</option>
+                  {referrers.map((r) => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
+                  <option value="other">Other / no one</option>
+                </select>
+              </label>
             </div>
           </div>
 

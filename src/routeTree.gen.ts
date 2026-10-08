@@ -31,6 +31,7 @@ import { Route as FeaturesCommunityRouteImport } from './routes/features.communi
 import { Route as FeaturesCurriculumRouteImport } from './routes/features.curriculum'
 import { Route as FeaturesMentorshipRouteImport } from './routes/features.mentorship'
 import { Route as FeaturesRiskRouteImport } from './routes/features.risk'
+import { Route as ApiPublicRecruitersListRouteImport } from './routes/api/public/recruiters-list'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as ApiPublicSubmitApplicationRouteImport } from './routes/api/public/submit-application'
 import { Route as ApiPublicWeeklyTickRouteImport } from './routes/api/public/weekly-tick'
@@ -158,6 +159,11 @@ const FeaturesRiskRoute = FeaturesRiskRouteImport.update({
   path: '/features/risk',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRecruitersListRoute = ApiPublicRecruitersListRouteImport.update({
+  id: '/api/public/recruiters-list',
+  path: '/api/public/recruiters-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   id: '/api/public/stripe-webhook',
   path: '/api/public/stripe-webhook',
@@ -270,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/features/curriculum': typeof FeaturesCurriculumRoute
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
+  '/api/public/recruiters-list': typeof ApiPublicRecruitersListRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
   '/api/public/weekly-tick': typeof ApiPublicWeeklyTickRoute
@@ -310,6 +317,7 @@ export interface FileRoutesByTo {
   '/features/curriculum': typeof FeaturesCurriculumRoute
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
+  '/api/public/recruiters-list': typeof ApiPublicRecruitersListRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
   '/api/public/weekly-tick': typeof ApiPublicWeeklyTickRoute
@@ -351,6 +359,7 @@ export interface FileRoutesById {
   '/features/curriculum': typeof FeaturesCurriculumRoute
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
+  '/api/public/recruiters-list': typeof ApiPublicRecruitersListRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
   '/api/public/weekly-tick': typeof ApiPublicWeeklyTickRoute
@@ -393,6 +402,7 @@ export interface FileRouteTypes {
     | '/features/curriculum'
     | '/features/mentorship'
     | '/features/risk'
+    | '/api/public/recruiters-list'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
     | '/api/public/weekly-tick'
@@ -433,6 +443,7 @@ export interface FileRouteTypes {
     | '/features/curriculum'
     | '/features/mentorship'
     | '/features/risk'
+    | '/api/public/recruiters-list'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
     | '/api/public/weekly-tick'
@@ -473,6 +484,7 @@ export interface FileRouteTypes {
     | '/features/curriculum'
     | '/features/mentorship'
     | '/features/risk'
+    | '/api/public/recruiters-list'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
     | '/api/public/weekly-tick'
@@ -514,6 +526,7 @@ export interface RootRouteChildren {
   FeaturesCurriculumRoute: typeof FeaturesCurriculumRoute
   FeaturesMentorshipRoute: typeof FeaturesMentorshipRoute
   FeaturesRiskRoute: typeof FeaturesRiskRoute
+  ApiPublicRecruitersListRoute: typeof ApiPublicRecruitersListRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicSubmitApplicationRoute: typeof ApiPublicSubmitApplicationRoute
   ApiPublicWeeklyTickRoute: typeof ApiPublicWeeklyTickRoute
@@ -688,6 +701,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeaturesRiskRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/recruiters-list': {
+      id: '/api/public/recruiters-list'
+      path: '/api/public/recruiters-list'
+      fullPath: '/api/public/recruiters-list'
+      preLoaderRoute: typeof ApiPublicRecruitersListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/stripe-webhook': {
       id: '/api/public/stripe-webhook'
       path: '/api/public/stripe-webhook'
@@ -826,6 +846,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturesCurriculumRoute: FeaturesCurriculumRoute,
   FeaturesMentorshipRoute: FeaturesMentorshipRoute,
   FeaturesRiskRoute: FeaturesRiskRoute,
+  ApiPublicRecruitersListRoute: ApiPublicRecruitersListRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicSubmitApplicationRoute: ApiPublicSubmitApplicationRoute,
   ApiPublicWeeklyTickRoute: ApiPublicWeeklyTickRoute,

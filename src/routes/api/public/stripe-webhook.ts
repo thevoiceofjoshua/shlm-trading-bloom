@@ -52,6 +52,17 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
             { onConflict: "stripe_session_id" },
           );
 
+          // Auto-credit the referring recruiter (+1 land), once per paid application.
+          const appId = session.metadata?.application_id as string | undefined;
+          if (session.payment_status === "paid" && appId) {
+            try {
+              const { creditReferral } = await import("@/lib/referrers.server");
+              await creditReferral(supabaseAdmin, appId);
+            } catch (err) {
+              console.error("Referral credit threw", err);
+            }
+          }
+
           // Send the client their receipt once the payment is fully processed.
           if (session.payment_status === "paid" && email) {
             try {
