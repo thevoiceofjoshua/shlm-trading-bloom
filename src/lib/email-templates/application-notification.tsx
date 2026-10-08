@@ -110,6 +110,7 @@ export const template = {
     fullName: 'Jane Doe',
     email: 'jane@example.com',
     phone: '+1 555-123-4567',
+    referredBy: 'Mike Staten',
     tier: 'Intermediate',
     experience: '2 years trading futures',
     goals: 'Consistency and risk management',
