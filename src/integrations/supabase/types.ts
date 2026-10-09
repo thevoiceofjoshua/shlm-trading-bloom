@@ -461,6 +461,7 @@ export type Database = {
           close: number
           created_at: string
           date: string
+          estimated: boolean
           high: number
           id: string
           low: number
@@ -477,6 +478,7 @@ export type Database = {
           close: number
           created_at?: string
           date: string
+          estimated?: boolean
           high: number
           id?: string
           low: number
@@ -493,6 +495,7 @@ export type Database = {
           close?: number
           created_at?: string
           date?: string
+          estimated?: boolean
           high?: number
           id?: string
           low?: number
