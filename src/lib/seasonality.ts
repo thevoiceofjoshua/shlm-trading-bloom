@@ -1,7 +1,7 @@
 export const CHARACTERS = ["range bound", "slow", "choppy", "fast"] as const;
 export type Character = typeof CHARACTERS[number];
 export type SeasonalitySymbol = "NQ" | "YM";
-export interface HistoryRow { symbol: string; date: string; character: string; open: number; high: number; low: number; close: number; volume: number; source: string; tradable: boolean | null; tradability_evidence: string | null }
+export interface HistoryRow { symbol: string; date: string; character: string; open: number; high: number; low: number; close: number; volume: number; source: string; tradable: boolean | null; tradability_evidence: string | null; estimated?: boolean }
 export interface CoverageRow { symbol: string; year: number; month: number; complete: boolean; source: string }
 export interface CalendarRow { date: string; is_trading_day: boolean; jobs_report: boolean; first_trading_day: boolean; last_trading_day: boolean; options_expiry: boolean; source: string }
 export const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

@@ -1,0 +1,1 @@
+ALTER TABLE public.seasonality_history ADD COLUMN estimated boolean NOT NULL DEFAULT true;
