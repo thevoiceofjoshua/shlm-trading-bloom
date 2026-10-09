@@ -1,7 +1,7 @@
 import { useState, type PointerEvent } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CHARACTERS, CHARACTER_GUIDE, MONTHS, calendarFlags, characterMix, dayStats, monthRank, monthStats, weekdays, type Character } from "@/lib/seasonality";
+import { CHARACTERS, CHARACTER_GUIDE, MONTHS, calendarFlags, characterMix, dayStats, monthRank, monthStats, weekdays } from "@/lib/seasonality";
 import type { SeasonalityResponse } from "@/lib/seasonality.functions";
 
 const percent = (n: number) => `${n > 0 ? "+" : ""}${n.toFixed(2)}%`;

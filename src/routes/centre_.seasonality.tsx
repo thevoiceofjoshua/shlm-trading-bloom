@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { HomeButton } from "@/components/HomeButton";
 import { SeasonalityView } from "@/components/hub/Seasonality";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthUser } from "@/hooks/use-auth-user";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 import { getSeasonality } from "@/lib/seasonality.functions";
 import type { SeasonalitySymbol } from "@/lib/seasonality";
@@ -22,10 +22,10 @@ export const Route = createFileRoute("/centre_/seasonality")({
 });
 
 function SeasonalityPage() {
-  const [identity, setIdentity] = useState<string | null | undefined>(undefined);
+  const { user, loaded } = useAuthUser();
+  const identity = loaded ? user?.id ?? null : undefined;
   const [symbol, setSymbol] = useState<SeasonalitySymbol>("NQ");
   const { viewAsMember } = useAdminMode();
-  useEffect(() => { let active = true; supabase.auth.getSession().then(({ data }) => { if (active) setIdentity(data.session?.user.id ?? null); }); return () => { active = false; }; }, []);
   const fetchHistory = useServerFn(getSeasonality);
   const query = useQuery({ queryKey: ["seasonality", identity, symbol, viewAsMember], queryFn: () => fetchHistory({ data: { symbol, asMember: viewAsMember } }), enabled: Boolean(identity), retry: false, refetchInterval: 60_000 });
   return <div className="min-h-screen bg-background text-foreground"><header className="border-b border-border"><div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6"><Link to="/centre" className="font-display font-medium">← SHLM Centre</Link><HomeButton /></div></header><main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
