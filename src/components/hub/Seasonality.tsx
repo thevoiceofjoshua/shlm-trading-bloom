@@ -13,7 +13,7 @@ function Collecting() {
 
 function MixBar({ mix }: { mix: ReturnType<typeof characterMix> }) {
   let x = 0;
-  return <div className="mt-4"><svg viewBox="0 0 100 3" className="h-3 w-full" role="img" aria-label="Historical character mix">{mix.map((m, i) => { const start = x; x += m.pct ?? 0; return <rect key={m.character} x={start} width={m.pct ?? 0} height={3} className={MIX_CLASSES[i]}><title>{m.character}: {m.pct?.toFixed(1) ?? "No data"}%</title></rect>; })}</svg><div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">{mix.map(m => <p key={m.character} className="text-xs capitalize text-muted-foreground">{m.character} <span className="text-foreground">{m.pct == null ? "—" : `${m.pct.toFixed(1)}%`}</span></p>)}</div></div>;
+  return <div className="mt-4"><svg viewBox="0 0 100 3" preserveAspectRatio="none" className="h-3 w-full" role="img" aria-label="Historical character mix">{mix.map((m, i) => { const start = x; x += m.pct ?? 0; return <rect key={m.character} x={start} width={m.pct ?? 0} height={3} className={MIX_CLASSES[i]}><title>{m.character}: {m.pct?.toFixed(1) ?? "No data"}%</title></rect>; })}</svg><div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">{mix.map(m => <p key={m.character} className="text-xs capitalize text-muted-foreground">{m.character} <span className="text-foreground">{m.pct == null ? "—" : `${m.pct.toFixed(1)}%`}</span></p>)}</div></div>;
 }
 
 function HistoryGraph({ labels, values, selected, onSelect, categorical = false }: { labels: string[]; values: (number | null)[]; selected: number; onSelect: (i: number) => void; categorical?: boolean }) {

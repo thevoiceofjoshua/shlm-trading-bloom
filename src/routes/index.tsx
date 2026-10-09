@@ -127,7 +127,7 @@ function Index() {
       <main>
         <HeroSection stats={stats} />
         <section className="border-b border-border bg-background px-4 py-16 text-center sm:px-6 sm:py-20" aria-label="SHLM payouts">
-          <p className="font-display text-6xl font-medium leading-none sm:text-8xl lg:text-9xl">$42,000+</p>
+          <p className="font-display text-5xl font-medium leading-none sm:text-8xl lg:text-9xl">$42,000+</p>
           <p className="mt-4 text-sm font-medium text-muted-foreground sm:text-base">in payouts</p>
         </section>
         <StatsSection stats={stats} />
