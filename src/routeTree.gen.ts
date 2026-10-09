@@ -25,6 +25,7 @@ import { Route as SuccessRouteImport } from './routes/success'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TestCheckoutRouteImport } from './routes/test-checkout'
 import { Route as BlogBreakoutStrategyRouteImport } from './routes/blog.breakout-strategy'
+import { Route as CentreSeasonalityRouteImport } from './routes/centre_.seasonality'
 import { Route as CentreWeeklyBehaviorRouteImport } from './routes/centre_.weekly-behavior'
 import { Route as EnrollApplicationIdRouteImport } from './routes/enroll.$applicationId'
 import { Route as FeaturesCommunityRouteImport } from './routes/features.community'
@@ -127,6 +128,11 @@ const TestCheckoutRoute = TestCheckoutRouteImport.update({
 const BlogBreakoutStrategyRoute = BlogBreakoutStrategyRouteImport.update({
   id: '/blog/breakout-strategy',
   path: '/blog/breakout-strategy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CentreSeasonalityRoute = CentreSeasonalityRouteImport.update({
+  id: '/centre_/seasonality',
+  path: '/centre/seasonality',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CentreWeeklyBehaviorRoute = CentreWeeklyBehaviorRouteImport.update({
@@ -270,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/centre/seasonality': typeof CentreSeasonalityRoute
   '/centre/weekly-behavior': typeof CentreWeeklyBehaviorRoute
   '/enroll/$applicationId': typeof EnrollApplicationIdRoute
   '/features/community': typeof FeaturesCommunityRoute
@@ -311,6 +318,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/centre/seasonality': typeof CentreSeasonalityRoute
   '/centre/weekly-behavior': typeof CentreWeeklyBehaviorRoute
   '/enroll/$applicationId': typeof EnrollApplicationIdRoute
   '/features/community': typeof FeaturesCommunityRoute
@@ -353,6 +361,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
+  '/centre_/seasonality': typeof CentreSeasonalityRoute
   '/centre_/weekly-behavior': typeof CentreWeeklyBehaviorRoute
   '/enroll/$applicationId': typeof EnrollApplicationIdRoute
   '/features/community': typeof FeaturesCommunityRoute
@@ -396,6 +405,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/test-checkout'
     | '/blog/breakout-strategy'
+    | '/centre/seasonality'
     | '/centre/weekly-behavior'
     | '/enroll/$applicationId'
     | '/features/community'
@@ -437,6 +447,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/test-checkout'
     | '/blog/breakout-strategy'
+    | '/centre/seasonality'
     | '/centre/weekly-behavior'
     | '/enroll/$applicationId'
     | '/features/community'
@@ -478,6 +489,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/test-checkout'
     | '/blog/breakout-strategy'
+    | '/centre_/seasonality'
     | '/centre_/weekly-behavior'
     | '/enroll/$applicationId'
     | '/features/community'
@@ -520,6 +532,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TestCheckoutRoute: typeof TestCheckoutRoute
   BlogBreakoutStrategyRoute: typeof BlogBreakoutStrategyRoute
+  CentreSeasonalityRoute: typeof CentreSeasonalityRoute
   CentreWeeklyBehaviorRoute: typeof CentreWeeklyBehaviorRoute
   EnrollApplicationIdRoute: typeof EnrollApplicationIdRoute
   FeaturesCommunityRoute: typeof FeaturesCommunityRoute
@@ -657,6 +670,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/breakout-strategy'
       fullPath: '/blog/breakout-strategy'
       preLoaderRoute: typeof BlogBreakoutStrategyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/centre_/seasonality': {
+      id: '/centre_/seasonality'
+      path: '/centre/seasonality'
+      fullPath: '/centre/seasonality'
+      preLoaderRoute: typeof CentreSeasonalityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/centre_/weekly-behavior': {
@@ -840,6 +860,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TestCheckoutRoute: TestCheckoutRoute,
   BlogBreakoutStrategyRoute: BlogBreakoutStrategyRoute,
+  CentreSeasonalityRoute: CentreSeasonalityRoute,
   CentreWeeklyBehaviorRoute: CentreWeeklyBehaviorRoute,
   EnrollApplicationIdRoute: EnrollApplicationIdRoute,
   FeaturesCommunityRoute: FeaturesCommunityRoute,
