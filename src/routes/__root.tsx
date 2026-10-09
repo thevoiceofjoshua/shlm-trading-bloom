@@ -171,7 +171,7 @@ function RootComponent() {
     const { data: subscription } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       // Never reuse Centre access decisions or activity from another session.
-      for (const queryKey of ["hub-data", "weekly-behavior", "weekly-activity"]) {
+      for (const queryKey of ["hub-data", "weekly-behavior", "weekly-activity", "seasonality"]) {
         queryClient.removeQueries({ queryKey: [queryKey] });
       }
     });

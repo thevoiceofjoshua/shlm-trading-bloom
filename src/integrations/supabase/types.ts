@@ -467,6 +467,8 @@ export type Database = {
           open: number
           source: string
           symbol: string
+          tradability_evidence: string | null
+          tradable: boolean | null
           updated_at: string
           volume: number
         }
@@ -481,6 +483,8 @@ export type Database = {
           open: number
           source: string
           symbol: string
+          tradability_evidence?: string | null
+          tradable?: boolean | null
           updated_at?: string
           volume: number
         }
@@ -495,6 +499,8 @@ export type Database = {
           open?: number
           source?: string
           symbol?: string
+          tradability_evidence?: string | null
+          tradable?: boolean | null
           updated_at?: string
           volume?: number
         }

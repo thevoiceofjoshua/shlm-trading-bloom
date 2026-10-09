@@ -19,3 +19,5 @@
 - Weekly Behavior US30 read runs the unchanged NASDAQ classifier functions on YM=F bars as a separate output (payload.us30); its sweeps are not logged and it never feeds the NASDAQ label. Why: genuinely independent read without touching NASDAQ logic.
 
 - Referral credit: applications store referred_by_recruiter_id (chosen from a recruiter dropdown); the Stripe webhook appends one +1 recruiter_lands row per paid application (unique application_id). Why: automatic and idempotent, while manual Founder adjustments stay separate.
+- Seasonality is an independent read-only history tool using user-scoped RLS and Centre access; complete-month coverage gates returns and verified tradability observations gate odds. Why: partial data and character labels alone cannot justify performance or trading probabilities.
+- Seasonality calendar-date patterns aggregate the same month/day across historical years, omit weekends and verified closures, and require sourced event flags. Why: calendar position is not proof of a scheduled economic release.

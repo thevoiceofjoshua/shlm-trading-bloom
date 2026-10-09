@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Payout section and Seasonality
-- [ ] Add text-only homepage payout section immediately below hero
-- [ ] Add protected history tables and read-only Seasonality tool with linked charts and day details
-- [ ] Test calculations, empty state, access boundaries and navigation
+- [x] Add text-only homepage payout section immediately below hero
+- [x] Add protected history tables and read-only Seasonality tool with linked charts and day details
+- [x] Test calculations, empty state, signed-out boundary and isolated graph navigation (14 passing tests; no fixture history stored)
+- [ ] Verify signed-in Founder/member/MOD access and Tools navigation (blocked: externally managed accounts unavailable to test browser)
 - [ ] Load verified market history (requires sourced historical records from user; no synthetic seed)
 
 ## Homepage vault boot and embedded sign-in
