@@ -17,7 +17,7 @@ export const getSeasonality = createServerFn({ method: "POST" })
     // User-scoped reads retain table RLS. Paginate every source past PostgREST's 1,000-row limit.
     const history: HistoryRow[] = [], coverage: CoverageRow[] = [], calendar: CalendarRow[] = [];
     for (let offset = 0; ; offset += 1000) {
-      const r = await context.supabase.from("seasonality_history").select("symbol,date,character,open,high,low,close,volume,source,tradable,tradability_evidence").eq("symbol", data.symbol).order("date").range(offset, offset + 999);
+      const r = await context.supabase.from("seasonality_history").select("symbol,date,character,open,high,low,close,volume,source,tradable,tradability_evidence,estimated").eq("symbol", data.symbol).order("date").range(offset, offset + 999);
       if (r.error) throw r.error;
       history.push(...(r.data ?? []) as HistoryRow[]);
       if ((r.data?.length ?? 0) < 1000) break;
