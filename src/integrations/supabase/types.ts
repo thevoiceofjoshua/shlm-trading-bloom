@@ -419,6 +419,117 @@ export type Database = {
         }
         Relationships: []
       }
+      seasonality_calendar: {
+        Row: {
+          created_at: string
+          date: string
+          first_trading_day: boolean
+          is_trading_day: boolean
+          jobs_report: boolean
+          last_trading_day: boolean
+          options_expiry: boolean
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          first_trading_day?: boolean
+          is_trading_day: boolean
+          jobs_report?: boolean
+          last_trading_day?: boolean
+          options_expiry?: boolean
+          source: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          first_trading_day?: boolean
+          is_trading_day?: boolean
+          jobs_report?: boolean
+          last_trading_day?: boolean
+          options_expiry?: boolean
+          source?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      seasonality_history: {
+        Row: {
+          character: string
+          close: number
+          created_at: string
+          date: string
+          high: number
+          id: string
+          low: number
+          open: number
+          source: string
+          symbol: string
+          updated_at: string
+          volume: number
+        }
+        Insert: {
+          character: string
+          close: number
+          created_at?: string
+          date: string
+          high: number
+          id?: string
+          low: number
+          open: number
+          source: string
+          symbol: string
+          updated_at?: string
+          volume: number
+        }
+        Update: {
+          character?: string
+          close?: number
+          created_at?: string
+          date?: string
+          high?: number
+          id?: string
+          low?: number
+          open?: number
+          source?: string
+          symbol?: string
+          updated_at?: string
+          volume?: number
+        }
+        Relationships: []
+      }
+      seasonality_month_coverage: {
+        Row: {
+          complete: boolean
+          created_at: string
+          month: number
+          source: string
+          symbol: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          complete?: boolean
+          created_at?: string
+          month: number
+          source: string
+          symbol: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          complete?: boolean
+          created_at?: string
+          month?: number
+          source?: string
+          symbol?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
       session_reviews: {
         Row: {
           created_at: string
@@ -730,6 +841,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_read_seasonality: { Args: never; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
