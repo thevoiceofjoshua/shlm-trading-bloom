@@ -1,0 +1,2 @@
+ALTER TABLE public.seasonality_history ADD COLUMN tradable boolean, ADD COLUMN tradability_evidence text;
+ALTER TABLE public.seasonality_history ADD CONSTRAINT seasonality_tradability_evidence CHECK (tradable IS NULL OR nullif(btrim(tradability_evidence), '') IS NOT NULL);
