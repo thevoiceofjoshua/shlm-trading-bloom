@@ -281,6 +281,15 @@ function CentreMenu({
             <span className="font-medium">Session Guard</span>
             <span className="mt-0.5 block text-xs text-muted-foreground">Trade limit and session lockout</span>
           </a>
+          <Link
+            to="/centre/seasonality"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full items-center justify-between border-t border-border px-4 py-3 text-left text-sm hover:bg-accent"
+          >
+            <span className="font-medium">Seasonality</span>
+            <span className="rounded-full border border-border px-2 py-0.5 text-[10px] font-semibold">NEW</span>
+          </Link>
           {showBeta && (
             <button
               type="button"
