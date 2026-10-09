@@ -1,3 +1,4 @@
+/// <reference types="bun" />
 import { describe, expect, test } from "bun:test";
 import { CHARACTERS, CHARACTER_GUIDE, calendarFlags, characterMix, dayStats, monthRank, monthStats, weekdays, type HistoryRow } from "./seasonality";
 
