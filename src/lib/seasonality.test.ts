@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import { CHARACTERS, CHARACTER_GUIDE, calendarFlags, characterMix, dayStats, monthRank, monthStats, weekdays, type HistoryRow } from "./seasonality";
 
 const row = (date: string, close: number, character = "slow", extra: Partial<HistoryRow> = {}): HistoryRow => ({ symbol: "NQ", date, character, open: 100, high: Math.max(100, close), low: Math.min(100, close), close, volume: 100, source: "Unit test fixture — never imported", tradable: null, tradability_evidence: null, ...extra });
