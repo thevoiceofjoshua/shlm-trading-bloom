@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { bibleMessageInput, canPostBible, FREE_VIDEO_LIMIT, teachingInput } from "./bible-rules";
+import { bibleDisplayName, bibleMessageInput, canPostBible, FREE_VIDEO_LIMIT, teachingInput } from "./bible-rules";
 describe("independent Bible Study rules", () => {
   it("requires joined and unblocked membership, independently of purchases", () => { expect(canPostBible(null,new Date())).toBe(false); expect(canPostBible({ active:true,blocked:false,muted_until:null },new Date())).toBe(true); expect(canPostBible({ active:false,blocked:false,muted_until:null },new Date())).toBe(false); expect(canPostBible({ active:true,blocked:true,muted_until:null },new Date())).toBe(false); });
   it("honors timed moderation", () => { expect(canPostBible({ active:true,blocked:false,muted_until:"2026-10-30T00:00:00Z" },new Date("2026-10-29T00:00:00Z"))).toBe(false); });
