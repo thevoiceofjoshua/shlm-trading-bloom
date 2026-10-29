@@ -191,7 +191,7 @@ export function AccountMenu({
             variant="ghost"
             disabled={signingOut}
             onClick={handleSignOut}
-            className="flex w-full items-center border-t border-border px-4 py-2.5 text-left text-sm hover:bg-accent"
+            className="flex h-auto w-full justify-start rounded-none border-t border-border px-4 py-2.5 text-left text-sm hover:bg-accent"
             role="menuitem"
           >
             {signingOut ? "Signing out…" : "Sign out"}

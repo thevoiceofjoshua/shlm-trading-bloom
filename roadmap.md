@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Google account switching
-- [ ] Keep remembered sign-in and show Google account selection from every Google button
-- [ ] Make all sign-out buttons cancel private reads, clear caches and return to sign-in
-- [ ] Test account-selection requests and sign-out handling; real Google switch requires external account access
+- [x] Keep remembered sign-in and request Google account selection from all three Google buttons
+- [x] Make all sign-out buttons cancel private reads, clear caches, handle errors and replace the page with sign-in
+- [x] Three account-session tests pass; all three Google authorization requests verified on phone/desktop without runtime errors
+- [ ] Real sign-out/account-switch verification on live site (blocked: externally managed Google accounts and independent Cloudflare deployment)
 
 ## Mobile Session Guard loading glitch
 - [x] Remove the obsolete static-page reload loop without changing Guard rules or sign-in
