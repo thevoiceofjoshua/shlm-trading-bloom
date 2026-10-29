@@ -4,6 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import type { AuthUser } from "@/hooks/use-auth-user";
 import { useAdminMode } from "@/hooks/use-admin-mode";
 import { useRecruiterAccess } from "@/hooks/use-recruiter-access";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { signOutAccount } from "@/lib/account-session";
 
 export function AccountMenu({
   user,
@@ -15,6 +19,10 @@ export function AccountMenu({
   variant?: "desktop" | "mobile";
 }) {
   const [open, setOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState("");
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
   const { isStaff, modOnly, adminMode, exit, reopenPrompt } = useAdminMode();
   const { allowed: showRecruiters, error: recruiterError } = useRecruiterAccess(user.id);
@@ -29,9 +37,18 @@ export function AccountMenu({
   }, [open]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setOpen(false);
-    window.location.href = "/";
+    if (signingOut) return;
+    setSigningOut(true);
+    setSignOutError("");
+    try {
+      await signOutAccount(supabase.auth, queryClient, window.sessionStorage);
+      setOpen(false);
+      await navigate({ to: "/auth", replace: true });
+    } catch {
+      setSignOutError("Could not sign out. Please try again.");
+    } finally {
+      setSigningOut(false);
+    }
   };
 
   if (variant === "mobile") {
@@ -80,8 +97,10 @@ export function AccountMenu({
             Affiliate check failed: {recruiterError}
           </p>
         )}
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          disabled={signingOut}
           onClick={handleSignOut}
           className={cn(
             "flex min-h-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition-colors",
@@ -90,8 +109,9 @@ export function AccountMenu({
               : "border-white/20 text-white hover:bg-white/10",
           )}
         >
-          Sign out
-        </button>
+          {signingOut ? "Signing out…" : "Sign out"}
+        </Button>
+        {signOutError && <p role="alert" className="px-4 text-xs text-destructive">{signOutError}</p>}
       </div>
     );
   }
@@ -166,14 +186,17 @@ export function AccountMenu({
             </button>
           )}
 
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            disabled={signingOut}
             onClick={handleSignOut}
-            className="flex w-full items-center border-t border-border px-4 py-2.5 text-left text-sm hover:bg-accent"
+            className="flex h-auto w-full justify-start rounded-none border-t border-border px-4 py-2.5 text-left text-sm hover:bg-accent"
             role="menuitem"
           >
-            Sign out
-          </button>
+            {signingOut ? "Signing out…" : "Sign out"}
+          </Button>
+          {signOutError && <p role="alert" className="px-4 py-2 text-xs text-destructive">{signOutError}</p>}
         </div>
       )}
     </div>

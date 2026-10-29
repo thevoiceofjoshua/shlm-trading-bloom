@@ -5,6 +5,7 @@ import { HomeButton } from "@/components/HomeButton";
 import { Button } from "@/components/ui/button";
 import { VaultCredentialFrame, VaultDivider, VaultField } from "@/components/VaultCredentialFrame";
 import { supabase } from "@/integrations/supabase/client";
+import { googleSignInOptions } from "@/lib/account-session";
 
 const searchSchema = z.object({
   mode: z.enum(["signin", "signup"]).optional(),
@@ -82,9 +83,7 @@ function AuthPage() {
     // so this works regardless of which frontend deployment serves the request.
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: redirect ? `${window.location.origin}${redirect}` : window.location.origin,
-      },
+      options: googleSignInOptions(redirect ? `${window.location.origin}${redirect}` : window.location.origin),
     });
     if (error) {
       setError(error.message);
