@@ -19,6 +19,7 @@ import { JournalVaultGate } from "@/components/hub/JournalVaultGate";
 import { importTradovateFills } from "@/lib/tradovate.functions";
 import { listTradovateConnections } from "@/lib/tradovate.functions";
 import { GuardPanel } from "@/components/GuardPanel";
+import { saveJournalEntry } from "@/lib/journal.functions";
 
 /* ------------------------------ date helpers ------------------------------- */
 
@@ -133,6 +134,7 @@ interface StoredEntry {
   storageKey: string; // value of member_notes.session
   slot: string;
   entry: Entry;
+  updatedAt?: string;
 }
 
 function parseEntry(body: string, storageKey: string): Entry {
@@ -280,6 +282,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
   const fetchRange = useServerFn(getMemberNotesRange);
 
   const saveNote = useServerFn(saveMemberNote);
+  const saveAtomic = useServerFn(saveJournalEntry);
   const removeNote = useServerFn(deleteMemberNote);
   const fetchRules = useServerFn(getMemberRules);
   const getVaultStatus = useServerFn(getJournalVaultStatus);
@@ -310,7 +313,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
       const storageKey = r.session;
       const slot = storageKey.includes("#") ? storageKey.split("#")[1]! : storageKey;
       const list = map.get(r.note_date) ?? [];
-      list.push({ storageKey, slot, entry: parseEntry(r.body ?? "", storageKey) });
+      list.push({ storageKey, slot, entry: parseEntry(r.body ?? "", storageKey), updatedAt: (r as typeof r & {updated_at?:string}).updated_at });
       map.set(r.note_date, list);
     }
     for (const list of map.values()) list.sort((a, b) => a.storageKey.localeCompare(b.storageKey));
@@ -333,19 +336,14 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
   }, [selected]);
 
   const save = useMutation({
-    mutationFn: async (target: StoredEntry) => {
+    mutationFn: async (target: StoredEntry & { noteDate?: string }) => {
+      const noteDate = target.noteDate ?? selected;
       const desiredKey = `${target.entry.session}#${target.slot}`;
-      await saveNote({ data: { noteDate: selected, session: desiredKey, body: JSON.stringify(target.entry) } });
-      if (target.storageKey && target.storageKey !== desiredKey) {
-        try {
-          await removeNote({ data: { noteDate: selected, session: target.storageKey } });
-        } catch {
-          /* old row may not exist yet */
-        }
-      }
-      return desiredKey;
+      await saveAtomic({ data: { date: noteDate, oldKey: target.storageKey, newKey: desiredKey, body: JSON.stringify(target.entry), expectedUpdatedAt: target.updatedAt ?? null } });
+      return { desiredKey, noteDate };
     },
-    onSuccess: async (desiredKey, target) => {
+    onSuccess: async ({ desiredKey, noteDate }, target) => {
+      if (noteDate !== selected) { await queryClient.invalidateQueries({ queryKey: ["member-notes-range", userId] }); return; }
       setDirty(false);
       const broken = brokenRules(target.entry, rules);
       const needsAck = broken.length > 0 && !!consequence && !target.entry.consequenceAcknowledged;
@@ -789,7 +787,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                 <button
                   type="button"
                   disabled={save.isPending}
-                  onClick={() => editing && save.mutate(editing)}
+                  onClick={() => editing && save.mutate({ ...editing, noteDate: selected })}
                   className="inline-flex min-h-11 min-w-0 items-center justify-center rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60 sm:px-6"
                 >
                   {save.isPending ? "Saving…" : "Save entry"}
@@ -809,7 +807,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                 ) : save.isSuccess ? (
                   <p className="col-span-2 text-xs text-muted-foreground sm:col-auto">Saved to your account.</p>
                 ) : null}
-                {save.isError && <p className="col-span-2 text-xs text-destructive sm:col-auto">Couldn’t save. Try again.</p>}
+                {save.isError && <p className="col-span-2 text-xs text-destructive sm:col-auto">{save.error.message}</p>}
               </div>
             </div>
           )}
