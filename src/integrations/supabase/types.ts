@@ -1519,6 +1519,16 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      save_journal_entry: {
+        Args: {
+          p_body: string
+          p_date: string
+          p_expected: string
+          p_new_key: string
+          p_old_key: string
+        }
+        Returns: string
+      }
       send_bible_message: {
         Args: {
           p_body: string

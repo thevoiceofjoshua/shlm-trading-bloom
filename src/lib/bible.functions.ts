@@ -107,7 +107,12 @@ export const getTeachingPlayback=createServerFn({method:"POST"}).middleware([req
   const{importPKCS8,SignJWT}=await import("jose");const pem=raw.includes("BEGIN")?raw:atob(raw);const key=await importPKCS8(pem,"RS256");
   const token=await new SignJWT({}).setProtectedHeader({alg:"RS256",kid}).setSubject(row.playback_id).setAudience("v").setExpirationTime("2h").sign(key);
   const thumbnailToken=await new SignJWT({}).setProtectedHeader({alg:"RS256",kid}).setSubject(row.playback_id).setAudience("t").setExpirationTime("2h").sign(key);
-  return {url:`https://player.mux.com/${row.playback_id}?token=${token}`,thumbnail:`https://image.mux.com/${row.playback_id}/thumbnail.jpg?token=${thumbnailToken}`};
+  return {playbackId:row.playback_id,token,thumbnailToken,thumbnail:`https://image.mux.com/${row.playback_id}/thumbnail.jpg?token=${thumbnailToken}`};
+});
+export const attachTeachingThumbnail=createServerFn({method:"POST"}).middleware([requireSupabaseAuth]).inputValidator((input:unknown)=>z.object({id:z.string().uuid(),path:z.string().regex(/^teachings\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/)}).parse(input)).handler(async({context,data})=>{
+ await admin(context);if(!data.path.startsWith(`teachings/${data.id}/`))throw new Error("Thumbnail does not match this teaching.");
+ const{data:objects,error:objectError}=await context.supabase.storage.from("bible-images").list(`teachings/${data.id}`,{limit:100});const filename=data.path.split("/").at(-1);if(objectError||!objects?.some(o=>o.name===filename))throw new Error("Thumbnail upload was not confirmed.");
+ const{ supabaseAdmin }=await import("@/integrations/supabase/client.server");const{error}=await supabaseAdmin.from("bible_teachings").update({thumbnail_path:data.path}).eq("id",data.id);if(error)throw new Error("Thumbnail not saved.");return{saved:true};
 });
 export const deleteTeaching=createServerFn({method:"POST"}).middleware([requireSupabaseAuth]).inputValidator((input:unknown)=>z.object({id:z.string().uuid()}).parse(input)).handler(async({context,data})=>{
   await admin(context);const{data:row,error}=await context.supabase.from("bible_teachings").select("*").eq("id",data.id).single();if(error||!row)throw new Error("Teaching not found.");

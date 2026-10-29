@@ -108,7 +108,7 @@ function applyDelayedQuotes(
     }
   >,
 ) {
-  payload.indexes = payload.indexes.map((idx) => {
+  payload.indexes = INDEX_QUOTES.filter(idx => !!quotes[idx.symbol]).map((idx) => {
     const q = quotes[idx.symbol];
     if (!q) return idx;
     // Key levels only carry real feed values — never a duplicated close or
@@ -132,11 +132,11 @@ function applyDelayedQuotes(
     };
   });
 
-  payload.magSeven = payload.magSeven.map((s) => {
+  payload.magSeven = MAG_SEVEN.filter(s => !!quotes[s.symbol]).map((s) => {
     const q = quotes[s.symbol];
     return q ? { ...s, price: q.price, change: q.change, changePct: q.changePct, dayHigh: q.dayHigh, dayLow: q.dayLow } : s;
   });
-  payload.dowDrivers = payload.dowDrivers.map((d) => {
+  payload.dowDrivers = DOW_DRIVERS.filter(d => !!quotes[d.symbol]).map((d) => {
     const q = quotes[d.symbol];
     return q ? { ...d, price: q.price, changePct: q.changePct } : d;
   });
@@ -144,7 +144,7 @@ function applyDelayedQuotes(
   const g = quotes["XAU/USD"];
   if (g) {
     payload.gold = {
-      ...payload.gold,
+      ...GOLD_QUOTE,
       price: g.price,
       change: g.change,
       changePct: g.changePct,
@@ -176,13 +176,13 @@ function applyDelayedQuotes(
     return null;
   };
   const patchMacro = <T extends { label: string; value: string; direction: "up" | "down" | "flat" }>(list: T[]): T[] =>
-    list.map((m) => {
+    list.filter(m => !!macroValue(m.label)).map((m) => {
       const v = macroValue(m.label);
       return v ? { ...m, value: v.value, direction: v.direction } : m;
     });
-  payload.nasdaqMacro = patchMacro(payload.nasdaqMacro);
-  payload.dowMacro = patchMacro(payload.dowMacro);
-  payload.goldDrivers = patchMacro(payload.goldDrivers);
+  payload.nasdaqMacro = patchMacro(NASDAQ_MACRO);
+  payload.dowMacro = patchMacro(DOW_MACRO);
+  payload.goldDrivers = patchMacro(GOLD_DRIVERS);
 
   // Recompute breadth / top-mover copy from the refreshed numbers.
   const green = payload.magSeven.filter((s) => s.changePct >= 0).length;
@@ -263,20 +263,20 @@ export const getHubData = createServerFn({ method: "POST" })
       access,
       dataState: DATA_STATE,
       sessions: sessionStatuses(now),
-      indexes: INDEX_QUOTES,
-      magSeven: MAG_SEVEN,
+      indexes: [],
+      magSeven: [],
       magBreadth: magSevenBreadth(),
-      nasdaqMacro: NASDAQ_MACRO,
+      nasdaqMacro: [],
       nasdaqMovers: nasdaqMovers(),
-      dowDrivers: DOW_DRIVERS,
-      dowMacro: DOW_MACRO,
+      dowDrivers: [],
+      dowMacro: [],
       dowMovers: dowMovers(),
-      gold: GOLD_QUOTE,
-      goldDrivers: GOLD_DRIVERS,
-      econEvents: ECON_EVENTS,
+      gold: { ...GOLD_QUOTE, price: 0, change: 0, changePct: 0, dayHigh: 0, dayLow: 0, h1: undefined, mtf: undefined, pullbacks: undefined },
+      goldDrivers: [],
+      econEvents: [],
     };
 
-    // Free delayed feed: overlay real prices when reachable, else keep samples.
+    // Sample constants provide metadata only; missing observations stay absent.
     if (access.hasAccess) {
       try {
         const { fetchDelayedQuotes } = await import("@/lib/quotes.server");

@@ -19,11 +19,12 @@ export function GuardPanel({ userId }: { userId: string }) {
   const [draft, setDraft] = useState<Pending | null>(null);
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [message, setMessage] = useState("");
   const [now, setNow] = useState(0);
+  const [pending, setPending] = useState(false);
   const storageKey = `shlm.guard.pending.${userId}`;
   useEffect(() => {
     setNow(Date.now());
     const timer = setInterval(() => setNow(Date.now()), 1000);
-    try { const raw = localStorage.getItem(storageKey); if (raw) { const parsed = guardTradeInput.safeParse(JSON.parse(raw)); if (parsed.success) { setDraft(parsed.data); setMessage("Unconfirmed trade restored. Retry to check its saved status."); } } } catch { setError("Recovery storage could not be read."); }
+    try { const raw = localStorage.getItem(storageKey); if (raw) { const parsed = guardTradeInput.safeParse(JSON.parse(raw)); if (parsed.success) { setPending(true); setDraft(parsed.data); setMessage("Unconfirmed trade restored. Retry to check its saved status."); } } } catch { setError("Recovery storage could not be read."); }
     const channel = supabase.channel(`guard-${userId}-${crypto.randomUUID()}`).on("postgres_changes", { event: "*", schema: "public", table: "guard_sessions", filter: `user_id=eq.${userId}` }, () => qc.invalidateQueries({ queryKey: ["guard", userId] })).subscribe();
     return () => { clearInterval(timer); void supabase.removeChannel(channel); };
   }, [userId, qc, storageKey]);
@@ -33,8 +34,9 @@ export function GuardPanel({ userId }: { userId: string }) {
     const parsed = guardTradeInput.safeParse(draft);
     if (!parsed.success) { setError(parsed.error.issues[0]?.message ?? "Check trade details."); return; }
     try { localStorage.setItem(storageKey, JSON.stringify(parsed.data)); } catch { setError("Recovery storage is blocked. No trade sent."); return; }
+    setPending(true);
     setBusy(true); setError("");
-    try { await save({ data: parsed.data }); localStorage.removeItem(storageKey); setDraft(null); setMessage("Saved to Guard and Journal."); await refresh(); }
+    try { await save({ data: parsed.data }); localStorage.removeItem(storageKey); setPending(false); setDraft(null); setMessage("Saved to Guard and Journal."); await refresh(); }
     catch (e) { setError(e instanceof Error ? e.message : "Trade not confirmed. Retry with the same details."); await refresh(); }
     finally { setBusy(false); }
   };
@@ -57,12 +59,12 @@ export function GuardPanel({ userId }: { userId: string }) {
     {(message || error) && <p role={error ? "alert" : "status"} className={`text-sm ${error ? "text-destructive" : "text-muted-foreground"}`}>{error || message}</p>}
     <ul className="divide-y divide-border">{q.data.trades.map(t => <li key={t.id} className={`flex flex-wrap justify-between gap-2 py-3 text-sm ${t.undone_at ? "text-muted-foreground line-through" : ""}`}><span>{t.instrument} · {t.account} · {t.outcome.toUpperCase()}</span><span>${Number(t.pnl).toFixed(2)} · {new Date(t.occurred_at).toLocaleTimeString()}</span></li>)}</ul>
     <Dialog open={!!draft} onOpenChange={open => { if (!open && !busy && !localStorage.getItem(storageKey)) setDraft(null); }}><DialogContent className="max-w-md"><DialogHeader><DialogTitle>{draft?.outcome.toUpperCase()} · Log trade</DialogTitle></DialogHeader>{draft && <form className="grid gap-4" onSubmit={event => { event.preventDefault(); void submit(); }}>
-      <div className="grid grid-cols-2 gap-3"><label className="grid gap-2 text-sm">Market<select className="h-10 rounded-md border border-input bg-background px-3" value={draft.instrument} disabled={busy || !!error} onChange={event => setDraft({ ...draft, instrument: event.target.value as Pending["instrument"] })}>{["NQ","MNQ","YM","MYM","GC","MGC"].map(m => <option key={m}>{m}</option>)}</select></label><label className="grid gap-2 text-sm">Account<Input maxLength={100} value={draft.account} disabled={busy} onChange={event => setDraft({ ...draft, account: event.target.value })} /></label></div>
-      <label className="grid gap-2 text-sm">Net P&L ($)<Input type="number" step="0.01" value={draft.pnl} disabled={busy} onChange={event => setDraft({ ...draft, pnl: Number(event.target.value) })} /></label>
-      <label className="grid gap-2 text-sm">Note (optional)<Textarea maxLength={2000} value={draft.note} disabled={busy} onChange={event => setDraft({ ...draft, note: event.target.value })} /></label>
+      <div className="grid grid-cols-2 gap-3"><label className="grid gap-2 text-sm">Market<select className="h-10 rounded-md border border-input bg-background px-3" value={draft.instrument} disabled={busy || pending} onChange={event => setDraft({ ...draft, instrument: event.target.value as Pending["instrument"] })}>{["NQ","MNQ","YM","MYM","GC","MGC"].map(m => <option key={m}>{m}</option>)}</select></label><label className="grid gap-2 text-sm">Account<Input maxLength={100} value={draft.account} disabled={busy || pending} onChange={event => setDraft({ ...draft, account: event.target.value })} /></label></div>
+      <label className="grid gap-2 text-sm">Net P&L ($)<Input type="number" step="0.01" value={draft.pnl} disabled={busy || pending} onChange={event => setDraft({ ...draft, pnl: Number(event.target.value) })} /></label>
+      <label className="grid gap-2 text-sm">Note (optional)<Textarea maxLength={2000} value={draft.note} disabled={busy || pending} onChange={event => setDraft({ ...draft, note: event.target.value })} /></label>
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       <Button className="rounded-full" disabled={busy}>{busy ? "Confirming save…" : error ? "Retry same trade" : "Save trade"}</Button>
-      {!busy && <Button type="button" variant="ghost" onClick={() => { if (!localStorage.getItem(storageKey) || window.confirm("This trade is unconfirmed. Discarding the recovery copy does not delete a trade that already saved. Check Guard before logging it again.")) { localStorage.removeItem(storageKey); setDraft(null); setError(""); } }}>Cancel</Button>}
+      {!busy && <Button type="button" variant="ghost" onClick={() => { if (!localStorage.getItem(storageKey) || window.confirm("This trade is unconfirmed. Discarding the recovery copy does not delete a trade that already saved. Check Guard before logging it again.")) { localStorage.removeItem(storageKey); setPending(false); setDraft(null); setError(""); } }}>Cancel</Button>}
     </form>}</DialogContent></Dialog>
   </section>;
 }

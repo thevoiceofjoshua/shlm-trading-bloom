@@ -310,7 +310,7 @@ export function DowBoard({ payload }: { payload: HubPayload }) {
     <div className="flex h-full flex-col rounded-2xl border border-border bg-card p-4 sm:p-5">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
         <h3 className="min-w-0 font-display text-lg font-medium">Dow 30 drivers — US30</h3>
-        <span className="min-w-0 text-xs leading-snug text-muted-foreground sm:text-right">{payload.dowMovers.label}</span>
+        <span className="min-w-0 text-xs leading-snug text-muted-foreground sm:text-right">{payload.dowDrivers.length ? payload.dowMovers.label : ""}</span>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {payload.dowDrivers.map((d) => (
@@ -372,7 +372,7 @@ export function GoldDesk({ payload }: { payload: HubPayload }) {
     <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-xs uppercase tracking-widest text-muted-foreground">XAU/USD</p>
+          <p className="truncate text-xs uppercase tracking-widest text-muted-foreground">GC futures · delayed</p>
           <h3 className="truncate font-display text-lg font-medium">Gold desk</h3>
         </div>
         <span className={`shrink-0 whitespace-nowrap text-right text-xs font-medium sm:text-sm ${changeColor(g.changePct)}`}>
@@ -413,8 +413,10 @@ export function DriverTabs({ payload }: { payload: HubPayload }) {
     { k: "NASDAQ" as const, t: "NAS100" },
     { k: "US30" as const, t: "US30" },
     { k: "GOLD" as const, t: "Gold" },
-  ];
+  ].filter(t => t.k === "NASDAQ" ? payload.magSeven.length || payload.nasdaqMacro.length : t.k === "US30" ? payload.dowDrivers.length || payload.dowMacro.length : payload.gold.price > 0);
+  const activeTab = tabs.some(t => t.k === tab) ? tab : tabs[0]?.k;
   const y = payload.context?.us02y;
+  if (!activeTab) return null;
   return (
     <div className="min-w-0 space-y-3">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
@@ -442,7 +444,7 @@ export function DriverTabs({ payload }: { payload: HubPayload }) {
           <span className="text-muted-foreground"> — {y.reason}. 2-year T-note futures, delayed.</span>
         </div>
       )}
-      {tab === "NASDAQ" ? <MagSevenBoard payload={payload} /> : tab === "US30" ? <DowBoard payload={payload} /> : <GoldDesk payload={payload} />}
+      {activeTab === "NASDAQ" ? <MagSevenBoard payload={payload} /> : activeTab === "US30" ? <DowBoard payload={payload} /> : <GoldDesk payload={payload} />}
     </div>
   );
 }
