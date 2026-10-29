@@ -61,7 +61,7 @@ export const Route = createFileRoute("/api/journal-voice")({ server: { handlers:
     const call = createResponsesCall(request, { baseURL: "https://ai.gateway.lovable.dev", apiKey, model: "openai/gpt-6-astra" }, [{ role: "user", content: transcript.slice(0, 12000) }], "Extract a trading journal draft from the member's spoken recap. Use only facts they explicitly said; use null when unsure. Do not invent trades, levels, P&L, emotions or rules. bias must be long, short, neutral or null. emotion must be calm, anxious, frustrated, overconfident, flat or null. outcome must be green, red, breakeven, none or null. pnl is a signed dollar number only. notes should retain useful remaining context in concise first-person wording.", Output.object({ schema }));
     let extracted: Record<string, unknown>;
     try { extracted = (await call.result.output) as Record<string, unknown>; }
-    catch (error) { if (NoObjectGeneratedError.isInstance(error) && error.finishReason !== "error" && error.text.trim()) { await finish("completed"); return json({ transcript, draft: { notes: transcript } }); } throw error; }
+    catch (error) { if (NoObjectGeneratedError.isInstance(error) && error.finishReason !== "error" && error.text?.trim()) { await finish("completed"); return json({ transcript, draft: { notes: transcript } }); } throw error; }
     await finish("completed");
     return json({ transcript, draft: normalizeVoiceDraft(extracted) });
   } catch (error) {
