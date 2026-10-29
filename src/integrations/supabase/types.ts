@@ -290,6 +290,95 @@ export type Database = {
         }
         Relationships: []
       }
+      guard_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          lock_reason: string | null
+          locked_at: string | null
+          note_date: string
+          period: string
+          session_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lock_reason?: string | null
+          locked_at?: string | null
+          note_date: string
+          period: string
+          session_key: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lock_reason?: string | null
+          locked_at?: string | null
+          note_date?: string
+          period?: string
+          session_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      guard_trades: {
+        Row: {
+          account: string
+          created_at: string
+          direction: string
+          id: string
+          instrument: string
+          note: string
+          occurred_at: string
+          outcome: string
+          pnl: number
+          session_id: string
+          undone_at: string | null
+          user_id: string
+        }
+        Insert: {
+          account?: string
+          created_at?: string
+          direction?: string
+          id: string
+          instrument: string
+          note?: string
+          occurred_at?: string
+          outcome: string
+          pnl: number
+          session_id: string
+          undone_at?: string | null
+          user_id: string
+        }
+        Update: {
+          account?: string
+          created_at?: string
+          direction?: string
+          id?: string
+          instrument?: string
+          note?: string
+          occurred_at?: string
+          outcome?: string
+          pnl?: number
+          session_id?: string
+          undone_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guard_trades_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "guard_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       indicator_request_events: {
         Row: {
           actor_id: string
@@ -1180,6 +1269,48 @@ export type Database = {
     Functions: {
       can_manage_indicators: { Args: never; Returns: boolean }
       can_read_seasonality: { Args: never; Returns: boolean }
+      commit_guard_trade: {
+        Args: {
+          p_account: string
+          p_direction: string
+          p_id: string
+          p_instrument: string
+          p_note: string
+          p_outcome: string
+          p_pnl: number
+          p_session: string
+          p_user: string
+        }
+        Returns: {
+          account: string
+          created_at: string
+          direction: string
+          id: string
+          instrument: string
+          note: string
+          occurred_at: string
+          outcome: string
+          pnl: number
+          session_id: string
+          undone_at: string | null
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "guard_trades"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      guard_period: {
+        Args: { p_now: string }
+        Returns: {
+          note_date: string
+          period: string
+          session_key: string
+          window_open: boolean
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1324,6 +1455,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      undo_guard_trade: {
+        Args: { p_id: string; p_user: string }
+        Returns: undefined
       }
     }
     Enums: {
