@@ -27,6 +27,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SuccessRouteImport } from './routes/success'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TestCheckoutRouteImport } from './routes/test-checkout'
+import { Route as ApiJournalVoiceRouteImport } from './routes/api/journal-voice'
 import { Route as BlogBreakoutStrategyRouteImport } from './routes/blog.breakout-strategy'
 import { Route as CentreSeasonalityRouteImport } from './routes/centre_.seasonality'
 import { Route as CentreWeeklyBehaviorRouteImport } from './routes/centre_.weekly-behavior'
@@ -142,6 +143,11 @@ const TermsRoute = TermsRouteImport.update({
 const TestCheckoutRoute = TestCheckoutRouteImport.update({
   id: '/test-checkout',
   path: '/test-checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiJournalVoiceRoute = ApiJournalVoiceRouteImport.update({
+  id: '/api/journal-voice',
+  path: '/api/journal-voice',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogBreakoutStrategyRoute = BlogBreakoutStrategyRouteImport.update({
@@ -302,6 +308,7 @@ export interface FileRoutesByFullPath {
   '/success': typeof SuccessRoute
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
+  '/api/journal-voice': typeof ApiJournalVoiceRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
   '/centre/seasonality': typeof CentreSeasonalityRoute
   '/centre/weekly-behavior': typeof CentreWeeklyBehaviorRoute
@@ -348,6 +355,7 @@ export interface FileRoutesByTo {
   '/success': typeof SuccessRoute
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
+  '/api/journal-voice': typeof ApiJournalVoiceRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
   '/centre/seasonality': typeof CentreSeasonalityRoute
   '/centre/weekly-behavior': typeof CentreWeeklyBehaviorRoute
@@ -395,6 +403,7 @@ export interface FileRoutesById {
   '/success': typeof SuccessRoute
   '/terms': typeof TermsRoute
   '/test-checkout': typeof TestCheckoutRoute
+  '/api/journal-voice': typeof ApiJournalVoiceRoute
   '/blog/breakout-strategy': typeof BlogBreakoutStrategyRoute
   '/centre_/seasonality': typeof CentreSeasonalityRoute
   '/centre_/weekly-behavior': typeof CentreWeeklyBehaviorRoute
@@ -443,6 +452,7 @@ export interface FileRouteTypes {
     | '/success'
     | '/terms'
     | '/test-checkout'
+    | '/api/journal-voice'
     | '/blog/breakout-strategy'
     | '/centre/seasonality'
     | '/centre/weekly-behavior'
@@ -489,6 +499,7 @@ export interface FileRouteTypes {
     | '/success'
     | '/terms'
     | '/test-checkout'
+    | '/api/journal-voice'
     | '/blog/breakout-strategy'
     | '/centre/seasonality'
     | '/centre/weekly-behavior'
@@ -535,6 +546,7 @@ export interface FileRouteTypes {
     | '/success'
     | '/terms'
     | '/test-checkout'
+    | '/api/journal-voice'
     | '/blog/breakout-strategy'
     | '/centre_/seasonality'
     | '/centre_/weekly-behavior'
@@ -582,6 +594,7 @@ export interface RootRouteChildren {
   SuccessRoute: typeof SuccessRoute
   TermsRoute: typeof TermsRoute
   TestCheckoutRoute: typeof TestCheckoutRoute
+  ApiJournalVoiceRoute: typeof ApiJournalVoiceRoute
   BlogBreakoutStrategyRoute: typeof BlogBreakoutStrategyRoute
   CentreSeasonalityRoute: typeof CentreSeasonalityRoute
   CentreWeeklyBehaviorRoute: typeof CentreWeeklyBehaviorRoute
@@ -736,6 +749,13 @@ declare module '@tanstack/react-router' {
       path: '/test-checkout'
       fullPath: '/test-checkout'
       preLoaderRoute: typeof TestCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/journal-voice': {
+      id: '/api/journal-voice'
+      path: '/api/journal-voice'
+      fullPath: '/api/journal-voice'
+      preLoaderRoute: typeof ApiJournalVoiceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/breakout-strategy': {
@@ -942,6 +962,7 @@ const rootRouteChildren: RootRouteChildren = {
   SuccessRoute: SuccessRoute,
   TermsRoute: TermsRoute,
   TestCheckoutRoute: TestCheckoutRoute,
+  ApiJournalVoiceRoute: ApiJournalVoiceRoute,
   BlogBreakoutStrategyRoute: BlogBreakoutStrategyRoute,
   CentreSeasonalityRoute: CentreSeasonalityRoute,
   CentreWeeklyBehaviorRoute: CentreWeeklyBehaviorRoute,

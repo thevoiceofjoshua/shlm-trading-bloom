@@ -1,0 +1,1 @@
+CREATE POLICY journal_voice_service_only ON public.journal_voice_requests FOR ALL TO service_role USING (true) WITH CHECK (true);

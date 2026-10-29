@@ -20,6 +20,8 @@ import { importTradovateFills } from "@/lib/tradovate.functions";
 import { listTradovateConnections } from "@/lib/tradovate.functions";
 import { GuardPanel } from "@/components/GuardPanel";
 import { saveJournalEntry } from "@/lib/journal.functions";
+import { VoiceJournalButton } from "@/components/VoiceJournalButton";
+import { mergeVoiceText, type VoiceDraft } from "@/lib/journal-voice";
 
 /* ------------------------------ date helpers ------------------------------- */
 
@@ -652,6 +654,20 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
               </div>
 
               <div className="mt-5 space-y-5">
+                <VoiceJournalButton key={`${selected}:${editing.slot}`} label="Speak journal entry" onDraft={(draft: VoiceDraft, transcript) => {
+                  setEditing(prev => {
+                    if (!prev) return prev;
+                    const entry = { ...prev.entry };
+                    for (const [key, value] of Object.entries(draft)) {
+                      if (!value || (prev.slot === "guard" && (key === "pnl" || key === "outcome"))) continue;
+                      if (key === "bias" || key === "emotion" || key === "outcome" || key === "pnl") { if (!entry[key]) entry[key] = value; }
+                      else if (key === "levels" || key === "wentWell" || key === "wentWrong" || key === "rule" || key === "notes") entry[key] = mergeVoiceText(entry[key], value);
+                    }
+                    entry.notes = mergeVoiceText(entry.notes, `Voice transcript: ${transcript}`);
+                    return { ...prev, entry };
+                  });
+                  setDirty(true);
+                }} />
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">💵 PnL for this entry ($)</p>
                   {(() => {
