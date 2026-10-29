@@ -222,6 +222,9 @@ export type Database = {
           file_size: number | null
           id: string
           media_type: string | null
+          mux_asset_id: string | null
+          mux_upload_id: string | null
+          playback_id: string | null
           published: boolean
           scripture: string
           state: string
@@ -239,6 +242,9 @@ export type Database = {
           file_size?: number | null
           id?: string
           media_type?: string | null
+          mux_asset_id?: string | null
+          mux_upload_id?: string | null
+          playback_id?: string | null
           published?: boolean
           scripture?: string
           state?: string
@@ -256,6 +262,9 @@ export type Database = {
           file_size?: number | null
           id?: string
           media_type?: string | null
+          mux_asset_id?: string | null
+          mux_upload_id?: string | null
+          playback_id?: string | null
           published?: boolean
           scripture?: string
           state?: string
@@ -287,6 +296,119 @@ export type Database = {
           instrument?: string
           levels?: Json
           session_date?: string
+        }
+        Relationships: []
+      }
+      forecast_outcomes: {
+        Row: {
+          actual: Json
+          created_at: string
+          horizon_minutes: number
+          id: string
+          observed_at: string
+          snapshot_id: string
+        }
+        Insert: {
+          actual: Json
+          created_at?: string
+          horizon_minutes: number
+          id?: string
+          observed_at: string
+          snapshot_id: string
+        }
+        Update: {
+          actual?: Json
+          created_at?: string
+          horizon_minutes?: number
+          id?: string
+          observed_at?: string
+          snapshot_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forecast_outcomes_snapshot_id_fkey"
+            columns: ["snapshot_id"]
+            isOneToOne: false
+            referencedRelation: "forecast_snapshots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forecast_snapshots: {
+        Row: {
+          id: string
+          inputs: Json
+          instrument: string
+          issued_at: string
+          model_version: string
+          output: Json
+          reason: string
+          scheduled_at: string
+          session_date: string
+          slot: string
+          status: string
+        }
+        Insert: {
+          id?: string
+          inputs: Json
+          instrument: string
+          issued_at?: string
+          model_version: string
+          output: Json
+          reason: string
+          scheduled_at: string
+          session_date: string
+          slot: string
+          status: string
+        }
+        Update: {
+          id?: string
+          inputs?: Json
+          instrument?: string
+          issued_at?: string
+          model_version?: string
+          output?: Json
+          reason?: string
+          scheduled_at?: string
+          session_date?: string
+          slot?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      forecast_validations: {
+        Row: {
+          calibrated: boolean
+          cutoff: string
+          evaluated_at: string
+          id: string
+          instrument: string
+          method: string
+          metrics: Json
+          model_version: string
+          sample_size: number
+        }
+        Insert: {
+          calibrated?: boolean
+          cutoff: string
+          evaluated_at?: string
+          id?: string
+          instrument: string
+          method: string
+          metrics: Json
+          model_version: string
+          sample_size: number
+        }
+        Update: {
+          calibrated?: boolean
+          cutoff?: string
+          evaluated_at?: string
+          id?: string
+          instrument?: string
+          method?: string
+          metrics?: Json
+          model_version?: string
+          sample_size?: number
         }
         Relationships: []
       }
