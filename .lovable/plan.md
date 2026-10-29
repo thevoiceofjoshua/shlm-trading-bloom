@@ -12,35 +12,11 @@
 
 ## Broken or missing
 
-### 1. Indicators and naming
-
-- Username submission **emails only**: no saved request, database indicator catalogue, restored status, duplicate-pending constraint or admin queue. One indicator is hardcoded.
-- UI is staff-only; submit endpoint checks sign-in but not the same eligibility. Validation is length-only; retries can duplicate emails. Success copy implies TradingView access without verifying a grant.
-- **Exact reported live button failure is unproven:** audit did not submit a request. No Founder-recipient events appeared in the available 14-day email window; that alone does not prove a failure.
-- `/recruiters` exists; `/affiliate-program` currently returns 404. Naming/routing can change without touching financial services.
-
-### 2. Journal and Guard
-
-- Guard stores W/L and timestamps in one browser key, not per user/account. No P&L, BE, durable sessions, Journal sync or server-enforced lock.
-- Journal requires explicit entry saves; it does not persist each Guard trade or finalize locks atomically. Journal edits/direct writes do not consult Guard.
-- Guard silently ignores storage errors. Durable pending-save recovery, concurrent-tab safety and cross-device restore are absent.
-- Import deduplication is current-entry-only; CSV lacks equivalent prevention. Tradovate has a point-value fallback that can yield wrong P&L when metadata is missing.
-- Preserve actual rules: **one win locks; three trades lock; two losses warn**. Windows: **5:00–7:15 PM / 6:20–7:30 AM Pacific**, resets **4:50 PM / 6:15 AM**. Existing 15-second undo can undo a lock-causing trade; BE counting and audited undo must be reconciled with finalization before Stage 2, without silently changing thresholds.
-
-### 3. Centre and forecasts
-
-- Current structure is **15M/5M**, not real 1H/4H. Headline NASDAQ/US30 prices are cash indices, while live structure uses futures; Gold futures are labeled XAU/USD. Price levels need consistent instrument identity.
-- **Confirmed code gap:** partial feed success can retain sample values in individual rows while the overall payload says delayed. Per-input provenance/freshness needs correction; this is not proof of a member's displayed state.
-- Full leadership/correlation, ATR and 30–45-minute target feasibility are missing. Session extrema/swings infer potential liquidity, not verified resting orders.
-- Weekly Behavior has NQ/YM, no Gold; Tue/Wed manipulation and Thursday expansion remain hardcoded. Six scenarios and three frozen checkpoint forecasts do not exist.
-- Weighted evidence scores are **not calibrated probabilities**. Activity history lacks frozen inputs/levels, outcome adjudication, per-market accuracy and walk-forward validation.
-- Five-minute scheduling is active; recent responses include successes and a timeout. Native/external paths differ and do not create durable 5 PM/5 AM/6:25 AM forecasts. Reconcile DST, session dates, retries and duplicates.
-
-### 4. Bible Study
-
-- No page, independent membership, teaching catalogue, direct-upload/processing pipeline, protected playback or persistent community chat/moderation.
-- Private screenshot storage exists, but has no bucket-specific size/MIME limits and no video encoding. Tawk is support chat, not group chat.
-- Replies/reactions/history/pins, mutes/removals, rate limits and membership revocation need secure persistent records. Push notifications require additional device support and permission.
+- **Indicators:** email-only submission; no saved requests, dynamic catalogue, restored statuses, pending uniqueness or admin queue. UI is staff-only but submit endpoint enforces sign-in alone. Validation is length-only; retries duplicate emails; success copy implies unverified TradingView access. **Exact live button failure remains unproven** without a signed-in reproduction. No Founder-recipient events appeared in the visible 14-day email window; absence does not prove failure. `/affiliate-program` is absent; `/recruiters` works.
+- **Guard/Journal:** Guard is one browser-local W/L counter, with no user/account binding, P&L, BE or durable session. Journal saves separately; no atomic trade/lock finalization or lock-aware edits. Guard ignores storage errors. Import dedupe is current-entry-only; CSV lacks equivalent protection, and missing Tradovate point-value metadata can produce wrong P&L. Preserve **one-win/three-trade locks, two-loss warning**, Pacific **5:00–7:15 PM / 6:20–7:30 AM** windows, **4:50 PM / 6:15 AM** resets. Existing 15-second undo can reverse a lock-causing trade; reconcile BE/undo with finalization before Stage 2 without silently changing thresholds.
+- **Markets:** 15M/5M exist, not genuine 1H/4H. Cash-index prices and futures structure are mixed; Gold futures are labeled XAU/USD. **Confirmed code gap:** partial feed success can retain sample rows under a delayed label; freshness lacks per-source checks. This is not proof of a member's current screen. Full leadership/correlation, ATR and 30–45-minute target feasibility are missing; extrema/swings imply liquidity, not verified resting orders.
+- **Forecasts:** NQ/YM reads exist, Gold does not; Tue/Wed manipulation and Thursday expansion remain fixed. No six-scenario engine, frozen checkpoint predictions, input/outcome ledger, per-market accuracy or walk-forward validation. Evidence scores are not probabilities. Active five-minute scheduling has recent successes and a timeout; native/external paths differ and need DST/retry/deduplication reconciliation.
+- **Bible Study:** no page, independent membership, teaching pipeline, protected playback or persistent community chat/moderation. Screenshot storage does not encode video; Tawk is support chat. Replies/reactions/pins, mutes, rate limits, membership revocation and supported notifications need new secure records/workflows.
 
 ## Services and costs — approval required before activation
 
@@ -56,11 +32,10 @@ No defensible monthly total without video library/viewing minutes, chat concurre
 
 ## Security and deployment
 
-- All current public tables have RLS enabled. Journal/screenshots are owner-scoped; screenshot bucket is confirmed private. Weekly activity direct reads are service-role-only under its policies.
-- **Legacy weakness:** some Founder application/account APIs accept a shared passcode instead of authenticated Founder identity; that passcode persists in browser storage. New administration must verify the authorized account server-side. Broader security remediation needs reviewed scope, not a silent audit fix.
-- Centre currently accepts historical paid purchases while dashboard membership calculates expiry. Preserve entitlement behavior unless separately approved. Journal passcode is a presentation gate, not a backend session lock.
-- shlmtrdng.com and Lovable are independently deployed, with some requests routed to Lovable. Check secrets/callbacks/versions on the actual host; source cannot prove live settings.
-- Authenticated Founder/member/MOD browser testing is unavailable with the current external Supabase session. Private flows and exact beta failure remain unverified. Public responses and database reads are not substitutes.
+- All current public tables have RLS. Journal/screenshots are owner-scoped; screenshot bucket is private. Weekly activity policies allow service-role direct reads only.
+- **Legacy weakness:** some Founder application/account APIs accept a shared passcode, not authenticated Founder identity; passcode persists in browser storage. New administration must enforce authorized accounts server-side. Broader security fixes need reviewed scope, not silent audit changes.
+- Centre accepts historical paid purchases while dashboard membership calculates expiry; preserve unless separately approved. Journal vault is a presentation gate, not a backend session lock.
+- Independent Cloudflare/Lovable deployments and cross-host calls need live configuration checks. Current external Supabase session does not permit authenticated Founder/member/MOD browser testing; exact beta failure and private flows remain unverified.
 
 ## Stages and approval gates
 
@@ -106,10 +81,10 @@ No defensible monthly total without video library/viewing minutes, chat concurre
 
 ## Technical references
 
-Reuse TanStack/React, existing design controls, Supabase server functions/RLS. Additive storage; atomic trade/lock operations; internal recruiter identifiers unchanged.
+Reuse existing TanStack/React/design controls and Supabase server functions/RLS; additive storage, atomic trade/lock operations, unchanged internal recruiter identifiers.
 
-Evidence: `src/lib/beta.functions.ts`, `src/components/hub/BetaIndicator.tsx`, `public/guard/index.html`, `src/components/hub/Journal.tsx`, `src/lib/hub.functions.ts`, `src/lib/quotes.server.ts`, `src/lib/weekly-behavior.server.ts`, `src/server.ts`, `src/lib/admin-api.ts`, `src/routes/recruiters.tsx`.
+Source evidence: beta handler/panel, Guard, Journal, hub/quotes/weekly server modules, admin API and recruiters route.
 
-[Stream pricing](https://developers.cloudflare.com/stream/pricing/) · [Mux pricing](https://www.mux.com/docs/pricing/overview) · [Supabase pricing](https://supabase.com/pricing) · [Yahoo delays/licensing](https://help.yahoo.com/kb/exchanges-data-providers-yahoo-finance-sln2310.html) · [Databento pricing](https://databento.com/pricing) · [CME licensing](https://www.cmegroup.com/market-data/license-data/market-data-policy-education-center.html)
+[Stream pricing](https://developers.cloudflare.com/stream/pricing/) · [Supabase pricing](https://supabase.com/pricing) · [Yahoo delays/licensing](https://help.yahoo.com/kb/exchanges-data-providers-yahoo-finance-sln2310.html) · [Databento pricing](https://databento.com/pricing)
 
 **Awaiting approval of Stage 1 only. Stages 2–4 and paid services remain unapproved.**
