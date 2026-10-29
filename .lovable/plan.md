@@ -1,6 +1,6 @@
 # SHLM master update — audit and staged plan
 
-**Audit only: no code, database, settings or services changed. Approval is for Stage 1 only.**
+**Read-only audit. Approval covers Stage 1 only.**
 
 ## Already exists
 
