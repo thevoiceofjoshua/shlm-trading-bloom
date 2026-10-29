@@ -85,12 +85,16 @@ export const beginTeachingUpload=createServerFn({method:"POST"}).middleware([req
   const auth="Basic "+btoa(tokenId+":"+secret);
   if(teaching.mux_upload_id){const r=await fetch(`https://api.mux.com/video/v1/uploads/${encodeURIComponent(teaching.mux_upload_id)}`,{headers:{Authorization:auth}}); if(r.ok){const previous=(await r.json()).data;if(previous.status==="waiting")return{uploadId:previous.id,url:previous.url};} throw new Error("Existing upload is processing or expired. Refresh its status before retrying.");}
   const inventory=await fetch("https://api.mux.com/video/v1/assets?limit=10",{headers:{Authorization:auth}});if(!inventory.ok)throw new Error("Mux connection could not be verified.");const assets=await inventory.json();if(assets.data?.length>=FREE_VIDEO_LIMIT)throw new Error("Free video library is full (10 assets). Delete an old video in Mux before uploading.");
+  const { supabaseAdmin }=await import("@/integrations/supabase/client.server");
+  const reservation=crypto.randomUUID();
+  const {error:claimError}=await supabaseAdmin.rpc("claim_bible_upload",{p_actor:context.userId,p_id:data.id,p_token:reservation,p_provider_count:assets.data?.length??0});
+  if(claimError)throw new Error("An upload is already starting or the free library is full. Refresh before trying again.");
   const origin=new URL(getRequest().url).origin;
   const r=await fetch("https://api.mux.com/video/v1/uploads",{method:"POST",headers:{Authorization:auth,"Content-Type":"application/json"},body:JSON.stringify({cors_origin:origin,new_asset_settings:{playback_policies:["signed"],video_quality:"basic",passthrough:data.id}})});
-  if(!r.ok){console.error("Mux upload request failed",r.status);throw new Error("Upload could not be started. Check Mux account access.");}
+  if(!r.ok){await supabaseAdmin.from("bible_teachings").update({upload_reservation:null,upload_claimed_at:null}).eq("id",data.id).eq("upload_reservation",reservation);console.error("Mux upload request failed",r.status);throw new Error("Upload could not be started. Check Mux account access.");}
   const upload=(await r.json()).data;
-  const{ supabaseAdmin }=await import("@/integrations/supabase/client.server");const{error:saveError}=await supabaseAdmin.from("bible_teachings").update({mux_upload_id:upload.id,state:"uploading",file_size:data.size,media_type:data.name.toLowerCase().endsWith(".mov")?"video/quicktime":"video/mp4"}).eq("id",data.id);
-  if(saveError)throw new Error("Upload record not confirmed. No file sent.");return{uploadId:upload.id,url:upload.url};
+  const{data:attached,error:saveError}=await supabaseAdmin.from("bible_teachings").update({mux_upload_id:upload.id,upload_reservation:null,upload_claimed_at:null,state:"uploading",file_size:data.size,media_type:data.name.toLowerCase().endsWith(".mov")?"video/quicktime":"video/mp4"}).eq("id",data.id).eq("upload_reservation",reservation).select("id").maybeSingle();
+  if(saveError||!attached){await fetch(`https://api.mux.com/video/v1/uploads/${encodeURIComponent(upload.id)}/cancel`,{method:"PUT",headers:{Authorization:auth}});throw new Error("Upload record not confirmed. No file sent.");}return{uploadId:upload.id,url:upload.url};
 });
 export const refreshTeachingVideo=createServerFn({method:"POST"}).middleware([requireSupabaseAuth]).inputValidator((input:unknown)=>z.object({id:z.string().uuid()}).parse(input)).handler(async({context,data})=>{
   await admin(context);const{data:row,error}=await context.supabase.from("bible_teachings").select("*").eq("id",data.id).single();if(error||!row?.mux_upload_id)throw new Error("No upload to refresh.");
@@ -116,6 +120,9 @@ export const attachTeachingThumbnail=createServerFn({method:"POST"}).middleware(
 });
 export const deleteTeaching=createServerFn({method:"POST"}).middleware([requireSupabaseAuth]).inputValidator((input:unknown)=>z.object({id:z.string().uuid()}).parse(input)).handler(async({context,data})=>{
   await admin(context);const{data:row,error}=await context.supabase.from("bible_teachings").select("*").eq("id",data.id).single();if(error||!row)throw new Error("Teaching not found.");
-  if(row.mux_asset_id){const tokenId=process.env["MUX_TOKEN_ID"],secret=process.env["MUX_TOKEN_SECRET"];if(!tokenId||!secret)throw new Error("Mux not connected.");const r=await fetch(`https://api.mux.com/video/v1/assets/${encodeURIComponent(row.mux_asset_id)}`,{method:"DELETE",headers:{Authorization:"Basic "+btoa(tokenId+":"+secret)}});if(!r.ok&&r.status!==404)throw new Error("Video deletion not confirmed.");}
+  if(row.upload_reservation)throw new Error("An upload is starting. Wait before deleting this teaching.");
+  let assetId=row.mux_asset_id;
+  if(row.mux_upload_id){const tokenId=process.env["MUX_TOKEN_ID"],secret=process.env["MUX_TOKEN_SECRET"];if(!tokenId||!secret)throw new Error("Mux not connected.");const headers={Authorization:"Basic "+btoa(tokenId+":"+secret)};const response=await fetch(`https://api.mux.com/video/v1/uploads/${encodeURIComponent(row.mux_upload_id)}`,{headers});if(!response.ok)throw new Error("Upload could not be checked before deletion.");const upload=(await response.json()).data;assetId=assetId??upload.asset_id??null;if(upload.status==="waiting"){const cancelled=await fetch(`https://api.mux.com/video/v1/uploads/${encodeURIComponent(row.mux_upload_id)}/cancel`,{method:"PUT",headers});if(!cancelled.ok)throw new Error("Upload cancellation not confirmed. Refresh before deleting.");}}
+  if(assetId){const tokenId=process.env["MUX_TOKEN_ID"],secret=process.env["MUX_TOKEN_SECRET"];if(!tokenId||!secret)throw new Error("Mux not connected.");const r=await fetch(`https://api.mux.com/video/v1/assets/${encodeURIComponent(assetId)}`,{method:"DELETE",headers:{Authorization:"Basic "+btoa(tokenId+":"+secret)}});if(!r.ok&&r.status!==404)throw new Error("Video deletion not confirmed.");}
   const{ supabaseAdmin }=await import("@/integrations/supabase/client.server");const{error:delError}=await supabaseAdmin.from("bible_teachings").delete().eq("id",data.id);if(delError)throw new Error("Teaching deletion not confirmed.");return{saved:true};
 });
