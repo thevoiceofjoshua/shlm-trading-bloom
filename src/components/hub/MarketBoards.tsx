@@ -177,6 +177,7 @@ export function IndexCards({ payload }: { payload: HubPayload }) {
             <div className="min-w-0">
               <p className="truncate text-xs uppercase tracking-widest text-muted-foreground">{idx.symbol}</p>
               <h3 className="truncate font-display text-lg font-medium">{idx.name}</h3>
+              <p className="mt-1 text-[10px] text-muted-foreground">Cash index price · futures structure below</p>
             </div>
             <span className={`shrink-0 whitespace-nowrap text-right text-xs font-medium sm:text-sm ${changeColor(idx.changePct)}`}>
               {idx.change >= 0 ? "+" : ""}

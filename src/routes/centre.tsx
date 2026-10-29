@@ -354,11 +354,7 @@ function FeedBadges({ payload, dataUpdatedAt }: { payload: HubPayload; dataUpdat
           Delayed live
         </span>
       )}
-      {payload.dataState === "sample" && (
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-2 py-0.5">
-          Sample data
-        </span>
-      )}
+      {payload.dataState === "sample" && null}
       <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/60 px-2 py-0.5">
         Updated {timeText}
       </span>
