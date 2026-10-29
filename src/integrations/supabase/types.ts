@@ -231,6 +231,8 @@ export type Database = {
           thumbnail_path: string | null
           title: string
           updated_at: string
+          upload_claimed_at: string | null
+          upload_reservation: string | null
           video_path: string | null
         }
         Insert: {
@@ -251,6 +253,8 @@ export type Database = {
           thumbnail_path?: string | null
           title: string
           updated_at?: string
+          upload_claimed_at?: string | null
+          upload_reservation?: string | null
           video_path?: string | null
         }
         Update: {
@@ -271,6 +275,8 @@ export type Database = {
           thumbnail_path?: string | null
           title?: string
           updated_at?: string
+          upload_claimed_at?: string | null
+          upload_reservation?: string | null
           video_path?: string | null
         }
         Relationships: []
@@ -1391,6 +1397,15 @@ export type Database = {
     Functions: {
       can_manage_indicators: { Args: never; Returns: boolean }
       can_read_seasonality: { Args: never; Returns: boolean }
+      claim_bible_upload: {
+        Args: {
+          p_actor: string
+          p_id: string
+          p_provider_count: number
+          p_token: string
+        }
+        Returns: boolean
+      }
       commit_guard_trade: {
         Args: {
           p_account: string
@@ -1528,6 +1543,16 @@ export type Database = {
           p_old_key: string
         }
         Returns: string
+      }
+      save_journal_entry_confirmed: {
+        Args: {
+          p_body: string
+          p_date: string
+          p_expected: string
+          p_new_key: string
+          p_old_key: string
+        }
+        Returns: Json
       }
       send_bible_message: {
         Args: {
