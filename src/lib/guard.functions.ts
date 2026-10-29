@@ -34,7 +34,7 @@ export const undoGuardTrade = createServerFn({ method: "POST" }).middleware([req
 export const setGuardDone = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input: unknown) => z.object({ sessionKey: z.string().regex(/^\d{4}-\d{2}-\d{2}-(am|pm)$/), revert: z.boolean(), expectedDoneAt: z.string().datetime().nullable() }).parse(input)).handler(async ({ context, data }) => {
   if (!(await checkAccess(context)).hasAccess) throw new Error("Centre membership required.");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: session, error } = await supabaseAdmin.rpc("set_guard_done", { p_user: context.userId, p_session: data.sessionKey, p_revert: data.revert, p_expected: data.expectedDoneAt ?? undefined });
+  const { data: session, error } = await supabaseAdmin.rpc("set_guard_done", { p_user: context.userId, p_session: data.sessionKey, p_revert: data.revert, p_expected: data.expectedDoneAt ?? "1970-01-01T00:00:00Z" });
   if (error) throw new Error(error.message.includes("window ended") ? "The five-minute revert window has ended." : "Session lock not confirmed. Reload to check its status.");
   return { saved: true, session };
 });
