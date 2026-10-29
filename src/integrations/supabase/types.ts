@@ -95,6 +95,139 @@ export type Database = {
         }
         Relationships: []
       }
+      indicator_request_events: {
+        Row: {
+          actor_id: string
+          created_at: string
+          id: string
+          previous_status: string | null
+          request_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          actor_id: string
+          created_at?: string
+          id?: string
+          previous_status?: string | null
+          request_id: string
+          status: string
+          user_id: string
+        }
+        Update: {
+          actor_id?: string
+          created_at?: string
+          id?: string
+          previous_status?: string | null
+          request_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indicator_request_events_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "indicator_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      indicator_requests: {
+        Row: {
+          created_at: string
+          id: string
+          indicator_id: string
+          indicator_name: string
+          member_email: string
+          member_name: string
+          note: string
+          notification_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submission_id: string
+          tradingview_username: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          indicator_id: string
+          indicator_name: string
+          member_email?: string
+          member_name?: string
+          note?: string
+          notification_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submission_id: string
+          tradingview_username: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          indicator_id?: string
+          indicator_name?: string
+          member_email?: string
+          member_name?: string
+          note?: string
+          notification_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submission_id?: string
+          tradingview_username?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "indicator_requests_indicator_id_fkey"
+            columns: ["indicator_id"]
+            isOneToOne: false
+            referencedRelation: "indicators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      indicators: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string
+          description: string
+          display_order: number
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by: string
+          description?: string
+          display_order?: number
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string
+          description?: string
+          display_order?: number
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       journal_vault_passcodes: {
         Row: {
           created_at: string
@@ -850,6 +983,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_manage_indicators: { Args: never; Returns: boolean }
       can_read_seasonality: { Args: never; Returns: boolean }
       has_role: {
         Args: {
@@ -857,6 +991,30 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      manage_indicator: {
+        Args: {
+          p_active: boolean
+          p_description: string
+          p_id: string
+          p_name: string
+        }
+        Returns: {
+          active: boolean
+          created_at: string
+          created_by: string
+          description: string
+          display_order: number
+          id: string
+          name: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "indicators"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       record_weekly_behavior_tick: {
         Args: {
@@ -868,6 +1026,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      reorder_indicators: { Args: { p_ids: string[] }; Returns: undefined }
       reserve_recruiter_payout: {
         Args: {
           p_amount_cents: number
@@ -879,6 +1038,63 @@ export type Database = {
           p_recruiter: string
         }
         Returns: string
+      }
+      review_indicator_request: {
+        Args: { p_id: string; p_status: string }
+        Returns: {
+          created_at: string
+          id: string
+          indicator_id: string
+          indicator_name: string
+          member_email: string
+          member_name: string
+          note: string
+          notification_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submission_id: string
+          tradingview_username: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "indicator_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      submit_indicator_request: {
+        Args: {
+          p_indicator: string
+          p_note: string
+          p_submission: string
+          p_username: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          indicator_id: string
+          indicator_name: string
+          member_email: string
+          member_name: string
+          note: string
+          notification_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submission_id: string
+          tradingview_username: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "indicator_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {
