@@ -6,7 +6,7 @@ export const Route = createFileRoute("/recruiters")({
   },
   head: () => ({ meta: [
     { title: "Affiliate Program — Legacy SHLM Link" },
-    { name: "description", content: "The SHLM Recruiter Portal is now the Affiliate Program." },
+    { name: "description", content: "Continue to the SHLM Affiliate Program." },
     { property: "og:title", content: "Affiliate Program — SHLM" },
     { property: "og:description", content: "Your SHLM Affiliate Program, earnings and payouts." },
     { property: "og:type", content: "website" },

@@ -71,7 +71,9 @@ export const saveIndicator = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     await owner(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row, error } = await supabaseAdmin.rpc("manage_indicator", { p_actor: context.userId, p_id: data.id ?? null, p_name: data.name, p_description: data.description, p_active: data.active });
+    // The generated RPC type cannot express SQL NULL for an optional UUID.
+    const args = { p_actor: context.userId, p_id: data.id ?? null, p_name: data.name, p_description: data.description, p_active: data.active };
+    const { data: row, error } = await supabaseAdmin.rpc("manage_indicator", args as unknown as Database["public"]["Functions"]["manage_indicator"]["Args"]);
     if (error) throw new Error(error.code === "23505" ? "An indicator with that name already exists." : "Indicator not saved. Please retry.");
     return row;
   });
