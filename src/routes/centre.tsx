@@ -117,7 +117,7 @@ function CentrePage() {
               <CentreMenu
                 onOpenJournal={() => setJournalOpen(true)}
                 onOpenBeta={() => setBetaOpen(true)}
-                showBeta={isStaff}
+                showBeta={payload?.access.hasAccess === true}
               />
             )}
             {user && <AccountMenu user={user} scrolled={true} variant="desktop" />}
@@ -199,7 +199,7 @@ function CentrePage() {
         </div>
       )}
 
-      {betaOpen && isStaff && (
+      {betaOpen && payload?.access.hasAccess && (
         <div className="fixed inset-0 z-50 flex min-h-dvh items-start justify-center overflow-x-hidden overflow-y-auto bg-background/80 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur-sm xs:p-3 sm:p-6">
           <div className="min-w-0 w-full max-w-2xl">
             <BetaIndicator onClose={() => setBetaOpen(false)} />
@@ -302,7 +302,7 @@ function CentreMenu({
             >
               <span className="font-medium">Beta testing · VIP</span>
               <span className="mt-0.5 block text-xs text-muted-foreground">
-                SHLM SYSTEM TradingView indicator
+                TradingView indicators
               </span>
             </button>
           )}

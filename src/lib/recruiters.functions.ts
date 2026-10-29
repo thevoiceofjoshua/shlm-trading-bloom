@@ -82,7 +82,7 @@ export const getRecruiterPortal = createServerFn({ method: "POST" })
         (typeof meta["full_name"] === "string" && (meta["full_name"] as string)) ||
         (typeof meta["name"] === "string" && (meta["name"] as string)) ||
         u?.user?.email ||
-        "Recruiter";
+        "Affiliate";
       const mine = ((lands ?? []) as unknown as { recruiter_id: string; delta: number; month: string }[]).filter(
         (l) => l.recruiter_id === id,
       );
@@ -116,7 +116,7 @@ export const adjustRecruiterLands = createServerFn({ method: "POST" })
       .eq("user_id", data.recruiterId)
       .eq("role", "recruiter" as any)
       .maybeSingle();
-    if (!isRecruiter) throw new Error("That account is not a recruiter.");
+    if (!isRecruiter) throw new Error("That account is not an affiliate.");
 
     const month = currentMonth();
     if (data.delta < 0) {
