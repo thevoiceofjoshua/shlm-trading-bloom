@@ -6,4 +6,11 @@ describe("independent Bible Study rules", () => {
   it("requires bounded message and stable identity", () => { expect(bibleMessageInput.safeParse({body:" ",submissionId:"27be6c2d-ce77-425b-bc69-53026daf099b"}).success).toBe(false); expect(bibleMessageInput.safeParse({body:"Amen",submissionId:"27be6c2d-ce77-425b-bc69-53026daf099b"}).success).toBe(true); });
   it("requires a title before saving a teaching", () => { expect(teachingInput.safeParse({title:" "}).success).toBe(false); });
   it("keeps the no-upgrade upload limit at ten assets", () => { expect(FREE_VIDEO_LIMIT).toBe(10); });
+  it("shows a member by the name they signed up with, never an ID", () => {
+    expect(bibleDisplayName({ full_name: "Joshua Bennett" }, "joschewagner56@gmail.com")).toBe("Joshua Bennett");
+    expect(bibleDisplayName({ name: "Josh" }, null)).toBe("Josh");
+    expect(bibleDisplayName({ full_name: "   ", name: "Amy" }, null)).toBe("Amy");
+    expect(bibleDisplayName({}, "joschewagner56@gmail.com")).toBe("joschewagner56@gmail.com");
+    expect(bibleDisplayName(null, null)).toBe("Member");
+  });
 });
