@@ -9,8 +9,9 @@ export function normalizeVoiceDraft(input: Record<string, unknown>): VoiceDraft 
     if (typeof raw !== "string") continue;
     let value = raw.trim().slice(0, key === "notes" ? 4000 : 1000);
     if (!value) continue;
-    if (CHOICES[key] && !CHOICES[key]!.includes(value.toLowerCase())) continue;
-    if (CHOICES[key]) value = value.toLowerCase();
+    const choices = CHOICES[key];
+    if (choices && !choices.includes(value.toLowerCase())) continue;
+    if (choices) value = value.toLowerCase();
     if (key === "pnl") { const clean = value.replace(/[^0-9.-]/g, ""); if (!/^-?\d+(\.\d{1,2})?$/.test(clean)) continue; value = clean; }
     out[key] = value;
   }
