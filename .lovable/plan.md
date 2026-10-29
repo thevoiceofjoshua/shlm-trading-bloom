@@ -4,16 +4,11 @@
 
 ## What already exists
 
-- Existing SHLM black-and-white styling, Space Grotesk/DM Sans, dropdown navigation, reusable forms, dialogs, selectors and progress controls. These stay intact.
-- Existing accounts, Founder/admin and read-only SHLM MOD roles, paid membership, lifetime-member access, Stripe enrollment and Wise payouts.
-- Centre Market Map, Drivers, Liquidity Radar, session context, market summaries, opening range, readiness, economic calendar, Weekly Behavior and notifications. Market Internals remains hidden.
-- Journal with persistent entries, trade details, screenshots, calendar, P&L, win rate, personal rules, and Tradovate/CSV imports.
-- Session Guard with existing trading windows, win/trade-count locks and undo — currently a separate browser-local tool.
-- Recruiter Portal with referral tracking, manual adjustments, commission/bonus calculations, payout history and live updates. These financial services can remain unchanged during renaming.
-- Beta indicator preview, password screen and authenticated username-to-email submission.
-- Supabase storage and live-update capabilities already used elsewhere. Tawk is support chat; Discord is an external community link, not an in-site Bible Study system.
-
-**Verified current history:** NQ and YM each have **3,817 weekday rows, 25 August 2011–28 October 2026**. Each has only **5 non-estimated character labels**; this is daily price history, not validated intraday forecasts.
+- SHLM styling, typography, dropdowns, reusable controls, existing accounts/roles, paid and lifetime access, Stripe enrollment and Wise payouts.
+- Centre Map, Drivers, Radar, session summaries, opening range, readiness, calendar, Weekly Behavior and notifications. Internals stays hidden.
+- Persistent Journal entries, P&L, win rate, screenshots, personal rules and imports; separate browser-local Session Guard.
+- Recruiter referral/commission/bonus/payout tracking and live updates; beta preview and username email; Supabase storage and Realtime; Tawk support chat and external Discord.
+- **Verified daily history:** NQ/YM each have **3,817 rows, 25 August 2011–28 October 2026**, with only **5 non-estimated character labels each**. This is not validated intraday forecast history.
 
 ## What is broken or missing
 
@@ -49,29 +44,23 @@
 - The existing private screenshot bucket is unsuitable as a complete video system. It has no configured bucket-specific size/MIME limit and supplies no video encoding.
 - Replies, reactions, pinned announcements, mutes/removals, membership revocation and notification preferences need persistent records and permissions. Browser push notifications require additional support and user permission; support varies by device.
 
-## Dependencies and costs — before approval of any paid service
+## Dependencies and costs — no services enabled
 
-| Area | Reuse / dependency | Cost and limitation |
-|---|---|---|
-| Stage 1 | Existing Supabase accounts/database and notification email | No new paid provider inherently required. Notification configuration must work on the actual host; email failure must not undo a saved request. TradingView access remains manually granted, not automatically provisioned. |
-| Stage 2 | Existing Supabase, Journal and Guard | No new external service inherently required. Add durable trade/session storage, transaction-safe saves and retry handling; normal database/hosting usage applies. |
-| Video | Managed video service such as **Cloudflare Stream** or **Mux**, plus existing database for metadata | Stream publishes **$5/month per 1,000 stored minutes of capacity**, plus **$1 per 1,000 watched minutes**; encoding included. Supports MP4/MOV and resumable TUS uploads. Example only: 1,000 stored + 1,000 watched minutes = $6 before other services/tax. No service enabled. |
-| Video alternative | Mux direct uploads, processing and signed playback | Published starting storage/delivery rates are $0.0024/minute-month and $0.0008/delivered minute; resolution, tier and account allowances affect the bill. Confirm a project-specific budget before selecting it. Raw Supabase Storage alone does **not** provide adaptive video processing or reliable MOV playback. |
-| In-site group chat | Supabase database + Realtime | No separate chat vendor is inherently needed. Published Free allowances include 2 million realtime messages/month and 200 peak connections. Pro starts at $25/month, with different allowances and overages. Fan-out/reactions/presence count toward usage; the project's actual plan and headroom were not verified. Quotas do not replace anti-spam limits. |
-| Forecast data | Licensed live and intraday historical feed for CME NQ/MNQ, CBOT YM/MYM and COMEX GC/MGC | Current free Yahoo data is delayed and has no supported multi-year intraday service guarantee. Yahoo prohibits redistribution of its supplied information. A paid, licensed feed is a likely production dependency for reliable 5M confirmation and shared member forecasts. |
-| Feed candidate | Databento historical/live CME Group coverage | Internal-use plans start at $199/month; **that is not a licence or all-in quote for this member website**. Historical acquisition, exchange/non-display/derived-data/distribution rights and commercial plan requirements need a written quote. Existing Tradovate account access does not authorize shared redistribution either. |
-| Releases and validation | Sourced economic calendar with point-in-time history; durable ingestion and validation processing | Existing calendar can be reused where rights and completeness permit. A commercial calendar API may require an additional subscription/quote. Long historical validation and video encoding should not run inside normal page requests. |
+- **Stages 1–2:** existing Supabase/auth/email services suffice; no new paid vendor inherently required. Database/hosting usage applies. Email availability on the actual host needs checking; TradingView access remains manually granted.
+- **Video:** managed processing/playback is needed, not raw storage alone. **Cloudflare Stream** supports MP4/MOV, resumable uploads and adaptive playback: published **$5/month per 1,000 stored minutes of capacity + $1 per 1,000 watched minutes**, encoding included. Conditional example: 1,000 stored + 1,000 watched minutes = $6 before other services/tax. **Mux** is an alternative; starting storage/delivery rates are $0.0024/minute-month and $0.0008/delivered minute, subject to tier, resolution and account allowances. Confirm budget before selecting either. Large video bytes/encoding must bypass normal page requests.
+- **In-site chat:** reuse Supabase database + Realtime. Published Free allowances: 2 million realtime messages/month and 200 peak connections. Pro starts at $25/month with different allowances/overages; actual project plan/headroom is unverified. Message fan-out/reactions/presence affect usage. Rate limits/moderation and browser push are additional implementation, not automatic Realtime features.
+- **Forecast feeds:** licensed live and historical intraday data for CME NQ/MNQ, CBOT YM/MYM and COMEX GC/MGC is a likely production dependency. Yahoo is delayed, has no supported multi-year intraday guarantee, and prohibits redistribution. Existing Tradovate access does not permit shared redistribution either.
+- **Databento candidate:** internal-use plans start at $199/month, **not an all-in quote or licence for this member website**. Historical data, commercial distribution, exchange/non-display/derived-data rights need a written quote. A licensed sourced economic calendar with point-in-time history may add subscription costs. Validation also needs durable ingestion and background processing.
 
-Monthly totals depend on retained video duration, viewing minutes, chat activity/concurrency, market licensing and hosting. **No paid service will be connected or enabled without presenting its cost and obtaining approval.**
+No defensible monthly total without video duration/viewing, chat concurrency, account plans and market licensing. **Present costs and obtain approval before connecting or enabling any paid service.**
 
 ## Security and deployment findings
 
-- All current public application tables have RLS enabled. Journal rows/screenshots are owner-scoped; the screenshot bucket is confirmed private. Weekly activity policies permit service-role access, not anonymous/member direct reads.
-- **Important legacy weakness:** some Founder application/account APIs authorize by a shared passcode rather than authenticated Founder identity; that passcode is persisted in browser storage. New indicator, community and video administration must enforce authenticated authorized accounts server-side, not copy this boundary. Existing security changes require an explicit reviewed scope, not a silent audit fix.
-- Centre entitlement currently accepts any historical paid purchase, while the membership dashboard calculates expiry. Preserve existing behavior unless its correction is separately approved.
-- The Journal passcode is a presentation/privacy gate, not a backend lock. Session Guard lock enforcement must be added to every relevant write path, including direct requests and edits.
-- shlmtrdng.com and Lovable remain independently deployed, with some calls routed to Lovable. Secrets, callbacks and deployment versions must be checked on the host actually used. Source configuration does not prove live secrets are present.
-- No current authenticated browser session is available for this external Supabase setup. Signed-in Founder/member/MOD tests, the exact failing beta request, and private live workflows remain unverified. Public route checks and database inspection are not substitutes.
+- Current public tables have RLS enabled; Journal/screenshots are owner-scoped and the screenshot bucket is private. Weekly activity direct access is service-role-only under its policies.
+- **Legacy weakness:** some Founder application/account APIs authorize by shared passcode, not authenticated Founder identity; the passcode persists in browser storage. New administration must require authorized accounts server-side. Do not silently expand Stage 1 into unrelated security rewrites.
+- Centre accepts historical paid purchases while the dashboard calculates expiry; leave existing entitlement behavior unless separately approved. Journal vault is a presentation gate, not a backend session lock.
+- shlmtrdng.com and Lovable are independently deployed, with some calls routed to Lovable. Validate secrets/callbacks/versions on the actual host; source does not prove live configuration.
+- Authenticated Founder/member/MOD browser testing is unavailable in this externally managed setup. Private workflows and exact beta failure remain unverified; public route checks and database reads do not substitute.
 
 ## Implementation stages and acceptance gates
 
@@ -116,15 +105,12 @@ Monthly totals depend on retained video duration, viewing minutes, chat activity
 
 **Every stage preserves SHLM styling and unrelated working features, adds tests for concrete rules, and must pass its acceptance checks before the next stage. No destructive history migration without reviewing its impact.**
 
-## Technical references and official pricing
+## Technical references and official costs
 
-Source anchors: `src/lib/beta.functions.ts`, `src/components/hub/BetaIndicator.tsx`, `public/guard/index.html`, `src/components/hub/Journal.tsx`, `src/lib/hub.functions.ts`, `src/lib/quotes.server.ts`, `src/lib/weekly-behavior.server.ts`, `src/lib/weekly-activity.server.ts`, `src/server.ts`, `src/routes/api/public/weekly-tick.ts`, `src/lib/admin-api.ts`, `src/hooks/use-admin-mode.ts`, `src/routes/recruiters.tsx`, `wrangler.jsonc`.
+Existing TanStack/React, Tailwind/shadcn, Supabase server functions and RLS are reused. New storage is additive; internal recruiter identifiers and financial services remain unchanged. Atomic database operations are required for trade/lock correctness, not browser-only coordination.
 
-- [Cloudflare Stream pricing](https://developers.cloudflare.com/stream/pricing/) · [Direct uploads](https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/)
-- [Mux pricing](https://www.mux.com/docs/pricing/overview)
-- [Supabase pricing](https://supabase.com/pricing) · [Realtime billing](https://supabase.com/docs/guides/realtime/pricing) · [Resumable storage uploads](https://supabase.com/docs/guides/storage/uploads/resumable-uploads)
-- [Yahoo exchange delays and redistribution notice](https://help.yahoo.com/kb/exchanges-data-providers-yahoo-finance-sln2310.html)
-- [Databento pricing](https://databento.com/pricing) · [CME licensing policies](https://www.cmegroup.com/market-data/license-data/market-data-policy-education-center.html)
-- [Trading Economics calendar documentation](https://docs.tradingeconomics.com/economic_calendar/point-in-time/)
+Evidence: `src/lib/beta.functions.ts`, `src/components/hub/BetaIndicator.tsx`, `public/guard/index.html`, `src/components/hub/Journal.tsx`, `src/lib/hub.functions.ts`, `src/lib/quotes.server.ts`, `src/lib/weekly-behavior.server.ts`, `src/server.ts`, `src/routes/api/public/weekly-tick.ts`, `src/lib/admin-api.ts`, `src/hooks/use-admin-mode.ts`, `src/routes/recruiters.tsx`.
 
-**Awaiting your approval of Stage 1. Stages 2–4 and any paid services remain unapproved.**
+[Stream pricing](https://developers.cloudflare.com/stream/pricing/) · [Mux pricing](https://www.mux.com/docs/pricing/overview) · [Supabase pricing](https://supabase.com/pricing) · [Realtime billing](https://supabase.com/docs/guides/realtime/pricing) · [Yahoo delays/redistribution](https://help.yahoo.com/kb/exchanges-data-providers-yahoo-finance-sln2310.html) · [Databento pricing](https://databento.com/pricing) · [CME licensing](https://www.cmegroup.com/market-data/license-data/market-data-policy-education-center.html)
+
+**Awaiting approval of Stage 1 only. Stages 2–4 and paid services remain unapproved.**
