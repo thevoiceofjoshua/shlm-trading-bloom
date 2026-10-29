@@ -71,6 +71,201 @@ export type Database = {
         }
         Relationships: []
       }
+      bible_memberships: {
+        Row: {
+          active: boolean
+          blocked: boolean
+          joined_at: string
+          muted_until: string | null
+          notifications: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          blocked?: boolean
+          joined_at?: string
+          muted_until?: string | null
+          notifications?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          blocked?: boolean
+          joined_at?: string
+          muted_until?: string | null
+          notifications?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bible_messages: {
+        Row: {
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+          pinned: boolean
+          removed: boolean
+          reply_to: string | null
+          submission_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          author_name: string
+          body: string
+          created_at?: string
+          id?: string
+          pinned?: boolean
+          removed?: boolean
+          reply_to?: string | null
+          submission_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          created_at?: string
+          id?: string
+          pinned?: boolean
+          removed?: boolean
+          reply_to?: string | null
+          submission_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bible_messages_reply_to_fkey"
+            columns: ["reply_to"]
+            isOneToOne: false
+            referencedRelation: "bible_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bible_notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          message_id: string | null
+          read_at: string | null
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          message_id?: string | null
+          read_at?: string | null
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          message_id?: string | null
+          read_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bible_notifications_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "bible_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bible_reactions: {
+        Row: {
+          created_at: string
+          message_id: string
+          reaction: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          message_id: string
+          reaction: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          message_id?: string
+          reaction?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bible_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "bible_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bible_teachings: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string
+          duration_seconds: number | null
+          featured: boolean
+          file_size: number | null
+          id: string
+          media_type: string | null
+          published: boolean
+          scripture: string
+          state: string
+          thumbnail_path: string | null
+          title: string
+          updated_at: string
+          video_path: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string
+          duration_seconds?: number | null
+          featured?: boolean
+          file_size?: number | null
+          id?: string
+          media_type?: string | null
+          published?: boolean
+          scripture?: string
+          state?: string
+          thumbnail_path?: string | null
+          title: string
+          updated_at?: string
+          video_path?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string
+          duration_seconds?: number | null
+          featured?: boolean
+          file_size?: number | null
+          id?: string
+          media_type?: string | null
+          published?: boolean
+          scripture?: string
+          state?: string
+          thumbnail_path?: string | null
+          title?: string
+          updated_at?: string
+          video_path?: string | null
+        }
+        Relationships: []
+      }
       daily_levels: {
         Row: {
           computed_at: string
@@ -992,6 +1187,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_bible_member: { Args: never; Returns: boolean }
       manage_indicator: {
         Args: {
           p_active: boolean
@@ -1066,6 +1262,33 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "indicator_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      send_bible_message: {
+        Args: {
+          p_body: string
+          p_name: string
+          p_reply: string
+          p_submission: string
+          p_user: string
+        }
+        Returns: {
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+          pinned: boolean
+          removed: boolean
+          reply_to: string | null
+          submission_id: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bible_messages"
           isOneToOne: true
           isSetofReturn: false
         }
