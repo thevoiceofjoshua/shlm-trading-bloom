@@ -339,17 +339,17 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
     mutationFn: async (target: StoredEntry & { noteDate?: string }) => {
       const noteDate = target.noteDate ?? selected;
       const desiredKey = `${target.entry.session}#${target.slot}`;
-      await saveAtomic({ data: { date: noteDate, oldKey: target.storageKey, newKey: desiredKey, body: JSON.stringify(target.entry), expectedUpdatedAt: target.updatedAt ?? null } });
-      return { desiredKey, noteDate };
+      const saved = await saveAtomic({ data: { date: noteDate, oldKey: target.storageKey, newKey: desiredKey, body: JSON.stringify(target.entry), expectedUpdatedAt: target.updatedAt ?? null } });
+      return { desiredKey, noteDate, updatedAt: saved.updatedAt };
     },
-    onSuccess: async ({ desiredKey, noteDate }, target) => {
+    onSuccess: async ({ desiredKey, noteDate, updatedAt }, target) => {
       if (noteDate !== selected) { await queryClient.invalidateQueries({ queryKey: ["member-notes-range", userId] }); return; }
       setDirty(false);
       const broken = brokenRules(target.entry, rules);
       const needsAck = broken.length > 0 && !!consequence && !target.entry.consequenceAcknowledged;
       // Keep the editor mounted only while an acknowledgement is pending;
       // otherwise collapse the entry back into the day list.
-      setEditing(needsAck ? { ...target, storageKey: desiredKey } : null);
+      setEditing(needsAck ? { ...target, storageKey: desiredKey, updatedAt } : null);
       await Promise.all([
         refetch(),
         queryClient.invalidateQueries({ queryKey: ["member-notes-summary", userId] }),
@@ -713,6 +713,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
                 <TradesEditor
                   noteDate={selected}
                   entry={editing.entry}
+                  readOnly={editing.slot === "guard"}
                   onChange={(patch) => {
                     setEditing((prev) => (prev ? { ...prev, entry: { ...prev.entry, ...patch } } : prev));
                     setDirty(true);
@@ -1332,10 +1333,12 @@ function TradesEditor({
   entry,
   onChange,
   noteDate,
+  readOnly = false,
 }: {
   entry: Entry;
   onChange: (patch: Partial<Entry>) => void;
   noteDate: string;
+  readOnly?: boolean;
 }) {
   const trades = entry.trades ?? [];
   const [sectionCollapsed, setSectionCollapsed] = useState(false);
@@ -1378,6 +1381,8 @@ function TradesEditor({
     const remaining = trades.filter((t) => t.id !== id);
     onChange({ trades: remaining, tradeCount: String(remaining.length) });
   };
+
+  if (readOnly) return <section className="border-y border-border py-4"><p className="text-xs font-medium">Guard session trades · protected history</p><ul className="mt-3 divide-y divide-border">{trades.map(trade => <li key={trade.id} className="flex justify-between gap-3 py-2 text-sm"><span>{trade.instrument} · {trade.result.toUpperCase()}</span><span>${trade.pnl}</span></li>)}</ul><p className="mt-3 text-xs text-muted-foreground">Session trades are recorded through Quick log. Notes and reflections remain editable.</p></section>;
 
   return (
     <div>

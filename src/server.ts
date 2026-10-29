@@ -46,11 +46,11 @@ function isH3SwallowedErrorBody(body: string): boolean {
 }
 
 export default {
-  async scheduled(_event: unknown, _env: unknown, ctx: { waitUntil: (promise: Promise<unknown>) => void }) {
+  async scheduled(event: { scheduledTime?: number }, _env: unknown, ctx: { waitUntil: (promise: Promise<unknown>) => void }) {
     ctx.waitUntil((async () => {
       const now = new Date();
       const { recordForecastTick } = await import("./lib/forecast-tick.server");
-      await recordForecastTick(now).catch(error => console.error("Forecast scheduled check failed", error));
+      await recordForecastTick(now,event.scheduledTime?new Date(event.scheduledTime):undefined).catch(error => console.error("Forecast scheduled check failed", error));
       const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", weekday: "short", hour: "2-digit", hour12: false }).formatToParts(now);
       const day = parts.find((p) => p.type === "weekday")?.value;
       const hour = Number(parts.find((p) => p.type === "hour")?.value ?? 0);

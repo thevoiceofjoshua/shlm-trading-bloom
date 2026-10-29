@@ -23,6 +23,8 @@ export const Route = createFileRoute("/dashboard")({
       { name: "description", content: "Your private SHLM trading mentorship dashboard." },
       { property: "og:title", content: "Member Dashboard — SHLM" },
       { property: "og:description", content: "Your private SHLM trading mentorship dashboard." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/dashboard" },
       { name: "robots", content: "noindex" },
     ],

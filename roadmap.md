@@ -7,12 +7,16 @@
 - [x] Complete Affiliate Program rename and legacy redirect without financial changes
 - [x] Rule tests and database permission checks; signed-out legacy/canonical routes and phone layout verified
 - [ ] Exact beta failure and signed-in save/readback/Founder flows (blocked: externally managed authenticated account unavailable)
-- [ ] Stage 1 approval-time eligibility revalidation
-- [ ] Stage 2 shared durable Guard/Journal trades and locks, recovery and tests
-- [ ] Stage 3 five Centre sections, dynamic market context, honest forecasts/snapshots/outcomes and tests
-- [ ] Stage 4 independent Bible Study membership, secure free video workflow, persistent chat/moderation and tests
+- [x] Stage 1 approval-time eligibility revalidation
+- [x] Stage 2 shared durable Guard/Journal quick-log trades and locks, recovery and rule tests; historical editor remains separate
+- [x] Stage 3 five Centre sections, dynamic NQ/YM/GC context, honest snapshot/outcome ledger and rule tests
+- [x] Stage 4 independent Bible Study membership, private Mux video workflow, thumbnails, chat/replies/reactions/pins/moderation and rule tests
 - [ ] Authenticated end-to-end verification (blocked: externally managed accounts unavailable to the test browser)
 - [ ] Validated forecasts (blocked until sufficient sourced intraday history and out-of-sample observations exist)
+- [ ] Forecast model, full macro leadership calibration and exchange-calendar/roll validation (blocked: licensed point-in-time intraday/calendar history unavailable; context never claims validated predictions)
+- [ ] Real MP4/MOV upload, resume and signed playback verification (blocked: authenticated admin unavailable; Mux token responds, private key parses, signing-key lookup scope returns 403)
+- [ ] Live site verification and scheduled snapshot timing (blocked: deployment on independently hosted site is outside this environment)
+- [x] 37 rule/regression tests passed; public Bible/Guard/affiliate/weekly flows and phone layout verified; no new database security findings
 
 ## Payout section and Seasonality
 - [x] Add text-only homepage payout section immediately below hero
