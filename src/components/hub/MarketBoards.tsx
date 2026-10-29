@@ -372,7 +372,7 @@ export function GoldDesk({ payload }: { payload: HubPayload }) {
     <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-xs uppercase tracking-widest text-muted-foreground">XAU/USD</p>
+          <p className="truncate text-xs uppercase tracking-widest text-muted-foreground">GC futures · delayed</p>
           <h3 className="truncate font-display text-lg font-medium">Gold desk</h3>
         </div>
         <span className={`shrink-0 whitespace-nowrap text-right text-xs font-medium sm:text-sm ${changeColor(g.changePct)}`}>
