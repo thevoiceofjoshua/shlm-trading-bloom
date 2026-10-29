@@ -31,7 +31,7 @@ export const undoGuardTrade = createServerFn({ method: "POST" }).middleware([req
   if (error) throw new Error("Undo not confirmed; the 15-second window may have ended.");
   return { saved: true };
 });
-export const setGuardDone = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input: unknown) => z.object({ sessionKey: z.string().regex(/^\d{4}-\d{2}-\d{2}-(am|pm)$/), revert: z.boolean(), expectedDoneAt: z.string().datetime().nullable() }).parse(input)).handler(async ({ context, data }) => {
+export const setGuardDone = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((input: unknown) => z.object({ sessionKey: z.string().regex(/^\d{4}-\d{2}-\d{2}-(am|pm)$/), revert: z.boolean(), expectedDoneAt: z.string().datetime({ offset: true }).nullable() }).parse(input)).handler(async ({ context, data }) => {
   if (!(await checkAccess(context)).hasAccess) throw new Error("Centre membership required.");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: session, error } = await supabaseAdmin.rpc("set_guard_done", { p_user: context.userId, p_session: data.sessionKey, p_revert: data.revert, p_expected: data.expectedDoneAt ?? "1970-01-01T00:00:00Z" });

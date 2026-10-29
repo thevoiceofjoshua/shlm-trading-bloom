@@ -19,17 +19,18 @@ async function boundedForm(request: Request) {
   const chunks: Uint8Array[] = [], reader = request.body.getReader();
   let bytes = 0;
   while (true) { const next = await reader.read(); if (next.done) break; bytes += next.value.byteLength; if (bytes > VOICE_MAX_BYTES + 100000) { await reader.cancel(); throw new Error("Recording too long"); } chunks.push(next.value); }
-  const body = new Blob(chunks as BlobPart[], { type: request.headers.get("content-type") || "" });
-  return new Response(body, { headers: { "Content-Type": body.type } }).formData();
+  const body = new Blob(chunks as BlobPart[]);
+  return new Response(body, { headers: { "Content-Type": request.headers.get("content-type") || "" } }).formData();
 }
 async function readTranscript(response: Response) {
   if (!response.body) throw new Error("Voice transcript was empty.");
-  let text = "", final = "", error = "";
-  const parser = createParser({ onEvent(event) { try { const data = JSON.parse(event.data); if (data.type === "transcript.text.delta") text += data.delta ?? ""; if (data.type === "transcript.text.done") final = data.text ?? ""; if (data.type === "error" || data.error) error = data.error?.message || data.message || "Transcription failed."; } catch { /* ignore keepalive */ } } });
+  let final = "", completed = false, error = "";
+  const parser = createParser({ onEvent(event) { try { const data = JSON.parse(event.data); if (data.type === "transcript.text.done") { final = data.text ?? ""; completed = true; } if (data.type === "error" || data.error) error = data.error?.message || data.message || "Transcription failed."; } catch { /* ignore keepalive */ } } });
   const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
   while (true) { const chunk = await reader.read(); if (chunk.done) break; parser.feed(chunk.value); }
   if (error) throw new Error(error);
-  return (final || text).trim();
+  if (!completed) throw new Error("Transcription did not finish. No partial result was saved.");
+  return final.trim();
 }
 export const Route = createFileRoute("/api/journal-voice")({ server: { handlers: { POST: async ({ request }) => {
   const length = Number(request.headers.get("content-length") || 0);

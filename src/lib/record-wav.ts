@@ -38,7 +38,8 @@ export async function recordWav(): Promise<{ stop: () => Promise<File> }> {
     const source = audioContext.createMediaStreamSource(stream);
     const node = audioContext.createScriptProcessor(4096, 1, 1);
     const chunks: Float32Array[] = [];
-    node.onaudioprocess = (event) => chunks.push(new Float32Array(event.inputBuffer.getChannelData(0)));
+    let samples = 0;
+    node.onaudioprocess = (event) => { const chunk = event.inputBuffer.getChannelData(0); if (samples + chunk.length > audioContext.sampleRate * 240) return; samples += chunk.length; chunks.push(new Float32Array(chunk)); };
     source.connect(node);
     node.connect(audioContext.destination);
     let stopped = false;
