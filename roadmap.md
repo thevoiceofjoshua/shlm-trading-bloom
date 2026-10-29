@@ -1,20 +1,25 @@
 # Roadmap
 
-## Approved master update — Stage 1 only
+## Approved master update — all stages
 - [x] Audit existing features, permissions and costs without changing the application
 - [x] Add persistent indicator catalogue, requests, duplicate protection and Founder-only permissions
 - [x] Complete dynamic member form and Founder catalogue/request administration
 - [x] Complete Affiliate Program rename and legacy redirect without financial changes
 - [x] Rule tests and database permission checks; signed-out legacy/canonical routes and phone layout verified
 - [ ] Exact beta failure and signed-in save/readback/Founder flows (blocked: externally managed authenticated account unavailable)
-- [ ] Stage 2–4 await separate approval
+- [ ] Stage 1 approval-time eligibility revalidation
+- [ ] Stage 2 shared durable Guard/Journal trades and locks, recovery and tests
+- [ ] Stage 3 five Centre sections, dynamic market context, honest forecasts/snapshots/outcomes and tests
+- [ ] Stage 4 independent Bible Study membership, secure free video workflow, persistent chat/moderation and tests
+- [ ] Authenticated end-to-end verification (blocked: externally managed accounts unavailable to the test browser)
+- [ ] Validated forecasts (blocked until sufficient sourced intraday history and out-of-sample observations exist)
 
 ## Payout section and Seasonality
 - [x] Add text-only homepage payout section immediately below hero
 - [x] Add protected history tables and read-only Seasonality tool with linked charts and day details
 - [x] Test calculations, empty state, signed-out boundary and isolated graph navigation (14 passing tests; no fixture history stored)
 - [ ] Verify signed-in Founder/member/MOD access and Tools navigation (blocked: externally managed accounts unavailable to test browser)
-- [ ] Load verified market history (requires sourced historical records from user; no synthetic seed)
+- [x] Load real NQ/YM daily history with estimates labeled and scheduled refresh
 
 ## Homepage vault boot and embedded sign-in
 - [x] Add the homepage-only terminal boot screen with spinning SHLM logo
