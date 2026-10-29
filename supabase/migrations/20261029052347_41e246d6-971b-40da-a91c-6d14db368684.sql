@@ -1,0 +1,1 @@
+ALTER FUNCTION public.is_bible_member() SECURITY INVOKER;
