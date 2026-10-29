@@ -1,5 +1,11 @@
 # Roadmap
 
+## Session Guard Done, break-even and voice Journal
+- [ ] Persist manual Done lock and five-minute revert without bypassing automatic locks
+- [ ] Exclude break-even from the three-trade limit while preserving every Journal record
+- [ ] Add authenticated audio transcription and reviewable journal autofill in Guard and Journal
+- [ ] Verify lock boundaries, saved records and voice processing; document unavailable live checks
+
 ## Google account switching
 - [x] Keep remembered sign-in and request Google account selection from all three Google buttons
 - [x] Make all sign-out buttons cancel private reads, clear caches, handle errors and replace the page with sign-in
