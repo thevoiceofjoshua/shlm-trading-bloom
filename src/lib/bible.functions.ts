@@ -119,10 +119,14 @@ export const attachTeachingThumbnail=createServerFn({method:"POST"}).middleware(
  const{ supabaseAdmin }=await import("@/integrations/supabase/client.server");const{error}=await supabaseAdmin.from("bible_teachings").update({thumbnail_path:data.path}).eq("id",data.id);if(error)throw new Error("Thumbnail not saved.");return{saved:true};
 });
 export const deleteTeaching=createServerFn({method:"POST"}).middleware([requireSupabaseAuth]).inputValidator((input:unknown)=>z.object({id:z.string().uuid()}).parse(input)).handler(async({context,data})=>{
-  await admin(context);const{data:row,error}=await context.supabase.from("bible_teachings").select("*").eq("id",data.id).single();if(error||!row)throw new Error("Teaching not found.");
-  if(row.upload_reservation)throw new Error("An upload is starting. Wait before deleting this teaching.");
+  await admin(context);const{ supabaseAdmin }=await import("@/integrations/supabase/client.server");
+  const reservation=crypto.randomUUID();
+  const{data:row,error}=await supabaseAdmin.from("bible_teachings").update({upload_reservation:reservation,upload_claimed_at:new Date().toISOString()}).eq("id",data.id).is("upload_reservation",null).select("*").maybeSingle();
+  if(error||!row)throw new Error("Teaching is busy or missing. Refresh before deleting.");
+  try {
   let assetId=row.mux_asset_id;
   if(row.mux_upload_id){const tokenId=process.env["MUX_TOKEN_ID"],secret=process.env["MUX_TOKEN_SECRET"];if(!tokenId||!secret)throw new Error("Mux not connected.");const headers={Authorization:"Basic "+btoa(tokenId+":"+secret)};const response=await fetch(`https://api.mux.com/video/v1/uploads/${encodeURIComponent(row.mux_upload_id)}`,{headers});if(!response.ok)throw new Error("Upload could not be checked before deletion.");const upload=(await response.json()).data;assetId=assetId??upload.asset_id??null;if(upload.status==="waiting"){const cancelled=await fetch(`https://api.mux.com/video/v1/uploads/${encodeURIComponent(row.mux_upload_id)}/cancel`,{method:"PUT",headers});if(!cancelled.ok)throw new Error("Upload cancellation not confirmed. Refresh before deleting.");}}
   if(assetId){const tokenId=process.env["MUX_TOKEN_ID"],secret=process.env["MUX_TOKEN_SECRET"];if(!tokenId||!secret)throw new Error("Mux not connected.");const r=await fetch(`https://api.mux.com/video/v1/assets/${encodeURIComponent(assetId)}`,{method:"DELETE",headers:{Authorization:"Basic "+btoa(tokenId+":"+secret)}});if(!r.ok&&r.status!==404)throw new Error("Video deletion not confirmed.");}
-  const{ supabaseAdmin }=await import("@/integrations/supabase/client.server");const{error:delError}=await supabaseAdmin.from("bible_teachings").delete().eq("id",data.id);if(delError)throw new Error("Teaching deletion not confirmed.");return{saved:true};
+  const{error:delError}=await supabaseAdmin.from("bible_teachings").delete().eq("id",data.id).eq("upload_reservation",reservation);if(delError)throw new Error("Teaching deletion not confirmed.");return{saved:true};
+  }catch(error){await supabaseAdmin.from("bible_teachings").update({upload_reservation:null,upload_claimed_at:null}).eq("id",data.id).eq("upload_reservation",reservation);throw error;}
 });
