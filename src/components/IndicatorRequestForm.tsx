@@ -47,7 +47,7 @@ export function IndicatorRequestForm() {
         try {
           const result = await submit({ data: { indicatorId: selectedId, username: parsed.data, note: note.trim(), submissionId: submission.current.id } });
           if (result.saved) {
-            setStatus(result.request.notification_status === "sent" ? "Request saved. Awaiting review; TradingView access is not granted automatically." : "Request saved and visible to the Founder. Email notification is not confirmed.");
+            setStatus(result.request.notification_status === "sent" ? `Request saved for ${result.request.tradingview_username}. Awaiting review; TradingView access is not granted automatically.` : `Request saved for ${result.request.tradingview_username} and visible to the Founder. Email notification is not confirmed.`);
             await Promise.all([qc.invalidateQueries({ queryKey: ["indicator-workspace"] }), qc.invalidateQueries({ queryKey: ["indicator-admin"] })]);
           }
         } catch (failure) { setError(true); setStatus(failure instanceof Error ? failure.message : "Save not confirmed. Please retry."); }

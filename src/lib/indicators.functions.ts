@@ -40,7 +40,7 @@ export const submitIndicatorRequest = createServerFn({ method: "POST" })
     });
     if (error || !saved) {
       console.error("Indicator request persistence failed", { userId: context.userId, submissionId: data.submissionId, code: error?.code });
-      throw new Error("Request not confirmed. Retry with the same details.");
+      throw new Error(error?.message.includes("Different request already pending") ? "A different username is already pending for this indicator. Reload to view it." : "Request not confirmed. Retry with the same details.");
     }
     const request = (Array.isArray(saved) ? saved[0] : saved) as IndicatorRequest | undefined;
     if (!request) throw new Error("Request not confirmed. Please retry.");
@@ -72,7 +72,7 @@ export const saveIndicator = createServerFn({ method: "POST" })
     await owner(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // The generated RPC type cannot express SQL NULL for an optional UUID.
-    const args = { p_actor: context.userId, p_id: data.id ?? null, p_name: data.name, p_description: data.description, p_active: data.active };
+    const args = { p_actor: context.userId, p_id: data.id ?? null, p_name: data.name, p_description: data.description, p_active: data.active, p_expected: data.expectedUpdatedAt ?? null };
     const { data: row, error } = await supabaseAdmin.rpc("manage_indicator", args as unknown as Database["public"]["Functions"]["manage_indicator"]["Args"]);
     if (error) throw new Error(error.code === "23505" ? "An indicator with that name already exists." : "Indicator not saved. Please retry.");
     return row;

@@ -3,9 +3,10 @@
 ## Approved master update — Stage 1 only
 - [x] Audit existing features, permissions and costs without changing the application
 - [x] Add persistent indicator catalogue, requests, duplicate protection and Founder-only permissions
-- [ ] Complete dynamic member form and Founder catalogue/request administration
-- [ ] Complete Affiliate Program rename and legacy redirect without financial changes
-- [ ] Run rule/security tests and verify available live flows; authenticated browser test requires external account session
+- [x] Complete dynamic member form and Founder catalogue/request administration
+- [x] Complete Affiliate Program rename and legacy redirect without financial changes
+- [x] Rule tests and database permission checks; signed-out legacy/canonical routes and phone layout verified
+- [ ] Exact beta failure and signed-in save/readback/Founder flows (blocked: externally managed authenticated account unavailable)
 - [ ] Stage 2–4 await separate approval
 
 ## Payout section and Seasonality

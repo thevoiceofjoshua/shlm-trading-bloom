@@ -23,7 +23,7 @@ export function IndicatorManager({ compact = false }: { compact?: boolean }) {
   const q = useQuery({ queryKey: ["indicator-admin", user?.id, page], queryFn: () => getAdmin({ data: { page } }), enabled: user?.id === INDICATOR_OWNER_ID, retry: false, refetchInterval: 15_000 });
   const mutation = useMutation({
     mutationFn: async (action: { type: "save"; indicator: Partial<Indicator> } | { type: "order"; ids: string[] } | { type: "review"; id: string; status: "approved" | "rejected" }) => {
-      if (action.type === "save") await save({ data: { id: action.indicator.id, name: action.indicator.name ?? "", description: action.indicator.description ?? "", active: action.indicator.active ?? true } });
+      if (action.type === "save") await save({ data: { id: action.indicator.id, name: action.indicator.name ?? "", description: action.indicator.description ?? "", active: action.indicator.active ?? true, expectedUpdatedAt: action.indicator.updated_at } });
       if (action.type === "order") await reorder({ data: { ids: action.ids } });
       if (action.type === "review") await review({ data: { id: action.id, status: action.status } });
     },
