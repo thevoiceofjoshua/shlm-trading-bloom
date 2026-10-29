@@ -1,12 +1,12 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { FORECAST_VERSION,snapshotSlot } from "@/lib/forecast-rules";
+import { FORECAST_VERSION,dueSnapshot } from "@/lib/forecast-rules";
 import { fetchForecastContext,sourceBars } from "@/lib/forecast-data.server";
-export async function recordForecastTick(now=new Date()){
- const slot=snapshotSlot(now);
+export async function recordForecastTick(now=new Date(),scheduledTime?:Date){
+ const slot=dueSnapshot(now,scheduledTime);
  if(slot){
   const{data:exists}=await supabaseAdmin.from("forecast_snapshots").select("instrument").eq("session_date",slot.date).eq("slot",slot.slot).eq("model_version",FORECAST_VERSION);
   if((exists?.length??0)<3){const context=await fetchForecastContext(now);for(const market of context.markets){if(exists?.some(r=>r.instrument===market.instrument))continue;
-   const {error}=await supabaseAdmin.from("forecast_snapshots").insert({session_date:slot.date,instrument:market.instrument,slot:slot.slot,scheduled_at:now.toISOString(),issued_at:now.toISOString(),model_version:FORECAST_VERSION,status:"no_reliable_forecast",reason:market.stale?"STALE_OR_MISSING_DATA":"UNVALIDATED_MODEL",inputs:market as any,output:{status:"NO RELIABLE FORECAST",context:market.context,confidence:null,forecast:null,leadership:context.leadership,calendarVerified:false,licensingVerified:false} as any});
+   const {error}=await supabaseAdmin.from("forecast_snapshots").insert({session_date:slot.date,instrument:market.instrument,slot:slot.slot,scheduled_at:slot.scheduledAt.toISOString(),issued_at:now.toISOString(),model_version:FORECAST_VERSION,status:"no_reliable_forecast",reason:slot.late?"LATE_SNAPSHOT":market.stale?"STALE_OR_MISSING_DATA":"UNVALIDATED_MODEL",inputs:market as any,output:{status:"NO RELIABLE FORECAST",context:market.context,confidence:null,forecast:null,leadership:context.leadership,calendarVerified:false,licensingVerified:false,late:slot.late} as any});
    if(error&&error.code!=="23505")console.error("Forecast snapshot not saved",error.code);
   }}
  }

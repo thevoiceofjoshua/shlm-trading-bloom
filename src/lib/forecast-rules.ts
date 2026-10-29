@@ -14,6 +14,11 @@ export function snapshotSlot(now: Date) {
   const date = slot === "17:00" ? new Date(Date.parse(clock.date + "T12:00:00Z") + 86400000).toISOString().slice(0, 10) : clock.date;
   return { date, slot };
 }
+export function dueSnapshot(now:Date,scheduledTime?:Date){
+ const scheduled=scheduledTime??new Date(Math.floor(now.getTime()/(5*60000))*5*60000);
+ const slot=snapshotSlot(scheduled);
+ return slot?{...slot,scheduledAt:scheduled,late:now.getTime()-scheduled.getTime()>=60000}:null;
+}
 export function completeBars(bars: Candle[], intervalMinutes: number, cutoff: number) { return bars.filter(b => b.t + intervalMinutes * 60 <= cutoff && [b.o,b.h,b.l,b.c].every(Number.isFinite)); }
 export function aggregateBars(bars: Candle[], sourceMinutes: number, targetMinutes: number): Candle[] {
   const size = targetMinutes / sourceMinutes, buckets = new Map<number,Candle[]>();
