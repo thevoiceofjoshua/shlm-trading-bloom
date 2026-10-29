@@ -18,17 +18,14 @@
 - **Forecasts:** NQ/YM reads exist, Gold does not; Tue/Wed manipulation and Thursday expansion remain fixed. No six-scenario engine, frozen checkpoint predictions, input/outcome ledger, per-market accuracy or walk-forward validation. Evidence scores are not probabilities. Active five-minute scheduling has recent successes and a timeout; native/external paths differ and need DST/retry/deduplication reconciliation.
 - **Bible Study:** no page, independent membership, teaching pipeline, protected playback or persistent community chat/moderation. Screenshot storage does not encode video; Tawk is support chat. Replies/reactions/pins, mutes, rate limits, membership revocation and supported notifications need new secure records/workflows.
 
-## Services and costs — approval required before activation
+## Services and costs — nothing enabled
 
-| Dependency | Audit conclusion |
-|---|---|
-| Stages 1–2 | Existing Supabase/auth/email can support these; no new paid provider inherently needed. Database/hosting usage applies. Save requests independently of email delivery; TradingView grants remain manual. |
-| Video | Managed encoding/adaptive playback required. **Cloudflare Stream** supports MP4/MOV and resumable uploads: published **$5/month per 1,000 stored minutes of capacity + $1 per 1,000 watched minutes**, encoding included. Conditional example: 1,000 stored + 1,000 watched = $6 before other services/tax. **Mux** is an alternative with tier/resolution-dependent pricing. Raw Supabase Storage alone is not reliable MOV processing/playback. Upload bytes and encoding must bypass normal page requests. |
-| Native chat | Reuse Supabase Postgres + Realtime; no separate chat vendor inherently needed. Published Free allowances: **2 million realtime messages/month, 200 peak connections**. Pro starts at **$25/month**, with different allowances/overages. Actual project plan/headroom unverified; fan-out/presence/reactions affect usage. Quotas do not replace anti-spam controls. |
-| Forecast market feeds | Licensed real-time and intraday historical coverage for **CME NQ/MNQ, CBOT YM/MYM, COMEX GC/MGC** is a likely production dependency. Yahoo is delayed, has no supported multi-year intraday guarantee, and prohibits redistribution. Existing Tradovate account access does not permit shared redistribution either. |
-| Feed candidate/calendar | Databento internal-use plans start at **$199/month**, **not an all-in quote or licence for this member website**. Historical data, commercial distribution and exchange/non-display/derived-data rights need a written quote. A licensed economic calendar with point-in-time history may add costs. Forecast ingestion/validation needs background processing. |
+- **Stages 1–2:** existing Supabase/auth/email suffice; no new paid provider inherently needed. Normal usage applies; email failure must not erase requests; TradingView grants remain manual.
+- **Video:** managed processing required. **Cloudflare Stream** supports MP4/MOV/resumable uploads: **$5/month per 1,000 stored minutes of capacity + $1 per 1,000 watched minutes**, encoding included. Conditional example: 1,000 stored + 1,000 watched = $6 before other services/tax. **Mux** is an alternative with tier/resolution-dependent costs. Raw Storage alone cannot guarantee MOV/adaptive playback. Video bytes/encoding bypass ordinary page requests.
+- **Chat:** Supabase Postgres/Realtime, no separate vendor required. Published Free allowances: **2 million messages/month, 200 peak connections**. Pro starts **$25/month**; actual project plan/headroom unverified. Fan-out/presence/reactions affect usage; anti-spam and supported push need implementation.
+- **Forecasts:** licensed live/intraday history for **CME NQ/MNQ, CBOT YM/MYM, COMEX GC/MGC** likely required. Yahoo is delayed, lacks supported multi-year intraday guarantees and prohibits redistribution; existing Tradovate access is not a redistribution licence. Databento internal-use plans start **$199/month**, **not an all-in commercial website quote**; history/exchange/non-display/derived/distribution rights require written terms. A sourced point-in-time macro calendar may add costs; validation needs background processing.
 
-No defensible monthly total without video library/viewing minutes, chat concurrency, account plans and market licensing. **No paid service connected or enabled in this audit. Present its budget and obtain approval first.**
+Budget depends on viewing/library minutes, chat traffic, plans and feed licensing. **Present costs and obtain approval before any paid activation.**
 
 ## Security and deployment
 
