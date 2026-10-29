@@ -17,6 +17,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CentreRouteImport } from './routes/centre'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DiscordRouteImport } from './routes/discord'
+import { Route as GuardRouteImport } from './routes/guard'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProgramRouteImport } from './routes/program'
 import { Route as RecruitersRouteImport } from './routes/recruiters'
@@ -89,6 +90,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const DiscordRoute = DiscordRouteImport.update({
   id: '/discord',
   path: '/discord',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuardRoute = GuardRouteImport.update({
+  id: '/guard',
+  path: '/guard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -274,6 +280,7 @@ export interface FileRoutesByFullPath {
   '/centre': typeof CentreRoute
   '/dashboard': typeof DashboardRoute
   '/discord': typeof DiscordRoute
+  '/guard': typeof GuardRoute
   '/privacy': typeof PrivacyRoute
   '/program': typeof ProgramRoute
   '/recruiters': typeof RecruitersRoute
@@ -317,6 +324,7 @@ export interface FileRoutesByTo {
   '/centre': typeof CentreRoute
   '/dashboard': typeof DashboardRoute
   '/discord': typeof DiscordRoute
+  '/guard': typeof GuardRoute
   '/privacy': typeof PrivacyRoute
   '/program': typeof ProgramRoute
   '/recruiters': typeof RecruitersRoute
@@ -361,6 +369,7 @@ export interface FileRoutesById {
   '/centre': typeof CentreRoute
   '/dashboard': typeof DashboardRoute
   '/discord': typeof DiscordRoute
+  '/guard': typeof GuardRoute
   '/privacy': typeof PrivacyRoute
   '/program': typeof ProgramRoute
   '/recruiters': typeof RecruitersRoute
@@ -406,6 +415,7 @@ export interface FileRouteTypes {
     | '/centre'
     | '/dashboard'
     | '/discord'
+    | '/guard'
     | '/privacy'
     | '/program'
     | '/recruiters'
@@ -449,6 +459,7 @@ export interface FileRouteTypes {
     | '/centre'
     | '/dashboard'
     | '/discord'
+    | '/guard'
     | '/privacy'
     | '/program'
     | '/recruiters'
@@ -492,6 +503,7 @@ export interface FileRouteTypes {
     | '/centre'
     | '/dashboard'
     | '/discord'
+    | '/guard'
     | '/privacy'
     | '/program'
     | '/recruiters'
@@ -536,6 +548,7 @@ export interface RootRouteChildren {
   CentreRoute: typeof CentreRoute
   DashboardRoute: typeof DashboardRoute
   DiscordRoute: typeof DiscordRoute
+  GuardRoute: typeof GuardRoute
   PrivacyRoute: typeof PrivacyRoute
   ProgramRoute: typeof ProgramRoute
   RecruitersRoute: typeof RecruitersRoute
@@ -627,6 +640,13 @@ declare module '@tanstack/react-router' {
       path: '/discord'
       fullPath: '/discord'
       preLoaderRoute: typeof DiscordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guard': {
+      id: '/guard'
+      path: '/guard'
+      fullPath: '/guard'
+      preLoaderRoute: typeof GuardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -872,6 +892,7 @@ const rootRouteChildren: RootRouteChildren = {
   CentreRoute: CentreRoute,
   DashboardRoute: DashboardRoute,
   DiscordRoute: DiscordRoute,
+  GuardRoute: GuardRoute,
   PrivacyRoute: PrivacyRoute,
   ProgramRoute: ProgramRoute,
   RecruitersRoute: RecruitersRoute,
