@@ -75,6 +75,7 @@ export type Database = {
         Row: {
           active: boolean
           blocked: boolean
+          display_name: string | null
           joined_at: string
           muted_until: string | null
           notifications: boolean
@@ -84,6 +85,7 @@ export type Database = {
         Insert: {
           active?: boolean
           blocked?: boolean
+          display_name?: string | null
           joined_at?: string
           muted_until?: string | null
           notifications?: boolean
@@ -93,6 +95,7 @@ export type Database = {
         Update: {
           active?: boolean
           blocked?: boolean
+          display_name?: string | null
           joined_at?: string
           muted_until?: string | null
           notifications?: boolean

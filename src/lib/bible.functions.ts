@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { bibleMessageInput, teachingInput, FREE_VIDEO_LIMIT } from "@/lib/bible-rules";
+import { bibleMessageInput, bibleDisplayName, teachingInput, FREE_VIDEO_LIMIT } from "@/lib/bible-rules";
 import type { Database } from "@/integrations/supabase/types";
 
 type Context = { userId: string; supabase: any; claims: Record<string,unknown> };
@@ -28,7 +28,10 @@ export const setBibleMembership = createServerFn({method:"POST"}).middleware([re
   const {supabaseAdmin}=await import("@/integrations/supabase/client.server");
   const {data:existing,error:readError}=await context.supabase.from("bible_memberships").select("*").eq("user_id",context.userId).maybeSingle();
   if(readError||existing?.blocked&&data.active) throw new Error("Membership is restricted. Contact the administrator.");
-  const {error}=await supabaseAdmin.from("bible_memberships").upsert({user_id:context.userId,active:data.active,...(data.notifications===undefined?{}:{notifications:data.notifications})},{onConflict:"user_id"});
+  const {data:account,error:accountError}=await supabaseAdmin.auth.admin.getUserById(context.userId);
+  if(accountError||!account.user) throw new Error("Membership could not be confirmed. Try again.");
+  const display_name=bibleDisplayName(account.user.user_metadata, account.user.email);
+  const {error}=await supabaseAdmin.from("bible_memberships").upsert({user_id:context.userId,active:data.active,display_name,...(data.notifications===undefined?{}:{notifications:data.notifications})},{onConflict:"user_id"});
   if(error)throw new Error("Membership not saved. Try again."); return {saved:true};
 });
 export const getBibleChat = createServerFn({method:"POST"}).middleware([requireSupabaseAuth]).inputValidator((input:unknown)=>z.object({before:z.string().datetime().optional()}).parse(input??{})).handler(async({context,data})=>{
@@ -47,7 +50,8 @@ export const postBibleMessage=createServerFn({method:"POST"}).middleware([requir
   const {supabaseAdmin}=await import("@/integrations/supabase/client.server");
   const {data:user,error:userError}=await supabaseAdmin.auth.admin.getUserById(context.userId);
   if(userError||!user.user||user.user.banned_until&&Date.parse(user.user.banned_until)>Date.now())throw new Error("Posting is restricted.");
-  const name=user.user.user_metadata?.full_name??user.user.user_metadata?.name??"Member";
+  const name=bibleDisplayName(user.user.user_metadata, user.user.email);
+  await supabaseAdmin.from("bible_memberships").update({display_name:name}).eq("user_id",context.userId);
   const {data:message,error}=await supabaseAdmin.rpc("send_bible_message",{p_user:context.userId,p_name:String(name),p_body:data.body,p_reply:data.replyTo,p_submission:data.submissionId} as any);
   if(error)throw new Error(error.message.includes("wait")?"Please wait before sending another message.":"Message not confirmed. Retry the same message.");
   return {saved:true,message};
