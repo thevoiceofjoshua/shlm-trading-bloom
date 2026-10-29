@@ -51,7 +51,19 @@ export async function recordWav(): Promise<{ stop: () => Promise<File> }> {
         node.disconnect();
         source.disconnect();
         node.onaudioprocess = null;
-        const blob = encodeWav(chunks, audioContext.sampleRate);
+        const sourceRate = audioContext.sampleRate;
+        const mono = new Float32Array(chunks.reduce((sum, chunk) => sum + chunk.length, 0));
+        let cursor = 0;
+        for (const chunk of chunks) { mono.set(chunk, cursor); cursor += chunk.length; }
+        const targetRate = Math.min(16000, sourceRate);
+        const downsampled = new Float32Array(Math.floor(mono.length * targetRate / sourceRate));
+        for (let i = 0; i < downsampled.length; i++) {
+          const start = Math.floor(i * sourceRate / targetRate), end = Math.min(mono.length, Math.floor((i + 1) * sourceRate / targetRate));
+          let sum = 0;
+          for (let j = start; j < end; j++) sum += mono[j];
+          downsampled[i] = sum / Math.max(1, end - start);
+        }
+        const blob = encodeWav([downsampled], targetRate);
         await audioContext.close();
         if (blob.size < 2048) throw new Error("Recording was empty; please record again");
         return new File([blob], "recording.wav", { type: "audio/wav" });
