@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Session Guard Done, break-even and voice Journal
+- [ ] Requested Guard-to-Journal verification: run isolated save/readback checks without leaving artificial trades in the member history
 - [x] Persist manual Done lock and five-minute revert without bypassing automatic locks
 - [x] Exclude break-even from the three-trade limit while preserving every Journal record
 - [x] Add authenticated audio transcription and reviewable journal autofill in Guard and Journal
