@@ -6,9 +6,11 @@ interface Props {
   username?: string
   memberEmail?: string
   note?: string
+  indicatorName?: string
+  requestId?: string
 }
 
-const Email = ({ username = '', memberEmail = '', note = '' }: Props) => (
+const Email = ({ username = '', memberEmail = '', note = '', indicatorName = 'SHLM SYSTEM', requestId = '' }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>{`Beta access request — ${username || 'TradingView user'}`}</Preview>
@@ -18,10 +20,12 @@ const Email = ({ username = '', memberEmail = '', note = '' }: Props) => (
           <Text style={pill}>&#9679;&nbsp;&nbsp;BETA ACCESS REQUEST</Text>
           <Heading style={title}>{username || 'TradingView username'}</Heading>
           <Text style={subtitle}>
-            A beta tester submitted their TradingView username for SHLM SYSTEM invite-only access.
+            A member saved a TradingView access request for {indicatorName}.
           </Text>
 
           <Section style={innerCard}>
+            <Text style={row}><strong>Indicator:</strong> {indicatorName}</Text>
+            {requestId && <Text style={row}><strong>Request:</strong> {requestId}</Text>}
             <Text style={row}>
               <strong>TradingView username:</strong> {username || '—'}
             </Text>

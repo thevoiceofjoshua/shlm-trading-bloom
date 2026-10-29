@@ -39,7 +39,7 @@ export function WiseConnectCard() {
     <section className="mt-12">
       <h2 className="font-display text-xl font-medium">Wise payouts</h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        Pay recruiters from your Wise balance. Your token is stored encrypted and never shown again.
+        Pay affiliates from your Wise balance. Your token is stored encrypted and never shown again.
       </p>
       {!s ? (
         <p className="mt-4 text-sm text-muted-foreground">Loading…</p>

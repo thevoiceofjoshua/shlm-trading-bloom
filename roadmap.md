@@ -1,5 +1,13 @@
 # Roadmap
 
+## Approved master update — Stage 1 only
+- [x] Audit existing features, permissions and costs without changing the application
+- [x] Add persistent indicator catalogue, requests, duplicate protection and Founder-only permissions
+- [ ] Complete dynamic member form and Founder catalogue/request administration
+- [ ] Complete Affiliate Program rename and legacy redirect without financial changes
+- [ ] Run rule/security tests and verify available live flows; authenticated browser test requires external account session
+- [ ] Stage 2–4 await separate approval
+
 ## Payout section and Seasonality
 - [x] Add text-only homepage payout section immediately below hero
 - [x] Add protected history tables and read-only Seasonality tool with linked charts and day details

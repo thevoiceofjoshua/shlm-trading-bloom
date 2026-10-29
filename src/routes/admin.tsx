@@ -1,4 +1,5 @@
 import { WiseConnectCard } from "@/components/WiseConnectCard";
+import { IndicatorManager } from "@/components/IndicatorManager";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
@@ -24,7 +25,15 @@ type ApplicationList = AdminApplication[];
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
   head: () => ({
-    meta: [{ title: "SHLM Founder" }, { name: "robots", content: "noindex" }],
+    meta: [
+      { title: "SHLM Founder — Applications and Indicators" },
+      { name: "description", content: "SHLM Founder administration for mentorship applications, indicator requests and accounts." },
+      { property: "og:title", content: "SHLM Founder — Applications and Indicators" },
+      { property: "og:description", content: "Private SHLM Founder administration." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "robots", content: "noindex" },
+    ],
     links: [{ rel: "canonical", href: "https://shlm-trading-bloom.lovable.app/admin" }],
   }),
 });
@@ -494,6 +503,7 @@ function AdminPage() {
 
         {passcode && <ManageRoles passcode={passcode} />}
         {passcode && <WiseConnectCard />}
+        {passcode && <IndicatorManager />}
       </div>
     </div>
   );
@@ -502,7 +512,7 @@ function AdminPage() {
 const ROLE_OPTIONS: { value: ManagedRole; label: string }[] = [
   { value: "member", label: "Member (no special role)" },
   { value: "free_member", label: "Free member (lifetime)" },
-  { value: "recruiter", label: "Recruiter (lifetime + portal)" },
+  { value: "recruiter", label: "Affiliate (lifetime + program)" },
   { value: "shlm_mod", label: "SHLM MOD" },
   { value: "admin", label: "Founder (admin)" },
   { value: "revoked", label: "No access (revoked)" },

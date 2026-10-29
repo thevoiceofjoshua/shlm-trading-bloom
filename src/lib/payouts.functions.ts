@@ -299,7 +299,7 @@ const payInput = z.object({ recruiterId: z.string().uuid(), amountCents: z.numbe
 async function recipientFor(recruiterId: string, mode: string) {
   const { admin } = await import("@/lib/wise.server");
   const { data } = await (await admin()).from("recruiter_bank_accounts").select("*").eq("recruiter_id", recruiterId).eq("mode", mode).maybeSingle();
-  if (!data) throw new Error("This recruiter hasn't added a bank account yet.");
+  if (!data) throw new Error("This affiliate hasn't added a bank account yet.");
   return data as any;
 }
 
@@ -308,7 +308,7 @@ export const quotePayout = createServerFn({ method: "POST" })
   .inputValidator((d) => payInput.parse(d))
   .handler(async ({ data, context }) => {
     await requireFounder(context.userId);
-    if (!(await isRecruiterId(data.recruiterId))) throw new Error("That account is not a recruiter.");
+    if (!(await isRecruiterId(data.recruiterId))) throw new Error("That account is not an affiliate.");
     const { getActiveMode, getConnection, wiseFetch } = await import("@/lib/wise.server");
     const { mode } = await getActiveMode();
     const bank = await recipientFor(data.recruiterId, mode);
@@ -337,7 +337,7 @@ export const confirmPayout = createServerFn({ method: "POST" })
   .inputValidator((d) => payInput.extend({ quoteId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await requireFounder(context.userId);
-    if (!(await isRecruiterId(data.recruiterId))) throw new Error("That account is not a recruiter.");
+    if (!(await isRecruiterId(data.recruiterId))) throw new Error("That account is not an affiliate.");
     const { admin, getActiveMode, getConnection, wiseFetch, mapStatus, WiseError } = await import("@/lib/wise.server");
     const db = await admin();
     const { mode } = await getActiveMode();
@@ -360,7 +360,7 @@ export const confirmPayout = createServerFn({ method: "POST" })
       p_bonus_cents: BONUS_AMOUNT * 100,
       p_created_by: context.userId,
     });
-    if (rErr) throw new Error(rErr.message.includes("owed") ? "That's more than this recruiter is owed." : "Couldn't reserve the payout.");
+    if (rErr) throw new Error(rErr.message.includes("owed") ? "That's more than this affiliate is owed." : "Couldn't reserve the payout.");
 
     const { data: row } = await db.from("recruiter_payouts").select("customer_transaction_id").eq("id", payoutId).single();
     const opt = (q.paymentOptions ?? []).find((o: any) => o.payIn === "BALANCE") ?? {};

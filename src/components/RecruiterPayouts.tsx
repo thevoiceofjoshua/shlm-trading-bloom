@@ -102,7 +102,7 @@ export function FounderPayoutPanel({ s, name, mode, connected }: { s: PayoutSumm
           onClick={() => setOpen(true)}
           className="min-h-10 rounded-full bg-foreground px-5 text-sm font-semibold text-background disabled:opacity-40"
         >
-          Pay recruiter
+          Pay affiliate
         </button>
       </div>
       <div className="mt-3 grid grid-cols-3 gap-2 text-sm">
@@ -194,7 +194,7 @@ function PayDialog({ s, name, mode, onClose }: { s: PayoutSummary; name: string;
                 <dt className="text-muted-foreground">Sending</dt><dd className="text-right font-semibold">{money(cents)}</dd>
                 {quote.fee != null && (<><dt className="text-muted-foreground">Wise fee</dt><dd className="text-right">${Number(quote.fee).toFixed(2)}</dd></>)}
                 <dt className="text-muted-foreground">Taken from balance</dt><dd className="text-right">${Number(quote.sourceAmount).toFixed(2)}</dd>
-                {quote.targetAmount != null && (<><dt className="text-muted-foreground">Recruiter receives</dt><dd className="text-right font-semibold">{Number(quote.targetAmount).toLocaleString("en-US")} {quote.targetCurrency}</dd></>)}
+                {quote.targetAmount != null && (<><dt className="text-muted-foreground">Affiliate receives</dt><dd className="text-right font-semibold">{Number(quote.targetAmount).toLocaleString("en-US")} {quote.targetCurrency}</dd></>)}
                 {quote.rate != null && quote.targetCurrency !== "USD" && (<><dt className="text-muted-foreground">Rate</dt><dd className="text-right">{quote.rate}</dd></>)}
               </dl>
             )}

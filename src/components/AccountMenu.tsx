@@ -63,7 +63,7 @@ export function AccountMenu({
         </a>
         {showRecruiters && (
           <a
-            href="/recruiters"
+            href="/affiliate-program"
             className={cn(
               "flex min-h-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition-colors",
               scrolled
@@ -71,12 +71,12 @@ export function AccountMenu({
                 : "border-white/20 text-white hover:bg-white/10",
             )}
           >
-            Recruiter Portal
+            Affiliate Program
           </a>
         )}
         {!showRecruiters && recruiterError && (
           <p className="break-words rounded-2xl border border-destructive/40 px-4 py-2 text-xs text-destructive">
-            Recruiter check failed: {recruiterError}
+            Affiliate check failed: {recruiterError}
           </p>
         )}
         <button
@@ -139,11 +139,11 @@ export function AccountMenu({
           </a>
           {showRecruiters && (
             <a
-              href="/recruiters"
+              href="/affiliate-program"
               className="flex items-center border-t border-border px-4 py-2.5 text-sm hover:bg-accent"
               role="menuitem"
             >
-              Recruiter Portal
+              Affiliate Program
             </a>
           )}
           {isStaff && (

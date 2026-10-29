@@ -995,6 +995,7 @@ export type Database = {
       manage_indicator: {
         Args: {
           p_active: boolean
+          p_actor: string
           p_description: string
           p_id: string
           p_name: string
@@ -1026,7 +1027,10 @@ export type Database = {
         }
         Returns: undefined
       }
-      reorder_indicators: { Args: { p_ids: string[] }; Returns: undefined }
+      reorder_indicators: {
+        Args: { p_actor: string; p_ids: string[] }
+        Returns: undefined
+      }
       reserve_recruiter_payout: {
         Args: {
           p_amount_cents: number
@@ -1040,7 +1044,7 @@ export type Database = {
         Returns: string
       }
       review_indicator_request: {
-        Args: { p_id: string; p_status: string }
+        Args: { p_actor: string; p_id: string; p_status: string }
         Returns: {
           created_at: string
           id: string
@@ -1070,6 +1074,7 @@ export type Database = {
           p_indicator: string
           p_note: string
           p_submission: string
+          p_user: string
           p_username: string
         }
         Returns: {
