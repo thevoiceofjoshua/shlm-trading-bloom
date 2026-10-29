@@ -4,11 +4,9 @@
 
 ## Already exists
 
-- Existing SHLM styling, fonts, navigation, reusable controls, accounts, Founder/MOD roles, paid/lifetime access, Stripe and Wise.
-- Centre Map, Drivers, Radar, market/session summaries, opening range, readiness, calendar, Weekly Behavior and notifications. **Internals remains hidden.**
-- Persistent Journal entries, P&L, win rate, screenshots, rules and imports; separate browser-local Session Guard.
-- Recruiter referral/commission/bonus/payout tracking and live updates; beta preview and username email; Supabase storage/Realtime; Tawk support chat and external Discord.
-- **Database verified:** NQ/YM each have **3,817 daily rows, 25 August 2011–28 October 2026**, with only **5 non-estimated character labels each**. This is not validated intraday forecast history.
+SHLM styling/navigation/controls; accounts/roles/membership; Stripe/Wise; Centre Map, Drivers, Radar, context, calendar, Weekly Behavior/notifications; Journal analytics/screenshots/imports; separate Guard; Recruiter ledgers/live updates; beta preview/email; Supabase storage/Realtime; Tawk/Discord. **Internals stays hidden.**
+
+**Database verified:** NQ/YM each have **3,817 daily rows, 25 August 2011–28 October 2026**, only **5 non-estimated labels each**. Daily history is not validated intraday prediction history.
 
 ## Broken or missing
 
@@ -74,14 +72,10 @@ Budget depends on viewing/library minutes, chat traffic, plans and feed licensin
 - Persistent realtime chat with history/replies/reactions/pins, announcements, moderation, rate limits and supported notifications.
 - Test phone upload interruption, actual MOV/MP4 playback, processing failures, revoked membership, unauthorized administration and chat reconnect. Present video/chat costs before activation.
 
-**Each stage preserves SHLM styling and unrelated working features, tests concrete rules and phone/desktop flows, and stops for review before the next. No destructive history changes without impact review.**
+**Preserve styling/history; test each stage on phone/desktop and stop for review before the next.**
 
-## Technical references
+## Official cost/licensing sources
 
-Reuse existing TanStack/React/design controls and Supabase server functions/RLS; additive storage, atomic trade/lock operations, unchanged internal recruiter identifiers.
-
-Source evidence: beta handler/panel, Guard, Journal, hub/quotes/weekly server modules, admin API and recruiters route.
-
-[Stream pricing](https://developers.cloudflare.com/stream/pricing/) · [Supabase pricing](https://supabase.com/pricing) · [Yahoo delays/licensing](https://help.yahoo.com/kb/exchanges-data-providers-yahoo-finance-sln2310.html) · [Databento pricing](https://databento.com/pricing)
+[Stream](https://developers.cloudflare.com/stream/pricing/) · [Supabase](https://supabase.com/pricing) · [Yahoo](https://help.yahoo.com/kb/exchanges-data-providers-yahoo-finance-sln2310.html) · [Databento](https://databento.com/pricing)
 
 **Awaiting approval of Stage 1 only. Stages 2–4 and paid services remain unapproved.**
