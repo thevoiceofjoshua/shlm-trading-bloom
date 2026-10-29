@@ -1,5 +1,9 @@
 # Roadmap
 
+## Mobile Session Guard loading glitch
+- [ ] Remove the obsolete static-page reload loop without changing Guard rules or sign-in
+- [ ] Verify mobile/desktop Guard entry, legacy links and reduced-motion behavior
+
 ## Approved master update — all stages
 - [x] Audit existing features, permissions and costs without changing the application
 - [x] Add persistent indicator catalogue, requests, duplicate protection and Founder-only permissions
