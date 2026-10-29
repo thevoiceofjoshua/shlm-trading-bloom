@@ -16,7 +16,7 @@ export function VoiceJournalButton({ onDraft, label = "Speak recap" }: { onDraft
     if (!recorder.current) return; if (timer.current) clearTimeout(timer.current);
     const active = recorder.current; recorder.current = null; setState("processing"); setMessage("Transcribing…");
     try {
-      const file = await active.stop(); const session = (await supabase.auth.getSession()).data.session;
+      const file = await active.stop(); if (!alive.current) return; const session = (await supabase.auth.getSession()).data.session;
       if (!session) throw new Error("Sign in again before recording.");
       const form = new FormData(); form.append("file", file, file.name);
       abort.current = new AbortController();
@@ -30,7 +30,7 @@ export function VoiceJournalButton({ onDraft, label = "Speak recap" }: { onDraft
   const start = async () => {
     setError(""); setMessage(""); setState("processing");
     try { const next = await recordWav(); if (!alive.current) { await next.stop(); return; } recorder.current = next; setState("recording"); setMessage("Recording… tap stop when finished."); timer.current = setTimeout(() => void stop(), 4 * 60 * 1000); }
-    catch { setError("Microphone access is required to record."); setState("idle"); }
+    catch { if (alive.current) { setError("Microphone access is required to record."); setState("idle"); } }
   };
   return <div className="space-y-2"><Button type="button" variant="outline" disabled={state === "processing"} onClick={() => state === "recording" ? void stop() : void start()} className="min-h-10 gap-2 rounded-full" title={label}>{state === "recording" ? <Square size={15} /> : <Mic size={15} />}{state === "recording" ? "Stop recording" : state === "processing" ? "Processing…" : label}</Button>{(message || error) && <p role={error ? "alert" : "status"} className={`text-xs ${error ? "text-destructive" : "text-muted-foreground"}`}>{error || message}</p>}</div>;
 }

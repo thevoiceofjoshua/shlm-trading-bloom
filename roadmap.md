@@ -1,10 +1,12 @@
 # Roadmap
 
 ## Session Guard Done, break-even and voice Journal
-- [ ] Persist manual Done lock and five-minute revert without bypassing automatic locks
-- [ ] Exclude break-even from the three-trade limit while preserving every Journal record
-- [ ] Add authenticated audio transcription and reviewable journal autofill in Guard and Journal
-- [ ] Verify lock boundaries, saved records and voice processing; document unavailable live checks
+- [x] Persist manual Done lock and five-minute revert without bypassing automatic locks
+- [x] Exclude break-even from the three-trade limit while preserving every Journal record
+- [x] Add authenticated audio transcription and reviewable journal autofill in Guard and Journal
+- [x] 13 targeted tests pass; real speech transcription and structured extraction pass; service-only permissions and signed-out phone/desktop boundaries verified
+- [ ] Authenticated Done/revert, BE Journal readback and voice-save checks for member/MOD/Founder (blocked: externally managed sign-in unavailable)
+- [ ] Live Cloudflare rollout (blocked: independent deployment; voice service needs server-held LOVABLE_API_KEY there)
 
 ## Google account switching
 - [x] Keep remembered sign-in and request Google account selection from all three Google buttons
