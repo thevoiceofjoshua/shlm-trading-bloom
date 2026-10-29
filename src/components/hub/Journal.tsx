@@ -18,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { JournalVaultGate } from "@/components/hub/JournalVaultGate";
 import { importTradovateFills } from "@/lib/tradovate.functions";
 import { listTradovateConnections } from "@/lib/tradovate.functions";
+import { GuardPanel } from "@/components/GuardPanel";
 
 /* ------------------------------ date helpers ------------------------------- */
 
@@ -815,6 +816,7 @@ export function Journal({ userId, onClose }: { userId: string; onClose?: () => v
         </div>
       </div>
 
+      <details className="mt-6 border-t border-border pt-4"><summary className="cursor-pointer font-display text-sm font-medium">Active session · Quick log</summary><GuardPanel userId={userId} /></details>
       <WeekMonthSummary userId={userId} />
 
       <InstructionsPanel />

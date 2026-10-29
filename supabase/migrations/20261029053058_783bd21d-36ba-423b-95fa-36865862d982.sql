@@ -1,0 +1,14 @@
+ALTER TABLE public.bible_teachings ADD COLUMN mux_upload_id text,ADD COLUMN mux_asset_id text,ADD COLUMN playback_id text;
+CREATE TABLE public.forecast_snapshots(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),session_date date NOT NULL,instrument text NOT NULL CHECK(instrument IN ('NQ','YM','GC')),slot text NOT NULL CHECK(slot IN ('17:00','05:00','06:25')),scheduled_at timestamptz NOT NULL,issued_at timestamptz NOT NULL DEFAULT now(),model_version text NOT NULL,status text NOT NULL CHECK(status IN ('no_reliable_forecast','context_only')),reason text NOT NULL,inputs jsonb NOT NULL,output jsonb NOT NULL,UNIQUE(session_date,instrument,slot,model_version));
+GRANT SELECT ON public.forecast_snapshots TO authenticated; GRANT SELECT,INSERT ON public.forecast_snapshots TO service_role; ALTER TABLE public.forecast_snapshots ENABLE ROW LEVEL SECURITY;
+CREATE POLICY forecasts_centre_read ON public.forecast_snapshots FOR SELECT TO authenticated USING(public.can_read_seasonality());
+CREATE TABLE public.forecast_outcomes(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),snapshot_id uuid NOT NULL REFERENCES public.forecast_snapshots(id),horizon_minutes integer NOT NULL CHECK(horizon_minutes IN (30,45)),observed_at timestamptz NOT NULL,actual jsonb NOT NULL,created_at timestamptz NOT NULL DEFAULT now(),UNIQUE(snapshot_id,horizon_minutes));
+GRANT SELECT ON public.forecast_outcomes TO authenticated; GRANT SELECT,INSERT ON public.forecast_outcomes TO service_role; ALTER TABLE public.forecast_outcomes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY forecast_outcomes_read ON public.forecast_outcomes FOR SELECT TO authenticated USING(public.can_read_seasonality());
+CREATE TABLE public.forecast_validations(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),instrument text NOT NULL,model_version text NOT NULL,evaluated_at timestamptz NOT NULL DEFAULT now(),cutoff timestamptz NOT NULL,sample_size integer NOT NULL,method text NOT NULL,metrics jsonb NOT NULL,calibrated boolean NOT NULL DEFAULT false);
+GRANT SELECT ON public.forecast_validations TO authenticated; GRANT SELECT,INSERT ON public.forecast_validations TO service_role; ALTER TABLE public.forecast_validations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY forecast_validation_read ON public.forecast_validations FOR SELECT TO authenticated USING(public.can_read_seasonality());
+CREATE FUNCTION public.immutable_forecast() RETURNS trigger LANGUAGE plpgsql SET search_path=public AS $$ BEGIN RAISE EXCEPTION 'Forecast evidence is append-only'; END $$;
+CREATE TRIGGER forecast_snapshots_immutable BEFORE UPDATE OR DELETE ON public.forecast_snapshots FOR EACH ROW EXECUTE FUNCTION public.immutable_forecast();
+CREATE TRIGGER forecast_outcomes_immutable BEFORE UPDATE OR DELETE ON public.forecast_outcomes FOR EACH ROW EXECUTE FUNCTION public.immutable_forecast();
+CREATE TRIGGER forecast_validations_immutable BEFORE UPDATE OR DELETE ON public.forecast_validations FOR EACH ROW EXECUTE FUNCTION public.immutable_forecast();
