@@ -155,6 +155,7 @@ function CentrePage() {
             </div>
 
             <WeeklyNotificationBanner enabled={true} />
+            <SessionBar payload={payload} />
             <section className="space-y-5 border-t border-border pt-6"><h2 className="font-display text-xl font-medium">Market Outlook</h2>
               {payload.context && <MarketBrief payload={payload} />}
               {payload.dataState !== "sample" && <details><summary className="cursor-pointer text-sm font-medium">Daily Market Map · Direction &amp; Structure</summary><div className="mt-4"><IndexCards payload={payload} /></div></details>}
@@ -167,7 +168,7 @@ function CentrePage() {
             <section className="space-y-5 border-t border-border pt-6"><h2 className="font-display text-xl font-medium">Market Relationship</h2><ForecastContext view="leadership"/>
               {payload.dataState !== "sample" && <details><summary className="cursor-pointer text-sm font-medium">Market Drivers</summary><div className="mt-4"><DriverTabs payload={payload} /></div></details>}
             </section>
-            <section className="space-y-5 border-t border-border pt-6"><h2 className="font-display text-xl font-medium">Session Outlook</h2><SessionBar payload={payload}/><MarketConditions payload={payload}/><ForecastContext/>
+            <section className="space-y-5 border-t border-border pt-6"><h2 className="font-display text-xl font-medium">Session Outlook</h2><MarketConditions payload={payload}/><ForecastContext/>
             {openingRangeMarkets(payload).length > 0 && (
               <MobileCollapse title="NY Opening Range">
                 <OpeningRange payload={payload} />
