@@ -15,6 +15,8 @@ import { Journal } from "@/components/hub/Journal";
 import { BetaIndicator } from "@/components/hub/BetaIndicator";
 import { MarketInternals } from "@/components/hub/MarketInternals";
 import { WeeklyNotificationBanner, WeeklyNotificationCenter } from "@/components/hub/WeeklyNotifications";
+import { ForecastContext } from "@/components/hub/ForecastContext";
+import { Button } from "@/components/ui/button";
 
 
 import { AdminPreviewTag } from "@/components/AdminBar";
@@ -153,32 +155,24 @@ function CentrePage() {
             </div>
 
             <WeeklyNotificationBanner enabled={true} />
-            <SessionBar payload={payload} />
-
-            <MarketBrief payload={payload} />
+            <section className="space-y-5 border-t border-border pt-6"><h2 className="font-display text-xl font-medium">Market Outlook</h2>
+              {payload.context && <MarketBrief payload={payload} />}
+              {payload.dataState !== "sample" && <details><summary className="cursor-pointer text-sm font-medium">Daily Market Map · Direction &amp; Structure</summary><div className="mt-4"><IndexCards payload={payload} /></div></details>}
+            </section>
 
             {/* Market Internals hidden until a paid NYSE internals source is connected —
                 restore by adding <MarketInternals payload={payload} /> here (component + logic kept intact). */}
 
-            <MarketConditions payload={payload} />
-
-            {/* Sections without real data are hidden — never shown with sample or "unavailable" content. */}
-            {payload.dataState !== "sample" && <IndexCards payload={payload} />}
-
-            <LiquidityRadar payload={payload} />
-
-            {payload.dataState !== "sample" && <DriverTabs payload={payload} />}
-
+            <section className="space-y-5 border-t border-border pt-6"><h2 className="font-display text-xl font-medium">Liquidity Intelligence</h2><LiquidityRadar payload={payload} /></section>
+            <section className="space-y-5 border-t border-border pt-6"><h2 className="font-display text-xl font-medium">Market Relationship</h2><ForecastContext view="leadership"/>
+              {payload.dataState !== "sample" && <details><summary className="cursor-pointer text-sm font-medium">Market Drivers</summary><div className="mt-4"><DriverTabs payload={payload} /></div></details>}
+            </section>
+            <section className="space-y-5 border-t border-border pt-6"><h2 className="font-display text-xl font-medium">Session Outlook</h2><SessionBar payload={payload}/><MarketConditions payload={payload}/><ForecastContext/>
             {openingRangeMarkets(payload).length > 0 && (
               <MobileCollapse title="NY Opening Range">
                 <OpeningRange payload={payload} />
               </MobileCollapse>
             )}
-            <MobileCollapse title="Trade Readiness">
-              <TradeReadiness readOnly={!!payload.access.readOnly} />
-            </MobileCollapse>
-            <WeeklyNotificationCenter enabled={true} />
-
             {payload.econLive && (
               <>
                 <MorningNewsSpotlight payload={payload} />
@@ -187,6 +181,9 @@ function CentrePage() {
                 </MobileCollapse>
               </>
             )}
+            </section>
+            <section className="space-y-5 border-t border-border pt-6"><h2 className="font-display text-xl font-medium">Setup Quality</h2><ForecastContext view="setup"/><MobileCollapse title="Trade Readiness"><TradeReadiness readOnly={!!payload.access.readOnly}/></MobileCollapse></section>
+            <WeeklyNotificationCenter enabled={true}/>
           </div>
         )}
       </main>
@@ -233,7 +230,7 @@ function CentreMenu({
 
   return (
     <div ref={ref} className="relative">
-      <button
+      <Button
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="menu"
@@ -243,7 +240,7 @@ function CentreMenu({
         <span className="hidden sm:inline">Member tools</span>
         <span className="sm:hidden">Tools</span>
         <span aria-hidden className="text-[10px]">▾</span>
-      </button>
+      </Button>
       {open && (
         <div
           role="menu"
@@ -272,7 +269,7 @@ function CentreMenu({
             <span className="mt-0.5 block text-xs text-muted-foreground">Day-of-week NY session context</span>
           </Link>
           <a
-            href="/guard/"
+            href="/guard"
             target="_blank"
             rel="noopener noreferrer"
             role="menuitem"
@@ -281,6 +278,7 @@ function CentreMenu({
             <span className="font-medium">Session Guard</span>
             <span className="mt-0.5 block text-xs text-muted-foreground">Trade limit and session lockout</span>
           </a>
+          <Link to="/bible-study" role="menuitem" onClick={()=>setOpen(false)} className="block w-full border-t border-border px-4 py-3 text-left text-sm hover:bg-accent"><span className="font-medium">Bible Study</span></Link>
           <Link
             to="/centre/seasonality"
             role="menuitem"
