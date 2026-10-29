@@ -74,6 +74,7 @@ export function AccountMenu({
             Affiliate Program
           </a>
         )}
+        <a href="/bible-study" className="flex min-h-12 items-center justify-center rounded-full border border-border px-4 text-sm font-semibold text-foreground hover:bg-accent">Bible Study</a>
         {!showRecruiters && recruiterError && (
           <p className="break-words rounded-2xl border border-destructive/40 px-4 py-2 text-xs text-destructive">
             Affiliate check failed: {recruiterError}
@@ -146,6 +147,10 @@ export function AccountMenu({
               Affiliate Program
             </a>
           )}
+          {isStaff && (
+            <a href="/bible-study" className="flex items-center border-t border-border px-4 py-2.5 text-sm hover:bg-accent" role="menuitem">Bible Study</a>
+          )}
+          {!isStaff && <a href="/bible-study" className="flex items-center border-t border-border px-4 py-2.5 text-sm hover:bg-accent" role="menuitem">Bible Study</a>}
           {isStaff && (
             <button
               type="button"

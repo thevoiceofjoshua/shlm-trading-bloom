@@ -49,11 +49,13 @@ export default {
   async scheduled(_event: unknown, _env: unknown, ctx: { waitUntil: (promise: Promise<unknown>) => void }) {
     ctx.waitUntil((async () => {
       const now = new Date();
+      const { recordForecastTick } = await import("./lib/forecast-tick.server");
+      await recordForecastTick(now).catch(error => console.error("Forecast scheduled check failed", error));
       const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", weekday: "short", hour: "2-digit", hour12: false }).formatToParts(now);
       const day = parts.find((p) => p.type === "weekday")?.value;
       const hour = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
       // Pre-NY trading sessions: Sunday 15:00 PT through Friday 07:00 PT.
-      if (day === "Sat" || (day === "Sun" && hour < 15) || (day === "Fri" && hour >= 7)) return;
+      if (day === "Sat" || (day === "Sun" && hour < 15) || (day === "Fri" && hour >= 14)) return;
       const { recordWeeklyActivity } = await import("./lib/weekly-activity.server");
       await recordWeeklyActivity();
     })().catch((error) => console.error("Weekly behavior scheduled check failed", error)));

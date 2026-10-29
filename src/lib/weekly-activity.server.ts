@@ -12,8 +12,8 @@ export function sessionDay(now: Date = new Date()) {
 export async function recordWeeklyActivity(data?: WeeklyBehaviorPayload) {
   const reading = data ?? await computeWeeklyBehavior();
   if (reading.todayDow < 1 || reading.todayDow > 5 || reading.lastBarTs === 0) return reading;
-  const status = reading.todayDow === 1 ? reading.monday : reading.todayDow === 5 ? reading.friday : null;
-  const us30 = reading.todayDow === 1 ? reading.us30?.monday : reading.todayDow === 5 ? reading.us30?.friday : null;
+  const status = reading.current?.nasdaq ?? (reading.todayDow === 1 ? reading.monday : reading.todayDow === 5 ? reading.friday : null);
+  const us30 = reading.current?.us30 ?? (reading.todayDow === 1 ? reading.us30?.monday : reading.todayDow === 5 ? reading.us30?.friday : null);
   const snapshot = {
     label: status?.kind === "classified" ? status.label : null,
     developing: status?.kind === "classified" ? status.developing : null,

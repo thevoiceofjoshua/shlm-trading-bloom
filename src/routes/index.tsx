@@ -193,6 +193,7 @@ function Header({
     { label: "Mentorship", href: "#mentorship" },
     { label: "Pricing", href: "#pricing" },
     { label: "FAQ", href: "#faq" },
+    { label: "Bible Study", href: "/bible-study" },
   ];
 
   useEffect(() => {

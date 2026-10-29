@@ -15,6 +15,8 @@ async function handle(request: Request) {
   const day = parts.find((p) => p.type === "weekday")?.value;
   const hour = Number(parts.find((p) => p.type === "hour")?.value ?? 0) % 24;
   const minute = Number(parts.find((p) => p.type === "minute")?.value ?? 0);
+  const { recordForecastTick } = await import("@/lib/forecast-tick.server");
+  await recordForecastTick().catch(error => console.error("Forecast tick failed", error));
   // Seasonality daily job: after the US close (2:00–2:15 PM PT, Mon–Fri) add the new day for NQ and YM.
   let seasonality: unknown = undefined;
   if (day !== "Sat" && day !== "Sun" && hour === 14 && minute < 15) {
