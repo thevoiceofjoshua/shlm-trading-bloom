@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AffiliateProgramRouteImport } from './routes/affiliate-program'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CentreRouteImport } from './routes/centre'
@@ -58,6 +59,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AffiliateProgramRoute = AffiliateProgramRouteImport.update({
+  id: '/affiliate-program',
+  path: '/affiliate-program',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApplyRoute = ApplyRouteImport.update({
@@ -262,6 +268,7 @@ const LovableEmailTransactionalPreviewRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/affiliate-program': typeof AffiliateProgramRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
   '/centre': typeof CentreRoute
@@ -304,6 +311,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/affiliate-program': typeof AffiliateProgramRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
   '/centre': typeof CentreRoute
@@ -347,6 +355,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/affiliate-program': typeof AffiliateProgramRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
   '/centre': typeof CentreRoute
@@ -391,6 +400,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/affiliate-program'
     | '/apply'
     | '/auth'
     | '/centre'
@@ -433,6 +443,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/affiliate-program'
     | '/apply'
     | '/auth'
     | '/centre'
@@ -475,6 +486,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/affiliate-program'
     | '/apply'
     | '/auth'
     | '/centre'
@@ -518,6 +530,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AffiliateProgramRoute: typeof AffiliateProgramRoute
   ApplyRoute: typeof ApplyRoute
   AuthRoute: typeof AuthRoute
   CentreRoute: typeof CentreRoute
@@ -572,6 +585,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/affiliate-program': {
+      id: '/affiliate-program'
+      path: '/affiliate-program'
+      fullPath: '/affiliate-program'
+      preLoaderRoute: typeof AffiliateProgramRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apply': {
@@ -846,6 +866,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AffiliateProgramRoute: AffiliateProgramRoute,
   ApplyRoute: ApplyRoute,
   AuthRoute: AuthRoute,
   CentreRoute: CentreRoute,
