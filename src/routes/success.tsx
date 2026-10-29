@@ -22,6 +22,8 @@ export const Route = createFileRoute("/success")({
       { name: "description", content: "Your SHLM mentorship plan is confirmed. Head to your private dashboard to begin." },
       { property: "og:title", content: "Welcome to SHLM — Purchase Confirmed" },
       { property: "og:description", content: "Your SHLM mentorship plan is confirmed. Head to your private dashboard to begin." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://shlm-trading-bloom.lovable.app/success" },
       { name: "robots", content: "noindex" },
     ],
