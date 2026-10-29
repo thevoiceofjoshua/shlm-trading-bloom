@@ -110,6 +110,6 @@ export const reviewIndicatorRequest = createServerFn({ method: "POST" })
     await owner(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: request, error } = await supabaseAdmin.rpc("review_indicator_request", { p_actor: context.userId, p_id: data.id, p_status: data.status });
-    if (error) throw new Error("Decision not saved. Reload and try again.");
+    if (error) throw new Error(error.message.includes("eligible") ? "Member no longer has Centre access. Approval was not saved." : error.message.includes("archived") ? "This indicator is archived. Approval was not saved." : "Decision not saved. Reload and try again.");
     return request;
   });
