@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminMode } from "@/hooks/use-admin-mode";
+import { googleSignInOptions } from "@/lib/account-session";
 
 type Mode = "signin" | "signup";
 type Phase = "booting" | "ready" | "opening";
@@ -155,7 +156,7 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
     dismissPrompt();
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin },
+      options: googleSignInOptions(window.location.origin),
     });
     if (oauthError) {
       window.sessionStorage.removeItem(ACCESS_INTENT_KEY);
@@ -202,7 +203,7 @@ export function HomepageVaultBoot({ onComplete }: { onComplete: () => void }) {
     dismissPrompt();
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin },
+      options: googleSignInOptions(window.location.origin),
     });
     if (oauthError) {
       window.sessionStorage.removeItem(ACCESS_INTENT_KEY);

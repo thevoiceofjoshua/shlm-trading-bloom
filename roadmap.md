@@ -1,5 +1,10 @@
 # Roadmap
 
+## Google account switching
+- [ ] Keep remembered sign-in and show Google account selection from every Google button
+- [ ] Make all sign-out buttons cancel private reads, clear caches and return to sign-in
+- [ ] Test account-selection requests and sign-out handling; real Google switch requires external account access
+
 ## Mobile Session Guard loading glitch
 - [x] Remove the obsolete static-page reload loop without changing Guard rules or sign-in
 - [x] Verify `/guard`, `/guard/` and legacy HTML links at 320px, 390px and desktop, including reduced motion; six Guard rule tests pass

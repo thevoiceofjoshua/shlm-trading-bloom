@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { signOutAccount } from "@/lib/account-session";
 import { displayFirstName } from "@/lib/display-name";
 import { HomeButton } from "@/components/HomeButton";
 import { TradovateConnect } from "@/components/TradovateConnect";
@@ -34,6 +36,9 @@ export const Route = createFileRoute("/dashboard")({
 
 function DashboardPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState("");
   const { demo } = useSearch({ from: "/dashboard" });
   const [user, setUser] = useState<{ email?: string | null; name?: string | null } | null>(null);
   const [loading, setLoading] = useState(!demo);
@@ -81,18 +86,33 @@ function DashboardPage() {
             <span className="hidden text-sm text-muted-foreground sm:inline">
               {displayFirstName(user?.name, user?.email)}
             </span>
-            <button
+            <Button
               type="button"
-              onClick={() => supabase.auth.signOut().then(() => navigate({ to: "/", replace: true }))}
+              variant="ghost"
+              disabled={signingOut}
+              onClick={async () => {
+                if (signingOut) return;
+                setSigningOut(true);
+                setSignOutError("");
+                try {
+                  await signOutAccount(supabase.auth, queryClient, window.sessionStorage);
+                  await navigate({ to: "/auth", replace: true });
+                } catch {
+                  setSignOutError("Could not sign out. Please try again.");
+                } finally {
+                  setSigningOut(false);
+                }
+              }}
               className="rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
             >
-              Sign out
-            </button>
+              {signingOut ? "Signing out…" : "Sign out"}
+            </Button>
           </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        {signOutError && <p role="alert" className="mb-4 text-sm text-destructive">{signOutError}</p>}
         <h1 className="font-display text-3xl font-medium tracking-tight">
           Welcome back{user?.name ? `, ${user.name}` : ""}
         </h1>
