@@ -35,6 +35,7 @@ import { Route as FeaturesCommunityRouteImport } from './routes/features.communi
 import { Route as FeaturesCurriculumRouteImport } from './routes/features.curriculum'
 import { Route as FeaturesMentorshipRouteImport } from './routes/features.mentorship'
 import { Route as FeaturesRiskRouteImport } from './routes/features.risk'
+import { Route as GuardIndexDothtmlRouteImport } from './routes/guard_.index[.]html'
 import { Route as ApiPublicRecruitersListRouteImport } from './routes/api/public/recruiters-list'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe-webhook'
 import { Route as ApiPublicSubmitApplicationRouteImport } from './routes/api/public/submit-application'
@@ -183,6 +184,11 @@ const FeaturesRiskRoute = FeaturesRiskRouteImport.update({
   path: '/features/risk',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuardIndexDothtmlRoute = GuardIndexDothtmlRouteImport.update({
+  id: '/guard_/index.html',
+  path: '/guard/index.html',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicRecruitersListRoute = ApiPublicRecruitersListRouteImport.update({
   id: '/api/public/recruiters-list',
   path: '/api/public/recruiters-list',
@@ -304,6 +310,7 @@ export interface FileRoutesByFullPath {
   '/features/curriculum': typeof FeaturesCurriculumRoute
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
+  '/guard/index.html': typeof GuardIndexDothtmlRoute
   '/api/public/recruiters-list': typeof ApiPublicRecruitersListRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
@@ -349,6 +356,7 @@ export interface FileRoutesByTo {
   '/features/curriculum': typeof FeaturesCurriculumRoute
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
+  '/guard/index.html': typeof GuardIndexDothtmlRoute
   '/api/public/recruiters-list': typeof ApiPublicRecruitersListRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
@@ -395,6 +403,7 @@ export interface FileRoutesById {
   '/features/curriculum': typeof FeaturesCurriculumRoute
   '/features/mentorship': typeof FeaturesMentorshipRoute
   '/features/risk': typeof FeaturesRiskRoute
+  '/guard_/index.html': typeof GuardIndexDothtmlRoute
   '/api/public/recruiters-list': typeof ApiPublicRecruitersListRoute
   '/api/public/stripe-webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/submit-application': typeof ApiPublicSubmitApplicationRoute
@@ -442,6 +451,7 @@ export interface FileRouteTypes {
     | '/features/curriculum'
     | '/features/mentorship'
     | '/features/risk'
+    | '/guard/index.html'
     | '/api/public/recruiters-list'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
@@ -487,6 +497,7 @@ export interface FileRouteTypes {
     | '/features/curriculum'
     | '/features/mentorship'
     | '/features/risk'
+    | '/guard/index.html'
     | '/api/public/recruiters-list'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
@@ -532,6 +543,7 @@ export interface FileRouteTypes {
     | '/features/curriculum'
     | '/features/mentorship'
     | '/features/risk'
+    | '/guard_/index.html'
     | '/api/public/recruiters-list'
     | '/api/public/stripe-webhook'
     | '/api/public/submit-application'
@@ -578,6 +590,7 @@ export interface RootRouteChildren {
   FeaturesCurriculumRoute: typeof FeaturesCurriculumRoute
   FeaturesMentorshipRoute: typeof FeaturesMentorshipRoute
   FeaturesRiskRoute: typeof FeaturesRiskRoute
+  GuardIndexDothtmlRoute: typeof GuardIndexDothtmlRoute
   ApiPublicRecruitersListRoute: typeof ApiPublicRecruitersListRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicSubmitApplicationRoute: typeof ApiPublicSubmitApplicationRoute
@@ -781,6 +794,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeaturesRiskRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guard_/index.html': {
+      id: '/guard_/index.html'
+      path: '/guard/index.html'
+      fullPath: '/guard/index.html'
+      preLoaderRoute: typeof GuardIndexDothtmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/recruiters-list': {
       id: '/api/public/recruiters-list'
       path: '/api/public/recruiters-list'
@@ -930,6 +950,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeaturesCurriculumRoute: FeaturesCurriculumRoute,
   FeaturesMentorshipRoute: FeaturesMentorshipRoute,
   FeaturesRiskRoute: FeaturesRiskRoute,
+  GuardIndexDothtmlRoute: GuardIndexDothtmlRoute,
   ApiPublicRecruitersListRoute: ApiPublicRecruitersListRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicSubmitApplicationRoute: ApiPublicSubmitApplicationRoute,

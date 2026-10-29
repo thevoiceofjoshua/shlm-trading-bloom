@@ -1,5 +1,10 @@
 # Roadmap
 
+## Mobile Session Guard loading glitch
+- [x] Remove the obsolete static-page reload loop without changing Guard rules or sign-in
+- [x] Verify `/guard`, `/guard/` and legacy HTML links at 320px, 390px and desktop, including reduced motion; six Guard rule tests pass
+- [ ] Confirm corrected entry on live Cloudflare and authenticated member/MOD/Founder (blocked: independent deployment and externally managed sign-in)
+
 ## Approved master update — all stages
 - [x] Audit existing features, permissions and costs without changing the application
 - [x] Add persistent indicator catalogue, requests, duplicate protection and Founder-only permissions
