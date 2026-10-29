@@ -997,6 +997,7 @@ export type Database = {
           p_active: boolean
           p_actor: string
           p_description: string
+          p_expected: string
           p_id: string
           p_name: string
         }

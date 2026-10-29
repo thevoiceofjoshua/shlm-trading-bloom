@@ -14,6 +14,7 @@ export const indicatorInput = z.object({
   name: z.string().trim().min(1).max(100),
   description: z.string().trim().max(500).default(""),
   active: z.boolean().default(true),
+  expectedUpdatedAt: z.string().optional(),
 });
 export function canManageIndicators(userId: string, hasAdminRole: boolean) {
   return userId === INDICATOR_OWNER_ID && hasAdminRole;
