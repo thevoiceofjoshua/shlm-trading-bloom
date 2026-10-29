@@ -10,7 +10,14 @@ export const guardTradeInput = z.object({
     context.addIssue({ code: "custom", path: ["pnl"], message: "WIN needs positive P&L, LOSS negative P&L, and breakeven allows zero or fees." });
 });
 export function guardLock(outcomes: string[]) {
-  return outcomes.includes("win") ? "one-win" : outcomes.length >= 3 ? "three-trade-limit" : null;
+  return outcomes.includes("win") ? "one-win" : guardCount(outcomes) >= 3 ? "three-trade-limit" : null;
+}
+export function guardCount(outcomes: string[]) {
+  return outcomes.filter(outcome => outcome === "win" || outcome === "loss").length;
+}
+export const DONE_REVERT_MS = 5 * 60 * 1000;
+export function doneRemaining(doneAt: string | null | undefined, now: number) {
+  return doneAt ? Math.max(0, Date.parse(doneAt) + DONE_REVERT_MS - now) : 0;
 }
 export function guardPeriod(now: Date) {
   const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Los_Angeles", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).formatToParts(now);

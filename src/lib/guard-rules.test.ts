@@ -1,8 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { guardLock, guardPeriod, guardTradeInput } from "./guard-rules";
+import { doneRemaining, guardCount, guardLock, guardPeriod, guardTradeInput } from "./guard-rules";
 describe("existing Guard rules", () => {
   it("locks on one win", () => { expect(guardLock(["win"])).toBe("one-win"); expect(guardLock(["loss", "win"])).toBe("one-win"); });
-  it("locks after three trades, including BE", () => { expect(guardLock(["loss", "loss"])).toBeNull(); expect(guardLock(["loss", "breakeven", "loss"])).toBe("three-trade-limit"); });
+  it("does not count break-even toward the three-trade limit", () => { expect(guardCount(["loss", "breakeven", "loss"])).toBe(2); expect(guardLock(["loss", "breakeven", "loss"])).toBeNull(); expect(guardLock(["breakeven", "breakeven", "breakeven"])).toBeNull(); });
+  it("locks after three non-break-even trades", () => { expect(guardLock(["loss", "breakeven", "loss", "loss"])).toBe("three-trade-limit"); });
+  it("allows Done revert for exactly five minutes", () => { const at="2026-10-29T13:30:00Z"; expect(doneRemaining(at, Date.parse(at))).toBe(300000); expect(doneRemaining(at, Date.parse(at)+299999)).toBe(1); expect(doneRemaining(at, Date.parse(at)+300000)).toBe(0); expect(doneRemaining(at, Date.parse(at)+300001)).toBe(0); expect(doneRemaining(null,Date.parse(at))).toBe(0); });
   it("keeps 06:20–07:30 and 17:00–19:15 Pacific windows", () => {
     for (const [time, open] of [["13:19", false], ["13:20", true], ["14:29", true], ["14:30", false], ["23:59", false]] as const) expect(guardPeriod(new Date(`2026-10-29T${time}:00Z`)).windowOpen).toBe(open);
     expect(guardPeriod(new Date("2026-10-30T00:00:00Z")).windowOpen).toBe(true);
