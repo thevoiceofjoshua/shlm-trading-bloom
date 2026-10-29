@@ -218,8 +218,7 @@ export function MarketConditions({ payload }: { payload: HubPayload }) {
   });
   const w = wk?.data;
   const day = w?.todayDow;
-  const status = day === 1 ? w?.monday : day === 5 ? w?.friday : null;
-  const fixed: Record<number, string> = { 2: "MANIPULATION → EXPANSION", 3: "MANIPULATION → EXPANSION", 4: "BIG PUSH / EXPANSION" };
+  const status = w?.current?.nasdaq ?? (day === 1 ? w?.monday : day === 5 ? w?.friday : null);
 
   const condRows = INSTRUMENTS.map((i) => {
     const ctx = ctxOf(payload, i.key);
@@ -256,13 +255,11 @@ export function MarketConditions({ payload }: { payload: HubPayload }) {
           <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Day character</p>
           <Link to="/centre/weekly-behavior" className="text-xs underline underline-offset-2">Full read →</Link>
         </div>
-        {day && fixed[day] ? (
-          <p className="mt-1 font-display text-sm font-semibold">{fixed[day]}{w!.fixedNote ? <span className="block text-[11px] font-normal text-muted-foreground">{w!.fixedNote.text}</span> : null}</p>
-        ) : status?.kind === "classified" ? (
+        {status?.kind === "classified" ? (
           <>
             <p className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">{status.phase === "live" ? "Live session read" : "Premarket read"} · NASDAQ</p>
             <p className="font-display text-sm font-semibold">{status.developing ? "Developing — " : ""}{status.label}</p>
-            <SymbolReads nq={status} ym={day === 1 ? w?.us30?.monday : w?.us30?.friday} />
+            <SymbolReads nq={status} ym={w?.current?.us30 ?? (day === 1 ? w?.us30?.monday : w?.us30?.friday)} />
             {status.phase === "live" && status.premarketLabel && (
               <p className="text-[11px] text-muted-foreground">Premarket read was {status.premarketLabel}</p>
             )}

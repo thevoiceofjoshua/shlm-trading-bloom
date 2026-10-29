@@ -8,15 +8,16 @@ import { useAdminMode } from "@/hooks/use-admin-mode";
 import { getWeeklyBehavior } from "@/lib/weekly-behavior.functions";
 import type { DayStatus } from "@/lib/weekly-behavior.server";
 import { WeeklyNotificationBanner, WeeklyNotificationCenter } from "@/components/hub/WeeklyNotifications";
+import { ForecastContext } from "@/components/hub/ForecastContext";
 
 export const Route = createFileRoute("/centre_/weekly-behavior")({
   component: WeeklyBehaviorPage,
   head: () => ({
     meta: [
       { title: "Weekly Behavior — SHLM Centre" },
-      { name: "description", content: "Expected NY session behavior by day of the week, with a live Monday/Friday choppy-or-fast read." },
+      { name: "description", content: "Dynamic NASDAQ, US30 and Gold session context with immutable forecast checkpoints and real outcomes." },
       { property: "og:title", content: "Weekly Behavior — SHLM Centre" },
-      { property: "og:description", content: "Day-of-week NY session behavior context for SHLM members." },
+      { property: "og:description", content: "Three-market session context, sourced observations and forecast evidence for SHLM members." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -24,11 +25,6 @@ export const Route = createFileRoute("/centre_/weekly-behavior")({
   }),
 });
 
-const FIXED: Record<number, string> = {
-  2: "MANIPULATION → EXPANSION",
-  3: "MANIPULATION → EXPANSION",
-  4: "BIG PUSH / EXPANSION",
-};
 const NAMES = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 function WeeklyBehaviorPage() {
@@ -73,7 +69,7 @@ function WeeklyBehaviorPage() {
         {res && !locked && <WeeklyNotificationBanner enabled={true} />}
         <h1 className="font-display text-2xl font-medium tracking-tight sm:text-3xl">Weekly Behavior</h1>
         <p className="mt-1 text-xs text-muted-foreground">
-          How the NY session tends to behave each day. Monday/Friday labels are read from NASDAQ (NQ futures) price action, with index structure from NASDAQ + US30 and a 2-year Treasury futures check. Context only — not an entry signal.
+          Dynamic session observations from NQ, YM and GC futures. Delayed data · context only.
         </p>
 
         {!ready || isLoading ? (
@@ -86,18 +82,19 @@ function WeeklyBehaviorPage() {
             </Link>
           </div>
         ) : (
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-6 space-y-6"><ForecastContext/>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {[1, 2, 3, 4, 5].map((d) => (
               <DayCard
                 key={d}
                 day={d}
                 today={data?.todayDow === d}
-                status={d === 1 ? data?.monday ?? null : d === 5 ? data?.friday ?? null : undefined}
-                us30={d === 1 ? data?.us30?.monday : d === 5 ? data?.us30?.friday : undefined}
-                note={data?.fixedNote?.day === d ? data.fixedNote.text : null}
+                status={data?.todayDow===d?data.current?.nasdaq??null:{kind:"not_today",reason:"No current-session observation for this day"}}
+                us30={data?.todayDow===d?data.current?.us30:null}
+                gold={data?.todayDow===d?data.current?.gold:null}
               />
             ))}
-          </div>
+          </div></div>
         )}
         {res && !locked && <WeeklyNotificationCenter enabled={true} />}
       </main>
@@ -112,8 +109,8 @@ function readText(s: DayStatus | null | undefined): string | null {
   if (s.kind === "waiting" && s.reason !== "Market data feed unavailable" && s.reason !== "US30 data unavailable") return "WAITING FOR DATA";
   return null;
 }
-function SymbolReads({ nq, ym }: { nq: DayStatus | null | undefined; ym: DayStatus | null | undefined }) {
-  const rows = [["NASDAQ", readText(nq)], ["US30", readText(ym)]].filter((r) => r[1]);
+function SymbolReads({ nq, ym, gc }: { nq: DayStatus | null | undefined; ym: DayStatus | null | undefined; gc?:DayStatus|null }) {
+  const rows = [["NASDAQ", readText(nq)], ["US30", readText(ym)], ["Gold",readText(gc)]].filter((r) => r[1]);
   if (!rows.length) return null;
   return (
     <div className="mt-2 space-y-0.5">
@@ -124,16 +121,13 @@ function SymbolReads({ nq, ym }: { nq: DayStatus | null | undefined; ym: DayStat
   );
 }
 
-function DayCard({ day, today, status, us30, note }: { day: number; today: boolean; status: DayStatus | null | undefined; us30?: DayStatus | null; note?: string | null }) {
-  const dynamic = day === 1 || day === 5;
+function DayCard({ day, today, status, us30, gold }: { day: number; today: boolean; status: DayStatus | null | undefined; us30?: DayStatus | null; gold?:DayStatus|null }) {
+  const dynamic = true;
   let headline: string;
   let sub: string | null = null;
   let tone = "border-border bg-surface text-foreground";
 
-  if (!dynamic) {
-    headline = FIXED[day];
-    sub = note ?? null;
-  } else if (!status || (status.kind === "waiting" && status.reason === "Market data feed unavailable")) {
+  if (!status || (status.kind === "waiting" && status.reason === "Market data feed unavailable")) {
     // Feed failed — hide the reading rather than show a broken state.
     return null;
   } else if (status.kind === "classified") {
@@ -149,7 +143,7 @@ function DayCard({ day, today, status, us30, note }: { day: number; today: boole
     sub = status.reason;
     tone = "border-border bg-surface text-muted-foreground";
   } else {
-    headline = "FAST / CHOPPY / SLOW / RANGE";
+    headline = "Not issued";
     sub = status.reason;
     tone = "border-border bg-surface text-muted-foreground";
   }
@@ -165,7 +159,7 @@ function DayCard({ day, today, status, us30, note }: { day: number; today: boole
       <span className={`mt-3 inline-flex max-w-full rounded-full border px-3 py-1.5 font-display text-sm font-semibold tracking-tight ${tone}`}>
         {headline}
       </span>
-      {dynamic && <SymbolReads nq={status} ym={us30} />}
+      {dynamic && <SymbolReads nq={status} ym={us30} gc={gold} />}
       {sub && <p className="mt-2 text-[11px] text-muted-foreground">{sub}</p>}
       {dynamic && status?.kind === "classified" && (
         <ul className="mt-3 space-y-1">

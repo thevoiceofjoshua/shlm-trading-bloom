@@ -14,6 +14,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AffiliateProgramRouteImport } from './routes/affiliate-program'
 import { Route as ApplyRouteImport } from './routes/apply'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BibleStudyRouteImport } from './routes/bible-study'
 import { Route as CentreRouteImport } from './routes/centre'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DiscordRouteImport } from './routes/discord'
@@ -75,6 +76,11 @@ const ApplyRoute = ApplyRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BibleStudyRoute = BibleStudyRouteImport.update({
+  id: '/bible-study',
+  path: '/bible-study',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CentreRoute = CentreRouteImport.update({
@@ -277,6 +283,7 @@ export interface FileRoutesByFullPath {
   '/affiliate-program': typeof AffiliateProgramRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
+  '/bible-study': typeof BibleStudyRoute
   '/centre': typeof CentreRoute
   '/dashboard': typeof DashboardRoute
   '/discord': typeof DiscordRoute
@@ -321,6 +328,7 @@ export interface FileRoutesByTo {
   '/affiliate-program': typeof AffiliateProgramRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
+  '/bible-study': typeof BibleStudyRoute
   '/centre': typeof CentreRoute
   '/dashboard': typeof DashboardRoute
   '/discord': typeof DiscordRoute
@@ -366,6 +374,7 @@ export interface FileRoutesById {
   '/affiliate-program': typeof AffiliateProgramRoute
   '/apply': typeof ApplyRoute
   '/auth': typeof AuthRoute
+  '/bible-study': typeof BibleStudyRoute
   '/centre': typeof CentreRoute
   '/dashboard': typeof DashboardRoute
   '/discord': typeof DiscordRoute
@@ -412,6 +421,7 @@ export interface FileRouteTypes {
     | '/affiliate-program'
     | '/apply'
     | '/auth'
+    | '/bible-study'
     | '/centre'
     | '/dashboard'
     | '/discord'
@@ -456,6 +466,7 @@ export interface FileRouteTypes {
     | '/affiliate-program'
     | '/apply'
     | '/auth'
+    | '/bible-study'
     | '/centre'
     | '/dashboard'
     | '/discord'
@@ -500,6 +511,7 @@ export interface FileRouteTypes {
     | '/affiliate-program'
     | '/apply'
     | '/auth'
+    | '/bible-study'
     | '/centre'
     | '/dashboard'
     | '/discord'
@@ -545,6 +557,7 @@ export interface RootRouteChildren {
   AffiliateProgramRoute: typeof AffiliateProgramRoute
   ApplyRoute: typeof ApplyRoute
   AuthRoute: typeof AuthRoute
+  BibleStudyRoute: typeof BibleStudyRoute
   CentreRoute: typeof CentreRoute
   DashboardRoute: typeof DashboardRoute
   DiscordRoute: typeof DiscordRoute
@@ -619,6 +632,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bible-study': {
+      id: '/bible-study'
+      path: '/bible-study'
+      fullPath: '/bible-study'
+      preLoaderRoute: typeof BibleStudyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/centre': {
@@ -889,6 +909,7 @@ const rootRouteChildren: RootRouteChildren = {
   AffiliateProgramRoute: AffiliateProgramRoute,
   ApplyRoute: ApplyRoute,
   AuthRoute: AuthRoute,
+  BibleStudyRoute: BibleStudyRoute,
   CentreRoute: CentreRoute,
   DashboardRoute: DashboardRoute,
   DiscordRoute: DiscordRoute,

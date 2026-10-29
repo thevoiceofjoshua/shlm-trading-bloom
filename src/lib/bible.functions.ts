@@ -3,6 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { bibleMessageInput, teachingInput, FREE_VIDEO_LIMIT } from "@/lib/bible-rules";
+import type { Database } from "@/integrations/supabase/types";
 
 type Context = { userId: string; supabase: any; claims: Record<string,unknown> };
 async function admin(context: Context) {
@@ -96,9 +97,9 @@ export const refreshTeachingVideo=createServerFn({method:"POST"}).middleware([re
   const tokenId=process.env["MUX_TOKEN_ID"],secret=process.env["MUX_TOKEN_SECRET"];if(!tokenId||!secret)throw new Error("Mux not connected.");
   const headers={Authorization:"Basic "+btoa(tokenId+":"+secret)};
   const response=await fetch(`https://api.mux.com/video/v1/uploads/${encodeURIComponent(row.mux_upload_id)}`,{headers});if(!response.ok)throw new Error("Upload status could not be checked.");const upload=(await response.json()).data;
-  let patch:Record<string,unknown>={state:["errored","cancelled","timed_out"].includes(upload.status)?"failed":"processing"};
+  let patch:Database["public"]["Tables"]["bible_teachings"]["Update"]={state:["errored","cancelled","timed_out"].includes(upload.status)?"failed":"processing"};
   if(upload.asset_id){const r=await fetch(`https://api.mux.com/video/v1/assets/${encodeURIComponent(upload.asset_id)}`,{headers});if(!r.ok)throw new Error("Processing status could not be checked.");const asset=(await r.json()).data;patch={mux_asset_id:asset.id,state:asset.status==="ready"?"ready":asset.status==="errored"?"failed":"processing",playback_id:asset.playback_ids?.find((p:{policy:string})=>p.policy==="signed")?.id??null,duration_seconds:asset.duration??null};}
-  const{ supabaseAdmin }=await import("@/integrations/supabase/client.server");const{error:saveError}=await supabaseAdmin.from("bible_teachings").update(patch).eq("id",row.id);if(saveError)throw new Error("Processing status not saved.");return{saved:true,state:patch.state};
+  const{ supabaseAdmin }=await import("@/integrations/supabase/client.server");const{error:saveError}=await supabaseAdmin.from("bible_teachings").update(patch).eq("id",row.id);if(saveError)throw new Error("Processing status not saved.");return{saved:true,state:patch.state??"processing"};
 });
 export const getTeachingPlayback=createServerFn({method:"POST"}).middleware([requireSupabaseAuth]).inputValidator((input:unknown)=>z.object({id:z.string().uuid()}).parse(input)).handler(async({context,data})=>{
   await joined(context);const{data:row,error}=await context.supabase.from("bible_teachings").select("*").eq("id",data.id).single();if(error||!row?.playback_id||row.state!=="ready")throw new Error("Teaching not available.");

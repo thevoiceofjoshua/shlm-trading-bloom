@@ -55,6 +55,8 @@ export interface WeeklyBehaviorPayload {
   sweepEvents: SweepEvent[];
   /** Independent US30 (YM=F) read, same methodology, own bars. Never affects the NASDAQ read. */
   us30: { monday: DayStatus; friday: DayStatus };
+  /** Dynamic same-session observations on every weekday, independently by instrument. */
+  current: { nasdaq: DayStatus; us30: DayStatus; gold: DayStatus } | null;
 }
 
 export interface SweepEvent { kind: "detected" | "confirmed" | "canceled"; ts: number; side: "high" | "low"; message: string }
@@ -501,18 +503,20 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
   let lastBarTs = 0;
   let ymMonday = monday;
   let ymFriday = friday;
+  let current: WeeklyBehaviorPayload["current"] = null;
   const live = sessionDow >= 1 && sessionDow <= 5 ? sessionDow : null;
   const target = sessionDow === 1 || sessionDow === 5 ? sessionDow : null;
 
   if (live) {
     try {
-      const [nq, ym, us2, quotes, econ] = await Promise.all([
+      const [nq, ym, us2, quotes, econ, gc] = await Promise.all([
         bars("NQ=F").catch(() => []),
         bars("YM=F").catch(() => [] as Bar[]),
         bars("ZT=F") // 2-year T-note futures: tracks US02Y inversely; breakout test is direction-agnostic
        .catch(() => []),
         fetchDelayedQuotes().catch(() => ({} as Record<string, any>)),
         fetchLiveEconEvents().catch(() => []),
+        bars("GC=F").catch(() => [] as Bar[]),
       ]);
       lastBarTs = Math.max(0, ...nq.filter((b) => b.key === todayKey && b.sm < NY_END).map((b) => b.t));
       const mtfs = [quotes["NASDAQ"]?.mtf, quotes["US30"]?.mtf].filter(Boolean) as { direction: string; state: string }[];
@@ -528,17 +532,17 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
         catalyst = hits.length > 0;
         catalystWhy = catalyst ? `${hits[0].title} near the open` : "No major U.S. release near the open";
       }
-      const r = classify(nq, us2, todayKey, nowSm, structure, structureWhy, catalyst, catalystWhy, !target);
+      const r = classify(nq, us2, todayKey, nowSm, structure, structureWhy, catalyst, catalystWhy, false);
       sweepEvents = r.sweepEvents;
       let status: DayStatus = r.status.kind === "classified" ? { ...r.status, phase: "premarket" } : r.status;
       const liveRead = classifyLive(nq, todayKey, status, structure, structureWhy, catalyst, catalystWhy, sweepEvents);
-      if (liveRead && target) status = liveRead;
+      if (liveRead) status = liveRead;
       if (target === 1) monday = status;
       else if (target === 5) friday = status;
-      else if (r.note) fixedNote = { day: live as 2 | 3 | 4, ...r.note };
+      fixedNote = null;
 
       // Independent US30 read: same classifiers run on YM=F's own bars. Its sweeps are not logged.
-      if (target) {
+      {
         let ymStatus: DayStatus = { kind: "waiting", reason: "US30 data unavailable", checks: [] };
         if (ym.length) {
           const y = classify(ym, us2, todayKey, nowSm, structure, structureWhy, catalyst, catalystWhy, false);
@@ -547,6 +551,13 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
           if (yLive) ymStatus = yLive;
         }
         if (target === 1) ymMonday = ymStatus; else ymFriday = ymStatus;
+        const gm = quotes["XAU/USD"]?.mtf;
+        const goldStructure = gm ? gm.state === "trending" && (gm.direction === "bullish" || gm.direction === "bearish") : null;
+        const g = classify(gc, [], todayKey, nowSm, goldStructure, goldStructure === null ? "Gold structure unavailable" : goldStructure ? "Directional Gold structure" : "Gold ranging", catalyst, catalystWhy, false);
+        let goldStatus: DayStatus = g.status.kind === "classified" ? { ...g.status, phase: "premarket" } : g.status;
+        goldStatus = classifyLive(gc, todayKey, goldStatus, goldStructure, "Gold futures structure", catalyst, catalystWhy, []) ?? goldStatus;
+        const attribute = (read: DayStatus, instrument: string): DayStatus => read.kind === "classified" || read.kind === "waiting" ? { ...read, checks: read.checks.map(check => ({ ...check, source: check.key === "catalyst" ? "U.S. calendar" : check.key === "us02y" ? "2Y Treasury futures" : instrument })) } : read;
+        current = { nasdaq: attribute(status, "NASDAQ · NQ"), us30: attribute(ymStatus, "US30 · YM"), gold: attribute(goldStatus, "Gold · GC") };
       }
     } catch {
       const w: DayStatus = { kind: "waiting", reason: "Market data feed unavailable", checks: [] };
@@ -554,5 +565,5 @@ export async function computeWeeklyBehavior(now: Date = new Date()): Promise<Wee
     }
   }
   sweepEvents = sweepEvents.map((e) => ({ ...e, message: `NASDAQ: ${e.message}` }));
-  return { todayDow: sessionDow, monday, friday, fixedNote, computedAt: now.toISOString(), sessionDate: todayKey, lastBarTs, sweepEvents, us30: { monday: ymMonday, friday: ymFriday } };
+  return { todayDow: sessionDow, monday, friday, fixedNote, computedAt: now.toISOString(), sessionDate: todayKey, lastBarTs, sweepEvents, us30: { monday: ymMonday, friday: ymFriday }, current };
 }
