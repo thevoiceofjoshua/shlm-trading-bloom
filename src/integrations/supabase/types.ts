@@ -424,6 +424,7 @@ export type Database = {
       guard_sessions: {
         Row: {
           created_at: string
+          done_at: string | null
           id: string
           lock_reason: string | null
           locked_at: string | null
@@ -435,6 +436,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          done_at?: string | null
           id?: string
           lock_reason?: string | null
           locked_at?: string | null
@@ -446,6 +448,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          done_at?: string | null
           id?: string
           lock_reason?: string | null
           locked_at?: string | null
@@ -665,6 +668,33 @@ export type Database = {
           id?: string
           passcode_hash?: string
           passcode_length?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      journal_voice_requests: {
+        Row: {
+          created_at: string
+          denial_message: string | null
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          denial_message?: string | null
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          denial_message?: string | null
+          id?: string
+          status?: string
           updated_at?: string
           user_id?: string
         }
@@ -1409,6 +1439,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      claim_journal_voice: { Args: { p_user: string }; Returns: string }
       commit_guard_trade: {
         Args: {
           p_account: string
@@ -1584,6 +1615,32 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      set_guard_done: {
+        Args: {
+          p_expected: string
+          p_revert: boolean
+          p_session: string
+          p_user: string
+        }
+        Returns: {
+          created_at: string
+          done_at: string | null
+          id: string
+          lock_reason: string | null
+          locked_at: string | null
+          note_date: string
+          period: string
+          session_key: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "guard_sessions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       submit_indicator_request: {
         Args: {
           p_indicator: string
@@ -1616,6 +1673,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      sync_guard_journal: { Args: { p_session: string }; Returns: undefined }
       undo_guard_trade: {
         Args: { p_id: string; p_user: string }
         Returns: undefined
